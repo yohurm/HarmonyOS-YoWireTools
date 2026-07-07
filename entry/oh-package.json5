@@ -1,10 +1,22 @@
 {
   "name": "entry",
   "version": "1.0.0",
-  "description": "Please describe the basic information.",
+  "description": "YoWire entry module",
   "main": "",
   "author": "",
-  "license": "",
-  "dependencies": {}
+  "license": "Apache-2.0",
+  "dependencies": {
+    "common_core": "file:../common/core",
+    "common_platform": "file:../common/platform",
+    "common_storage": "file:../common/storage",
+    "common_ui": "file:../common/ui",
+    "feature_debug_core": "file:../features/debug_core",
+    "feature_bluetooth": "file:../features/bluetooth",
+    "feature_wifi_network": "file:../features/wifi_network",
+    "feature_nearlink": "file:../features/nearlink",
+    "feature_home": "file:../features/home",
+    "feature_log_center": "file:../features/log_center",
+    "feature_command_center": "file:../features/command_center",
+    "feature_settings": "file:../features/settings"
+  }
 }
-

@@ -2,15 +2,67 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "YoWire wireless debugging tools"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "YoWire entry ability"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "YoWire"
+    },
+    {
+      "name": "perm_bluetooth_reason",
+      "value": "Bluetooth scan and connection debugging"
+    },
+    {
+      "name": "perm_bluetooth_mac_reason",
+      "value": "Persistent Bluetooth peer address for debugging"
+    },
+    {
+      "name": "perm_wifi_info_reason",
+      "value": "WiFi scan and diagnostics"
+    },
+    {
+      "name": "perm_wifi_mac_reason",
+      "value": "Read real WiFi peer MAC for diagnostics"
+    },
+    {
+      "name": "perm_wifi_control_reason",
+      "value": "WiFi configuration debugging"
+    },
+    {
+      "name": "perm_internet_reason",
+      "value": "Network socket and HTTP debugging"
+    },
+    {
+      "name": "perm_network_info_reason",
+      "value": "Read network connection status"
+    },
+    {
+      "name": "perm_nearlink_reason",
+      "value": "NearLink wireless debugging"
+    },
+    {
+      "name": "tab_workbench",
+      "value": "工作台"
+    },
+    {
+      "name": "tab_bluetooth",
+      "value": "蓝牙"
+    },
+    {
+      "name": "tab_network",
+      "value": "网络"
+    },
+    {
+      "name": "tab_nearlink",
+      "value": "星闪"
+    },
+    {
+      "name": "tab_more",
+      "value": "更多"
     }
   ]
 }

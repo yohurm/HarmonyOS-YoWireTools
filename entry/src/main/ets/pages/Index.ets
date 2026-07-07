@@ -1,23 +1,29 @@
+import { UIContextRegistry } from 'common_platform';
+import { UiColorToken } from 'common_ui';
+import { AppRoutes } from '../navigation/AppRoutes';
+import { MainTabContainer } from '../shell/MainTabContainer';
+
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @State message: string = 'Hello World';
+  @Local activeTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
+
+  aboutToAppear(): void {
+    UIContextRegistry.getInstance().bind(this.getUIContext());
+  }
 
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('HelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
-        .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
-        })
-        .onClick(() => {
-          this.message = 'Welcome';
-        })
+    Column() {
+      MainTabContainer({
+        currentTabIndex: this.activeTabIndex,
+        onTabChange: (index: number) => {
+          this.activeTabIndex = index;
+        }
+      })
     }
-    .height('100%')
     .width('100%')
+    .height('100%')
+    .backgroundColor(UiColorToken.BACKGROUND)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }
