@@ -1,0 +1,26 @@
+{
+  "color": [
+    { "name": "ui_primary", "value": "#0A59F7" },
+    { "name": "ui_primary_pressed", "value": "#084BCF" },
+    { "name": "ui_brand_secondary", "value": "#0A59F7" },
+    { "name": "ui_text_primary", "value": "#E5000000" },
+    { "name": "ui_text_secondary", "value": "#99000000" },
+    { "name": "ui_text_tertiary", "value": "#66000000" },
+    { "name": "ui_text_inverse", "value": "#FFFFFFFF" },
+    { "name": "ui_background", "value": "#FFF1F3F5" },
+    { "name": "ui_background_secondary", "value": "#FFE5E5EA" },
+    { "name": "ui_surface", "value": "#FFFFFFFF" },
+    { "name": "ui_comp_raised", "value": "#FFFFFFFF" },
+    { "name": "ui_border", "value": "#33000000" },
+    { "name": "ui_interactive_pressed", "value": "#19000000" },
+    { "name": "ui_error", "value": "#E84026" },
+    { "name": "ui_warning", "value": "#ED6F21" },
+    { "name": "ui_success", "value": "#64BB5C" },
+    { "name": "ui_info", "value": "#0A59F7" },
+    { "name": "ui_emphasize_tertiary", "value": "#190A59F7" },
+    { "name": "ui_scrim", "value": "#80000000" },
+    { "name": "ui_terminal_background", "value": "#FFF1F3F5" },
+    { "name": "ui_terminal_inbound", "value": "#0A59F7" },
+    { "name": "ui_terminal_outbound", "value": "#64BB5C" }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "common_core",
+  "version": "1.0.0",
+  "description": "Core primitives: Result, async queue, encoding, observable, monotonic clock and task executor contracts.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

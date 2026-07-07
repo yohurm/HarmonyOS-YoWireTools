@@ -1,0 +1,11 @@
+{
+  "name": "common_platform",
+  "version": "1.0.0",
+  "description": "YoWire platform layer: permission, capability, lifecycle, logging",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "common_core": "file:../core"
+  }
+}

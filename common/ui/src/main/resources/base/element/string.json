@@ -1,0 +1,52 @@
+{
+  "string": [
+    {
+      "name": "ui_error_default_title",
+      "value": "出错了"
+    },
+    {
+      "name": "ui_retry",
+      "value": "重试"
+    },
+    {
+      "name": "ui_empty_default_title",
+      "value": "暂无数据"
+    },
+    {
+      "name": "ui_empty_default_message",
+      "value": "当前没有可显示的内容"
+    },
+    {
+      "name": "ui_loading_default_message",
+      "value": "加载中..."
+    },
+    {
+      "name": "ui_grant_permission",
+      "value": "去授权"
+    },
+    {
+      "name": "ui_open_settings",
+      "value": "打开设置"
+    },
+    {
+      "name": "tab_workbench",
+      "value": "工作台"
+    },
+    {
+      "name": "tab_bluetooth",
+      "value": "蓝牙"
+    },
+    {
+      "name": "tab_network",
+      "value": "网络"
+    },
+    {
+      "name": "tab_nearlink",
+      "value": "星闪"
+    },
+    {
+      "name": "tab_more",
+      "value": "更多"
+    }
+  ]
+}
