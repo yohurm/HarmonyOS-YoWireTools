@@ -1,6 +1,6 @@
 {
   "modelVersion": "6.1.0",
-  "description": "Please describe the basic information.",
+  "description": "YoWire wireless debug tools for HarmonyOS: Bluetooth, WiFi/network, NearLink sessions, unified logs, command center, and settings.",
   "dependencies": {
   },
   "devDependencies": {
