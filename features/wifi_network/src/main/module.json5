@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "feature_wifi_network",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
