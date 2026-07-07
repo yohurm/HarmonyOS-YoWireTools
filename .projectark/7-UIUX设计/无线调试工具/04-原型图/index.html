@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YoWire APP 原型图画板</title>
+  <link rel="stylesheet" href="./prototype.css">
+</head>
+<body>
+  <header class="canvas-header">
+    <div>
+      <h1>YoWire APP 原型图画板</h1>
+      <p>HTML 仅作为原型图载体。主体按手机和平板两个版块排布，不再使用网页式产品页结构。</p>
+    </div>
+    <div class="source-strip" aria-label="设计依据">
+      <span class="chip primary">Figma flows</span>
+      <span class="chip cyan">NN/g mobile & tablet</span>
+      <span class="chip success">HarmonyOS 4/8/12 栅格</span>
+      <span class="chip warning">手机 + 平板</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="board" id="rules">
+      <div class="board-title">
+        <div>
+          <h2>原型排布规则</h2>
+          <p>联网研究后的落地规则：按设备 frame 和用户 flow 排布，而不是按网页区块排布。每个 frame 都是 APP 画面，包含状态栏、安全区、导航、主任务区和恢复路径。</p>
+        </div>
+        <span class="chip primary">Prototype board</span>
+      </div>
+      <div class="flow-note">
+        <div class="note-card"><strong>手机区</strong><span>390×844，底部 Tab，单栈任务路径。</span></div>
+        <div class="note-card"><strong>平板区</strong><span>1024×768，侧边导航 + 双栏任务区。</span></div>
+        <div class="note-card"><strong>Flow</strong><span>蓝牙、WiFi、星闪、全局状态分别成组。</span></div>
+        <div class="note-card"><strong>完整性</strong><span>覆盖发现、配置、执行、观察、恢复、导出。</span></div>
+      </div>
+    </section>
+
+    <section class="board" id="phone">
+      <div class="board-title">
+        <div>
+          <h2>手机原型图</h2>
+          <p>手机采用单栈 APP 流程。页面不横向塞满信息，而是通过列表、详情、日志、Sheet/Dialog 分层进入。</p>
+        </div>
+        <span class="chip success">390×844</span>
+      </div>
+
+      <div class="phone-grid">
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 01 · 工作台</strong><span class="connector">进入模块 flow</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>YoWire</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>工作台</h3><span class="mini-chip success">Ready</span></div>
+                <div class="banner info"><strong>后台会话正在运行</strong><span>SPP 终端保留连接，点击可返回。</span></div>
+                <div class="card-grid">
+                  <div class="card"><h4>蓝牙</h4><p>权限待授权，2 个最近设备。</p><span class="mini-chip warning">扫描前授权</span></div>
+                  <div class="card"><h4>WiFi</h4><p>Yovo-Lab，-51 dBm，IP 已获取。</p><span class="mini-chip success">可调试</span></div>
+                  <div class="card"><h4>星闪</h4><p>能力 Ready，SSAP 与 DT 可用。</p><span class="mini-chip success">Ready</span></div>
+                  <div class="card"><h4>快捷任务</h4><p>GATT、SPP、TCP、SSAP。</p><span class="mini-chip primary">继续</span></div>
+                </div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>SPP 后台会话</span><span class="mini-chip primary">进入</span></div><div class="row-meta"><span>HS02 Factory</span><span>收 3.2KB</span><span>周期发送暂停</span></div></div>
+                  <div class="row"><div class="row-head"><span>MQTT Pub/Sub</span><span class="mini-chip">导出</span></div><div class="row-meta"><span>broker.local</span><span>48 logs</span></div></div>
+                  <div class="row"><div class="row-head"><span>星闪 SSAP</span><span class="mini-chip">继续</span></div><div class="row-meta"><span>NearLink Sensor</span><span>MTU 256</span></div></div>
+                </div>
+              </div>
+              <div class="tabbar"><div class="active">工作台</div><div>蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 02 · 蓝牙 BLE 扫描</strong><span class="connector">过滤 Sheet</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>蓝牙</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>蓝牙</h3><span class="mini-chip">设置</span></div>
+                <div class="seg"><span class="active">GATT</span><span>SPP</span><span>UART</span><span>实验</span></div>
+                <div class="banner info"><strong>扫描中，剩余 8 秒</strong><span>连接前自动 stopScan，避免连接失败。</span></div>
+                <div class="toolbar"><span class="action primary">扫描</span><span class="action">过滤</span><span class="action">停止</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>Yovo Sensor A1</span><span class="mini-chip success">-48</span></div><div class="row-meta"><span>C0:98:E5:11:02:3A</span><span>FFF0</span><span>Mfg 0x06</span></div></div>
+                  <div class="row"><div class="row-head"><span>Nordic UART</span><span class="mini-chip cyan">UART</span></div><div class="row-meta"><span>NUS</span><span>Notify</span><span>RSSI -55</span></div></div>
+                  <div class="row"><div class="row-head"><span>Unknown Device</span><span class="mini-chip warning">-73</span></div><div class="row-meta"><span>Service Mask</span><span>Adv 31B</span></div></div>
+                </div>
+                <div class="banner warn"><strong>权限状态</strong><span>仅在点击扫描时请求，不阻断启动。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 03 · BLE GATT 详情</strong><span class="connector">服务树 + 日志</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>GATT</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>Yovo Sensor A1</h3><span class="mini-chip success">已连接</span></div>
+                <div class="metrics"><div class="metric"><strong>-48</strong><span>RSSI</span></div><div class="metric"><strong>247</strong><span>MTU</span></div><div class="metric"><strong>4.5K</strong><span>字节</span></div></div>
+                <div class="tree">
+                  <div class="node"><strong>Service 180F</strong><div class="child">2A19 Battery <span class="mini-chip">Read</span></div></div>
+                  <div class="node"><strong>Service FFF0</strong><div class="child">FFF1 RX <span class="mini-chip primary">Write</span></div><div class="child">FFF2 TX <span class="mini-chip success">Notify</span></div></div>
+                </div>
+                <div class="log">
+                  <div><span>10:23</span><span>TX</span><span>FFF1 01 03 00 2A</span></div>
+                  <div><span>10:23</span><span>RX</span><span>FFF2 81 03 00 2A 00</span></div>
+                  <div><span>10:24</span><span>EVT</span><span>MTU changed to 247</span></div>
+                </div>
+                <div class="toolbar"><span class="action">暂停</span><span class="action">清空</span><span class="action primary">导出</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 04 · 经典 SPP 终端</strong><span class="connector">UUID Sheet</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>SPP</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>经典 SPP</h3><span class="mini-chip success">后台可保留</span></div>
+                <div class="seg"><span>已配对</span><span class="active">终端</span><span>附近</span></div>
+                <div class="banner good"><strong>HS02 Factory 已连接</strong><span>UUID 00001101-0000-1000-8000-00805F9B34FB</span></div>
+                <div class="terminal">
+                  <div class="terminal-head"><strong>原始字节日志</strong><span class="mini-chip">Text/HEX</span></div>
+                  <div class="terminal-body">&gt;&gt; AT^GET_SW_VERSION\r\n<br>&lt;&lt; +SW: 1.2.8<br>&gt;&gt; 02 10 00 FF<br>&lt;&lt; 02 90 00 00</div>
+                  <div class="input-dock"><div class="seg"><span class="active">Text</span><span>HEX</span></div><div class="input">AT^GET_SW_VERSION</div><span class="action primary">发送</span></div>
+                </div>
+                <div class="banner warn"><strong>返回时确认</strong><span>断开 / 后台保留 / 取消。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 05 · WiFi 环境分析</strong><span class="connector">AP 详情</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>WiFi</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>WiFi 环境</h3><span class="mini-chip">设置</span></div>
+                <div class="seg"><span class="active">环境</span><span>协议</span><span>诊断</span></div>
+                <div class="banner good"><strong>当前网络 Yovo-Lab</strong><span>IP 192.168.1.36，RSSI -51 dBm。</span></div>
+                <div class="toolbar"><span class="action primary">刷新 AP</span><span class="action">过滤</span><span class="action">导出</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>Yovo-Lab</span><span class="mini-chip success">-51</span></div><div class="row-meta"><span>5G Ch149</span><span>WPA3</span><span>802.11ax</span></div></div>
+                  <div class="row"><div class="row-head"><span>Hidden SSID</span><span class="mini-chip warning">受限</span></div><div class="row-meta"><span>BSSID 受限</span><span>2.4G Ch6</span></div></div>
+                </div>
+                <div class="chart"><strong>信道占用</strong><div class="bars"><span style="height:40%"></span><span style="height:70%"></span><span style="height:32%"></span><span style="height:58%"></span><span style="height:85%"></span><span style="height:44%"></span><span style="height:62%"></span><span style="height:38%"></span><span style="height:76%"></span><span style="height:55%"></span></div><span class="subtitle">选中 AP：Ch149，干扰低。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div class="active">WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 06 · 网络协议调试</strong><span class="connector">Traffic Log</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>网络协议</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>网络协议</h3><span class="mini-chip primary">TCP</span></div>
+                <div class="seg"><span class="active">TCP</span><span>UDP</span><span>HTTP</span><span>WS</span><span>MQTT</span></div>
+                <div class="card-grid">
+                  <div class="card"><h4>Host</h4><p>192.168.1.10</p></div>
+                  <div class="card"><h4>Port</h4><p>9000</p></div>
+                </div>
+                <div class="terminal">
+                  <div class="terminal-head"><strong>Traffic Log</strong><span class="mini-chip">TXT/CSV/JSON</span></div>
+                  <div class="terminal-body">&gt;&gt; TCP 32B hello-device<br>&lt;&lt; ACK 48B latency=18ms<br>&gt;&gt; HTTP GET /status<br>&lt;&lt; 200 OK</div>
+                  <div class="input-dock"><div class="seg"><span class="active">Text</span><span>HEX</span></div><div class="input">hello-device</div><span class="action primary">发送</span></div>
+                </div>
+                <div class="banner warn"><strong>UDP 广播</strong><span>广播发送使用风险 Dialog。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div class="active">WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 07 · 星闪能力与 SSAP</strong><span class="connector">能力先行</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>星闪</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>星闪</h3><span class="mini-chip success">Ready</span></div>
+                <div class="banner good"><strong>能力检测通过</strong><span>设备支持、权限允许、SSAP/DT 可用。</span></div>
+                <div class="seg"><span>能力</span><span class="active">SSAP</span><span>DT</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>NearLink Sensor</span><span class="mini-chip success">-45</span></div><div class="row-meta"><span>发现 12 次</span><span>Service 1020</span></div></div>
+                  <div class="row"><div class="row-head"><span>NL Beacon</span><span class="mini-chip warning">无信号</span></div><div class="row-meta"><span>RSSI 127</span><span>广播详情</span></div></div>
+                </div>
+                <div class="tree"><div class="node"><strong>SSAP Service 1020</strong><div class="child">Attr 0001 Read</div><div class="child">Attr 0002 Write</div><div class="child">Attr 0003 Subscribe</div></div></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div>WiFi</div><div class="active">星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 08 · 星闪 dataTransfer</strong><span class="connector">加密固定条</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>dataTransfer</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>DT 终端</h3><span class="mini-chip success">已连接</span></div>
+                <div class="banner warn"><strong>加密状态：未知</strong><span>不标记安全，发送前按策略阻止或确认。</span></div>
+                <div class="card-grid">
+                  <div class="card"><h4>Port UUID</h4><p>9f41-0001</p></div>
+                  <div class="card"><h4>MTU</h4><p>256</p></div>
+                </div>
+                <div class="terminal">
+                  <div class="terminal-head"><strong>原始字节</strong><span class="mini-chip">HEX</span></div>
+                  <div class="terminal-body">&gt;&gt; 04 80 01 00 00<br>&lt;&lt; ACK seq=7<br>&lt;&lt; RX 04 90 00 00</div>
+                  <div class="input-dock"><div class="seg"><span class="active">HEX</span><span>Text</span></div><div class="input">04 80 01</div><span class="action primary">发送</span></div>
+                </div>
+                <div class="banner bad"><strong>风险确认</strong><span>未加密或未知状态发送使用 Dialog。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div>WiFi</div><div class="active">星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 09 · 更多设置</strong><span class="connector">全局设置</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>更多</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>更多</h3><span class="mini-chip">全局</span></div>
+                <div class="settings">
+                  <div class="setting-row"><div><strong>外观</strong><p>主题、字体、日志密度。</p></div><div class="switch"></div></div>
+                  <div class="setting-row"><div><strong>存储</strong><p>日志保存位置、保留周期。</p></div><span class="mini-chip">JSON</span></div>
+                  <div class="setting-row"><div><strong>隐私</strong><p>导出前脱敏地址、SSID、Host。</p></div><span class="mini-chip warning">开启</span></div>
+                  <div class="setting-row"><div><strong>后台</strong><p>通知与后台可见性。</p></div><span class="mini-chip success">已开启</span></div>
+                  <div class="setting-row"><div><strong>关于</strong><p>版本、开源许可、诊断信息。</p></div><span class="mini-chip">1.0</span></div>
+                </div>
+                <div class="banner info"><strong>边界</strong><span>不承载模块日志和模块命令。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div>WiFi</div><div>星闪</div><div class="active">更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 10 · 权限 / 导出 / 风险</strong><span class="connector">Sheet + Dialog</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>状态</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>任务状态</h3><span class="mini-chip warning">需处理</span></div>
+                <div class="banner warn"><strong>蓝牙扫描权限被拒绝</strong><span>授权后自动回到扫描列表。</span></div>
+                <div class="sheet" style="position:static;width:auto;box-shadow:none">
+                  <h4>导出会话</h4>
+                  <div class="form">
+                    <div class="field"><label>格式</label><div>TXT / CSV / JSON</div></div>
+                    <div class="field"><label>范围</label><div>全部 / 最近 10 分钟</div></div>
+                    <div class="field"><label>脱敏</label><div>地址、SSID、Host</div></div>
+                  </div>
+                </div>
+                <div class="dialog" style="position:static;width:auto;box-shadow:none">
+                  <h4>未加密发送确认</h4>
+                  <p class="subtitle">当前星闪 DT 加密状态未知。确认后仅发送本次 Payload。</p>
+                  <div class="toolbar"><span class="action">取消</span><span class="action primary">确认发送</span></div>
+                </div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div>WiFi</div><div>星闪</div><div class="active">更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 11 · BLE 高级扫描与广告详情</strong><span class="connector">nRF / LightBlue 补齐</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>BLE Advanced</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>广告详情</h3><span class="mini-chip primary">Raw Adv</span></div>
+                <div class="seg"><span class="active">广告</span><span>RSSI</span><span>过滤</span><span>导出</span></div>
+                <div class="card-grid">
+                  <div class="card"><h4>Flags</h4><p>LE General Discoverable, BR/EDR Not Supported</p></div>
+                  <div class="card"><h4>Connectable</h4><p>ADV_IND，可连接。</p></div>
+                  <div class="card"><h4>Manufacturer</h4><p>0x0059 · 06 01 02 03 FF</p></div>
+                  <div class="card"><h4>Service UUID</h4><p>180F, FFF0, FEAA</p></div>
+                </div>
+                <div class="chart"><strong>RSSI 时间线</strong><div class="bars"><span style="height:50%"></span><span style="height:54%"></span><span style="height:48%"></span><span style="height:62%"></span><span style="height:58%"></span><span style="height:65%"></span><span style="height:60%"></span><span style="height:55%"></span><span style="height:68%"></span><span style="height:57%"></span></div><span class="subtitle">支持暂停扫描、CSV 导出、Beacon 识别。</span></div>
+                <div class="banner info"><strong>高级过滤</strong><span>Name / MAC / RSSI / Service / Manufacturer Mask / Bonded / Connectable。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 12 · BLE 工具箱</strong><span class="connector">Profile / DFU / GATT Server</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>BLE Tools</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>BLE 工具箱</h3><span class="mini-chip">实验室</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>BLE UART Profile</span><span class="mini-chip success">Ready</span></div><div class="row-meta"><span>NUS</span><span>HM-10</span><span>自定义 UUID</span></div></div>
+                  <div class="row"><div class="row-head"><span>GATT Server / 虚拟外设</span><span class="mini-chip primary">启动</span></div><div class="row-meta"><span>Battery</span><span>UART</span><span>自定义服务</span></div></div>
+                  <div class="row"><div class="row-head"><span>Advertiser / Beacon</span><span class="mini-chip">编辑</span></div><div class="row-meta"><span>iBeacon</span><span>Eddystone</span><span>Raw Adv</span></div></div>
+                  <div class="row"><div class="row-head"><span>DFU / Throughput</span><span class="mini-chip warning">风险</span></div><div class="row-meta"><span>固件包</span><span>速率</span><span>丢包</span></div></div>
+                </div>
+                <div class="banner warn"><strong>高风险能力</strong><span>DFU、Advertiser、GATT Server 使用风险确认和能力检测。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 13 · SPP 设备 / UUID / 宏</strong><span class="connector">Serial Terminal 补齐</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>SPP Devices</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>SPP 连接</h3><span class="mini-chip">RFCOMM</span></div>
+                <div class="seg"><span class="active">设备</span><span>UUID</span><span>宏</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>HS02 Factory</span><span class="mini-chip success">已配对</span></div><div class="row-meta"><span>00:11:22:33:44:55</span><span>最近连接</span></div></div>
+                  <div class="row"><div class="row-head"><span>附近 Inquiry</span><span class="mini-chip warning">12s</span></div><div class="row-meta"><span>RSSI</span><span>Class</span><span>未配对引导</span></div></div>
+                </div>
+                <div class="card-grid">
+                  <div class="card"><h4>UUID</h4><p>标准 SPP、自定义 UUID、最近 UUID。</p></div>
+                  <div class="card"><h4>连接模式</h4><p>Secure / Insecure，失败可重试。</p></div>
+                  <div class="card"><h4>宏命令</h4><p>AT、HEX、延迟、循环。</p></div>
+                  <div class="card"><h4>终端设置</h4><p>CR/LF、Local Echo、Timestamp。</p></div>
+                </div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div class="active">蓝牙</div><div>WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 14 · WiFi 诊断工具箱</strong><span class="connector">PingTools / HE.NET 补齐</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>诊断</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>网络诊断</h3><span class="mini-chip primary">Tools</span></div>
+                <div class="seg"><span>LAN</span><span class="active">诊断</span><span>历史</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>Ping / GeoPing</span><span class="mini-chip success">18ms</span></div><div class="row-meta"><span>丢包 0%</span><span>延迟图</span><span>原始输出</span></div></div>
+                  <div class="row"><div class="row-head"><span>Traceroute</span><span class="mini-chip">12 hops</span></div><div class="row-meta"><span>IPv4/IPv6</span><span>复制结果</span></div></div>
+                  <div class="row"><div class="row-head"><span>Port Scan</span><span class="mini-chip warning">风险</span></div><div class="row-meta"><span>22</span><span>80</span><span>1883</span><span>9000</span></div></div>
+                  <div class="row"><div class="row-head"><span>DNS / Whois / SSL</span><span class="mini-chip">查询</span></div><div class="row-meta"><span>A/AAAA</span><span>证书</span><span>域名历史</span></div></div>
+                </div>
+                <div class="banner info"><strong>LAN 扫描</strong><span>mDNS、Bonjour、UPnP、Ping Sweep、主机厂商。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div class="active">WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 15 · WiFi 协议模板</strong><span class="connector">TCP/UDP/HTTP/WS/MQTT</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>协议模板</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>协议命令</h3><span class="mini-chip">模块内</span></div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>TCP Modbus Probe</span><span class="mini-chip primary">运行</span></div><div class="row-meta"><span>192.168.1.10:502</span><span>HEX</span><span>超时 3s</span></div></div>
+                  <div class="row"><div class="row-head"><span>UDP Broadcast Discover</span><span class="mini-chip warning">Dialog</span></div><div class="row-meta"><span>255.255.255.255</span><span>广播风险</span></div></div>
+                  <div class="row"><div class="row-head"><span>HTTP Device Status</span><span class="mini-chip">GET</span></div><div class="row-meta"><span>Headers</span><span>Body</span><span>历史</span></div></div>
+                  <div class="row"><div class="row-head"><span>MQTT Publish</span><span class="mini-chip success">QoS 1</span></div><div class="row-meta"><span>retain off</span><span>topic/yovo/debug</span></div></div>
+                </div>
+                <div class="banner info"><strong>Traffic Log</strong><span>请求、响应、状态码、耗时、Frame、Payload 原始数据。</span></div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div class="active">WiFi</div><div>星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Phone 16 · 星闪广播 / 恢复</strong><span class="connector">NearLink 补齐</span></div>
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="statusbar"><span>9:41</span><span>NearLink Lab</span><span>100%</span></div>
+              <div class="app-page">
+                <div class="title-row"><h3>星闪能力</h3><span class="mini-chip success">SLE</span></div>
+                <div class="card-grid">
+                  <div class="card"><h4>支持状态</h4><p>SLE 可用，SLB 未开放。</p><span class="mini-chip success">通过</span></div>
+                  <div class="card"><h4>开关状态</h4><p>系统星闪开关已开启。</p><span class="mini-chip success">On</span></div>
+                  <div class="card"><h4>权限</h4><p>扫描和连接已授权。</p><span class="mini-chip success">Allowed</span></div>
+                  <div class="card"><h4>API</h4><p>SSAP、DT 可调用。</p><span class="mini-chip success">Ready</span></div>
+                </div>
+                <div class="list">
+                  <div class="row selected"><div class="row-head"><span>发送广播</span><span class="mini-chip primary">Start</span></div><div class="row-meta"><span>Raw Adv</span><span>Service</span><span>Manufacturer</span></div></div>
+                  <div class="row"><div class="row-head"><span>拥塞退避</span><span class="mini-chip warning">1009700023</span></div><div class="row-meta"><span>自动降频</span><span>保留错误码</span></div></div>
+                  <div class="row"><div class="row-head"><span>FAQ / 降级</span><span class="mini-chip">帮助</span></div><div class="row-meta"><span>Unsupported</span><span>Simulator</span><span>Denied</span></div></div>
+                </div>
+              </div>
+              <div class="tabbar"><div>工作台</div><div>蓝牙</div><div>WiFi</div><div class="active">星闪</div><div>更多</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" id="tablet">
+      <div class="board-title">
+        <div>
+          <h2>平板原型图</h2>
+          <p>平板不是手机放大版。这里采用侧边导航与双栏任务区：左侧稳定放模块导航，中间放对象列表，右侧放详情、终端、日志、图表或设置。</p>
+        </div>
+        <span class="chip success">1024×768</span>
+      </div>
+
+      <div class="tablet-grid">
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 01 · 工作台</strong><span class="connector">侧边导航 + 任务摘要</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>YoWire 平板</span><span>WiFi · 100%</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">工作台 <span>3</span></div>
+                  <div class="nav-item">蓝牙 <span>2</span></div>
+                  <div class="nav-item">WiFi <span>4</span></div>
+                  <div class="nav-item">星闪 <span>Ready</span></div>
+                  <div class="nav-item">更多 <span>设置</span></div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>运行中</h3><span class="mini-chip primary">Session</span></div>
+                  <div class="row selected"><div class="row-head"><span>SPP 后台会话</span><span class="mini-chip primary">进入</span></div><div class="row-meta"><span>HS02 Factory</span><span>3.2KB</span><span>暂停周期发送</span></div></div>
+                  <div class="row"><div class="row-head"><span>MQTT Pub/Sub</span><span class="mini-chip">导出</span></div><div class="row-meta"><span>broker.local</span><span>48 logs</span></div></div>
+                  <div class="row"><div class="row-head"><span>星闪 SSAP</span><span class="mini-chip success">Ready</span></div><div class="row-meta"><span>NearLink Sensor</span><span>MTU 256</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>模块能力摘要</h3><span class="mini-chip success">不阻断启动</span></div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>蓝牙</h4><p>权限待授权，点击扫描时请求。</p><span class="mini-chip warning">需授权</span></div>
+                    <div class="card"><h4>WiFi</h4><p>Yovo-Lab，IP 192.168.1.36。</p><span class="mini-chip success">可调试</span></div>
+                    <div class="card"><h4>星闪</h4><p>能力 Ready，DT 加密策略开启。</p><span class="mini-chip success">Ready</span></div>
+                  </div>
+                  <div class="chart"><strong>最近会话日志量</strong><div class="bars"><span style="height:40%"></span><span style="height:62%"></span><span style="height:35%"></span><span style="height:82%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:48%"></span><span style="height:76%"></span><span style="height:38%"></span><span style="height:64%"></span></div><span class="subtitle">点击任意会话 deep link 到模块内页面，不进入全局日志中心。</span></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 02 · 蓝牙模块</strong><span class="connector">设备列表 + 服务树</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>蓝牙</span><span>WiFi · 100%</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">BLE GATT</div>
+                  <div class="nav-item">经典 SPP</div>
+                  <div class="nav-item">BLE UART</div>
+                  <div class="nav-item">实验室</div>
+                  <div class="nav-item">蓝牙设置</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>BLE 设备</h3><span class="mini-chip primary">扫描</span></div>
+                  <div class="banner info"><strong>扫描中</strong><span>连接前自动 stopScan。</span></div>
+                  <div class="row selected"><div class="row-head"><span>Yovo Sensor A1</span><span class="mini-chip success">-48</span></div><div class="row-meta"><span>C0:98:E5</span><span>FFF0</span><span>Mfg</span></div></div>
+                  <div class="row"><div class="row-head"><span>Nordic UART</span><span class="mini-chip cyan">UART</span></div><div class="row-meta"><span>NUS</span><span>Notify</span></div></div>
+                  <div class="row"><div class="row-head"><span>HS02 Factory</span><span class="mini-chip">SPP</span></div><div class="row-meta"><span>已配对</span><span>UUID 最近</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>Yovo Sensor A1</h3><span class="mini-chip success">已连接</span></div>
+                  <div class="metrics"><div class="metric"><strong>-48</strong><span>RSSI</span></div><div class="metric"><strong>247</strong><span>MTU</span></div><div class="metric"><strong>18</strong><span>Logs</span></div></div>
+                  <div class="tablet-two">
+                    <div class="tree"><div class="node"><strong>FFF0 Vendor</strong><div class="child">FFF1 Write</div><div class="child">FFF2 Notify</div></div><div class="node"><strong>180F Battery</strong><div class="child">2A19 Read</div></div></div>
+                    <div class="terminal"><div class="terminal-head"><strong>Write / Notify</strong><span class="mini-chip">HEX</span></div><div class="terminal-body">&gt;&gt; FFF1 01 03 00 2A<br>&lt;&lt; FFF2 81 03 00 2A 00<br>&lt;&lt; Notify Battery 87%</div><div class="input-dock"><div class="seg"><span class="active">HEX</span><span>Text</span></div><div class="input">01 03 00 2A</div><span class="action primary">发送</span></div></div>
+                  </div>
+                  <div class="log"><div><span>10:23</span><span>TX</span><span>FFF1 01 03 00 2A</span></div><div><span>10:23</span><span>RX</span><span>FFF2 81 03 00 2A 00</span></div><div><span>10:24</span><span>EVT</span><span>MTU changed to 247</span></div></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 03 · WiFi 模块</strong><span class="connector">AP + 图表 + 协议</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>WiFi</span><span>Yovo-Lab</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">环境分析</div>
+                  <div class="nav-item">网络协议</div>
+                  <div class="nav-item">LAN/诊断</div>
+                  <div class="nav-item">WiFi 设置</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>AP 列表</h3><span class="mini-chip">过滤</span></div>
+                  <div class="row selected"><div class="row-head"><span>Yovo-Lab</span><span class="mini-chip success">-51</span></div><div class="row-meta"><span>5G Ch149</span><span>WPA3</span><span>802.11ax</span></div></div>
+                  <div class="row"><div class="row-head"><span>Hidden SSID</span><span class="mini-chip warning">受限</span></div><div class="row-meta"><span>BSSID 受限</span><span>2.4G</span></div></div>
+                  <div class="row"><div class="row-head"><span>Factory_AP</span><span class="mini-chip">-65</span></div><div class="row-meta"><span>WPA2</span><span>Ch36</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>环境与协议</h3><span class="mini-chip primary">双栏详情</span></div>
+                  <div class="tablet-two">
+                    <div class="chart"><strong>信道占用</strong><div class="bars"><span style="height:40%"></span><span style="height:72%"></span><span style="height:32%"></span><span style="height:58%"></span><span style="height:84%"></span><span style="height:44%"></span><span style="height:62%"></span><span style="height:38%"></span><span style="height:76%"></span><span style="height:55%"></span></div><span class="subtitle">AP 不放在 C 栏 Tab 内，B 栏稳定显示。</span></div>
+                    <div class="terminal"><div class="terminal-head"><strong>TCP Client</strong><span class="mini-chip success">Connected</span></div><div class="terminal-body">&gt;&gt; TCP hello-device<br>&lt;&lt; ACK latency=18ms<br>&gt;&gt; MQTT topic=yovo/debug</div><div class="input-dock"><div class="seg"><span class="active">Text</span><span>HEX</span></div><div class="input">hello-device</div><span class="action primary">发送</span></div></div>
+                  </div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>HTTP</h4><p>GET/POST、Headers、Body。</p></div>
+                    <div class="card"><h4>WebSocket</h4><p>Frame Log、断线重连。</p></div>
+                    <div class="card"><h4>MQTT</h4><p>QoS、retain、Pub/Sub。</p></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 04 · 星闪模块</strong><span class="connector">能力 + SSAP + DT</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>星闪</span><span>Ready</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item">能力检测</div>
+                  <div class="nav-item active">SSAP Client</div>
+                  <div class="nav-item">dataTransfer</div>
+                  <div class="nav-item">星闪设置</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="banner good"><strong>能力 Ready</strong><span>Unsupported 状态下显示单栏占位，不显示空白扫描。</span></div>
+                  <div class="row selected"><div class="row-head"><span>NearLink Sensor</span><span class="mini-chip success">-45</span></div><div class="row-meta"><span>发现 12 次</span><span>Service 1020</span></div></div>
+                  <div class="row"><div class="row-head"><span>NL Beacon</span><span class="mini-chip warning">无信号</span></div><div class="row-meta"><span>RSSI 127</span><span>广播详情</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>SSAP / dataTransfer</h3><span class="mini-chip warning">加密条固定</span></div>
+                  <div class="banner warn"><strong>DT 加密状态：未知</strong><span>不标记安全；发送前按策略阻止或确认。</span></div>
+                  <div class="tablet-two">
+                    <div class="tree"><div class="node"><strong>SSAP Service 1020</strong><div class="child">Attr 0001 Read</div><div class="child">Attr 0002 Write</div><div class="child">Attr 0003 Subscribe</div></div></div>
+                    <div class="terminal"><div class="terminal-head"><strong>DT Terminal</strong><span class="mini-chip">HEX</span></div><div class="terminal-body">&gt;&gt; 04 80 01 00 00<br>&lt;&lt; ACK seq=7<br>&lt;&lt; RX 04 90 00 00</div><div class="input-dock"><div class="seg"><span class="active">HEX</span><span>Text</span></div><div class="input">04 80 01</div><span class="action primary">发送</span></div></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 05 · 模块设置</strong><span class="connector">命令归属模块</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>模块设置</span><span>100%</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">蓝牙设置</div>
+                  <div class="nav-item">WiFi 设置</div>
+                  <div class="nav-item">星闪设置</div>
+                  <div class="nav-item">更多</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>设置分组</h3><span class="mini-chip">NavDestination</span></div>
+                  <div class="row selected"><div class="row-head"><span>会话与日志</span><span class="mini-chip">导出</span></div><div class="row-meta"><span>TXT</span><span>CSV</span><span>JSON</span></div></div>
+                  <div class="row"><div class="row-head"><span>命令面板</span><span class="mini-chip primary">模块内</span></div><div class="row-meta"><span>GATT</span><span>SPP</span><span>UART</span></div></div>
+                  <div class="row"><div class="row-head"><span>扫描与连接</span><span class="mini-chip">默认值</span></div><div class="row-meta"><span>时长</span><span>RSSI</span><span>MTU</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>命令面板</h3><span class="mini-chip primary">无全局命令中心</span></div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>GATT Write</h4><p>绑定 Characteristic，支持 HEX。</p><span class="mini-chip">运行</span></div>
+                    <div class="card"><h4>SPP Text</h4><p>AT 命令模板和换行策略。</p><span class="mini-chip">编辑</span></div>
+                    <div class="card"><h4>UART HEX</h4><p>Profile 绑定和最近命令。</p><span class="mini-chip">复制</span></div>
+                  </div>
+                  <div class="settings">
+                    <div class="setting-row"><div><strong>后台保留连接</strong><p>返回时弹出保留连接确认。</p></div><div class="switch"></div></div>
+                    <div class="setting-row"><div><strong>导出默认脱敏</strong><p>地址、SSID、Host 默认脱敏。</p></div><span class="mini-chip warning">开启</span></div>
+                    <div class="setting-row"><div><strong>日志保留周期</strong><p>本地保存 30 天。</p></div><span class="mini-chip">30d</span></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 06 · 全局状态与弹层</strong><span class="connector">Sheet / Dialog</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>状态原型</span><span>100%</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">状态</div>
+                  <div class="nav-item">权限</div>
+                  <div class="nav-item">导出</div>
+                  <div class="nav-item">风险</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="row selected"><div class="row-head"><span>权限拒绝</span><span class="mini-chip warning">恢复</span></div><div class="row-meta"><span>Banner</span><span>去设置</span></div></div>
+                  <div class="row"><div class="row-head"><span>后台运行</span><span class="mini-chip success">通知</span></div><div class="row-meta"><span>工作台同步</span><span>模块状态条</span></div></div>
+                  <div class="row"><div class="row-head"><span>导出失败</span><span class="mini-chip danger">重试</span></div><div class="row-meta"><span>换格式</span><span>存储检查</span></div></div>
+                </section>
+                <section class="tablet-detail overlay-zone">
+                  <div class="title-row"><h3>弹层层级</h3><span class="mini-chip primary">任务上下文</span></div>
+                  <div class="banner warn"><strong>蓝牙扫描权限被拒绝</strong><span>权限恢复后回到原扫描任务，不跳出模块。</span></div>
+                  <div class="sheet">
+                    <h4>导出会话 Sheet</h4>
+                    <div class="form">
+                      <div class="field"><label>格式</label><div>TXT / CSV / JSON</div></div>
+                      <div class="field"><label>范围</label><div>全部 / 最近 10 分钟</div></div>
+                      <div class="field"><label>脱敏</label><div>地址、SSID、Host</div></div>
+                    </div>
+                  </div>
+                  <div class="dialog">
+                    <h4>UDP 广播风险 Dialog</h4>
+                    <p class="subtitle">广播可能影响同网段设备。确认后仅执行本次发送。</p>
+                    <div class="toolbar"><span class="action">取消</span><span class="action primary">确认发送</span></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 07 · BLE 高级工作台</strong><span class="connector">广告 / Profile / GATT Server</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>BLE Advanced</span><span>100%</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">高级扫描</div>
+                  <div class="nav-item">广告详情</div>
+                  <div class="nav-item">GATT Server</div>
+                  <div class="nav-item">Advertiser</div>
+                  <div class="nav-item">DFU / Throughput</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>扫描过滤器</h3><span class="mini-chip primary">6 维</span></div>
+                  <div class="row selected"><div class="row-head"><span>Manufacturer Mask</span><span class="mini-chip">0x0059</span></div><div class="row-meta"><span>06 ?? 02</span><span>Raw HEX</span></div></div>
+                  <div class="row"><div class="row-head"><span>Service UUID</span><span class="mini-chip">FFF0</span></div><div class="row-meta"><span>180F</span><span>FEAA</span><span>NUS</span></div></div>
+                  <div class="row"><div class="row-head"><span>Signal / State</span><span class="mini-chip success">-70+</span></div><div class="row-meta"><span>Connectable</span><span>Bonded</span><span>Beacon</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>广告包与工具</h3><span class="mini-chip cyan">nRF / LightBlue 对齐</span></div>
+                  <div class="tablet-two">
+                    <div class="chart"><strong>RSSI 趋势</strong><div class="bars"><span style="height:46%"></span><span style="height:52%"></span><span style="height:60%"></span><span style="height:58%"></span><span style="height:70%"></span><span style="height:64%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:68%"></span><span style="height:62%"></span></div><span class="subtitle">暂停/恢复扫描，CSV/Excel 导出。</span></div>
+                    <div class="tree"><div class="node"><strong>Raw Advertisement</strong><div class="child">Flags: 0x06</div><div class="child">Mfg: 59 00 06 01 02 03 FF</div><div class="child">Service: 180F / FFF0 / FEAA</div></div></div>
+                  </div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>GATT Server</h4><p>虚拟 Battery / UART / 自定义服务。</p><span class="mini-chip primary">启动</span></div>
+                    <div class="card"><h4>Advertiser</h4><p>iBeacon、Eddystone、Raw ADV。</p><span class="mini-chip">编辑</span></div>
+                    <div class="card"><h4>DFU / Throughput</h4><p>固件包、吞吐、丢包统计。</p><span class="mini-chip warning">风险确认</span></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 08 · SPP 串口工作台</strong><span class="connector">配对 / UUID / 宏 / 历史</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>SPP Terminal</span><span>Connected</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">设备</div>
+                  <div class="nav-item">UUID</div>
+                  <div class="nav-item">终端</div>
+                  <div class="nav-item">宏命令</div>
+                  <div class="nav-item">后台</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>设备与 UUID</h3><span class="mini-chip">RFCOMM</span></div>
+                  <div class="row selected"><div class="row-head"><span>HS02 Factory</span><span class="mini-chip success">已配对</span></div><div class="row-meta"><span>标准 SPP UUID</span><span>Secure</span></div></div>
+                  <div class="row"><div class="row-head"><span>Nearby Meter</span><span class="mini-chip warning">Inquiry</span></div><div class="row-meta"><span>RSSI -68</span><span>未配对</span></div></div>
+                  <div class="row"><div class="row-head"><span>自定义 UUID</span><span class="mini-chip">最近</span></div><div class="row-meta"><span>00001101...</span><span>Insecure 可选</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>终端与宏</h3><span class="mini-chip success">后台可保留</span></div>
+                  <div class="tablet-two">
+                    <div class="terminal"><div class="terminal-head"><strong>SPP 原始日志</strong><span class="mini-chip">Text/HEX</span></div><div class="terminal-body">&gt;&gt; AT^GET_SW_VERSION\r\n<br>&lt;&lt; +SW: 1.2.8<br>&gt;&gt; 02 10 00 FF<br>&lt;&lt; 02 90 00 00</div><div class="input-dock"><div class="seg"><span class="active">Text</span><span>HEX</span></div><div class="input">AT^GET_SW_VERSION</div><span class="action primary">发送</span></div></div>
+                    <div class="settings">
+                      <div class="setting-row"><div><strong>CR/LF</strong><p>发送追加换行。</p></div><div class="switch"></div></div>
+                      <div class="setting-row"><div><strong>Local Echo</strong><p>显示本地输入。</p></div><div class="switch"></div></div>
+                      <div class="setting-row"><div><strong>Timestamp</strong><p>日志带毫秒时间。</p></div><div class="switch"></div></div>
+                    </div>
+                  </div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>宏 1</h4><p>AT^GET_SW_VERSION</p><span class="mini-chip primary">运行</span></div>
+                    <div class="card"><h4>宏 2</h4><p>HEX 02 10 00 FF，延迟 200ms。</p><span class="mini-chip">编辑</span></div>
+                    <div class="card"><h4>文件发送</h4><p>分片、进度、失败重试。</p><span class="mini-chip warning">实验</span></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 09 · WiFi 网络工具箱</strong><span class="connector">Analyzer / PingTools / HE.NET</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>Network Tools</span><span>Yovo-Lab</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">WiFi Analyzer</div>
+                  <div class="nav-item">LAN Scan</div>
+                  <div class="nav-item">Ping / Trace</div>
+                  <div class="nav-item">Port / SSL</div>
+                  <div class="nav-item">iPerf / Speed</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>工具任务</h3><span class="mini-chip primary">历史</span></div>
+                  <div class="row selected"><div class="row-head"><span>Channel Rating</span><span class="mini-chip success">推荐 Ch149</span></div><div class="row-meta"><span>2.4G</span><span>5G</span><span>6G</span></div></div>
+                  <div class="row"><div class="row-head"><span>Ping Sweep</span><span class="mini-chip">24 hosts</span></div><div class="row-meta"><span>192.168.1.0/24</span><span>厂商</span></div></div>
+                  <div class="row"><div class="row-head"><span>Port Scan</span><span class="mini-chip warning">风险</span></div><div class="row-meta"><span>22</span><span>80</span><span>1883</span><span>9000</span></div></div>
+                  <div class="row"><div class="row-head"><span>SSL/TLS</span><span class="mini-chip">证书</span></div><div class="row-meta"><span>有效期</span><span>链路</span><span>域名</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>环境分析与诊断</h3><span class="mini-chip">可导出</span></div>
+                  <div class="tablet-two">
+                    <div class="chart"><strong>信道评分</strong><div class="bars"><span style="height:52%"></span><span style="height:35%"></span><span style="height:70%"></span><span style="height:82%"></span><span style="height:48%"></span><span style="height:66%"></span><span style="height:40%"></span><span style="height:75%"></span><span style="height:58%"></span><span style="height:62%"></span></div><span class="subtitle">AP 列表、信道图、时间图、评分分屏展示。</span></div>
+                    <div class="terminal"><div class="terminal-head"><strong>诊断输出</strong><span class="mini-chip">原始文本</span></div><div class="terminal-body">PING 192.168.1.10 56 bytes<br>64 bytes time=18ms ttl=64<br>TRACE hop 1 gateway.local 1ms<br>DNS A device.local 192.168.1.10</div></div>
+                  </div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>mDNS / UPnP</h4><p>服务名、端口、设备类型。</p></div>
+                    <div class="card"><h4>Routing Table</h4><p>IPv4/IPv6 路由和网关。</p></div>
+                    <div class="card"><h4>Whois / DNS</h4><p>A/AAAA/CNAME/MX 和 Whois。</p></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="frame-wrap">
+          <div class="frame-label"><strong>Tablet 10 · 星闪安全与错误恢复</strong><span class="connector">能力 / 广播 / SSAP / DT</span></div>
+          <div class="tablet-frame">
+            <div class="tablet-screen">
+              <div class="statusbar"><span>9:41</span><span>NearLink Recovery</span><span>SLE</span></div>
+              <div class="tablet-shell">
+                <aside class="tablet-nav">
+                  <div class="nav-item active">能力检测</div>
+                  <div class="nav-item">广播</div>
+                  <div class="nav-item">SSAP</div>
+                  <div class="nav-item">DT 安全</div>
+                  <div class="nav-item">FAQ</div>
+                </aside>
+                <section class="tablet-list">
+                  <div class="title-row"><h3>状态与错误</h3><span class="mini-chip warning">恢复</span></div>
+                  <div class="row selected"><div class="row-head"><span>Degraded</span><span class="mini-chip warning">SLB 不可用</span></div><div class="row-meta"><span>SLE 可用</span><span>DT 限速</span></div></div>
+                  <div class="row"><div class="row-head"><span>拥塞</span><span class="mini-chip danger">1009700023</span></div><div class="row-meta"><span>退避</span><span>重试</span><span>保留错误码</span></div></div>
+                  <div class="row"><div class="row-head"><span>权限拒绝</span><span class="mini-chip">去设置</span></div><div class="row-meta"><span>回到原任务</span><span>不丢输入</span></div></div>
+                </section>
+                <section class="tablet-detail">
+                  <div class="title-row"><h3>安全策略</h3><span class="mini-chip danger">未知不安全</span></div>
+                  <div class="banner warn"><strong>DT 加密状态：未知</strong><span>不标记安全；发送前按策略阻止，必要时弹出确认。</span></div>
+                  <div class="tablet-two">
+                    <div class="tree"><div class="node"><strong>能力检测</strong><div class="child">是否支持星闪</div><div class="child">开关状态</div><div class="child">权限 / 模拟器 / API</div></div><div class="node"><strong>广播</strong><div class="child">发送广播</div><div class="child">Raw Adv / Service / Mfg</div></div></div>
+                    <div class="terminal"><div class="terminal-head"><strong>DT 发送恢复</strong><span class="mini-chip">HEX</span></div><div class="terminal-body">&gt;&gt; 04 80 01 00 00<br>&lt;&lt; ERROR 1009700023 congestion<br>-- backoff 500ms<br>&lt;&lt; ACK seq=8</div><div class="input-dock"><div class="seg"><span class="active">HEX</span><span>Text</span></div><div class="input">04 80 01</div><span class="action primary">重试</span></div></div>
+                  </div>
+                  <div class="tablet-three">
+                    <div class="card"><h4>Unsupported</h4><p>单栏占位，不显示扫描按钮。</p></div>
+                    <div class="card"><h4>Simulator</h4><p>模拟器提示，禁用真实连接。</p></div>
+                    <div class="card"><h4>FAQ</h4><p>能力、权限、开关、错误码。</p></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
