@@ -1,0 +1,15 @@
+{
+  "name": "feature_home",
+  "version": "1.0.0",
+  "description": "YoWire home workbench: active sessions, permissions, log preview",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "common_core": "file:../../common/core",
+    "common_platform": "file:../../common/platform",
+    "common_storage": "file:../../common/storage",
+    "common_ui": "file:../../common/ui",
+    "feature_debug_core": "file:../debug_core"
+  }
+}

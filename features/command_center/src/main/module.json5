@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "feature_command_center",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
