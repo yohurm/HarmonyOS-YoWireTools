@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
@@ -16,6 +17,7 @@ export struct CapabilityBannerView {
   @Param actionLabel: ResourceStr = '';
   @Event onAction: () => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
@@ -53,8 +55,8 @@ export struct CapabilityBannerView {
     }
     .width('100%')
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiSpacing.SECTION_GAP,
       bottom: UiSpacing.SECTION_GAP
     })

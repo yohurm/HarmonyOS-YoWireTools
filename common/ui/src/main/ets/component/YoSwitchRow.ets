@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
@@ -11,6 +12,7 @@ export struct YoSwitchRow {
   @Param isEnabled: boolean = true;
   @Event onCheckedChange: (checked: boolean) => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
   build() {
     Row() {
       Column({ space: UiSpacing.INLINE_STACK_GAP }) {
@@ -32,8 +34,8 @@ export struct YoSwitchRow {
     .width('100%')
     .constraintSize({ minHeight: UiLayoutConstants.LIST_ROW_HEIGHT })
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiSpacing.ITEM_GAP,
       bottom: UiSpacing.ITEM_GAP
     })

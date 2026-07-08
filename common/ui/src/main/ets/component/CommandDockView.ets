@@ -1,19 +1,21 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
-/** Secondary action entry for CommandDock toolbar row. */
+
 export class CommandDockAction {
   readonly key: string;
   readonly label: string;
+
   constructor(key: string, label: string) {
     this.key = key;
     this.label = label;
   }
 }
+
 /**
- * Bottom command input dock: TextInput + send + optional secondary actions.
- * Applies navigation-bar avoid padding on phone layouts.
+ * Bottom command dock with live navigation-bar avoid inset from WindowMetricsState.
  */
 @ComponentV2
 export struct CommandDockView {
@@ -34,6 +36,8 @@ export struct CommandDockView {
   };
   @Event onStopPeriodic: () => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
       if (this.periodicActive) {
@@ -93,13 +97,14 @@ export struct CommandDockView {
     }
     .width('100%')
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiLayoutConstants.COMMAND_DOCK_PADDING,
       bottom: this.resolveBottomPadding()
     })
     .backgroundColor(UiColorToken.SURFACE)
   }
+
   @Builder
   private periodicBanner() {
     Row({ space: UiSpacing.ITEM_GAP }) {
@@ -127,10 +132,11 @@ export struct CommandDockView {
     .backgroundColor($r('app.color.ui_emphasize_tertiary'))
     .borderRadius(UiSpacing.CORNER_RADIUS)
   }
+
   private resolveBottomPadding(): number {
     const base = UiLayoutConstants.COMMAND_DOCK_PADDING;
     if (this.avoidNavBar) {
-      return base + UiLayoutConstants.NAV_BAR_AVOID;
+      return base + this.metrics.navigationBottomInsetVp;
     }
     return base;
   }

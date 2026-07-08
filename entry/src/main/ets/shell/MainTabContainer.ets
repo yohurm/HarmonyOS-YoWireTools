@@ -6,6 +6,31 @@ import { WifiFeaturePage } from 'feature_wifi_network';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { MoreFeaturePage } from './MoreFeaturePage';
 
+@Builder
+function workbenchTab() {
+  HomeFeaturePage()
+}
+
+@Builder
+function bluetoothTab() {
+  BluetoothFeaturePage()
+}
+
+@Builder
+function networkTab() {
+  WifiFeaturePage()
+}
+
+@Builder
+function nearlinkTab() {
+  NearLinkFeaturePage()
+}
+
+@Builder
+function moreTab() {
+  MoreFeaturePage()
+}
+
 @ComponentV2
 export struct MainTabContainer {
   @Param currentTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
@@ -18,46 +43,11 @@ export struct MainTabContainer {
       onTabChange: (index: number) => {
         this.onTabChange(index);
       },
-      workbenchContent: (): void => {
-        this.workbenchTab();
-      },
-      bluetoothContent: (): void => {
-        this.bluetoothTab();
-      },
-      networkContent: (): void => {
-        this.networkTab();
-      },
-      nearlinkContent: (): void => {
-        this.nearlinkTab();
-      },
-      moreContent: (): void => {
-        this.moreTab();
-      }
+      workbenchContent: workbenchTab,
+      bluetoothContent: bluetoothTab,
+      networkContent: networkTab,
+      nearlinkContent: nearlinkTab,
+      moreContent: moreTab
     })
-  }
-
-  @Builder
-  workbenchTab() {
-    HomeFeaturePage()
-  }
-
-  @Builder
-  bluetoothTab() {
-    BluetoothFeaturePage()
-  }
-
-  @Builder
-  networkTab() {
-    WifiFeaturePage()
-  }
-
-  @Builder
-  nearlinkTab() {
-    NearLinkFeaturePage()
-  }
-
-  @Builder
-  moreTab() {
-    MoreFeaturePage()
   }
 }

@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
@@ -15,6 +16,7 @@ export interface YoContextStripItem {
 export struct YoContextStrip {
   @Param items: YoContextStripItem[] = [];
   @Param riskMessage: ResourceStr = '';
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
   build() {
     if (this.items.length === 0 && !UiResourceUtil.hasText(this.riskMessage)) {
@@ -66,8 +68,8 @@ export struct YoContextStrip {
       }
       .width('100%')
       .padding({
-        left: UiSpacing.PAGE_PADDING,
-        right: UiSpacing.PAGE_PADDING,
+        left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+        right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
         top: UiSpacing.ITEM_GAP,
         bottom: UiSpacing.ITEM_GAP
       })

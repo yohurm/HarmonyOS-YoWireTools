@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
@@ -10,6 +11,7 @@ export struct SectionTitleView {
   @Param actionLabel: ResourceStr = '';
   @Event onAction: () => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
   build() {
     Row() {
@@ -39,8 +41,8 @@ export struct SectionTitleView {
     }
     .width('100%')
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiSpacing.SECTION_GAP,
       bottom: UiSpacing.ITEM_GAP
     })

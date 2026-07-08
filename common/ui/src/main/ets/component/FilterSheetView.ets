@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
 import { UiColorToken } from '../theme/UiColorToken';
@@ -37,6 +38,7 @@ export struct FilterSheetView {
   };
   @Event onClear: () => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
       if (this.title.length > 0 || this.showClear) {
@@ -78,13 +80,13 @@ export struct FilterSheetView {
             }
           }, (option: FilterChipOption) => option.key)
         }
-        .padding({ right: UiSpacing.PAGE_PADDING })
+        .padding({ right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint) })
       }
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
       .width('100%')
     }
     .width('100%')
-    .padding({ left: UiSpacing.PAGE_PADDING })
+    .padding({ left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint) })
   }
 }

@@ -2,8 +2,7 @@ import { YoNavDestinationKind } from './YoNavDestinationKind';
 import { YoPageShell } from '../component/YoPageShell';
 
 /**
- * Canonical empty feature-tab root: title bar only, no work area content.
- * All feature modules should use this until real flows land.
+ * Canonical feature-tab root. Responsive frame is provided by YoAppShell.
  */
 @ComponentV2
 export struct YoTabRootPage {

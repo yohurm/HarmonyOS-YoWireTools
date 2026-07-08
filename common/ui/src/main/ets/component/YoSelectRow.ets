@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
@@ -11,6 +12,7 @@ export struct YoSelectRow {
   @Param isEnabled: boolean = true;
   @Event onTap: () => void = () => {
   };
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
   build() {
     Row() {
       Column({ space: UiSpacing.LABEL_STACK_GAP }) {
@@ -40,8 +42,8 @@ export struct YoSelectRow {
     .width('100%')
     .constraintSize({ minHeight: UiLayoutConstants.LIST_ROW_HEIGHT })
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiSpacing.ITEM_GAP,
       bottom: UiSpacing.ITEM_GAP
     })

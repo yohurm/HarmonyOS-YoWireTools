@@ -1,3 +1,4 @@
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
@@ -44,6 +45,7 @@ export struct DataTerminalView {
   @Param entries: DataTerminalLine[] = [];
   @Param minHeight: number = UiLayoutConstants.TERMINAL_MIN_HEIGHT;
   @Param emptyHint: ResourceStr = '';
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
   build() {
     Column() {
       if (this.resolveRows().length === 0) {
@@ -114,8 +116,8 @@ export struct DataTerminalView {
     }
     .width('100%')
     .padding({
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING,
+      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
+      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
       top: UiSpacing.TERMINAL_ROW_PADDING_V,
       bottom: UiSpacing.TERMINAL_ROW_PADDING_V
     })

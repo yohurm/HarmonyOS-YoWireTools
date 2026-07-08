@@ -37,3 +37,6 @@ export { QuickLinkIds } from './src/main/ets/navigation/QuickLinkIds';
 export { WifiSettingsNavigator } from './src/main/ets/navigation/WifiSettingsNavigator';
 export { ThemeModeCoordinator } from './src/main/ets/theme/ThemeModeCoordinator';
 export { SystemBarThemeCoordinator } from './src/main/ets/theme/SystemBarThemeCoordinator';
+export { WindowWidthBreakpoint, WindowWidthBreakpointUtil } from './src/main/ets/window/WindowWidthBreakpoint';
+export { WindowMetricsState } from './src/main/ets/window/WindowMetricsState';
+export { WindowMetricsRegistry } from './src/main/ets/window/WindowMetricsRegistry';
