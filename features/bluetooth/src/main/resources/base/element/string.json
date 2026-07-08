@@ -59,6 +59,54 @@
     {
       "name": "bt_status_loading",
       "value": "检测中"
+    },
+    {
+      "name": "bt_entry_section_title",
+      "value": "调试入口"
+    },
+    {
+      "name": "bt_entry_spp_title",
+      "value": "SPP"
+    },
+    {
+      "name": "bt_entry_spp_subtitle",
+      "value": "经典蓝牙串口"
+    },
+    {
+      "name": "bt_entry_ble_title",
+      "value": "BLE"
+    },
+    {
+      "name": "bt_entry_ble_subtitle",
+      "value": "低功耗蓝牙"
+    },
+    {
+      "name": "bt_entry_status_ready",
+      "value": "可用"
+    },
+    {
+      "name": "bt_entry_status_blocked",
+      "value": "不可用"
+    },
+    {
+      "name": "bt_spp_page_title",
+      "value": "SPP"
+    },
+    {
+      "name": "bt_ble_page_title",
+      "value": "BLE"
+    },
+    {
+      "name": "bt_spp_metric_devices",
+      "value": "已配对设备"
+    },
+    {
+      "name": "bt_ble_metric_devices",
+      "value": "发现设备"
+    },
+    {
+      "name": "bt_metric_sessions",
+      "value": "会话"
     }
   ]
 }

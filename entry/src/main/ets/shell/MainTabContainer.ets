@@ -12,11 +12,6 @@ function workbenchTab() {
 }
 
 @Builder
-function bluetoothTab() {
-  BluetoothFeaturePage()
-}
-
-@Builder
 function networkTab() {
   WifiFeaturePage()
 }
@@ -36,6 +31,18 @@ export struct MainTabContainer {
   @Param currentTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
   @Event onTabChange: (index: number) => void = (_index: number) => {
   };
+  @Event onOpenBluetoothSpp: () => void = () => {
+  };
+  @Event onOpenBluetoothBle: () => void = () => {
+  };
+
+  @LocalBuilder
+  bluetoothTab() {
+    BluetoothFeaturePage({
+      onOpenSpp: this.onOpenBluetoothSpp,
+      onOpenBle: this.onOpenBluetoothBle
+    })
+  }
 
   build() {
     YoAppShell({
@@ -44,7 +51,7 @@ export struct MainTabContainer {
         this.onTabChange(index);
       },
       workbenchContent: workbenchTab,
-      bluetoothContent: bluetoothTab,
+      bluetoothContent: this.bluetoothTab,
       networkContent: networkTab,
       nearlinkContent: nearlinkTab,
       moreContent: moreTab

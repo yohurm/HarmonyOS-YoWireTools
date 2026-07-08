@@ -4,6 +4,8 @@
 export class AppRoutes {
   static readonly WORKBENCH: string = '/home/workbench';
   static readonly BLUETOOTH: string = '/bluetooth/overview';
+  static readonly BLUETOOTH_SPP: string = '/bluetooth/spp';
+  static readonly BLUETOOTH_BLE: string = '/bluetooth/ble';
   static readonly WIFI: string = '/wifi/overview';
   static readonly NEARLINK: string = '/nearlink/overview';
   static readonly MORE_HUB: string = '/more/hub';

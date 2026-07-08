@@ -1,5 +1,9 @@
 export { BluetoothFeaturePage } from './src/main/ets/ui/page/BluetoothFeaturePage';
+export { SppMainPage } from './src/main/ets/ui/page/SppMainPage';
+export { BleMainPage } from './src/main/ets/ui/page/BleMainPage';
 export { BtOverviewViewModel } from './src/main/ets/viewmodel/BtOverviewViewModel';
+export { SppMainViewModel } from './src/main/ets/viewmodel/SppMainViewModel';
+export { BleMainViewModel } from './src/main/ets/viewmodel/BleMainViewModel';
 export { BtStatusCard } from './src/main/ets/ui/component/BtStatusCard';
 export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
 export { SppTransportSession } from './src/main/ets/data/transport/SppTransportSession';
