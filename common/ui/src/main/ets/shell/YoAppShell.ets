@@ -26,7 +26,6 @@ export struct YoAppShell {
   @BuilderParam nearlinkContent: () => void = this.defaultTabContent;
   @BuilderParam moreContent: () => void = this.defaultTabContent;
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
-  @Local materialLevel: hdsMaterial.MaterialLevel = hdsMaterial.MaterialLevel.EXQUISITE;
   private tabsController: HdsTabsController = new HdsTabsController();
   private sideNavItems: YoSideNavItem[] = [
     { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
@@ -40,13 +39,6 @@ export struct YoAppShell {
   private networkIcon: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.ohos_wifi'));
   private nearlinkIcon: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.card_writer'));
   private moreIcon: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.more'));
-
-  aboutToAppear(): void {
-    const types = hdsMaterial.getSystemMaterialTypes();
-    if (types.indexOf(hdsMaterial.MaterialType.IMMERSIVE) < 0) {
-      this.materialLevel = hdsMaterial.MaterialLevel.SMOOTH;
-    }
-  }
 
   @Builder
   defaultTabContent() {
@@ -143,7 +135,7 @@ export struct YoAppShell {
       barBottomMargin: UiLayoutConstants.FLOATING_TAB_BAR_MARGIN,
       systemMaterialEffect: {
         materialType: hdsMaterial.MaterialType.ADAPTIVE,
-        materialLevel: this.materialLevel
+        materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
       }
     })
     .width('100%')

@@ -7,11 +7,31 @@ import { PlatformColorToken } from './PlatformColorToken';
  * Values sourced from PlatformColorToken / common_platform color.json.
  */
 export class SystemBarThemeCoordinator {
-  static buildProperties(colorMode: number): window.SystemBarProperties {
+  /** Status/navigation bar icon color for the active color mode (#AARRGGBB). */
+  static resolveContentColor(colorMode: number): string {
     const isDark = colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
-    const content = isDark ?
+    return isDark ?
       PlatformColorToken.SYSTEM_BAR_CONTENT_DARK :
       PlatformColorToken.SYSTEM_BAR_CONTENT_LIGHT;
+  }
+
+  /**
+   * Status bar content over hero/primary imagery (font_on_primary).
+   * Used by HdsNavigation.systemBarStyle originalStyle in immersive图文 scenes.
+   */
+  static resolveOnPrimaryContentColor(): string {
+    return PlatformColorToken.SYSTEM_BAR_CONTENT_DARK;
+  }
+
+  static resolveWindowBackgroundColor(colorMode: number): string {
+    const isDark = colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+    return isDark ?
+      PlatformColorToken.WINDOW_BACKGROUND_DARK :
+      PlatformColorToken.WINDOW_BACKGROUND_LIGHT;
+  }
+
+  static buildProperties(colorMode: number): window.SystemBarProperties {
+    const content = SystemBarThemeCoordinator.resolveContentColor(colorMode);
     return {
       statusBarColor: PlatformColorToken.SYSTEM_BAR_BACKGROUND,
       statusBarContentColor: content,
@@ -25,6 +45,11 @@ export class SystemBarThemeCoordinator {
       void mainWindow.setWindowSystemBarProperties(SystemBarThemeCoordinator.buildProperties(colorMode));
     } catch (_error) {
       // Window may not be ready during lifecycle transitions.
+    }
+    try {
+      mainWindow.setWindowBackgroundColor(SystemBarThemeCoordinator.resolveWindowBackgroundColor(colorMode));
+    } catch (_error) {
+      // Window background can only be changed after content is attached.
     }
   }
 }

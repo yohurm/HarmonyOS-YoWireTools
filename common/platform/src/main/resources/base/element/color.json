@@ -5,6 +5,10 @@
       "value": "#00000000"
     },
     {
+      "name": "ui_window_background",
+      "value": "#FFF1F3F5"
+    },
+    {
       "name": "ui_system_bar_content_light",
       "value": "#E5000000"
     },

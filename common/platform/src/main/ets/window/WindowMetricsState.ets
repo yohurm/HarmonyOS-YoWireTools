@@ -1,3 +1,4 @@
+import { ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { WindowWidthBreakpoint, WindowWidthBreakpointUtil } from './WindowWidthBreakpoint';
 
@@ -12,6 +13,7 @@ export class WindowMetricsState {
   @Trace breakpoint: WindowWidthBreakpoint = WindowWidthBreakpoint.COMPACT;
   @Trace systemTopInsetVp: number = 0;
   @Trace navigationBottomInsetVp: number = 0;
+  @Trace colorMode: number = ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT;
 
   updateSize(widthVp: number, heightVp: number): void {
     this.widthVp = widthVp;
@@ -23,5 +25,9 @@ export class WindowMetricsState {
     navigationArea: window.AvoidArea): void {
     this.systemTopInsetVp = uiContext.px2vp(systemArea.topRect.height);
     this.navigationBottomInsetVp = uiContext.px2vp(navigationArea.bottomRect.height);
+  }
+
+  updateColorMode(colorMode: number): void {
+    this.colorMode = colorMode;
   }
 }

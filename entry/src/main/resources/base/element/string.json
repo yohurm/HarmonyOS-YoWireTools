@@ -1,4 +1,4 @@
-﻿{
+{
   "string": [
     {
       "name": "module_desc",
@@ -47,10 +47,6 @@
     {
       "name": "more_hub_title",
       "value": "更多"
-    },
-    {
-      "name": "ui_retry",
-      "value": "重试"
     }
   ]
 }

@@ -6,6 +6,14 @@ export { UiSpacing } from './src/main/ets/theme/UiSpacing';
 export { UiTypography } from './src/main/ets/theme/UiTypography';
 export { UiColorToken } from './src/main/ets/theme/UiColorToken';
 export { UiLayoutConstants } from './src/main/ets/theme/UiLayoutConstants';
+export { HdsMaterialPolicy, HdsSystemMaterialEffect, UI_MATERIAL_MIN_SDK_API } from './src/main/ets/theme/HdsMaterialPolicy';
+export {
+  HdsTitleBarPolicy,
+  HdsTitleBarScene,
+  HdsTitleBarStyleBundle,
+  HdsSystemBarStyleBundle,
+  YoNavigationTitleBarConfig
+} from './src/main/ets/theme/HdsTitleBarPolicy';
 export { UiResourceUtil } from './src/main/ets/util/UiResourceUtil';
 export { YoNavDestinationKind } from './src/main/ets/shell/YoNavDestinationKind';
 export { YoAppShell } from './src/main/ets/shell/YoAppShell';
@@ -44,6 +52,7 @@ export { InspectorPanel } from './src/main/ets/component/InspectorPanel';
 export { YoContextStrip } from './src/main/ets/component/YoContextStrip';
 export type { YoContextStripItem } from './src/main/ets/component/YoContextStrip';
 export { YoPageShell } from './src/main/ets/component/YoPageShell';
+export { YoImmersiveSurface } from './src/main/ets/component/YoImmersiveSurface';
 export { ContentStateHost } from './src/main/ets/component/ContentStateHost';
 export { SegmentChipView } from './src/main/ets/component/SegmentChipView';
 export { DataTerminalView, DataTerminalLine } from './src/main/ets/component/DataTerminalView';

@@ -24,6 +24,7 @@ export default class EntryAbility extends UIAbility {
     }
     const colorMode = newConfig.colorMode ?? ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT;
     SystemBarThemeCoordinator.applyToWindow(this.mainWindow, colorMode);
+    WindowMetricsRegistry.updateColorMode(colorMode);
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -71,6 +72,7 @@ export default class EntryAbility extends UIAbility {
       void mainWindow.setWindowLayoutFullScreen(true);
       const colorMode = this.context.config.colorMode ?? ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT;
       SystemBarThemeCoordinator.applyToWindow(mainWindow, colorMode);
+      WindowMetricsRegistry.updateColorMode(colorMode);
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'configureMainWindow failed: %{public}s', JSON.stringify(err));
     }

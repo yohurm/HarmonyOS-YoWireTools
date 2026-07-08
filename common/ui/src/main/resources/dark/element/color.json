@@ -7,10 +7,10 @@
     { "name": "ui_text_secondary", "value": "#99FFFFFF" },
     { "name": "ui_text_tertiary", "value": "#66FFFFFF" },
     { "name": "ui_text_inverse", "value": "#E5000000" },
-    { "name": "ui_background", "value": "#E5E5E5" },
-    { "name": "ui_background_secondary", "value": "#191A1C" },
-    { "name": "ui_surface", "value": "#202224" },
-    { "name": "ui_comp_raised", "value": "#2E3033" },
+    { "name": "ui_background", "value": "#FF191A1C" },
+    { "name": "ui_background_secondary", "value": "#FF202224" },
+    { "name": "ui_surface", "value": "#FF202224" },
+    { "name": "ui_comp_raised", "value": "#FF2E3033" },
     { "name": "ui_border", "value": "#33FFFFFF" },
     { "name": "ui_interactive_pressed", "value": "#19FFFFFF" },
     { "name": "ui_error", "value": "#D94838" },
@@ -19,7 +19,7 @@
     { "name": "ui_info", "value": "#317AF7" },
     { "name": "ui_emphasize_tertiary", "value": "#19317AF7" },
     { "name": "ui_scrim", "value": "#80000000" },
-    { "name": "ui_terminal_background", "value": "#191A1C" },
+    { "name": "ui_terminal_background", "value": "#FF191A1C" },
     { "name": "ui_terminal_inbound", "value": "#317AF7" },
     { "name": "ui_terminal_outbound", "value": "#5BA854" }
   ]

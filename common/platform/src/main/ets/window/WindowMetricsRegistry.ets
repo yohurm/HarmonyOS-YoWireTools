@@ -12,6 +12,10 @@ export class WindowMetricsRegistry {
     return AppStorageV2.connect(WindowMetricsState, STORAGE_KEY, (): WindowMetricsState => new WindowMetricsState())!;
   }
 
+  static updateColorMode(colorMode: number): void {
+    WindowMetricsRegistry.connect().updateColorMode(colorMode);
+  }
+
   static bind(mainWindow: window.Window, uiContext: UIContext): void {
     const state = WindowMetricsRegistry.connect();
     WindowMetricsRegistry.syncSize(mainWindow, uiContext, state);
