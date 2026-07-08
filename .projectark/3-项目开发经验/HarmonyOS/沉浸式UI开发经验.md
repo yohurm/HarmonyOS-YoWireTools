@@ -264,7 +264,30 @@ Column() {
 
 **问题**：手动计算 px→vp 转换 + 硬编码 TITLE_BAR_HEIGHT + 依赖 AppStorageV2 传递的像素值。应使用 `enableComponentSafeArea: true`。
 
-### 3.4 ❌ 重复设置 `ignoreLayoutSafeArea`
+### 3.4 ❌ 在浅色列表页误用 `IMMERSIVE_GRADIENT_BLUR` / `GRADIENT_BLUR(enableScrollEffect:false)`
+
+WSL API 对标题默认色的规定（`HdsNavigationTitleStyle.mainTitleColor`）：
+
+| scrollEffectType | enableScrollEffect | 默认主标题色 |
+|------------------|-------------------|-------------|
+| `COMMON_BLUR` | 任意 | `font_primary`（浅色模式深色字）✅ |
+| `GRADIENT_BLUR` | `false` | `font_on_primary`（白字）❌ 浅色列表页 |
+| `GRADIENT_BLUR` | `true` | 滚动前 `font_primary`，滚动后 `font_on_primary` |
+| `IMMERSIVE_GRADIENT_BLUR` | `false` | 沉浸式图文初始态，白字 ❌ 浅色列表页 |
+
+**根因链路（自底而上）**：
+
+1. **L1** `EntryAbility` + `SystemBarThemeCoordinator`：窗口级透明系统栏 + 深浅色 contentColor —— 正确基线。
+2. **L4** `HdsNavigation.systemBarStyle`：WSL 明确「不建议与 `setWindowSystemBarProperties` 混用」；主页面状态栏以 HdsNavigation 为准，默认跟随标题栏字体色。
+3. **误配**：浅色列表/工作台（`scrollable:false`）使用 `IMMERSIVE_GRADIENT_BLUR` 或 `GRADIENT_BLUR + enableScrollEffect:false` → 标题固定 `font_on_primary` → 状态栏图标同步变白。
+
+**正确场景映射（`HdsTitleBarPolicy`）**：
+
+- 列表/工作台浅色内容：`COMMON_BLUR` + `originalStyle/scrollEffectStyle` 显式 `font_primary`
+- 可滚动列表沉浸光感：同上（参考 WSL《设置动态模糊样式》官方示例）
+- 沉浸式图文 hero：`IMMERSIVE_GRADIENT_BLUR` + `font_on_primary` → `font_primary` 过渡
+
+### 3.5 ❌ 重复设置 `ignoreLayoutSafeArea`
 
 在 RootPage 的 Navigation 和 TopNavigationPageContainer 的 HdsNavigation 上分别设置了 `ignoreLayoutSafeArea([TOP])`，但实际只需要后者。RootPage 的 Navigation 只需 `ignoreLayoutSafeArea([TOP, BOTTOM])` 保证根容器绘制延伸到系统栏即可；各页面的 HdsNavigation 各自用 `ignoreLayoutSafeArea([TOP])` 控制标题栏背景延伸。
 
