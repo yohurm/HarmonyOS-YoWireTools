@@ -3,6 +3,62 @@
     {
       "name": "bt_title_overview",
       "value": "蓝牙"
+    },
+    {
+      "name": "bt_status_adapter",
+      "value": "蓝牙开关"
+    },
+    {
+      "name": "bt_status_permission",
+      "value": "权限"
+    },
+    {
+      "name": "bt_status_classic",
+      "value": "经典蓝牙"
+    },
+    {
+      "name": "bt_status_ble",
+      "value": "BLE"
+    },
+    {
+      "name": "bt_status_on",
+      "value": "已开启"
+    },
+    {
+      "name": "bt_status_off",
+      "value": "已关闭"
+    },
+    {
+      "name": "bt_status_granted",
+      "value": "已授权"
+    },
+    {
+      "name": "bt_status_denied",
+      "value": "未授权"
+    },
+    {
+      "name": "bt_status_ready",
+      "value": "就绪"
+    },
+    {
+      "name": "bt_status_unavailable",
+      "value": "不可用"
+    },
+    {
+      "name": "bt_status_unsupported",
+      "value": "不支持"
+    },
+    {
+      "name": "bt_action_grant_permission",
+      "value": "授权"
+    },
+    {
+      "name": "bt_action_open_settings",
+      "value": "去设置"
+    },
+    {
+      "name": "bt_status_loading",
+      "value": "检测中"
     }
   ]
 }
