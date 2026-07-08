@@ -1,5 +1,4 @@
 import { CancellationToken } from '../cancellation/CancellationToken';
-
 export enum TaskExecutionPolicy {
   INLINE = 'inline',
   IO_BOUND = 'io_bound',
@@ -10,7 +9,6 @@ export class TaskSubmitOptions {
   readonly policy: TaskExecutionPolicy;
   readonly label: string;
   readonly cancelToken: CancellationToken | undefined;
-
   constructor(
     policy: TaskExecutionPolicy = TaskExecutionPolicy.INLINE,
     label: string = '',
@@ -27,6 +25,5 @@ export class TaskSubmitOptions {
  */
 export interface ITaskExecutor {
   execute<T>(task: () => Promise<T>, options?: TaskSubmitOptions): Promise<T>;
-
   executeSync<T>(task: () => T, options?: TaskSubmitOptions): Promise<T>;
 }

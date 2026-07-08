@@ -2,8 +2,10 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
 import { YoActionButton, YoActionButtonKind } from './YoActionButton';
+
 /**
  * Active/recent session card for workbench and module overview.
  */
@@ -21,12 +23,13 @@ export struct SessionCardView {
   @Param failureSummary: string = '';
   @Event onEnter: () => void = () => {
   };
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
       if (this.failureSummary.length > 0) {
         Row({ space: UiSpacing.ITEM_GAP }) {
           SymbolGlyph($r('sys.symbol.exclamationmark_circle_fill'))
-            .fontSize(16)
+            .fontSize(UiLayoutConstants.CHEVRON_GLYPH_SIZE)
             .fontColor([UiColorToken.ERROR])
           Text(this.failureSummary)
             .fontSize(UiTypography.CAPTION_SIZE)
@@ -38,7 +41,7 @@ export struct SessionCardView {
         .width('100%')
       }
       Row({ space: UiSpacing.ITEM_GAP }) {
-        Column({ space: 2 }) {
+        Column({ space: UiSpacing.LABEL_STACK_GAP }) {
           Text(this.sessionName)
             .fontSize(UiTypography.SUBTITLE_SIZE)
             .fontWeight(FontWeight.Medium)
@@ -68,16 +71,16 @@ export struct SessionCardView {
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.TEXT_TERTIARY)
           .layoutWeight(1)
-        Text(`日志 ${this.logCount}`)
+        Text(UiResourceUtil.format($r('app.string.ui_session_log_count'), this.logCount))
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.TEXT_TERTIARY)
         if (this.errorCount > 0) {
-          Text(`错误 ${this.errorCount}`)
+          Text(UiResourceUtil.format($r('app.string.ui_session_error_count'), this.errorCount))
             .fontSize(UiTypography.CAPTION_SIZE)
             .fontColor(UiColorToken.ERROR)
         }
         YoActionButton({
-          label: '进入',
+          label: $r('app.string.ui_session_enter'),
           kind: YoActionButtonKind.TEXT,
           fullWidth: false,
           compact: true,

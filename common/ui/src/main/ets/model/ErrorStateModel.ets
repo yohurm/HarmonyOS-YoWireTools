@@ -1,24 +1,23 @@
 /**
  * Three-layer error presentation per PRD §9 / architecture §10.
- * userMessage → causeHint → nextStep
  */
 export class ErrorStateModel {
-  readonly userMessage: string;
-  readonly causeHint: string;
-  readonly nextStep: string;
+  readonly userMessage: ResourceStr;
+  readonly causeHint: ResourceStr;
+  readonly nextStep: ResourceStr;
   readonly appCode: string;
   readonly nativeCode: string;
   readonly retryable: boolean;
-  readonly actionLabel: string;
+  readonly actionLabel: ResourceStr;
 
   constructor(
-    userMessage: string = '',
-    causeHint: string = '',
-    nextStep: string = '',
+    userMessage: ResourceStr = $r('app.string.ui_error_default_title'),
+    causeHint: ResourceStr = '',
+    nextStep: ResourceStr = '',
     appCode: string = '',
     nativeCode: string = '',
     retryable: boolean = false,
-    actionLabel: string = ''
+    actionLabel: ResourceStr = $r('app.string.ui_retry')
   ) {
     this.userMessage = userMessage;
     this.causeHint = causeHint;
@@ -30,9 +29,9 @@ export class ErrorStateModel {
   }
 
   static fromLayers(
-    userMessage: string,
-    causeHint: string,
-    nextStep: string,
+    userMessage: ResourceStr,
+    causeHint: ResourceStr,
+    nextStep: ResourceStr,
     retryable: boolean = true,
     appCode: string = '',
     nativeCode: string = ''
@@ -44,7 +43,7 @@ export class ErrorStateModel {
       appCode,
       nativeCode,
       retryable,
-      retryable ? 'Retry' : ''
+      retryable ? $r('app.string.ui_retry') : ''
     );
   }
 }

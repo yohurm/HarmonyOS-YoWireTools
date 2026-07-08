@@ -2,9 +2,8 @@ import { PermissionUiState } from 'common_platform';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
-/**
- * Permission explanation and action view driven by PermissionUiState from platform layer.
- */
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
 @ComponentV2
 export struct PermissionDeniedView {
   @Param state: PermissionUiState | undefined = undefined;
@@ -12,14 +11,15 @@ export struct PermissionDeniedView {
   };
   @Event onOpenSettings: () => void = () => {
   };
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
-      Text(this.state?.title ?? 'Permission required')
+      Text(this.state?.title ?? $r('app.string.ui_error_default_title'))
         .fontSize(UiTypography.SUBTITLE_SIZE)
         .fontWeight(UiTypography.TITLE_WEIGHT)
         .fontColor(UiColorToken.WARNING)
         .textAlign(TextAlign.Center)
-      Text(this.state?.message ?? 'Grant the required permission to continue.')
+      Text(this.state?.message ?? $r('app.string.ui_empty_default_message'))
         .fontSize(UiTypography.BODY_SIZE)
         .fontColor(UiColorToken.TEXT_SECONDARY)
         .textAlign(TextAlign.Center)

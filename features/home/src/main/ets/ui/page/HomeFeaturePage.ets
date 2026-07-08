@@ -1,8 +1,13 @@
-import { EmptyPageView } from 'common_ui';
+import { YoTabRootPage } from 'common_ui';
 
+/**
+ * Workbench tab root — placeholder until workbench flows are implemented.
+ */
 @ComponentV2
 export struct HomeFeaturePage {
   build() {
-    EmptyPageView({ title: '工作台' })
+    YoTabRootPage({
+      title: $r('app.string.home_title')
+    })
   }
 }

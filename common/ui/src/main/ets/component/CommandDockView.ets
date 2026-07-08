@@ -56,10 +56,10 @@ export struct CommandDockView {
           .padding({ left: UiSpacing.FORM_GAP, right: UiSpacing.FORM_GAP })
           .borderRadius(UiSpacing.CORNER_RADIUS)
           .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(Color.White)
+          .fontColor(UiColorToken.TEXT_INVERSE)
           .backgroundColor(UiColorToken.PRIMARY)
           .enabled(this.isSendEnabled)
-          .opacity(this.isSendEnabled ? 1 : 0.4)
+          .opacity(this.isSendEnabled ? 1 : UiLayoutConstants.DISABLED_ROW_OPACITY)
           .onClick(() => {
             if (this.isSendEnabled && this.inputValue.length > 0) {
               this.onSend(this.inputValue);

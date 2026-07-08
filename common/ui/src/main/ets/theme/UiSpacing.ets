@@ -10,6 +10,12 @@ export class UiSpacing {
   /** Major page block spacing. */
   static readonly SECTION_GAP_LARGE: number = 24;
   static readonly ITEM_GAP: number = 8;
+  /** Tight vertical stack between title and subtitle (vp). */
+  static readonly LABEL_STACK_GAP: number = 2;
+  /** Inline label/value stack spacing inside cards and buttons (vp). */
+  static readonly INLINE_STACK_GAP: number = 4;
+  /** Terminal log row vertical padding (vp). */
+  static readonly TERMINAL_ROW_PADDING_V: number = 6;
   static readonly FORM_GAP: number = 16;
   static readonly CARD_GAP: number = 12;
   static readonly CARD_INNER_PADDING: number = 12;

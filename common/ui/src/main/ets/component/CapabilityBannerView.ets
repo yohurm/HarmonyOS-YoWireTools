@@ -2,27 +2,29 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
 import { StatusPillTone } from './StatusPillView';
+
 export type CapabilityBannerTone = 'info' | 'warning' | 'error' | 'success';
-/**
- * Permission / capability / degradation banner per UI design spec.
- */
+
 @ComponentV2
 export struct CapabilityBannerView {
-  @Param title: string = '';
-  @Param message: string = '';
+  @Param title: ResourceStr = '';
+  @Param message: ResourceStr = '';
   @Param tone: CapabilityBannerTone = 'info';
-  @Param actionLabel: string = '';
+  @Param actionLabel: ResourceStr = '';
   @Event onAction: () => void = () => {
   };
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
       Row({ space: UiSpacing.ITEM_GAP }) {
         SymbolGlyph(this.resolveSymbol())
           .fontSize(UiSpacing.ICON_SIZE)
           .fontColor([this.resolveAccent()])
-        Column({ space: 4 }) {
-          if (this.title.length > 0) {
+        Column({ space: UiSpacing.INLINE_STACK_GAP }) {
+          if (UiResourceUtil.hasText(this.title)) {
             Text(this.title)
               .fontSize(UiTypography.SUBTITLE_SIZE)
               .fontWeight(FontWeight.Medium)
@@ -39,7 +41,7 @@ export struct CapabilityBannerView {
       }
       .width('100%')
       .alignItems(VerticalAlign.Top)
-      if (this.actionLabel.length > 0) {
+      if (UiResourceUtil.hasText(this.actionLabel)) {
         Button(this.actionLabel)
           .type(ButtonType.Normal)
           .fontSize(UiTypography.BODY_SIZE)
@@ -59,6 +61,7 @@ export struct CapabilityBannerView {
     .backgroundColor($r('app.color.ui_emphasize_tertiary'))
     .borderRadius(UiLayoutConstants.CARD_RADIUS)
   }
+
   private resolveSymbol(): Resource {
     switch (this.tone) {
       case 'error':
@@ -71,6 +74,7 @@ export struct CapabilityBannerView {
         return $r('sys.symbol.info_circle');
     }
   }
+
   private resolveAccent(): ResourceColor {
     switch (this.tone) {
       case 'error':
@@ -80,20 +84,12 @@ export struct CapabilityBannerView {
       case 'success':
         return UiColorToken.SUCCESS;
       default:
-        return UiColorToken.INFO;
+        return UiColorToken.PRIMARY;
     }
   }
 }
-export function capabilityStatusPillTone(status: string): StatusPillTone {
-  const normalized = status.toLowerCase();
-  if (normalized === 'available') {
-    return 'success';
-  }
-  if (normalized === 'limited') {
-    return 'warning';
-  }
-  if (normalized === 'unavailable') {
-    return 'error';
-  }
-  return 'neutral';
+
+export function capabilityStatusPillTone(enabled: boolean): StatusPillTone {
+  return enabled ? 'success' : 'warning';
 }
+

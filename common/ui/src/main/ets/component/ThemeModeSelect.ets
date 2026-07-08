@@ -1,8 +1,9 @@
-import { AppThemeMode, AppThemeModeUtil } from 'common_core';
+import { AppThemeMode } from 'common_core';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+
 /**
  * V2 global appearance selector: system / light / dark via Menu semantics.
  */
@@ -11,15 +12,16 @@ export struct ThemeModeSelect {
   @Param selectedMode: AppThemeMode = AppThemeMode.SYSTEM;
   @Event onModeChange: (mode: AppThemeMode) => void = (_mode: AppThemeMode) => {
   };
+
   build() {
     Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: 2 }) {
-        Text('外观模式')
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
+        Text($r('app.string.ui_theme_mode_title'))
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(UiColorToken.TEXT_PRIMARY)
           .fontWeight(FontWeight.Medium)
           .width('100%')
-        Text(AppThemeModeUtil.subtitle(this.selectedMode))
+        Text(this.themeSubtitle(this.selectedMode))
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.TEXT_SECONDARY)
           .width('100%')
@@ -28,12 +30,12 @@ export struct ThemeModeSelect {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-      Text(AppThemeModeUtil.label(this.selectedMode))
+      Text(this.themeLabel(this.selectedMode))
         .fontSize(UiTypography.BODY_SIZE)
         .fontColor(UiColorToken.PRIMARY)
         .maxLines(1)
       SymbolGlyph($r('sys.symbol.chevron_down'))
-        .fontSize(14)
+        .fontSize(UiTypography.BODY_SIZE)
         .fontColor([UiColorToken.TEXT_TERTIARY])
     }
     .width('100%')
@@ -67,8 +69,31 @@ export struct ThemeModeSelect {
       }
     ])
   }
+
   private menuItemLabel(mode: AppThemeMode): string {
-    const label = AppThemeModeUtil.label(mode);
-    return mode === this.selectedMode ? `✓ ${label}` : label;
+    const label = this.themeLabel(mode) as string;
+    return mode === this.selectedMode ? `鉁?${label}` : label;
+  }
+
+  private themeLabel(mode: AppThemeMode): ResourceStr {
+    switch (mode) {
+      case AppThemeMode.LIGHT:
+        return $r('app.string.ui_theme_light');
+      case AppThemeMode.DARK:
+        return $r('app.string.ui_theme_dark');
+      default:
+        return $r('app.string.ui_theme_system');
+    }
+  }
+
+  private themeSubtitle(mode: AppThemeMode): ResourceStr {
+    switch (mode) {
+      case AppThemeMode.LIGHT:
+        return $r('app.string.ui_theme_light_subtitle');
+      case AppThemeMode.DARK:
+        return $r('app.string.ui_theme_dark_subtitle');
+      default:
+        return $r('app.string.ui_theme_system_subtitle');
+    }
   }
 }

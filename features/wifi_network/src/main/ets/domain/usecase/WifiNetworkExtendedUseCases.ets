@@ -94,8 +94,12 @@ export class OpenMqttSessionUseCase {
     return Result.ok(undefined);
   }
 
-  getDataSource(): MqttClientDataSource {
-    return this.mqttDataSource;
+  onMessage(listener: (payload: string) => void): Result<void> {
+    return this.mqttDataSource.onMessage(listener);
+  }
+
+  async publish(topic: string, payload: string): Promise<Result<void>> {
+    return this.mqttDataSource.publish(topic, payload);
   }
 }
 

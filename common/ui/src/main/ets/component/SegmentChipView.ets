@@ -1,5 +1,6 @@
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
+import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
 /**
  * Segmented control chip (mode / category picker).
@@ -16,7 +17,12 @@ export struct SegmentChipView {
       .fontSize(UiTypography.CAPTION_SIZE)
       .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Regular)
       .fontColor(this.resolveTextColor())
-      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .padding({
+        left: UiSpacing.CARD_INNER_PADDING,
+        right: UiSpacing.CARD_INNER_PADDING,
+        top: UiSpacing.ITEM_GAP,
+        bottom: UiSpacing.ITEM_GAP
+      })
       .backgroundColor(this.resolveBackground())
       .borderRadius(UiLayoutConstants.CARD_RADIUS)
       .opacity(this.disabled ? 0.5 : 1)
@@ -31,7 +37,7 @@ export struct SegmentChipView {
       return UiColorToken.TEXT_TERTIARY;
     }
     if (this.selected) {
-      return Color.White;
+      return UiColorToken.TEXT_INVERSE;
     }
     return UiColorToken.TEXT_PRIMARY;
   }

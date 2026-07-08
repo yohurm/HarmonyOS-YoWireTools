@@ -47,6 +47,54 @@
     {
       "name": "tab_more",
       "value": "更多"
+    },
+    {
+      "name": "ui_action_processing",
+      "value": "处理中…"
+    },
+    {
+      "name": "ui_action_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "ui_theme_mode_title",
+      "value": "外观模式"
+    },
+    {
+      "name": "ui_theme_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "ui_theme_light",
+      "value": "浅色模式"
+    },
+    {
+      "name": "ui_theme_dark",
+      "value": "深色模式"
+    },
+    {
+      "name": "ui_theme_system_subtitle",
+      "value": "读取系统浅色/深色设置并实时更新"
+    },
+    {
+      "name": "ui_theme_light_subtitle",
+      "value": "强制使用浅色 Token，适合日间配置"
+    },
+    {
+      "name": "ui_theme_dark_subtitle",
+      "value": "强制使用深色 Token，适合终端与夜间调试"
+    },
+    {
+      "name": "ui_session_enter",
+      "value": "进入"
+    },
+    {
+      "name": "ui_session_log_count",
+      "value": "日志 %d"
+    },
+    {
+      "name": "ui_session_error_count",
+      "value": "错误 %d"
     }
   ]
 }

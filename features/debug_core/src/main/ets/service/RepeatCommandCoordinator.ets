@@ -1,4 +1,4 @@
-import { Result, ResultError } from 'common_core';
+import { Result, ResultError, Subscription } from 'common_core';
 import { RepeatPolicy } from '../domain/model/CommandTemplate';
 import { SendCommandInput, SendCommandUseCase } from '../usecase/CommandUseCases';
 import { ITransportSession } from '../transport/TransportContracts';
@@ -17,6 +17,7 @@ export class RepeatCommandCoordinator {
   private static instance: RepeatCommandCoordinator | undefined;
   private readonly jobs: Map<string, RepeatJob> = new Map();
   private readonly sendCommand: SendCommandUseCase;
+  private readonly runningListeners: (() => void)[] = [];
 
   private constructor(sendCommand: SendCommandUseCase = new SendCommandUseCase()) {
     this.sendCommand = sendCommand;
@@ -53,6 +54,7 @@ export class RepeatCommandCoordinator {
       void this.tick(jobId, input, policy);
     }, policy.intervalMs);
     this.jobs.set(jobId, job);
+    this.notifyRunningChange();
     return Result.ok(undefined);
   }
 
@@ -65,6 +67,7 @@ export class RepeatCommandCoordinator {
       clearInterval(job.timerId);
     }
     this.jobs.delete(jobId);
+    this.notifyRunningChange();
   }
 
   stopAllForSession(sessionId: string): void {
@@ -89,6 +92,16 @@ export class RepeatCommandCoordinator {
 
   runningCount(): number {
     return this.jobs.size;
+  }
+
+  subscribeRunningChange(listener: () => void): Subscription {
+    this.runningListeners.push(listener);
+    return new Subscription((): void => {
+      const index = this.runningListeners.indexOf(listener);
+      if (index >= 0) {
+        this.runningListeners.splice(index, 1);
+      }
+    });
   }
 
   stopAll(): void {
@@ -118,6 +131,13 @@ export class RepeatCommandCoordinator {
     job.sentCount = job.sentCount + 1;
     if (!sent.success && policy.stopOnError) {
       this.stop(jobId);
+    }
+    this.notifyRunningChange();
+  }
+
+  private notifyRunningChange(): void {
+    for (let i = 0; i < this.runningListeners.length; i++) {
+      this.runningListeners[i]();
     }
   }
 }

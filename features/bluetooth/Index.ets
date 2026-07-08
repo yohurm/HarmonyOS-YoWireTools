@@ -1,10 +1,4 @@
 export { BluetoothFeaturePage } from './src/main/ets/ui/page/BluetoothFeaturePage';
-export { BluetoothNavRoutes, BluetoothNavParams } from './src/main/ets/ui/navigation/BluetoothNavRoutes';
-export { BluetoothOverviewViewModel } from './src/main/ets/viewmodel/BluetoothOverviewViewModel';
-export { ClassicScanViewModel } from './src/main/ets/viewmodel/ClassicScanViewModel';
-export { SppTerminalViewModel } from './src/main/ets/viewmodel/SppTerminalViewModel';
-export { BleScanViewModel } from './src/main/ets/viewmodel/BleScanViewModel';
-export { GattDetailViewModel } from './src/main/ets/viewmodel/GattDetailViewModel';
 export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
 export { SppTransportSession } from './src/main/ets/data/transport/SppTransportSession';
 export { GattTransportSession } from './src/main/ets/data/transport/GattTransportSession';
@@ -45,6 +39,5 @@ export { BleSerialEndpoints } from './src/main/ets/domain/model/BleSerialPreset'
 export { GattCharacteristicRef, GattDescriptorRef, GattCharacteristicChangeEvent } from './src/main/ets/domain/model/GattCharacteristicRef';
 export { BluetoothErrorCodes } from './src/main/ets/constants/BluetoothErrorCodes';
 export { BluetoothRepositoryContract } from './src/main/ets/domain/repository/BluetoothRepositoryContract';
-export { BluetoothOverviewUiState, PermissionState } from './src/main/ets/domain/model/BluetoothOverviewUiState';
 export { BluetoothDeviceVerificationChecklist } from './src/main/ets/data/verification/BluetoothDeviceVerificationChecklist';
 export { ScanResultMergeQueue } from './src/main/ets/domain/service/ScanResultMergeQueue';

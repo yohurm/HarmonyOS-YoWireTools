@@ -4,6 +4,7 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { YoContextStrip, YoContextStripItem } from './YoContextStrip';
 /**
  * V2 four-zone page shell: Header + ContextStrip + WorkArea + ActionDock.
@@ -12,12 +13,12 @@ import { YoContextStrip, YoContextStripItem } from './YoContextStrip';
  */
 @ComponentV2
 export struct YoPageShell {
-  @Param title: string = '';
-  @Param subtitle: string = '';
+  @Param title: ResourceStr = '';
+  @Param subtitle: ResourceStr = '';
   @Param showBack: boolean = false;
   @Param destinationKind: YoNavDestinationKind = YoNavDestinationKind.ROOT_TAB;
   @Param contextItems: YoContextStripItem[] = [];
-  @Param contextRiskMessage: string = '';
+  @Param contextRiskMessage: ResourceStr = '';
   @Param scrollable: boolean = true;
   @Param bottomPaddingVp: number = -1;
   @BuilderParam content: () => void = this.defaultContent;
@@ -44,7 +45,7 @@ export struct YoPageShell {
         if (this.scrollable) {
           Scroll(this.scroller) {
             Column({ space: UiSpacing.SECTION_GAP }) {
-              if (this.subtitle.length > 0) {
+              if (UiResourceUtil.hasText(this.subtitle)) {
                 Text(this.subtitle)
                   .fontSize(UiTypography.CAPTION_SIZE)
                   .fontColor(UiColorToken.TEXT_SECONDARY)

@@ -1,7 +1,7 @@
 import { Observable } from 'common_core';
 import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
 import { WifiLinkedInfoSnapshot } from '../model/WifiLinkedInfoSnapshot';
-import { WifiOverviewSnapshot } from '../model/WifiOverviewUiState';
+import { WifiOverviewSnapshot } from '../model/WifiOverviewSnapshot';
 import { NetworkDiagnosticPlan, DiagnosticStepResult } from '../model/NetworkDiagnosticModels';
 import { SocketConnectionParams, UdpSessionConfig } from '../model/SocketModels';
 import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';

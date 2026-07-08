@@ -4,7 +4,6 @@ import { CreateSessionInput, DebugSession } from '../domain/model/DebugSession';
 import { SessionManager } from '../service/SessionManager';
 import { PermissionScenario } from '../capability/PermissionScenario';
 import { PermissionScenarioCoordinator } from '../capability/PermissionScenarioCoordinator';
-
 export class CreateSessionUseCase {
   private readonly sessionManager: SessionManager;
 

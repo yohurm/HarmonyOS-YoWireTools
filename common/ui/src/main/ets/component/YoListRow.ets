@@ -1,3 +1,4 @@
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
@@ -7,10 +8,10 @@ import { UiTypography } from '../theme/UiTypography';
  */
 @ComponentV2
 export struct YoListRow {
-  @Param title: string = '';
-  @Param subtitle: string = '';
-  @Param meta: string = '';
-  @Param trailing: string = '';
+  @Param title: ResourceStr = '';
+  @Param subtitle: ResourceStr = '';
+  @Param meta: ResourceStr = '';
+  @Param trailing: ResourceStr = '';
   @Param showChevron: boolean = false;
   @Param selected: boolean = false;
   @Param disabled: boolean = false;
@@ -19,7 +20,7 @@ export struct YoListRow {
   };
   build() {
     Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: 2 }) {
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
         Text(this.title)
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(this.disabled ? UiColorToken.TEXT_TERTIARY : UiColorToken.TEXT_PRIMARY)
@@ -27,7 +28,7 @@ export struct YoListRow {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
-        if (this.subtitle.length > 0) {
+        if (UiResourceUtil.hasText(this.subtitle)) {
           Text(this.subtitle)
             .fontSize(UiTypography.CAPTION_SIZE)
             .fontColor(UiColorToken.TEXT_SECONDARY)
@@ -35,7 +36,7 @@ export struct YoListRow {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .width('100%')
         }
-        if (this.meta.length > 0) {
+        if (UiResourceUtil.hasText(this.meta)) {
           Text(this.meta)
             .fontSize(UiTypography.CAPTION_SIZE)
             .fontColor(UiColorToken.TEXT_TERTIARY)
@@ -46,7 +47,7 @@ export struct YoListRow {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-      if (this.trailing.length > 0) {
+      if (UiResourceUtil.hasText(this.trailing)) {
         Text(this.trailing)
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(this.alert ? UiColorToken.ERROR : UiColorToken.TEXT_TERTIARY)
@@ -54,7 +55,7 @@ export struct YoListRow {
       }
       if (this.showChevron) {
         SymbolGlyph($r('sys.symbol.chevron_right'))
-          .fontSize(16)
+          .fontSize(UiLayoutConstants.CHEVRON_GLYPH_SIZE)
           .fontColor([UiColorToken.TEXT_TERTIARY])
       }
     }

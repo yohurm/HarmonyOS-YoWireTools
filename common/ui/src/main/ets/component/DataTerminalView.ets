@@ -2,6 +2,8 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
 export type DataTerminalDirection = 'TX' | 'RX' | 'SYS';
 /** Structured terminal log row aligned with DataTerminal spec. */
 export class DataTerminalLine {
@@ -41,7 +43,7 @@ export struct DataTerminalView {
   @Param lines: string[] = [];
   @Param entries: DataTerminalLine[] = [];
   @Param minHeight: number = UiLayoutConstants.TERMINAL_MIN_HEIGHT;
-  @Param emptyHint: string = '';
+  @Param emptyHint: ResourceStr = '';
   build() {
     Column() {
       if (this.resolveRows().length === 0) {
@@ -70,7 +72,7 @@ export struct DataTerminalView {
   @Builder
   private emptyBody() {
     Column() {
-      Text(this.emptyHint.length > 0 ? this.emptyHint : '暂无数据')
+      Text(UiResourceUtil.hasText(this.emptyHint) ? this.emptyHint : $r('app.string.ui_empty_default_title'))
         .fontSize(UiTypography.CAPTION_SIZE)
         .fontColor(UiColorToken.TEXT_TERTIARY)
         .fontFamily(UiTypography.MONO_FONT_FAMILY)
@@ -88,7 +90,7 @@ export struct DataTerminalView {
         .fontWeight(FontWeight.Medium)
         .fontColor(this.resolveDirectionColor(row.direction))
         .fontFamily(UiTypography.MONO_FONT_FAMILY)
-        .width(28)
+        .width(UiLayoutConstants.TERMINAL_DIRECTION_WIDTH)
       if (row.timestamp.length > 0) {
         Text(row.timestamp)
           .fontSize(UiTypography.CAPTION_SIZE)
@@ -114,8 +116,8 @@ export struct DataTerminalView {
     .padding({
       left: UiSpacing.PAGE_PADDING,
       right: UiSpacing.PAGE_PADDING,
-      top: 6,
-      bottom: 6
+      top: UiSpacing.TERMINAL_ROW_PADDING_V,
+      bottom: UiSpacing.TERMINAL_ROW_PADDING_V
     })
   }
   private resolveRows(): DataTerminalLine[] {

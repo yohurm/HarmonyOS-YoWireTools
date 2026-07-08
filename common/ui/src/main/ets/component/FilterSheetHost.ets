@@ -19,6 +19,7 @@ export function createFilterSheetBindOptions(config: FilterSheetBindConfig = {})
  * Reusable filter sheet panel (≤480vp per UI design 06).
  * Pair with {@link createFilterSheetBindOptions} on the host node:
  * `.bindSheet(!!visible, FilterSheetHost({...}), createFilterSheetBindOptions({ onDisappear }))`
+ * Pass @BuilderParam slots with arrow functions that delegate to caller @Builder methods.
  */
 @ComponentV2
 export struct FilterSheetHost {
@@ -37,7 +38,7 @@ export struct FilterSheetHost {
   build() {
     Column({ space: UiSpacing.SECTION_GAP }) {
       Row() {
-        Column({ space: 2 }) {
+        Column({ space: UiSpacing.LABEL_STACK_GAP }) {
           Text(this.title)
             .fontSize(UiTypography.TITLE_SIZE)
             .fontWeight(UiTypography.TITLE_WEIGHT)
@@ -80,7 +81,7 @@ export struct FilterSheetHost {
           .layoutWeight(1)
           .height(UiLayoutConstants.TOUCH_TARGET)
           .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(Color.White)
+          .fontColor(UiColorToken.TEXT_INVERSE)
           .backgroundColor(UiColorToken.PRIMARY)
           .borderRadius(UiSpacing.CORNER_RADIUS)
           .onClick(() => {
@@ -129,7 +130,7 @@ export struct FilterSheetBinder {
     FilterSheetHost({
       title: this.title,
       subtitle: this.subtitle,
-      content: () => {
+      content: (): void => {
         this.content();
       },
       onClose: () => {

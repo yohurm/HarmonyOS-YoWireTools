@@ -2,26 +2,26 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
+
 export interface YoContextStripItem {
-  label: string;
-  value: string;
+  label: ResourceStr;
+  value: ResourceStr;
   tone?: StatusPillTone;
 }
-/**
- * Page context summary: permissions, targets, session state, degradation reasons.
- * Mobile: max two lines; wide screens may expand in inspector header.
- */
+
 @ComponentV2
 export struct YoContextStrip {
   @Param items: YoContextStripItem[] = [];
-  @Param riskMessage: string = '';
+  @Param riskMessage: ResourceStr = '';
+
   build() {
-    if (this.items.length === 0 && this.riskMessage.length === 0) {
+    if (this.items.length === 0 && !UiResourceUtil.hasText(this.riskMessage)) {
       Blank()
     } else {
       Column({ space: UiSpacing.ITEM_GAP }) {
-        if (this.riskMessage.length > 0) {
+        if (UiResourceUtil.hasText(this.riskMessage)) {
           Row({ space: UiSpacing.ITEM_GAP }) {
             SymbolGlyph($r('sys.symbol.exclamationmark_triangle_fill'))
               .fontSize(UiSpacing.ICON_SIZE)
@@ -44,8 +44,8 @@ export struct YoContextStrip {
           .borderRadius(UiLayoutConstants.CARD_RADIUS_SMALL)
         }
         Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center }) {
-          ForEach(this.items.slice(0, 4), (item: YoContextStripItem) => {
-            Row({ space: 4 }) {
+          ForEach(this.items.slice(0, 4), (item: YoContextStripItem, index: number) => {
+            Row({ space: UiSpacing.INLINE_STACK_GAP }) {
               Text(item.label)
                 .fontSize(UiTypography.CAPTION_SIZE)
                 .fontColor(UiColorToken.TEXT_TERTIARY)
@@ -60,7 +60,7 @@ export struct YoContextStrip {
               }
             }
             .margin({ right: UiSpacing.FORM_GAP, bottom: UiSpacing.ITEM_GAP })
-          }, (item: YoContextStripItem, index: number) => `${item.label}_${index}`)
+          }, (item: YoContextStripItem, index: number) => `${index}_${item.label}`)
         }
         .width('100%')
       }

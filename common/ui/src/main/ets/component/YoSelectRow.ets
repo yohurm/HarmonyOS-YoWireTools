@@ -2,6 +2,7 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+
 @ComponentV2
 export struct YoSelectRow {
   @Param title: string = '';
@@ -12,7 +13,7 @@ export struct YoSelectRow {
   };
   build() {
     Row() {
-      Column({ space: 2 }) {
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
         Text(this.title)
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(UiColorToken.TEXT_PRIMARY)
@@ -33,7 +34,7 @@ export struct YoSelectRow {
         .fontColor(UiColorToken.TEXT_SECONDARY)
         .margin({ right: UiSpacing.ITEM_GAP })
       SymbolGlyph($r('sys.symbol.chevron_right'))
-        .fontSize(16)
+        .fontSize(UiLayoutConstants.CHEVRON_GLYPH_SIZE)
         .fontColor([UiColorToken.TEXT_TERTIARY])
     }
     .width('100%')
@@ -47,7 +48,7 @@ export struct YoSelectRow {
     .backgroundColor(UiColorToken.SURFACE)
     .borderRadius(UiSpacing.CORNER_RADIUS)
     .enabled(this.isEnabled)
-    .opacity(this.isEnabled ? 1 : 0.4)
+    .opacity(this.isEnabled ? 1 : UiLayoutConstants.DISABLED_ROW_OPACITY)
     .onClick(() => this.onTap())
   }
 }

@@ -3,6 +3,7 @@ import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
+
 /**
  * Unified device / session list card (72vp content-type list).
  */
@@ -18,7 +19,7 @@ export struct DeviceCardView {
   };
   build() {
     Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: 4 }) {
+      Column({ space: UiSpacing.INLINE_STACK_GAP }) {
         Text(this.title)
           .fontSize(UiTypography.SUBTITLE_SIZE)
           .fontWeight(FontWeight.Medium)
@@ -37,7 +38,7 @@ export struct DeviceCardView {
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
-      Column({ space: 4 }) {
+      Column({ space: UiSpacing.INLINE_STACK_GAP }) {
         if (this.statusLabel.length > 0) {
           StatusPillView({ label: this.statusLabel, tone: this.statusTone })
         }
@@ -59,7 +60,7 @@ export struct DeviceCardView {
     })
     .backgroundColor(this.selected ? $r('app.color.ui_emphasize_tertiary') : UiColorToken.SURFACE)
     .borderRadius(UiLayoutConstants.CARD_RADIUS)
-    .borderWidth(this.selected ? 1 : 0)
+    .borderWidth(this.selected ? UiLayoutConstants.SELECTED_BORDER_WIDTH : 0)
     .borderColor(UiColorToken.PRIMARY)
     .onClick(() => this.onTap())
   }

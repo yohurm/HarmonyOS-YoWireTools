@@ -4,6 +4,8 @@
 export class UiLayoutConstants {
   /** System navigation bar avoid height (vp). */
   static readonly NAV_BAR_AVOID: number = 28;
+  /** Floating HdsTabs bar bottom margin (vp). */
+  static readonly FLOATING_TAB_BAR_MARGIN: number = 28;
   /** Floating HdsTabs bar + bottom safe spacing for scroll content. */
   static readonly FLOATING_TAB_BOTTOM_PADDING: number = 88;
   /** Title bar height (vp). */
@@ -26,4 +28,18 @@ export class UiLayoutConstants {
   static readonly TERMINAL_MIN_HEIGHT: number = 120;
   /** CommandDock inner padding (vp). */
   static readonly COMMAND_DOCK_PADDING: number = 16;
+  /** TX/RX direction label column width in DataTerminal (vp). */
+  static readonly TERMINAL_DIRECTION_WIDTH: number = 28;
+  /** Trailing chevron glyph size in select/list rows (vp). */
+  static readonly CHEVRON_GLYPH_SIZE: number = 16;
+  /** Disabled button opacity (Material disabled emphasis). */
+  static readonly DISABLED_BUTTON_OPACITY: number = 0.38;
+  /** Disabled list/select row opacity. */
+  static readonly DISABLED_ROW_OPACITY: number = 0.4;
+  /** Selected card border width (vp). */
+  static readonly SELECTED_BORDER_WIDTH: number = 1;
+  /** Pill/chip corner radius (vp). */
+  static readonly CHIP_PILL_RADIUS: number = 20;
+  /** Log row direction/time column width (vp). */
+  static readonly LOG_ROW_DIRECTION_WIDTH: number = 52;
 }

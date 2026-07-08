@@ -1,24 +1,27 @@
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
-/** @Param names avoid ArkUI built-in `enabled` / `onClick` reserved by CustomComponent. */
+import { YoActionButton, YoActionButtonKind } from './YoActionButton';
+
+/**
+ * @deprecated Use {@link YoActionButton} with {@link YoActionButtonKind.PRIMARY} instead.
+ * Thin wrapper retained for migration; prefer ResourceStr labels via YoActionButton.
+ */
 @ComponentV2
 export struct YoPrimaryButton {
-  @Param label: string = '';
+  /** @deprecated Prefer YoActionButton.label (ResourceStr). */
+  @Param label: ResourceStr = '';
   @Param isEnabled: boolean = true;
   @Param loading: boolean = false;
   @Event onTap: () => void = () => {
   };
+
   build() {
-    Button(this.label, { type: ButtonType.Normal })
-      .width('100%')
-      .height(UiSpacing.BUTTON_HEIGHT)
-      .borderRadius(UiSpacing.CORNER_RADIUS)
-      .fontSize(UiTypography.BODY_SIZE)
-      .fontColor(Color.White)
-      .backgroundColor(UiColorToken.PRIMARY)
-      .enabled(this.isEnabled && !this.loading)
-      .opacity(this.isEnabled ? 1 : 0.4)
-      .onClick(() => this.onTap())
+    YoActionButton({
+      label: this.label,
+      kind: YoActionButtonKind.PRIMARY,
+      isEnabled: this.isEnabled,
+      loading: this.loading,
+      onTap: (): void => {
+        this.onTap();
+      }
+    })
   }
 }

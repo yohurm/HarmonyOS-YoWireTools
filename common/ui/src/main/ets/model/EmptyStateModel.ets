@@ -1,19 +1,19 @@
 /**
- * Empty list presentation model — business copy is supplied by feature ViewModel.
+ * Empty list presentation model — business copy is supplied by feature ViewModel / View resources.
  */
 export class EmptyStateModel {
-  readonly title: string;
-  readonly message: string;
-  readonly reasonHint: string;
-  readonly actionLabel: string;
-  readonly secondaryActionLabel: string;
+  readonly title: ResourceStr;
+  readonly message: ResourceStr;
+  readonly reasonHint: ResourceStr;
+  readonly actionLabel: ResourceStr;
+  readonly secondaryActionLabel: ResourceStr;
 
   constructor(
-    title: string = '',
-    message: string = '',
-    reasonHint: string = '',
-    actionLabel: string = '',
-    secondaryActionLabel: string = ''
+    title: ResourceStr = $r('app.string.ui_empty_default_title'),
+    message: ResourceStr = $r('app.string.ui_empty_default_message'),
+    reasonHint: ResourceStr = '',
+    actionLabel: ResourceStr = '',
+    secondaryActionLabel: ResourceStr = ''
   ) {
     this.title = title;
     this.message = message;

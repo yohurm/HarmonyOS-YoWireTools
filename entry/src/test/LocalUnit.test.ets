@@ -10,8 +10,8 @@ export default function localUnitTest() {
     it('AppRoutes_primary_tabs', 0, () => {
       expect(AppRoutes.BLUETOOTH).assertEqual('/bluetooth/overview');
       expect(AppRoutes.WIFI).assertEqual('/wifi/overview');
-      expect(AppRoutes.LOG).assertEqual('/log/list');
-      expect(AppRoutes.SETTINGS).assertEqual('/settings/index');
+      expect(AppRoutes.NEARLINK).assertEqual('/nearlink/overview');
+      expect(AppRoutes.MORE_HUB).assertEqual('/more/hub');
     });
   });
 }

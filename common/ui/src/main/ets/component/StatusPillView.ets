@@ -1,14 +1,14 @@
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiTypography } from '../theme/UiTypography';
+
 export type StatusPillTone = 'brand' | 'success' | 'warning' | 'error' | 'neutral';
-/**
- * Status pill with text label (not color-only).
- */
+
 @ComponentV2
 export struct StatusPillView {
-  @Param label: string = '';
+  @Param label: ResourceStr = '';
   @Param tone: StatusPillTone = 'neutral';
+
   build() {
     Text(this.label)
       .fontSize(UiTypography.CAPTION_SIZE)
@@ -18,6 +18,7 @@ export struct StatusPillView {
       .backgroundColor(this.resolveBackground())
       .borderRadius(UiLayoutConstants.CARD_RADIUS / 2)
   }
+
   private resolveColor(): ResourceColor {
     switch (this.tone) {
       case 'brand':
@@ -32,6 +33,7 @@ export struct StatusPillView {
         return UiColorToken.TEXT_SECONDARY;
     }
   }
+
   private resolveBackground(): ResourceColor {
     return $r('app.color.ui_emphasize_tertiary');
   }

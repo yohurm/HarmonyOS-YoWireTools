@@ -10,6 +10,8 @@ import { PermissionDeniedView } from './PermissionDeniedView';
 /**
  * Switches between content / loading / empty / error / permission states.
  * ViewModel drives `state` and model objects; UI never reads platform callbacks directly.
+ * Pass @BuilderParam slots with arrow functions that delegate to caller @Builder methods;
+ * do not invoke child components directly inside inline lambdas.
  */
 @ComponentV2
 export struct ContentStateHost {

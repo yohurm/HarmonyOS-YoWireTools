@@ -14,7 +14,7 @@ import {
 import { WifiScanLogger } from '../service/WifiScanLogger';
 import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
-import { WifiOverviewSnapshot, PermissionState, WifiOverviewUiState } from '../model/WifiOverviewUiState';
+import { WifiOverviewSnapshot } from '../model/WifiOverviewSnapshot';
 import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
 import { WifiScanPhase } from '../model/WifiScanState';
 import { NetworkDiagnosticPlan, DiagnosticStepResult } from '../model/NetworkDiagnosticModels';
@@ -23,32 +23,51 @@ import { WebSocketConfig } from '../model/WebSocketModels';
 import { LanDiscoveryConfig, LanHostResult, PortScanConfig, PortProbeResult } from '../model/LanDiscoveryModels';
 import { SocketConnectionParams } from '../model/SocketModels';
 
-export class LoadWifiOverviewUseCase {
+export class ObserveWifiStateUseCase {
   private readonly repository: WifiNetworkRepository;
-  private readonly ensureWifiInfo: EnsurePermissionUseCase;
+
+  constructor(repository: WifiNetworkRepository = WifiNetworkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  start(onChange: () => void): void {
+    this.repository.onWifiStateChange(() => onChange());
+    this.repository.onWifiConnectionChange(() => onChange());
+  }
+
+  stop(): void {
+    this.repository.offWifiStateChange();
+    this.repository.offWifiConnectionChange();
+  }
+}
+
+export class WifiScanCacheFacade {
+  private readonly repository: WifiNetworkRepository;
   private readonly ensurePeersMac: EnsurePermissionUseCase;
 
   constructor(
     repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
-    ensureWifiInfo: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     ensurePeersMac: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
-    this.ensureWifiInfo = ensureWifiInfo;
     this.ensurePeersMac = ensurePeersMac;
   }
 
-  async execute(): Promise<WifiOverviewUiState> {
-    const wifiPerm = await this.ensureWifiInfo.execute(PermissionScenario.WIFI_INFO);
+  getLastScanResults(): WifiAccessPointSnapshot[] {
+    return this.repository.getLastScanResults();
+  }
+
+  getScanCooldownRemainingMs(): number {
+    return this.repository.getScanCooldownRemainingMs();
+  }
+
+  async readScanCache(withMacPermission: boolean, fromCache: boolean): Promise<Result<WifiAccessPointSnapshot[]>> {
+    return this.repository.getScanResults(withMacPermission, fromCache);
+  }
+
+  async resolveMacPermissionGranted(): Promise<boolean> {
     const macPerm = await this.ensurePeersMac.execute(PermissionScenario.WIFI_PEERS_MAC);
-    const overview = await this.repository.loadOverview(wifiPerm.granted, macPerm.granted);
-    return new WifiOverviewUiState(
-      wifiPerm.granted ? PermissionState.GRANTED : PermissionState.DENIED,
-      macPerm.granted ? PermissionState.GRANTED : PermissionState.DENIED,
-      PermissionState.GRANTED,
-      overview,
-      0
-    );
+    return macPerm.granted;
   }
 }
 

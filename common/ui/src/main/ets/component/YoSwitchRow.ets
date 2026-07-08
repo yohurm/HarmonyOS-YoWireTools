@@ -1,22 +1,23 @@
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
 @ComponentV2
 export struct YoSwitchRow {
-  @Param title: string = '';
-  @Param subtitle: string = '';
+  @Param title: ResourceStr = '';
+  @Param subtitle: ResourceStr = '';
   @Param checked: boolean = false;
   @Param isEnabled: boolean = true;
   @Event onCheckedChange: (checked: boolean) => void = () => {
   };
   build() {
     Row() {
-      Column({ space: 4 }) {
+      Column({ space: UiSpacing.INLINE_STACK_GAP }) {
         Text(this.title)
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(UiColorToken.TEXT_PRIMARY)
-        if (this.subtitle.length > 0) {
+        if (UiResourceUtil.hasText(this.subtitle)) {
           Text(this.subtitle)
             .fontSize(UiTypography.CAPTION_SIZE)
             .fontColor(UiColorToken.TEXT_TERTIARY)

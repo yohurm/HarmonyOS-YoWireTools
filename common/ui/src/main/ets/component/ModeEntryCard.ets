@@ -2,25 +2,25 @@ import { UiColorToken } from '../theme/UiColorToken';
 import { UiLayoutConstants } from '../theme/UiLayoutConstants';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
 import { YoActionButton, YoActionButtonKind } from './YoActionButton';
-/**
- * V2 module mode entry card: classic/BLE, scan/SSAP, environment/protocol clusters.
- */
+
 @ComponentV2
 export struct ModeEntryCard {
-  @Param title: string = '';
-  @Param description: string = '';
-  @Param statusLabel: string = '';
+  @Param title: ResourceStr = '';
+  @Param description: ResourceStr = '';
+  @Param statusLabel: ResourceStr = '';
   @Param statusTone: StatusPillTone = 'brand';
-  @Param primaryLabel: string = '';
-  @Param secondaryLabel: string = '';
+  @Param primaryLabel: ResourceStr = '';
+  @Param secondaryLabel: ResourceStr = '';
   @Param disabled: boolean = false;
-  @Param disabledReason: string = '';
+  @Param disabledReason: ResourceStr = '';
   @Event onPrimary: () => void = () => {
   };
   @Event onSecondary: () => void = () => {
   };
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
       Row({ space: UiSpacing.ITEM_GAP }) {
@@ -29,7 +29,7 @@ export struct ModeEntryCard {
           .fontWeight(FontWeight.Medium)
           .fontColor(UiColorToken.TEXT_PRIMARY)
           .layoutWeight(1)
-        if (this.statusLabel.length > 0) {
+        if (UiResourceUtil.hasText(this.statusLabel)) {
           StatusPillView({ label: this.statusLabel, tone: this.statusTone })
         }
       }
@@ -41,14 +41,14 @@ export struct ModeEntryCard {
         .width('100%')
         .maxLines(3)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
-      if (this.disabled && this.disabledReason.length > 0) {
+      if (this.disabled && UiResourceUtil.hasText(this.disabledReason)) {
         Text(this.disabledReason)
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.WARNING)
           .width('100%')
       }
       Row({ space: UiSpacing.ITEM_GAP }) {
-        if (this.secondaryLabel.length > 0) {
+        if (UiResourceUtil.hasText(this.secondaryLabel)) {
           YoActionButton({
             label: this.secondaryLabel,
             kind: YoActionButtonKind.SECONDARY,
@@ -59,7 +59,7 @@ export struct ModeEntryCard {
           })
             .layoutWeight(1)
         }
-        if (this.primaryLabel.length > 0) {
+        if (UiResourceUtil.hasText(this.primaryLabel)) {
           YoActionButton({
             label: this.primaryLabel,
             kind: YoActionButtonKind.PRIMARY,

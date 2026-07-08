@@ -14,9 +14,6 @@
     "feature_bluetooth": "file:../features/bluetooth",
     "feature_wifi_network": "file:../features/wifi_network",
     "feature_nearlink": "file:../features/nearlink",
-    "feature_home": "file:../features/home",
-    "feature_log_center": "file:../features/log_center",
-    "feature_command_center": "file:../features/command_center",
-    "feature_settings": "file:../features/settings"
+    "feature_home": "file:../features/home"
   }
 }

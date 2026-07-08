@@ -2,28 +2,28 @@ import { ErrorStateModel } from '../model/ErrorStateModel';
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
-/**
- * Three-layer error state: what happened → why → next step.
- */
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
 @ComponentV2
 export struct ErrorStateView {
   @Param model: ErrorStateModel = new ErrorStateModel();
   @Event onRetry: () => void = () => {
   };
+
   build() {
     Column({ space: UiSpacing.ITEM_GAP }) {
-      Text(this.model.userMessage.length > 0 ? this.model.userMessage : $r('app.string.ui_error_default_title'))
+      Text(this.model.userMessage)
         .fontSize(UiTypography.SUBTITLE_SIZE)
         .fontWeight(UiTypography.TITLE_WEIGHT)
         .fontColor(UiColorToken.ERROR)
         .textAlign(TextAlign.Center)
-      if (this.model.causeHint.length > 0) {
+      if (UiResourceUtil.hasText(this.model.causeHint)) {
         Text(this.model.causeHint)
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(UiColorToken.TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
       }
-      if (this.model.nextStep.length > 0) {
+      if (UiResourceUtil.hasText(this.model.nextStep)) {
         Text(this.model.nextStep)
           .fontSize(UiTypography.BODY_SIZE)
           .fontColor(UiColorToken.TEXT_PRIMARY)
@@ -38,7 +38,7 @@ export struct ErrorStateView {
           .margin({ top: UiSpacing.ITEM_GAP })
       }
       if (this.model.retryable) {
-        Button(this.model.actionLabel.length > 0 ? this.model.actionLabel : $r('app.string.ui_retry'))
+        Button(this.model.actionLabel)
           .height(UiSpacing.BUTTON_HEIGHT)
           .margin({ top: UiSpacing.SECTION_GAP })
           .onClick(() => this.onRetry())
@@ -48,6 +48,7 @@ export struct ErrorStateView {
     .padding(UiSpacing.PAGE_PADDING)
     .justifyContent(FlexAlign.Center)
   }
+
   private buildCodeLine(): string {
     const parts: string[] = [];
     if (this.model.appCode.length > 0) {

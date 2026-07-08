@@ -1,25 +1,25 @@
 import { UiColorToken } from '../theme/UiColorToken';
 import { UiSpacing } from '../theme/UiSpacing';
 import { UiTypography } from '../theme/UiTypography';
-/**
- * Section title row per HarmonyOS subtitle pattern.
- */
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
 @ComponentV2
 export struct SectionTitleView {
-  @Param title: string = '';
-  @Param subtitle: string = '';
-  @Param actionLabel: string = '';
+  @Param title: ResourceStr = '';
+  @Param subtitle: ResourceStr = '';
+  @Param actionLabel: ResourceStr = '';
   @Event onAction: () => void = () => {
   };
+
   build() {
     Row() {
-      Column({ space: 2 }) {
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
         Text(this.title)
           .fontSize(UiTypography.SUBTITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(UiColorToken.TEXT_PRIMARY)
           .width('100%')
-        if (this.subtitle.length > 0) {
+        if (UiResourceUtil.hasText(this.subtitle)) {
           Text(this.subtitle)
             .fontSize(UiTypography.CAPTION_SIZE)
             .fontColor(UiColorToken.TEXT_TERTIARY)
@@ -28,7 +28,7 @@ export struct SectionTitleView {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-      if (this.actionLabel.length > 0) {
+      if (UiResourceUtil.hasText(this.actionLabel)) {
         Button(this.actionLabel)
           .type(ButtonType.Normal)
           .fontSize(UiTypography.CAPTION_SIZE)

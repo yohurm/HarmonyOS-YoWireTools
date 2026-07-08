@@ -20,7 +20,7 @@ export struct YoLogRow {
   };
   build() {
     Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: 2 }) {
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
         Text(this.directionLabel)
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
@@ -29,9 +29,9 @@ export struct YoLogRow {
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.TEXT_TERTIARY)
       }
-      .width(52)
+      .width(UiLayoutConstants.LOG_ROW_DIRECTION_WIDTH)
       .alignItems(HorizontalAlign.Start)
-      Column({ space: 2 }) {
+      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
         Text(`${this.moduleLabel} · ${this.protocolLabel}`)
           .fontSize(UiTypography.CAPTION_SIZE)
           .fontColor(UiColorToken.TEXT_TERTIARY)

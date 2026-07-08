@@ -1,0 +1,16 @@
+{
+  "color": [
+    {
+      "name": "ui_system_bar_background",
+      "value": "#00000000"
+    },
+    {
+      "name": "ui_system_bar_content_light",
+      "value": "#E5000000"
+    },
+    {
+      "name": "ui_system_bar_content_dark",
+      "value": "#E5FFFFFF"
+    }
+  ]
+}

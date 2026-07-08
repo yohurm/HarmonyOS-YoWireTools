@@ -10,7 +10,7 @@ import { WebSocketDataSource } from '../datasource/WebSocketDataSource';
 import { socket } from '@kit.NetworkKit';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
 import { WifiLinkedInfoSnapshot } from '../../domain/model/WifiLinkedInfoSnapshot';
-import { WifiOverviewSnapshot } from '../../domain/model/WifiOverviewUiState';
+import { WifiOverviewSnapshot } from '../../domain/model/WifiOverviewSnapshot';
 import { WifiScanSource } from '../../domain/model/WifiScanState';
 import {
   DiagnosticStepKind,
