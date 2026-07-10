@@ -1,5 +1,5 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { ComponentContent, promptAction, wrapBuilder } from '@kit.ArkUI';
+import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { UIContextRegistry } from 'common_platform';
 import { ButtonToken } from '../token/component/ButtonToken';
 import { DialogToken } from '../token/component/DialogToken';
