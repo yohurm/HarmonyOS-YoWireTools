@@ -10,9 +10,9 @@ export class PermissionUiState {
   readonly statuses: PermissionStatus[];
   readonly canRequest: boolean;
   readonly shouldShowSettingGuide: boolean;
-  readonly title: string;
-  readonly message: string;
-  readonly userAction: string;
+  readonly title: ResourceStr;
+  readonly message: ResourceStr;
+  readonly userAction: ResourceStr;
 
   constructor(
     scenarioId: string,
@@ -20,9 +20,9 @@ export class PermissionUiState {
     statuses: PermissionStatus[],
     canRequest: boolean,
     shouldShowSettingGuide: boolean,
-    title: string,
-    message: string,
-    userAction: string
+    title: ResourceStr,
+    message: ResourceStr,
+    userAction: ResourceStr
   ) {
     this.scenarioId = scenarioId;
     this.permissions = permissions;

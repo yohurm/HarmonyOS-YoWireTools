@@ -1,6 +1,7 @@
 import {
-  UiColorToken,
-  UiTypography,
+  EmptyStateModel,
+  EmptyStateView,
+  UiResponsive,
   YoNavDestinationKind,
   YoPageShell,
   YoSplitScaffold
@@ -9,27 +10,33 @@ import {
 @Builder
 function nearLinkListPane() {
   Column() {
-    Text('NearLink device list placeholder')
-      .fontSize(UiTypography.BODY_SIZE)
-      .fontColor(UiColorToken.TEXT_SECONDARY)
+    EmptyStateView({
+      model: new EmptyStateModel(
+        $r('app.string.nl_placeholder_list'),
+        $r('app.string.nl_placeholder_list_message')
+      )
+    })
   }
   .width('100%')
   .height('100%')
+  .padding(UiResponsive.CARD_CONTENT_PADDING)
   .justifyContent(FlexAlign.Center)
-  .alignItems(HorizontalAlign.Center)
 }
 
 @Builder
 function nearLinkDetailPane() {
   Column() {
-    Text('NearLink device detail placeholder')
-      .fontSize(UiTypography.BODY_SIZE)
-      .fontColor(UiColorToken.TEXT_SECONDARY)
+    EmptyStateView({
+      model: new EmptyStateModel(
+        $r('app.string.nl_placeholder_detail'),
+        $r('app.string.nl_placeholder_detail_message')
+      )
+    })
   }
   .width('100%')
   .height('100%')
+  .padding(UiResponsive.CARD_CONTENT_PADDING)
   .justifyContent(FlexAlign.Center)
-  .alignItems(HorizontalAlign.Center)
 }
 
 @Builder
@@ -51,4 +58,3 @@ export struct NearLinkFeaturePage {
     })
   }
 }
-

@@ -6,8 +6,9 @@ import {
   WindowWidthBreakpoint,
   WindowWidthBreakpointUtil
 } from 'common_platform';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiColorToken } from '../theme/UiColorToken';
+import { NavigationToken } from '../token/component/NavigationToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiResponsive } from '../token/semantic/UiResponsive';
 import { YoSideNavItem, YoSideNavRail } from './YoSideNavRail';
 
 /**
@@ -52,7 +53,7 @@ export struct YoAppShell {
             this.responsiveShell()
           }
           .width('100%')
-          .constraintSize({ maxWidth: UiLayoutConstants.CONTENT_MAX_WIDTH_XL })
+          .constraintSize({ maxWidth: UiResponsive.CONTENT_MAX_WIDTH })
         }
         .width('100%')
         .height('100%')
@@ -63,7 +64,7 @@ export struct YoAppShell {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(UiColorToken.BACKGROUND)
+    .backgroundColor(UiColor.BACKGROUND_PRIMARY)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
@@ -132,7 +133,7 @@ export struct YoAppShell {
     .barPosition(BarPosition.End)
     .vertical(false)
     .barFloatingStyle({
-      barBottomMargin: UiLayoutConstants.FLOATING_TAB_BAR_MARGIN,
+      barBottomMargin: NavigationToken.FLOATING_TAB_MARGIN,
       systemMaterialEffect: {
         materialType: hdsMaterial.MaterialType.ADAPTIVE,
         materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
@@ -140,7 +141,7 @@ export struct YoAppShell {
     })
     .width('100%')
     .height('100%')
-    .backgroundColor(UiColorToken.BACKGROUND)
+    .backgroundColor(UiColor.BACKGROUND_PRIMARY)
     .onChange((index: number) => {
       this.onTabChange(index);
     })

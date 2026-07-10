@@ -1,5 +1,5 @@
 import { UIContextRegistry } from 'common_platform';
-import { UiColorToken } from 'common_ui';
+import { UiColor } from 'common_ui';
 import { BleMainPage, SppMainPage } from 'feature_bluetooth';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { MainTabContainer } from '../shell/MainTabContainer';
@@ -63,7 +63,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(UiColorToken.BACKGROUND)
+    .backgroundColor(UiColor.BACKGROUND_PRIMARY)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

@@ -40,35 +40,35 @@ export class BusinessPermissionCatalog {
     }
   }
 
-  static reasonFor(group: BusinessPermissionGroup): string {
+  static reasonFor(group: BusinessPermissionGroup): ResourceStr {
     switch (group) {
       case BusinessPermissionGroup.BLUETOOTH_SCAN_CONNECT:
-        return '蓝牙扫描与连接需要 ACCESS_BLUETOOTH 权限';
+        return $r('app.string.perm_reason_bluetooth_scan_connect');
       case BusinessPermissionGroup.BLUETOOTH_PERSISTENT_MAC:
-        return '持久化蓝牙地址需要额外权限';
+        return $r('app.string.perm_reason_bluetooth_persistent_mac');
       case BusinessPermissionGroup.WIFI_INFO:
-        return 'WiFi 环境分析需要 GET_WIFI_INFO 权限';
+        return $r('app.string.perm_reason_wifi_info');
       case BusinessPermissionGroup.WIFI_PEERS_MAC:
-        return '读取真实 BSSID 需要 GET_WIFI_PEERS_MAC 权限';
+        return $r('app.string.perm_reason_wifi_peers_mac');
       case BusinessPermissionGroup.WIFI_CONTROL:
-        return 'WiFi 控制需要 SET_WIFI_INFO 权限';
+        return $r('app.string.perm_reason_wifi_control');
       case BusinessPermissionGroup.NETWORK_ACCESS:
-        return '网络调试需要 INTERNET 权限';
+        return $r('app.string.perm_reason_network_access');
       case BusinessPermissionGroup.NETWORK_INFO:
-        return '网络状态查询需要 GET_NETWORK_INFO 权限';
+        return $r('app.string.perm_reason_network_info');
       case BusinessPermissionGroup.NEARLINK_ACCESS:
-        return '星闪调试需要 ACCESS_NEARLINK 权限';
+        return $r('app.string.perm_reason_nearlink_access');
       default:
-        return '当前功能需要系统权限';
+        return $r('app.string.perm_reason_default');
     }
   }
 
   static presentationFor(group: BusinessPermissionGroup): PermissionPresentation {
     return new PermissionPresentation(
       group,
-      '需要权限',
+      $r('app.string.perm_title_required'),
       BusinessPermissionCatalog.reasonFor(group),
-      '去授权'
+      $r('app.string.perm_action_grant')
     );
   }
 }

@@ -5,10 +5,7 @@ import { AbilityContextRegistry } from 'common_platform';
  */
 export class UiResourceUtil {
   static hasText(value: ResourceStr): boolean {
-    if (typeof value === 'string') {
-      return value.length > 0;
-    }
-    return true;
+    return UiResourceUtil.resolveText(value).length > 0;
   }
 
   static format(res: Resource, ...args: Array<string | number>): string {
@@ -18,6 +15,21 @@ export class UiResourceUtil {
     }
     try {
       return context.resourceManager.getStringSync(res.id, ...args);
+    } catch (_error) {
+      return '';
+    }
+  }
+
+  static resolveText(value: ResourceStr): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return '';
+    }
+    try {
+      return context.resourceManager.getStringSync(value.id);
     } catch (_error) {
       return '';
     }

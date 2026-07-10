@@ -1,0 +1,60 @@
+{
+  "string": [
+    {
+      "name": "perm_title_required",
+      "value": "需要权限"
+    },
+    {
+      "name": "perm_action_grant",
+      "value": "去授权"
+    },
+    {
+      "name": "perm_reason_bluetooth_scan_connect",
+      "value": "蓝牙扫描与连接需要 ACCESS_BLUETOOTH 权限"
+    },
+    {
+      "name": "perm_reason_bluetooth_persistent_mac",
+      "value": "持久化蓝牙地址需要额外权限"
+    },
+    {
+      "name": "perm_reason_wifi_info",
+      "value": "WiFi 环境分析需要 GET_WIFI_INFO 权限"
+    },
+    {
+      "name": "perm_reason_wifi_peers_mac",
+      "value": "读取真实 BSSID 需要 GET_WIFI_PEERS_MAC 权限"
+    },
+    {
+      "name": "perm_reason_wifi_control",
+      "value": "WiFi 控制需要 SET_WIFI_INFO 权限"
+    },
+    {
+      "name": "perm_reason_network_access",
+      "value": "网络调试需要 INTERNET 权限"
+    },
+    {
+      "name": "perm_reason_network_info",
+      "value": "网络状态查询需要 GET_NETWORK_INFO 权限"
+    },
+    {
+      "name": "perm_reason_nearlink_access",
+      "value": "星闪调试需要 ACCESS_NEARLINK 权限"
+    },
+    {
+      "name": "perm_reason_default",
+      "value": "当前功能需要系统权限"
+    },
+    {
+      "name": "perm_blocked_title",
+      "value": "权限被拒绝"
+    },
+    {
+      "name": "perm_blocked_message",
+      "value": "权限已被拒绝，请前往系统设置开启所需权限。"
+    },
+    {
+      "name": "perm_blocked_action_open_settings",
+      "value": "打开设置"
+    }
+  ]
+}

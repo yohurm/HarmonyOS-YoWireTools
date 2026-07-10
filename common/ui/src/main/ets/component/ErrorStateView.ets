@@ -1,7 +1,8 @@
 import { ErrorStateModel } from '../model/ErrorStateModel';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { ButtonToken } from '../token/component/ButtonToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSpace } from '../token/foundation/UiSpace';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 
 @ComponentV2
@@ -11,41 +12,42 @@ export struct ErrorStateView {
   };
 
   build() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
+    Column({ space: UiSpace.M }) {
       Text(this.model.userMessage)
-        .fontSize(UiTypography.SUBTITLE_SIZE)
-        .fontWeight(UiTypography.TITLE_WEIGHT)
-        .fontColor(UiColorToken.ERROR)
+        .fontSize(UiTypeStyle.SUBTITLE_M.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
+        .fontColor(UiColor.ERROR)
         .textAlign(TextAlign.Center)
       if (UiResourceUtil.hasText(this.model.causeHint)) {
         Text(this.model.causeHint)
-          .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(UiColorToken.TEXT_SECONDARY)
+          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontColor(UiColor.TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
       }
       if (UiResourceUtil.hasText(this.model.nextStep)) {
         Text(this.model.nextStep)
-          .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(UiColorToken.TEXT_PRIMARY)
+          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontColor(UiColor.TEXT_PRIMARY)
           .textAlign(TextAlign.Center)
-          .margin({ top: UiSpacing.ITEM_GAP })
+          .margin({ top: UiSpace.M })
       }
       if (this.model.appCode.length > 0 || this.model.nativeCode.length > 0) {
         Text(this.buildCodeLine())
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
           .textAlign(TextAlign.Center)
-          .margin({ top: UiSpacing.ITEM_GAP })
+          .margin({ top: UiSpace.M })
       }
       if (this.model.retryable) {
         Button(this.model.actionLabel)
-          .height(UiSpacing.BUTTON_HEIGHT)
-          .margin({ top: UiSpacing.SECTION_GAP })
+          .height(ButtonToken.HEIGHT)
+          .borderRadius(ButtonToken.RADIUS)
+          .margin({ top: UiSpace.XL })
           .onClick(() => this.onRetry())
       }
     }
     .width('100%')
-    .padding(UiSpacing.PAGE_PADDING)
+    .padding(UiSpace.XL)
     .justifyContent(FlexAlign.Center)
   }
 

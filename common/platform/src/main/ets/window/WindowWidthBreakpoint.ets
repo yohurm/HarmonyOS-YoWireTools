@@ -41,6 +41,7 @@ export class WindowWidthBreakpointUtil {
     return !WindowWidthBreakpointUtil.isSideNavCapable(breakpoint);
   }
 
+  /** Compact 16vp / Medium 24vp / Expanded+ 32vp — aligned with UiResponsive.pageHorizontal. */
   static pagePaddingVp(breakpoint: WindowWidthBreakpoint): number {
     if (breakpoint === WindowWidthBreakpoint.EXPANDED || breakpoint === WindowWidthBreakpoint.XL) {
       return 32;

@@ -1,12 +1,15 @@
 import {
-  StatusPillView,
-  UiColorToken,
-  UiLayoutConstants,
-  UiSpacing,
-  UiTypography,
+  ContentStateHost,
+  LoadingStateModel,
+  ModeEntryCard,
+  UiColor,
+  UiPageState,
+  UiResponsive,
+  UiTypeStyle,
   YoNavDestinationKind,
   YoPageShell
 } from 'common_ui';
+import { PermissionScenario, PermissionScenarioCoordinator } from 'feature_debug_core';
 import { BtStatusCard } from '../component/BtStatusCard';
 import { BtOverviewViewModel } from '../../viewmodel/BtOverviewViewModel';
 
@@ -26,9 +29,45 @@ export struct BluetoothFeaturePage {
     this.vm.onPageDisappear();
   }
 
+  private resolvePageState(): UiPageState {
+    if (this.vm.isLoading) {
+      return UiPageState.LOADING;
+    }
+    if (!this.vm.permissionGranted) {
+      return UiPageState.PERMISSION;
+    }
+    return UiPageState.CONTENT;
+  }
+
+  private async handleRequestPermission(): Promise<void> {
+    await this.vm.requestPermission();
+  }
+
+  private async handleOpenSettings(): Promise<void> {
+    await PermissionScenarioCoordinator.getInstance()
+      .ensurePermission(PermissionScenario.BLUETOOTH_SCAN_CONNECT);
+    await this.vm.refresh();
+  }
+
   @LocalBuilder
   pageContent() {
-    Column({ space: UiSpacing.SECTION_GAP }) {
+    ContentStateHost({
+      state: this.resolvePageState(),
+      loadingModel: new LoadingStateModel($r('app.string.ui_loading_default_message')),
+      permissionState: this.vm.permissionUiState,
+      content: this.pageBody,
+      onRequestPermission: () => {
+        void this.handleRequestPermission();
+      },
+      onOpenSettings: () => {
+        void this.handleOpenSettings();
+      }
+    })
+  }
+
+  @LocalBuilder
+  pageBody() {
+    Column({ space: UiResponsive.SECTION_GAP }) {
       BtStatusCard({
         isLoading: this.vm.isLoading,
         adapterEnabled: this.vm.adapterEnabled,
@@ -62,62 +101,37 @@ export struct BluetoothFeaturePage {
 
   @LocalBuilder
   bluetoothEntryOverview() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
+    Column({ space: UiResponsive.CONTROL_GAP }) {
       Text($r('app.string.bt_entry_section_title'))
-        .fontSize(UiTypography.SUBTITLE_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(UiColorToken.TEXT_PRIMARY)
+        .fontSize(UiTypeStyle.SUBTITLE_M.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
+        .fontColor(UiColor.TEXT_PRIMARY)
         .width('100%')
-      this.entryCard(
-        $r('app.string.bt_entry_spp_title'),
-        $r('app.string.bt_entry_spp_subtitle'),
-        this.vm.isClassicReady(),
-        () => {
+      ModeEntryCard({
+        title: $r('app.string.bt_entry_spp_title'),
+        description: $r('app.string.bt_entry_spp_subtitle'),
+        statusLabel: this.vm.isClassicReady() ?
+          $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
+        statusTone: this.vm.isClassicReady() ? 'success' : 'warning',
+        primaryLabel: $r('app.string.ui_session_enter'),
+        disabled: !this.vm.isClassicReady(),
+        onPrimary: () => {
           this.onOpenSpp();
         }
-      )
-      this.entryCard(
-        $r('app.string.bt_entry_ble_title'),
-        $r('app.string.bt_entry_ble_subtitle'),
-        this.vm.isBleReady(),
-        () => {
+      })
+      ModeEntryCard({
+        title: $r('app.string.bt_entry_ble_title'),
+        description: $r('app.string.bt_entry_ble_subtitle'),
+        statusLabel: this.vm.isBleReady() ?
+          $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
+        statusTone: this.vm.isBleReady() ? 'success' : 'warning',
+        primaryLabel: $r('app.string.ui_session_enter'),
+        disabled: !this.vm.isBleReady(),
+        onPrimary: () => {
           this.onOpenBle();
         }
-      )
-    }
-    .width('100%')
-  }
-
-  @Builder
-  private entryCard(title: ResourceStr, subtitle: ResourceStr, ready: boolean, onTap: () => void) {
-    Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
-        Text(title)
-          .fontSize(UiTypography.SUBTITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(UiColorToken.TEXT_PRIMARY)
-          .width('100%')
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(subtitle)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
-          .width('100%')
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      StatusPillView({
-        label: ready ? $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
-        tone: ready ? 'success' : 'warning'
       })
     }
     .width('100%')
-    .padding(UiSpacing.CARD_INNER_PADDING)
-    .backgroundColor(UiColorToken.SURFACE)
-    .borderRadius(UiLayoutConstants.CARD_RADIUS_SMALL)
-    .alignItems(VerticalAlign.Center)
-    .onClick(() => onTap())
   }
 }

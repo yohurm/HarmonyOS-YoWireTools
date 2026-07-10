@@ -3,7 +3,8 @@ import { EmptyStateModel } from '../main/ets/model/EmptyStateModel';
 import { ErrorStateModel } from '../main/ets/model/ErrorStateModel';
 import { LoadingStateModel } from '../main/ets/model/LoadingStateModel';
 import { UiPageState } from '../main/ets/model/UiPageState';
-import { UiSpacing } from '../main/ets/theme/UiSpacing';
+import { UiSpace } from '../main/ets/token/foundation/UiSpace';
+import { UiResourceUtil } from '../main/ets/util/UiResourceUtil';
 
 export default function localUnitTest() {
   describe('CommonUiLocalUnitTest', () => {
@@ -35,8 +36,16 @@ export default function localUnitTest() {
       expect(model.showProgress).assertTrue();
     });
 
-    it('UiSpacing_tokens', 0, () => {
-      expect(UiSpacing.PAGE_PADDING).assertEqual(16);
+    it('UiSpace_page_padding', 0, () => {
+      expect(UiSpace.XL).assertEqual(16);
+    });
+
+    it('UiResourceUtil_hasText', 0, () => {
+      expect(UiResourceUtil.hasText('')).assertFalse();
+      expect(UiResourceUtil.resolveText('')).assertEqual('');
+      expect(UiResourceUtil.hasText('label')).assertTrue();
+      expect(UiResourceUtil.resolveText('label')).assertEqual('label');
+      expect(UiResourceUtil.hasText('   ')).assertTrue();
     });
   });
 }

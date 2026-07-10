@@ -2,24 +2,24 @@ import { SessionState } from '../domain/enums/DomainEnums';
 
 /** Maps session runtime state to user-facing labels per HarmonyOS 界面用语规范. */
 export class SessionUiFormat {
-  static stateLabel(state: SessionState): string {
+  static stateLabel(state: SessionState): ResourceStr {
     switch (state) {
       case SessionState.RUNNING:
-        return '运行中';
+        return $r('app.string.session_state_running');
       case SessionState.PREPARING:
-        return '准备中';
+        return $r('app.string.session_state_preparing');
       case SessionState.SUSPENDED:
-        return '已暂停';
+        return $r('app.string.session_state_suspended');
       case SessionState.FAILED:
-        return '失败';
+        return $r('app.string.session_state_failed');
       case SessionState.COMPLETED:
-        return '已结束';
+        return $r('app.string.session_state_completed');
       case SessionState.STOPPING:
-        return '停止中';
+        return $r('app.string.session_state_stopping');
       case SessionState.CANCELLED:
-        return '已取消';
+        return $r('app.string.session_state_cancelled');
       default:
-        return '已创建';
+        return $r('app.string.session_state_created');
     }
   }
 

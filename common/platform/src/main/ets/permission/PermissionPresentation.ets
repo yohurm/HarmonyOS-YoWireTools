@@ -3,21 +3,21 @@
  */
 export class PermissionPresentation {
   readonly scenarioId: string;
-  readonly title: string;
-  readonly message: string;
-  readonly userAction: string;
-  readonly blockedTitle: string;
-  readonly blockedMessage: string;
-  readonly blockedUserAction: string;
+  readonly title: ResourceStr;
+  readonly message: ResourceStr;
+  readonly userAction: ResourceStr;
+  readonly blockedTitle: ResourceStr;
+  readonly blockedMessage: ResourceStr;
+  readonly blockedUserAction: ResourceStr;
 
   constructor(
     scenarioId: string,
-    title: string,
-    message: string,
-    userAction: string,
-    blockedTitle: string = 'Permission blocked',
-    blockedMessage: string = 'Permission was denied. Open settings to enable required permissions.',
-    blockedUserAction: string = 'Open settings'
+    title: ResourceStr,
+    message: ResourceStr,
+    userAction: ResourceStr,
+    blockedTitle: ResourceStr = $r('app.string.perm_blocked_title'),
+    blockedMessage: ResourceStr = $r('app.string.perm_blocked_message'),
+    blockedUserAction: ResourceStr = $r('app.string.perm_blocked_action_open_settings')
   ) {
     this.scenarioId = scenarioId;
     this.title = title;

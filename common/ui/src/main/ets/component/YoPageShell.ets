@@ -1,5 +1,9 @@
 import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit';
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
+import { NavigationToken } from '../token/component/NavigationToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiResponsive } from '../token/semantic/UiResponsive';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
 import { YoNavDestinationKind } from '../shell/YoNavDestinationKind';
 import {
   HdsSystemBarStyleBundle,
@@ -8,20 +12,11 @@ import {
   YoNavigationTitleBarConfig,
   YoTitleBarContent
 } from '../theme/HdsTitleBarPolicy';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 import { YoContextStrip, YoContextStripItem } from './YoContextStrip';
 
 /**
  * L4 页面壳：HdsNavigation 标题栏沉浸 + 内容安全区。
- *
- * 颜色数据链（WSL）：
- * L1 EntryAbility/SystemBarThemeCoordinator → 窗口级透明系统栏基线
- * L4 HdsNavigation.titleBar.originalStyle → 标题 font_primary
- * L4 HdsNavigation.systemBarStyle → 主页面状态栏权威色（覆盖 L1，不与 setWindowSystemBarProperties 混用）
  */
 @ComponentV2
 export struct YoPageShell {
@@ -33,7 +28,6 @@ export struct YoPageShell {
   @Param contextRiskMessage: ResourceStr = '';
   @Param scrollable: boolean = true;
   @Param immersiveTitleBar: boolean = true;
-  /** 仅沉浸式图文 hero 页设为 true，启用 IMMERSIVE_GRADIENT_BLUR。 */
   @Param immersiveHeroContent: boolean = false;
   @Param bottomPaddingVp: number = -1;
   @BuilderParam content: () => void = this.defaultContent;
@@ -56,11 +50,11 @@ export struct YoPageShell {
       HdsNavigation() {
         if (this.scrollable) {
           Scroll(this.scroller) {
-            Column({ space: UiSpacing.SECTION_GAP }) {
+            Column({ space: UiResponsive.SECTION_GAP }) {
               if (UiResourceUtil.hasText(this.subtitle)) {
                 Text(this.subtitle)
-                  .fontSize(UiTypography.CAPTION_SIZE)
-                  .fontColor(UiColorToken.TEXT_SECONDARY)
+                  .fontSize(UiTypeStyle.BODY_S.size)
+                  .fontColor(UiColor.TEXT_SECONDARY)
                   .width('100%')
                   .padding({
                     left: this.resolveHorizontalPadding(),
@@ -90,7 +84,7 @@ export struct YoPageShell {
           .scrollBar(BarState.Auto)
           .clipContent(ContentClipMode.SAFE_AREA)
         } else {
-          Column({ space: UiSpacing.SECTION_GAP }) {
+          Column({ space: UiResponsive.SECTION_GAP }) {
             YoContextStrip({
               items: this.contextItems,
               riskMessage: this.contextRiskMessage
@@ -126,7 +120,7 @@ export struct YoPageShell {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(UiColorToken.BACKGROUND)
+    .backgroundColor(UiColor.BACKGROUND_PRIMARY)
   }
 
   private buildTitleBarConfig(): YoNavigationTitleBarConfig {
@@ -180,11 +174,11 @@ export struct YoPageShell {
     const navInset = this.metrics.navigationBottomInsetVp;
     if (this.destinationKind === YoNavDestinationKind.ROOT_TAB) {
       if (WindowWidthBreakpointUtil.isSideNavCapable(this.metrics.breakpoint)) {
-        return navInset + UiSpacing.FORM_GAP;
+        return navInset + UiResponsive.FORM_GAP;
       }
-      return UiLayoutConstants.FLOATING_TAB_BOTTOM_PADDING;
+      return NavigationToken.FLOATING_TAB_BOTTOM_PADDING;
     }
-    return navInset + UiSpacing.FORM_GAP;
+    return navInset + UiResponsive.FORM_GAP;
   }
 }
 

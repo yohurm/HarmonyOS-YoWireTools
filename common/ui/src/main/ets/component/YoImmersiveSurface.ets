@@ -1,6 +1,5 @@
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
+import { CardToken } from '../token/component/CardToken';
 import { HdsMaterialPolicy, UI_MATERIAL_MIN_SDK_API } from '../theme/HdsMaterialPolicy';
 
 /**
@@ -16,8 +15,8 @@ import { HdsMaterialPolicy, UI_MATERIAL_MIN_SDK_API } from '../theme/HdsMaterial
  */
 @ComponentV2
 export struct YoImmersiveSurface {
-  @Param cornerRadius: number = UiLayoutConstants.CARD_RADIUS;
-  @Param innerPadding: number = UiSpacing.CARD_INNER_PADDING;
+  @Param cornerRadius: number = CardToken.RADIUS;
+  @Param innerPadding: number = CardToken.PADDING;
   @BuilderParam content: () => void = this.defaultContent;
 
   @Builder

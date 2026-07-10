@@ -1,7 +1,8 @@
 import { EmptyStateModel } from '../model/EmptyStateModel';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { ButtonToken } from '../token/component/ButtonToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSpace } from '../token/foundation/UiSpace';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 
 @ComponentV2
@@ -13,40 +14,42 @@ export struct EmptyStateView {
   };
 
   build() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
+    Column({ space: UiSpace.M }) {
       Text(this.model.title)
-        .fontSize(UiTypography.SUBTITLE_SIZE)
-        .fontWeight(UiTypography.TITLE_WEIGHT)
-        .fontColor(UiColorToken.TEXT_PRIMARY)
+        .fontSize(UiTypeStyle.SUBTITLE_M.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
+        .fontColor(UiColor.TEXT_PRIMARY)
         .textAlign(TextAlign.Center)
       Text(this.model.message)
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontColor(UiColorToken.TEXT_SECONDARY)
+        .fontSize(UiTypeStyle.BODY_M.size)
+        .fontColor(UiColor.TEXT_SECONDARY)
         .textAlign(TextAlign.Center)
       if (UiResourceUtil.hasText(this.model.reasonHint)) {
         Text(this.model.reasonHint)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
           .textAlign(TextAlign.Center)
-          .margin({ top: UiSpacing.ITEM_GAP })
+          .margin({ top: UiSpace.M })
       }
       if (UiResourceUtil.hasText(this.model.actionLabel)) {
         Button(this.model.actionLabel)
-          .height(UiSpacing.BUTTON_HEIGHT)
-          .margin({ top: UiSpacing.SECTION_GAP })
+          .height(ButtonToken.HEIGHT)
+          .borderRadius(ButtonToken.RADIUS)
+          .margin({ top: UiSpace.XL })
           .onClick(() => this.onPrimaryAction())
       }
       if (UiResourceUtil.hasText(this.model.secondaryActionLabel)) {
         Button(this.model.secondaryActionLabel)
-          .height(UiSpacing.BUTTON_HEIGHT)
+          .height(ButtonToken.HEIGHT)
           .type(ButtonType.Normal)
+          .borderRadius(ButtonToken.RADIUS)
           .backgroundColor(Color.Transparent)
-          .fontColor(UiColorToken.PRIMARY)
+          .fontColor(UiColor.BRAND_PRIMARY)
           .onClick(() => this.onSecondaryAction())
       }
     }
     .width('100%')
-    .padding(UiSpacing.PAGE_PADDING)
+    .padding(UiSpace.XL)
     .justifyContent(FlexAlign.Center)
   }
 }

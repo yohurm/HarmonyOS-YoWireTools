@@ -1,12 +1,110 @@
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { NavigationToken } from '../token/component/NavigationToken';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiSpace } from '../token/foundation/UiSpace';
+import { UiRadius } from '../token/foundation/UiRadius';
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
+const KEY_CODE_SPACE: number = 2050;
+const KEY_CODE_ENTER: number = 2054;
 
 export interface YoSideNavItem {
   index: number;
   label: ResourceStr;
   symbol: Resource;
+}
+
+@ComponentV2
+struct YoSideNavRailItem {
+  @Param item: YoSideNavItem = { index: 0, label: '', symbol: $r('sys.symbol.circle') };
+  @Param selected: boolean = false;
+  @Event onSelect: () => void = () => {
+  };
+  @Local private isPressed: boolean = false;
+  @Local private isHovered: boolean = false;
+  @Local private isFocused: boolean = false;
+
+  build() {
+    Row({ space: UiSpace.M }) {
+      SymbolGlyph(this.item.symbol)
+        .fontSize(UiSize.ICON_M)
+        .fontColor([this.selected ? UiColor.BRAND_PRIMARY : UiColor.TEXT_SECONDARY])
+        .accessibilityLevel('no')
+      Text(this.item.label)
+        .fontSize(UiTypeStyle.BODY_M.size)
+        .fontWeight(this.selected ? UiTypeStyle.SUBTITLE_M.weight : UiTypeStyle.BODY_M.weight)
+        .fontColor(this.selected ? UiColor.BRAND_PRIMARY : UiColor.TEXT_PRIMARY)
+        .layoutWeight(1)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+    }
+    .width('100%')
+    .constraintSize({ minHeight: UiSize.TOUCH_TARGET_MIN })
+    .height(UiSize.LIST_ROW_HEIGHT)
+    .padding({ left: UiSpace.M, right: UiSpace.M })
+    .borderRadius(UiRadius.LARGE)
+    .backgroundColor(this.resolveBackground())
+    .borderWidth(this.isFocused ? 2 : 0)
+    .borderColor(UiColor.BORDER_FOCUSED)
+    .focusable(true)
+    .onClick(() => {
+      if (!this.selected) {
+        this.onSelect();
+      }
+    })
+    .onHover((isHover: boolean) => {
+      this.isHovered = isHover;
+    })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.isPressed = true;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.isPressed = false;
+      }
+    })
+    .onFocus(() => {
+      this.isFocused = true;
+    })
+    .onBlur(() => {
+      this.isFocused = false;
+      this.isPressed = false;
+    })
+    .onKeyEvent((event: KeyEvent) => {
+      if (event.type !== KeyType.Down) {
+        return;
+      }
+      if (event.keyCode === KEY_CODE_ENTER || event.keyCode === KEY_CODE_SPACE) {
+        this.onSelect();
+      }
+    })
+    .accessibilityGroup(true)
+    .accessibilityText(this.buildAccessibilityLabel())
+  }
+
+  private buildAccessibilityLabel(): string {
+    let label = UiResourceUtil.resolveText(this.item.label);
+    if (this.selected) {
+      label = UiResourceUtil.format($r('app.string.ui_a11y_selected'), label);
+    }
+    return label;
+  }
+
+  private resolveBackground(): ResourceColor {
+    if (this.isPressed) {
+      return UiColor.INTERACTIVE_PRESSED;
+    }
+    if (this.isFocused) {
+      return UiColor.INTERACTIVE_FOCUSED;
+    }
+    if (this.isHovered) {
+      return UiColor.INTERACTIVE_HOVER;
+    }
+    if (this.selected) {
+      return UiColor.SURFACE_SELECTED;
+    }
+    return Color.Transparent;
+  }
 }
 
 /**
@@ -20,47 +118,26 @@ export struct YoSideNavRail {
   };
 
   build() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
+    Column({ space: UiSpace.M }) {
       ForEach(this.items, (item: YoSideNavItem) => {
-        this.navItem(item)
+        YoSideNavRailItem({
+          item: item,
+          selected: item.index === this.currentIndex,
+          onSelect: () => {
+            this.onSelect(item.index);
+          }
+        })
       }, (item: YoSideNavItem) => `${item.index}`)
     }
-    .width(UiLayoutConstants.SIDE_NAV_WIDTH)
+    .width(NavigationToken.SIDE_NAV_WIDTH)
     .height('100%')
     .padding({
-      top: UiSpacing.SECTION_GAP,
-      bottom: UiSpacing.SECTION_GAP,
-      left: UiSpacing.PAGE_PADDING,
-      right: UiSpacing.PAGE_PADDING
+      top: UiSpace.XL,
+      bottom: UiSpace.XL,
+      left: UiSpace.XL,
+      right: UiSpace.XL
     })
-    .backgroundColor(UiColorToken.SURFACE)
+    .backgroundColor(UiColor.SURFACE_CARD)
     .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  private navItem(item: YoSideNavItem) {
-    Row({ space: UiSpacing.ITEM_GAP }) {
-      SymbolGlyph(item.symbol)
-        .fontSize(UiSpacing.ICON_SIZE)
-        .fontColor([item.index === this.currentIndex ?
-          UiColorToken.PRIMARY : UiColorToken.TEXT_SECONDARY])
-      Text(item.label)
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontWeight(item.index === this.currentIndex ? UiTypography.TITLE_WEIGHT : FontWeight.Regular)
-        .fontColor(item.index === this.currentIndex ? UiColorToken.PRIMARY : UiColorToken.TEXT_PRIMARY)
-        .layoutWeight(1)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-    }
-    .width('100%')
-    .height(UiLayoutConstants.LIST_ROW_HEIGHT)
-    .padding({ left: UiSpacing.ITEM_GAP, right: UiSpacing.ITEM_GAP })
-    .borderRadius(UiSpacing.CORNER_RADIUS)
-    .backgroundColor(item.index === this.currentIndex ? $r('app.color.ui_emphasize_tertiary') : Color.Transparent)
-    .onClick(() => {
-      if (item.index !== this.currentIndex) {
-        this.onSelect(item.index);
-      }
-    })
   }
 }

@@ -3,6 +3,22 @@
     {
       "name": "nl_title_overview",
       "value": "星闪"
+    },
+    {
+      "name": "nl_placeholder_list",
+      "value": "暂无设备"
+    },
+    {
+      "name": "nl_placeholder_list_message",
+      "value": "星闪设备列表将在扫描功能就绪后显示"
+    },
+    {
+      "name": "nl_placeholder_detail",
+      "value": "未选择设备"
+    },
+    {
+      "name": "nl_placeholder_detail_message",
+      "value": "从左侧列表选择设备以查看详情"
     }
   ]
 }

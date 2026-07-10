@@ -1,19 +1,30 @@
 import {
-  StatusPillView,
-  UiColorToken,
-  UiLayoutConstants,
-  UiSpacing,
-  UiTypography,
+  CommandDockAction,
+  CommandDockView,
+  ContentStateHost,
+  DataTerminalView,
+  LoadingStateModel,
+  RiskConfirmVariant,
+  UiPageState,
+  UiResponsive,
+  UiResourceUtil,
   YoNavDestinationKind,
   YoPageShell
 } from 'common_ui';
+import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
+import { BtSummaryCard } from '../component/BtSummaryCard';
 
 @ComponentV2
 export struct SppMainPage {
   @Event onBack: () => void = () => {
   };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
+  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
+  @Local private commandInput: string = '';
+  @Local private isSending: boolean = false;
+  @Local private periodicActive: boolean = false;
+  @Local private terminalLines: string[] = [];
 
   aboutToAppear(): void {
     void this.vm.onPageAppear();
@@ -21,8 +32,51 @@ export struct SppMainPage {
 
   @LocalBuilder
   pageContent() {
-    Column({ space: UiSpacing.SECTION_GAP }) {
-      this.summaryCard()
+    ContentStateHost({
+      state: this.vm.isLoading ? UiPageState.LOADING : UiPageState.CONTENT,
+      loadingModel: new LoadingStateModel($r('app.string.ui_loading_default_message')),
+      content: this.pageBody
+    })
+  }
+
+  @LocalBuilder
+  pageBody() {
+    Column({ space: UiResponsive.SECTION_GAP }) {
+      BtSummaryCard({
+        title: $r('app.string.bt_spp_page_title'),
+        ready: this.vm.ready,
+        primaryMetricLabel: $r('app.string.bt_spp_metric_devices'),
+        primaryMetricValue: this.vm.pairedDeviceCount,
+        sessionMetricValue: this.vm.activeSessionCount
+      })
+      DataTerminalView({
+        lines: this.terminalLines,
+        emptyHint: $r('app.string.bt_terminal_empty')
+      })
+        .layoutWeight(1)
+      CommandDockView({
+        inputValue: this.commandInput,
+        placeholder: $r('app.string.bt_command_placeholder'),
+        canSubmit: this.vm.ready,
+        isSendEnabled: this.vm.ready,
+        isLoading: this.isSending,
+        sendDisabledReason: this.vm.ready ? '' : $r('app.string.ui_send_disabled_not_connected'),
+        collapsed: !WindowWidthBreakpointUtil.isSplitCapable(this.metrics.breakpoint),
+        periodicActive: this.periodicActive,
+        secondaryActions: this.buildSecondaryActions(),
+        onInputChange: (value: string) => {
+          this.commandInput = value;
+        },
+        onSend: (text: string) => {
+          void this.handleSend(text);
+        },
+        onSecondaryAction: (key: string) => {
+          this.handleSecondaryAction(key);
+        },
+        onStopPeriodic: () => {
+          this.periodicActive = false;
+        }
+      })
     }
     .width('100%')
     .height('100%')
@@ -40,46 +94,42 @@ export struct SppMainPage {
     })
   }
 
-  @Builder
-  private summaryCard() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
-      Row() {
-        Text($r('app.string.bt_spp_page_title'))
-          .fontSize(UiTypography.SUBTITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(UiColorToken.TEXT_PRIMARY)
-          .layoutWeight(1)
-        StatusPillView({
-          label: this.vm.ready ? $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
-          tone: this.vm.ready ? 'success' : 'warning'
-        })
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Center)
-      Row({ space: UiSpacing.CARD_GAP }) {
-        this.metric($r('app.string.bt_spp_metric_devices'), this.vm.pairedDeviceCount)
-        this.metric($r('app.string.bt_metric_sessions'), this.vm.activeSessionCount)
-      }
-      .width('100%')
-    }
-    .width('100%')
-    .padding(UiSpacing.CARD_INNER_PADDING)
-    .backgroundColor(UiColorToken.SURFACE)
-    .borderRadius(UiLayoutConstants.CARD_RADIUS_SMALL)
+  private buildSecondaryActions(): CommandDockAction[] {
+    return [
+      new CommandDockAction('hex', $r('app.string.ui_action_hex')),
+      new CommandDockAction('periodic', $r('app.string.ui_action_periodic'), {
+        variant: RiskConfirmVariant.WARNING,
+        title: $r('app.string.ui_risk_periodic_title'),
+        message: $r('app.string.ui_risk_periodic_message'),
+        confirmLabel: $r('app.string.ui_risk_periodic_confirm')
+      }),
+      new CommandDockAction('disconnect', $r('app.string.ui_action_disconnect'), {
+        variant: RiskConfirmVariant.DANGER,
+        title: $r('app.string.ui_risk_disconnect_title'),
+        message: $r('app.string.ui_risk_disconnect_message'),
+        confirmLabel: $r('app.string.ui_risk_disconnect_confirm')
+      })
+    ];
   }
 
-  @Builder
-  private metric(label: ResourceStr, value: number) {
-    Column({ space: UiSpacing.LABEL_STACK_GAP }) {
-      Text(`${value}`)
-        .fontSize(UiTypography.TITLE_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(UiColorToken.TEXT_PRIMARY)
-      Text(label)
-        .fontSize(UiTypography.CAPTION_SIZE)
-        .fontColor(UiColorToken.TEXT_TERTIARY)
+  private async handleSend(text: string): Promise<void> {
+    if (!this.vm.ready || text.length === 0) {
+      return;
     }
-    .layoutWeight(1)
-    .alignItems(HorizontalAlign.Start)
+    this.isSending = true;
+    this.terminalLines = [...this.terminalLines, UiResourceUtil.format($r('app.string.bt_terminal_tx_line'), text)];
+    this.commandInput = '';
+    this.isSending = false;
+  }
+
+  private handleSecondaryAction(key: string): void {
+    if (key === 'periodic') {
+      this.periodicActive = true;
+      return;
+    }
+    if (key === 'disconnect') {
+      this.periodicActive = false;
+      this.terminalLines = [...this.terminalLines, UiResourceUtil.resolveText($r('app.string.bt_terminal_disconnected'))];
+    }
   }
 }

@@ -1,19 +1,24 @@
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
-import { UiColorToken } from '../theme/UiColorToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiResponsive } from '../token/semantic/UiResponsive';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSpace } from '../token/foundation/UiSpace';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 import { SegmentChipView } from './SegmentChipView';
 import { SessionChipView } from './SessionChipView';
 import { StatusPillTone } from './StatusPillView';
+
 /** Filter chip option for scan / log filter bars. */
 export class FilterChipOption {
   readonly key: string;
-  readonly label: string;
+  readonly label: ResourceStr;
   readonly selected: boolean;
   readonly tone: StatusPillTone;
+
   constructor(
     key: string,
-    label: string,
+    label: ResourceStr,
     selected: boolean = false,
     tone: StatusPillTone = 'brand'
   ) {
@@ -23,39 +28,41 @@ export class FilterChipOption {
     this.tone = tone;
   }
 }
+
 /**
  * Horizontal filter chip bar (FilterSheet companion — not a sheet wrapper).
- * Uses SegmentChipView for toggles; active session-style chips when {@link useSessionStyle}.
  */
 @ComponentV2
 export struct FilterSheetView {
-  @Param title: string = '';
+  @Param title: ResourceStr = '';
   @Param options: FilterChipOption[] = [];
   @Param useSessionStyle: boolean = false;
   @Param showClear: boolean = false;
-  @Param clearLabel: string = '清除';
+  @Param clearLabel: ResourceStr = $r('app.string.ui_clear');
   @Event onOptionSelect: (key: string) => void = () => {
   };
   @Event onClear: () => void = () => {
   };
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
+
   build() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
-      if (this.title.length > 0 || this.showClear) {
+    Column({ space: UiResponsive.CONTROL_GAP }) {
+      if (UiResourceUtil.hasText(this.title) || this.showClear) {
         Row() {
-          if (this.title.length > 0) {
+          if (UiResourceUtil.hasText(this.title)) {
             Text(this.title)
-              .fontSize(UiTypography.CAPTION_SIZE)
-              .fontColor(UiColorToken.TEXT_SECONDARY)
+              .fontSize(UiTypeStyle.BODY_S.size)
+              .fontColor(UiColor.TEXT_SECONDARY)
               .layoutWeight(1)
           } else {
             Blank().layoutWeight(1)
           }
           if (this.showClear) {
-            Text(this.clearLabel)
-              .fontSize(UiTypography.CAPTION_SIZE)
-              .fontColor(UiColorToken.PRIMARY)
-              .padding({ left: 8, right: 8, top: 8, bottom: 8 })
+            Button(this.clearLabel, { type: ButtonType.Normal })
+              .fontSize(UiTypeStyle.BODY_S.size)
+              .fontColor(UiColor.BRAND_PRIMARY)
+              .backgroundColor(Color.Transparent)
+              .constraintSize({ minHeight: UiSize.TOUCH_TARGET_MIN })
               .onClick(() => this.onClear())
           }
         }
@@ -63,7 +70,7 @@ export struct FilterSheetView {
         .alignItems(VerticalAlign.Center)
       }
       Scroll() {
-        Row({ space: UiSpacing.ITEM_GAP }) {
+        Row({ space: UiResponsive.CONTROL_GAP }) {
           ForEach(this.options, (option: FilterChipOption) => {
             if (this.useSessionStyle && option.selected) {
               SessionChipView({

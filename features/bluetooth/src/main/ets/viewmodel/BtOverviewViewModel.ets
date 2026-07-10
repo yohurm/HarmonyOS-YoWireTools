@@ -2,9 +2,14 @@ import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
-  LifecycleCoordinator
+  LifecycleCoordinator,
+  PermissionUiState
 } from 'common_platform';
-import { EnsurePermissionUseCase, PermissionScenario } from 'feature_debug_core';
+import {
+  EnsurePermissionUseCase,
+  PermissionScenario,
+  PermissionScenarioCoordinator
+} from 'feature_debug_core';
 import { BluetoothAdapterSnapshot, BluetoothOverviewSnapshot } from '../domain/model/BluetoothDevice';
 import { BluetoothRepository } from '../data/repository/BluetoothRepository';
 import { LoadBluetoothOverviewSnapshotUseCase } from '../domain/usecase/overview/OverviewUseCases';
@@ -13,6 +18,7 @@ import { LoadBluetoothOverviewSnapshotUseCase } from '../domain/usecase/overview
 export class BtOverviewViewModel {
   @Trace isLoading: boolean = true;
   @Trace permissionGranted: boolean = false;
+  @Trace permissionUiState: PermissionUiState | undefined = undefined;
   @Trace adapterEnabled: boolean = false;
   @Trace classicSupported: boolean = true;
   @Trace bleSupported: boolean = true;
@@ -64,6 +70,7 @@ export class BtOverviewViewModel {
     if (result.success && result.value !== undefined) {
       this.applySnapshot(result.value);
     }
+    await this.syncPermissionUiState();
     this.isLoading = false;
   }
 
@@ -96,5 +103,14 @@ export class BtOverviewViewModel {
 
   private applyAdapter(snapshot: BluetoothAdapterSnapshot): void {
     this.adapterEnabled = snapshot.enabled;
+  }
+
+  private async syncPermissionUiState(): Promise<void> {
+    if (this.permissionGranted) {
+      this.permissionUiState = undefined;
+      return;
+    }
+    this.permissionUiState = await PermissionScenarioCoordinator.getInstance()
+      .buildUiStateForScenario(PermissionScenario.BLUETOOTH_SCAN_CONNECT);
   }
 }

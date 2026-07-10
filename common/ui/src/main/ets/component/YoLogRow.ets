@@ -1,7 +1,10 @@
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { TerminalToken } from '../token/component/TerminalToken';
+import { CardToken } from '../token/component/CardToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiResponsive } from '../token/semantic/UiResponsive';
+
 /**
  * V2 log list row: direction, time, module/protocol, summary, payload size, alert flag.
  */
@@ -18,29 +21,33 @@ export struct YoLogRow {
   @Param selected: boolean = false;
   @Event onTap: () => void = () => {
   };
+
   build() {
-    Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
+    Row({ space: UiResponsive.CONTROL_GAP }) {
+      Column({ space: UiResponsive.LABEL_STACK_GAP }) {
         Text(this.directionLabel)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.directionInbound ? UiColorToken.TERMINAL_INBOUND : UiColorToken.TERMINAL_OUTBOUND)
+          .fontSize(UiTypeStyle.MONO_S.size)
+          .fontWeight(UiTypeStyle.SUBTITLE_S.weight)
+          .fontColor(this.directionInbound ? TerminalToken.INBOUND : TerminalToken.OUTBOUND)
+          .fontFamily(UiTypeStyle.MONO_S.family)
         Text(this.timeLabel)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
+          .fontSize(UiTypeStyle.MONO_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
+          .fontFamily(UiTypeStyle.MONO_S.family)
       }
-      .width(UiLayoutConstants.LOG_ROW_DIRECTION_WIDTH)
+      .width(TerminalToken.LOG_ROW_DIRECTION_WIDTH)
       .alignItems(HorizontalAlign.Start)
-      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
+      Column({ space: UiResponsive.LABEL_STACK_GAP }) {
         Text(`${this.moduleLabel} · ${this.protocolLabel}`)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
+          .fontSize(UiTypeStyle.MONO_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
+          .fontFamily(UiTypeStyle.MONO_S.family)
           .width('100%')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.summary)
-          .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(this.alert ? UiColorToken.ERROR : UiColorToken.TEXT_PRIMARY)
+          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontColor(this.alert ? UiColor.ERROR : UiColor.TEXT_PRIMARY)
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -48,18 +55,19 @@ export struct YoLogRow {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       Text(this.payloadSizeLabel)
-        .fontSize(UiTypography.CAPTION_SIZE)
-        .fontColor(UiColorToken.TEXT_TERTIARY)
+        .fontSize(UiTypeStyle.MONO_S.size)
+        .fontColor(UiColor.TEXT_TERTIARY)
+        .fontFamily(UiTypeStyle.MONO_S.family)
     }
     .width('100%')
-    .constraintSize({ minHeight: UiLayoutConstants.LIST_ROW_HEIGHT })
+    .constraintSize({ minHeight: UiSize.LIST_ROW_HEIGHT })
     .padding({
-      left: UiSpacing.CARD_INNER_PADDING,
-      right: UiSpacing.CARD_INNER_PADDING,
-      top: UiSpacing.ITEM_GAP,
-      bottom: UiSpacing.ITEM_GAP
+      left: CardToken.PADDING,
+      right: CardToken.PADDING,
+      top: UiResponsive.CONTROL_GAP,
+      bottom: UiResponsive.CONTROL_GAP
     })
-    .backgroundColor(this.selected ? UiColorToken.INTERACTIVE_PRESSED : Color.Transparent)
+    .backgroundColor(this.selected ? UiColor.INTERACTIVE_PRESSED : Color.Transparent)
     .onClick(() => this.onTap())
   }
 }

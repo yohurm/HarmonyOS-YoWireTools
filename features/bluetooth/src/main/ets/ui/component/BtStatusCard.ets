@@ -2,9 +2,12 @@ import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } 
 import {
   StatusPillTone,
   StatusPillView,
-  UiColorToken,
-  UiSpacing,
-  UiTypography,
+  UiColor,
+  UiResourceUtil,
+  UiResponsive,
+  UiTypeStyle,
+  YoActionButton,
+  YoActionButtonKind,
   YoImmersiveSurface
 } from 'common_ui';
 
@@ -52,27 +55,41 @@ export struct BtStatusCard {
 
   @Builder
   private statusCell(model: BtStatusCellModel) {
-    Column({ space: UiSpacing.INLINE_STACK_GAP }) {
-      Text(model.label)
-        .fontSize(UiTypography.CAPTION_SIZE)
-        .fontColor(UiColorToken.TEXT_TERTIARY)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .width('100%')
-      Row({ space: UiSpacing.INLINE_STACK_GAP }) {
+    Column({ space: UiResponsive.LABEL_STACK_GAP }) {
+      Column({ space: UiResponsive.LABEL_STACK_GAP }) {
+        Text(model.label)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
         StatusPillView({ label: model.value, tone: model.tone })
-        if (model.actionEnabled) {
-          Text(this.resolveActionLabel(model))
-            .fontSize(UiTypography.CAPTION_SIZE)
-            .fontColor(UiColorToken.PRIMARY)
-            .onClick(() => this.handleCellAction(model.kind))
-        }
       }
-      .alignItems(VerticalAlign.Center)
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+      .accessibilityGroup(true)
+      .accessibilityText(this.buildCellAccessibilityLabel(model))
+      if (model.actionEnabled) {
+        YoActionButton({
+          label: this.resolveActionLabel(model),
+          kind: YoActionButtonKind.TEXT,
+          compact: true,
+          fullWidth: false,
+          onTap: () => this.handleCellAction(model.kind)
+        })
+      }
     }
     .width('100%')
     .layoutWeight(1)
     .alignItems(HorizontalAlign.Start)
+  }
+
+  private buildCellAccessibilityLabel(model: BtStatusCellModel): string {
+    return UiResourceUtil.format(
+      $r('app.string.ui_a11y_join_two'),
+      UiResourceUtil.resolveText(model.label),
+      UiResourceUtil.resolveText(model.value)
+    );
   }
 
   private handleCellAction(kind: BtStatusCellKind): void {
@@ -85,8 +102,8 @@ export struct BtStatusCard {
 
   private resolveCellGap(): number {
     return WindowWidthBreakpointUtil.isSplitCapable(this.metrics.breakpoint)
-      ? UiSpacing.CARD_GAP
-      : UiSpacing.ITEM_GAP;
+      ? UiResponsive.CARD_GAP
+      : UiResponsive.CONTROL_GAP;
   }
 
   private buildAdapterCell(): BtStatusCellModel {

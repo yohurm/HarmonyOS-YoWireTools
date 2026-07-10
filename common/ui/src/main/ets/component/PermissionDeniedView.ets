@@ -1,7 +1,8 @@
 import { PermissionUiState } from 'common_platform';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { ButtonToken } from '../token/component/ButtonToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSpace } from '../token/foundation/UiSpace';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 
 @ComponentV2
@@ -13,40 +14,41 @@ export struct PermissionDeniedView {
   };
 
   build() {
-    Column({ space: UiSpacing.ITEM_GAP }) {
+    Column({ space: UiSpace.M }) {
       Text(this.state?.title ?? $r('app.string.ui_error_default_title'))
-        .fontSize(UiTypography.SUBTITLE_SIZE)
-        .fontWeight(UiTypography.TITLE_WEIGHT)
-        .fontColor(UiColorToken.WARNING)
+        .fontSize(UiTypeStyle.SUBTITLE_M.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
+        .fontColor(UiColor.WARNING)
         .textAlign(TextAlign.Center)
       Text(this.state?.message ?? $r('app.string.ui_empty_default_message'))
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontColor(UiColorToken.TEXT_SECONDARY)
+        .fontSize(UiTypeStyle.BODY_M.size)
+        .fontColor(UiColor.TEXT_SECONDARY)
         .textAlign(TextAlign.Center)
-      if (this.state !== undefined && this.state.userAction.length > 0) {
+      if (this.state !== undefined && UiResourceUtil.hasText(this.state.userAction)) {
         Text(this.state.userAction)
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_TERTIARY)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.TEXT_TERTIARY)
           .textAlign(TextAlign.Center)
-          .margin({ top: UiSpacing.ITEM_GAP })
+          .margin({ top: UiSpace.M })
       }
       if (this.state?.canRequest === true) {
         Button($r('app.string.ui_grant_permission'))
-          .height(UiSpacing.BUTTON_HEIGHT)
-          .margin({ top: UiSpacing.SECTION_GAP })
+          .height(ButtonToken.HEIGHT)
+          .borderRadius(ButtonToken.RADIUS)
+          .margin({ top: UiSpace.XL })
           .onClick(() => this.onRequestPermission())
       }
       if (this.state?.shouldShowSettingGuide === true) {
         Button($r('app.string.ui_open_settings'))
-          .height(UiSpacing.BUTTON_HEIGHT)
+          .height(ButtonToken.HEIGHT)
           .type(ButtonType.Normal)
           .backgroundColor(Color.Transparent)
-          .fontColor(UiColorToken.PRIMARY)
+          .fontColor(UiColor.BRAND_PRIMARY)
           .onClick(() => this.onOpenSettings())
       }
     }
     .width('100%')
-    .padding(UiSpacing.PAGE_PADDING)
+    .padding(UiSpace.XL)
     .justifyContent(FlexAlign.Center)
   }
 }

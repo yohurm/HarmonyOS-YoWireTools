@@ -107,6 +107,22 @@
     {
       "name": "bt_metric_sessions",
       "value": "会话"
+    },
+    {
+      "name": "bt_terminal_empty",
+      "value": "终端输出将显示在这里"
+    },
+    {
+      "name": "bt_command_placeholder",
+      "value": "输入命令或数据"
+    },
+    {
+      "name": "bt_terminal_tx_line",
+      "value": "TX %s"
+    },
+    {
+      "name": "bt_terminal_disconnected",
+      "value": "SYS 已断开连接"
     }
   ]
 }

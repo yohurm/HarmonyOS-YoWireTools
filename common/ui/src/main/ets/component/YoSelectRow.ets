@@ -1,29 +1,38 @@
-import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiSpace } from '../token/foundation/UiSpace';
+import { UiOpacity } from '../token/foundation/UiOpacity';
+import { InputToken } from '../token/component/InputToken';
+import { UiResourceUtil } from '../util/UiResourceUtil';
+
+const KEY_CODE_SPACE: number = 2050;
+const KEY_CODE_ENTER: number = 2054;
 
 @ComponentV2
 export struct YoSelectRow {
-  @Param title: string = '';
-  @Param subtitle: string = '';
-  @Param value: string = '';
+  @Param title: ResourceStr = '';
+  @Param subtitle: ResourceStr = '';
+  @Param value: ResourceStr = '';
   @Param isEnabled: boolean = true;
   @Event onTap: () => void = () => {
   };
-  @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
+  @Local private isPressed: boolean = false;
+  @Local private isHovered: boolean = false;
+  @Local private isFocused: boolean = false;
+
   build() {
     Row() {
-      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
+      Column({ space: UiSpace.XXS }) {
         Text(this.title)
-          .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(UiColorToken.TEXT_PRIMARY)
+          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontWeight(UiTypeStyle.BODY_M.weight)
+          .fontColor(this.isEnabled ? UiColor.TEXT_PRIMARY : UiColor.TEXT_DISABLED)
           .width('100%')
-        if (this.subtitle.length > 0) {
+        if (UiResourceUtil.hasText(this.subtitle)) {
           Text(this.subtitle)
-            .fontSize(UiTypography.CAPTION_SIZE)
-            .fontColor(UiColorToken.TEXT_SECONDARY)
+            .fontSize(UiTypeStyle.BODY_S.size)
+            .fontColor(this.isEnabled ? UiColor.TEXT_SECONDARY : UiColor.TEXT_DISABLED)
             .width('100%')
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -32,25 +41,99 @@ export struct YoSelectRow {
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text(this.value)
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontColor(UiColorToken.TEXT_SECONDARY)
-        .margin({ right: UiSpacing.ITEM_GAP })
+        .fontSize(UiTypeStyle.BODY_M.size)
+        .fontWeight(UiTypeStyle.BODY_M.weight)
+        .fontColor(this.isEnabled ? UiColor.TEXT_SECONDARY : UiColor.TEXT_DISABLED)
+        .margin({ right: UiSpace.M })
       SymbolGlyph($r('sys.symbol.chevron_right'))
-        .fontSize(UiLayoutConstants.CHEVRON_GLYPH_SIZE)
-        .fontColor([UiColorToken.TEXT_TERTIARY])
+        .fontSize(UiSize.ICON_S)
+        .fontColor([this.isEnabled ? UiColor.ICON_TERTIARY : UiColor.ICON_DISABLED])
+        .accessibilityLevel('no')
     }
     .width('100%')
-    .constraintSize({ minHeight: UiLayoutConstants.LIST_ROW_HEIGHT })
-    .padding({
-      left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
-      right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
-      top: UiSpacing.ITEM_GAP,
-      bottom: UiSpacing.ITEM_GAP
-    })
-    .backgroundColor(UiColorToken.SURFACE)
-    .borderRadius(UiSpacing.CORNER_RADIUS)
+    .constraintSize({ minHeight: UiSize.LIST_ROW_HEIGHT })
+    .padding({ top: UiSpace.M, bottom: UiSpace.M })
+    .backgroundColor(this.resolveBackground())
+    .borderRadius(InputToken.RADIUS)
+    .borderWidth(this.isFocused && this.isEnabled ? 2 : 0)
+    .borderColor(UiColor.BORDER_FOCUSED)
+    .focusable(this.isEnabled)
     .enabled(this.isEnabled)
-    .opacity(this.isEnabled ? 1 : UiLayoutConstants.DISABLED_ROW_OPACITY)
-    .onClick(() => this.onTap())
+    .opacity(this.isEnabled ? UiOpacity.ENABLED : UiOpacity.DISABLED_CONTAINER)
+    .onClick(() => {
+      if (this.isEnabled) {
+        this.onTap();
+      }
+    })
+    .onHover((isHover: boolean) => {
+      if (this.isEnabled) {
+        this.isHovered = isHover;
+      }
+    })
+    .onTouch((event: TouchEvent) => {
+      if (!this.isEnabled) {
+        return;
+      }
+      if (event.type === TouchType.Down) {
+        this.isPressed = true;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.isPressed = false;
+      }
+    })
+    .onFocus(() => {
+      this.isFocused = true;
+    })
+    .onBlur(() => {
+      this.isFocused = false;
+      this.isPressed = false;
+    })
+    .onKeyEvent((event: KeyEvent) => {
+      if (!this.isEnabled || event.type !== KeyType.Down) {
+        return;
+      }
+      if (event.keyCode === KEY_CODE_ENTER || event.keyCode === KEY_CODE_SPACE) {
+        this.onTap();
+      }
+    })
+    .accessibilityGroup(true)
+    .accessibilityText(this.buildAccessibilityLabel())
+  }
+
+  private buildAccessibilityLabel(): string {
+    let label = UiResourceUtil.resolveText(this.title);
+    if (UiResourceUtil.hasText(this.subtitle)) {
+      label = UiResourceUtil.format(
+        $r('app.string.ui_a11y_join_two'),
+        label,
+        UiResourceUtil.resolveText(this.subtitle)
+      );
+    }
+    if (UiResourceUtil.hasText(this.value)) {
+      label = UiResourceUtil.format(
+        $r('app.string.ui_a11y_join_two'),
+        label,
+        UiResourceUtil.resolveText(this.value)
+      );
+    }
+    if (!this.isEnabled) {
+      label = UiResourceUtil.format($r('app.string.ui_a11y_disabled'), label);
+    }
+    return label;
+  }
+
+  private resolveBackground(): ResourceColor {
+    if (!this.isEnabled) {
+      return UiColor.SURFACE_CARD;
+    }
+    if (this.isPressed) {
+      return UiColor.INTERACTIVE_PRESSED;
+    }
+    if (this.isFocused) {
+      return UiColor.INTERACTIVE_FOCUSED;
+    }
+    if (this.isHovered) {
+      return UiColor.INTERACTIVE_HOVER;
+    }
+    return UiColor.SURFACE_CARD;
   }
 }

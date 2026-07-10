@@ -1,8 +1,10 @@
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { CardToken } from '../token/component/CardToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiSpace } from '../token/foundation/UiSpace';
+import { UiResponsive } from '../token/semantic/UiResponsive';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
 
@@ -22,56 +24,51 @@ export struct YoContextStrip {
     if (this.items.length === 0 && !UiResourceUtil.hasText(this.riskMessage)) {
       Blank()
     } else {
-      Column({ space: UiSpacing.ITEM_GAP }) {
+      Column({ space: UiSpace.M }) {
         if (UiResourceUtil.hasText(this.riskMessage)) {
-          Row({ space: UiSpacing.ITEM_GAP }) {
+          Row({ space: UiSpace.M }) {
             SymbolGlyph($r('sys.symbol.exclamationmark_triangle_fill'))
-              .fontSize(UiSpacing.ICON_SIZE)
-              .fontColor([UiColorToken.WARNING])
+              .fontSize(UiSize.ICON_M)
+              .fontColor([UiColor.WARNING])
             Text(this.riskMessage)
-              .fontSize(UiTypography.CAPTION_SIZE)
-              .fontColor(UiColorToken.WARNING)
+              .fontSize(UiTypeStyle.BODY_S.size)
+              .fontColor(UiColor.WARNING)
               .layoutWeight(1)
               .maxLines(2)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
           .width('100%')
-          .padding({
-            left: UiSpacing.PAGE_PADDING,
-            right: UiSpacing.PAGE_PADDING,
-            top: UiSpacing.ITEM_GAP,
-            bottom: UiSpacing.ITEM_GAP
-          })
-          .backgroundColor(UiColorToken.SURFACE)
-          .borderRadius(UiLayoutConstants.CARD_RADIUS_SMALL)
+          .padding(UiSpace.M)
+          .backgroundColor(UiColor.WARNING_CONTAINER)
+          .borderRadius(CardToken.RADIUS)
         }
         Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center }) {
           ForEach(this.items.slice(0, 4), (item: YoContextStripItem, index: number) => {
-            Row({ space: UiSpacing.INLINE_STACK_GAP }) {
+            Row({ space: UiSpace.XS }) {
               Text(item.label)
-                .fontSize(UiTypography.CAPTION_SIZE)
-                .fontColor(UiColorToken.TEXT_TERTIARY)
+                .fontSize(UiTypeStyle.BODY_S.size)
+                .fontColor(UiColor.TEXT_TERTIARY)
               if (item.tone !== undefined) {
                 StatusPillView({ label: item.value, tone: item.tone })
               } else {
                 Text(item.value)
-                  .fontSize(UiTypography.CAPTION_SIZE)
-                  .fontColor(UiColorToken.TEXT_SECONDARY)
+                  .fontSize(UiTypeStyle.BODY_S.size)
+                  .fontColor(UiColor.TEXT_SECONDARY)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
               }
             }
-            .margin({ right: UiSpacing.FORM_GAP, bottom: UiSpacing.ITEM_GAP })
+            .margin({ right: UiSpace.XL, bottom: UiSpace.M })
           }, (item: YoContextStripItem, index: number) => `${index}_${item.label}`)
         }
         .width('100%')
       }
       .width('100%')
       .padding({
-        left: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
-        right: WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint),
-        top: UiSpacing.ITEM_GAP,
-        bottom: UiSpacing.ITEM_GAP
+        left: UiResponsive.pageHorizontal(this.metrics.breakpoint),
+        right: UiResponsive.pageHorizontal(this.metrics.breakpoint),
+        top: UiSpace.M,
+        bottom: UiSpace.M
       })
     }
   }

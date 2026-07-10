@@ -3,6 +3,38 @@
     {
       "name": "home_title",
       "value": "工作台"
+    },
+    {
+      "name": "home_module_bluetooth",
+      "value": "蓝牙调试"
+    },
+    {
+      "name": "home_module_bluetooth_desc",
+      "value": "SPP、BLE GATT 与 UART 会话"
+    },
+    {
+      "name": "home_module_wifi",
+      "value": "网络调试"
+    },
+    {
+      "name": "home_module_wifi_desc",
+      "value": "Wi-Fi 扫描、TCP/UDP 与诊断工具"
+    },
+    {
+      "name": "home_module_nearlink",
+      "value": "星闪"
+    },
+    {
+      "name": "home_module_nearlink_desc",
+      "value": "NearLink SSAP 与数据传输"
+    },
+    {
+      "name": "home_status_ready",
+      "value": "可用"
+    },
+    {
+      "name": "home_status_blocked",
+      "value": "暂不可用"
     }
   ]
 }

@@ -1,0 +1,18 @@
+name: UI Token Checks
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  ui-token-gate:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run UI token static checks
+        shell: pwsh
+        run: ./scripts/check-ui-tokens.ps1

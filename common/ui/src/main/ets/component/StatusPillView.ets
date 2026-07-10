@@ -1,8 +1,9 @@
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiTypography } from '../theme/UiTypography';
+import { ChipToken } from '../token/component/ChipToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSpace } from '../token/foundation/UiSpace';
 
-export type StatusPillTone = 'brand' | 'success' | 'warning' | 'error' | 'neutral';
+export type StatusPillTone = 'brand' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
 
 @ComponentV2
 export struct StatusPillView {
@@ -11,30 +12,51 @@ export struct StatusPillView {
 
   build() {
     Text(this.label)
-      .fontSize(UiTypography.CAPTION_SIZE)
-      .fontWeight(FontWeight.Medium)
-      .fontColor(this.resolveColor())
-      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .fontSize(UiTypeStyle.BODY_S.size)
+      .fontWeight(UiTypeStyle.BODY_S.weight)
+      .fontColor(this.resolveForeground())
+      .padding({
+        left: UiSpace.M,
+        right: UiSpace.M,
+        top: UiSpace.XS,
+        bottom: UiSpace.XS
+      })
       .backgroundColor(this.resolveBackground())
-      .borderRadius(UiLayoutConstants.CARD_RADIUS / 2)
+      .borderRadius(ChipToken.STATUS_RADIUS)
+      .accessibilityLevel('no')
   }
 
-  private resolveColor(): ResourceColor {
+  private resolveForeground(): ResourceColor {
     switch (this.tone) {
       case 'brand':
-        return UiColorToken.PRIMARY;
+        return UiColor.BRAND_PRIMARY;
       case 'success':
-        return UiColorToken.SUCCESS;
+        return UiColor.SUCCESS;
       case 'warning':
-        return UiColorToken.WARNING;
+        return UiColor.WARNING;
       case 'error':
-        return UiColorToken.ERROR;
+        return UiColor.ERROR;
+      case 'info':
+        return UiColor.INFO;
       default:
-        return UiColorToken.TEXT_SECONDARY;
+        return UiColor.TEXT_SECONDARY;
     }
   }
 
   private resolveBackground(): ResourceColor {
-    return $r('app.color.ui_emphasize_tertiary');
+    switch (this.tone) {
+      case 'brand':
+        return UiColor.SURFACE_SELECTED;
+      case 'success':
+        return UiColor.SUCCESS_CONTAINER;
+      case 'warning':
+        return UiColor.WARNING_CONTAINER;
+      case 'error':
+        return UiColor.ERROR_CONTAINER;
+      case 'info':
+        return UiColor.INFO_CONTAINER;
+      default:
+        return UiColor.BACKGROUND_SECONDARY;
+    }
   }
 }

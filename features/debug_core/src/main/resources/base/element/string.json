@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "session_state_running",
+      "value": "运行中"
+    },
+    {
+      "name": "session_state_preparing",
+      "value": "准备中"
+    },
+    {
+      "name": "session_state_suspended",
+      "value": "已暂停"
+    },
+    {
+      "name": "session_state_failed",
+      "value": "失败"
+    },
+    {
+      "name": "session_state_completed",
+      "value": "已结束"
+    },
+    {
+      "name": "session_state_stopping",
+      "value": "停止中"
+    },
+    {
+      "name": "session_state_cancelled",
+      "value": "已取消"
+    },
+    {
+      "name": "session_state_created",
+      "value": "已创建"
+    }
+  ]
+}

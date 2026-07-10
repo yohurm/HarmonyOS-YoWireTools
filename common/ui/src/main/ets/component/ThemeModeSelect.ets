@@ -1,8 +1,10 @@
 import { AppThemeMode } from 'common_core';
-import { UiColorToken } from '../theme/UiColorToken';
-import { UiLayoutConstants } from '../theme/UiLayoutConstants';
-import { UiSpacing } from '../theme/UiSpacing';
-import { UiTypography } from '../theme/UiTypography';
+import { CardToken } from '../token/component/CardToken';
+import { UiColor } from '../token/semantic/UiColor';
+import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
+import { UiSize } from '../token/foundation/UiSize';
+import { UiSpace } from '../token/foundation/UiSpace';
+import { UiResourceUtil } from '../util/UiResourceUtil';
 
 /**
  * V2 global appearance selector: system / light / dark via Menu semantics.
@@ -14,16 +16,16 @@ export struct ThemeModeSelect {
   };
 
   build() {
-    Row({ space: UiSpacing.ITEM_GAP }) {
-      Column({ space: UiSpacing.LABEL_STACK_GAP }) {
+    Row({ space: UiSpace.M }) {
+      Column({ space: UiSpace.XXS }) {
         Text($r('app.string.ui_theme_mode_title'))
-          .fontSize(UiTypography.BODY_SIZE)
-          .fontColor(UiColorToken.TEXT_PRIMARY)
-          .fontWeight(FontWeight.Medium)
+          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontColor(UiColor.TEXT_PRIMARY)
+          .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
           .width('100%')
         Text(this.themeSubtitle(this.selectedMode))
-          .fontSize(UiTypography.CAPTION_SIZE)
-          .fontColor(UiColorToken.TEXT_SECONDARY)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.TEXT_SECONDARY)
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -31,23 +33,18 @@ export struct ThemeModeSelect {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       Text(this.themeLabel(this.selectedMode))
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontColor(UiColorToken.PRIMARY)
+        .fontSize(UiTypeStyle.BODY_M.size)
+        .fontColor(UiColor.BRAND_PRIMARY)
         .maxLines(1)
       SymbolGlyph($r('sys.symbol.chevron_down'))
-        .fontSize(UiTypography.BODY_SIZE)
-        .fontColor([UiColorToken.TEXT_TERTIARY])
+        .fontSize(UiSize.ICON_S)
+        .fontColor([UiColor.ICON_TERTIARY])
     }
     .width('100%')
-    .constraintSize({ minHeight: UiLayoutConstants.LIST_ROW_HEIGHT })
-    .padding({
-      left: UiSpacing.CARD_INNER_PADDING,
-      right: UiSpacing.CARD_INNER_PADDING,
-      top: UiSpacing.ITEM_GAP,
-      bottom: UiSpacing.ITEM_GAP
-    })
-    .backgroundColor(UiColorToken.SURFACE)
-    .borderRadius(UiLayoutConstants.CARD_RADIUS_SMALL)
+    .constraintSize({ minHeight: UiSize.LIST_ROW_HEIGHT })
+    .padding(CardToken.PADDING_COMPACT)
+    .backgroundColor(CardToken.BACKGROUND)
+    .borderRadius(CardToken.RADIUS)
     .bindMenu([
       {
         value: this.menuItemLabel(AppThemeMode.SYSTEM),
@@ -72,7 +69,8 @@ export struct ThemeModeSelect {
 
   private menuItemLabel(mode: AppThemeMode): string {
     const label = this.themeLabel(mode) as string;
-    return mode === this.selectedMode ? `鉁?${label}` : label;
+    return mode === this.selectedMode ?
+      UiResourceUtil.format($r('app.string.ui_selected_prefix'), label) : label;
   }
 
   private themeLabel(mode: AppThemeMode): ResourceStr {
