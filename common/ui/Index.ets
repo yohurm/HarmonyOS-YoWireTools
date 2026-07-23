@@ -19,7 +19,10 @@ export { ChipToken } from './src/main/ets/token/component/ChipToken';
 export { CommandDockToken } from './src/main/ets/token/component/CommandDockToken';
 export { DialogToken } from './src/main/ets/token/component/DialogToken';
 export { InputToken } from './src/main/ets/token/component/InputToken';
+export { ListToken } from './src/main/ets/token/component/ListToken';
+export { MenuToken } from './src/main/ets/token/component/MenuToken';
 export { NavigationToken } from './src/main/ets/token/component/NavigationToken';
+export { PageLayoutToken } from './src/main/ets/token/component/PageLayoutToken';
 export { TerminalToken } from './src/main/ets/token/component/TerminalToken';
 export { HdsMaterialPolicy, HdsSystemMaterialEffect, UI_MATERIAL_MIN_SDK_API } from './src/main/ets/theme/HdsMaterialPolicy';
 export {
@@ -64,6 +67,7 @@ export { InspectorPanel } from './src/main/ets/component/InspectorPanel';
 export { YoContextStrip } from './src/main/ets/component/YoContextStrip';
 export type { YoContextStripItem } from './src/main/ets/component/YoContextStrip';
 export { YoPageShell } from './src/main/ets/component/YoPageShell';
+export { YoTitleBarMenuItem } from './src/main/ets/model/YoTitleBarMenuItem';
 export { YoImmersiveSurface } from './src/main/ets/component/YoImmersiveSurface';
 export { ContentStateHost } from './src/main/ets/component/ContentStateHost';
 export { SegmentChipView } from './src/main/ets/component/SegmentChipView';

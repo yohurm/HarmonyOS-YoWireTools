@@ -4,85 +4,65 @@ import { UiTypeStyle } from '../token/semantic/UiTypeStyle';
 import { UiSpace } from '../token/foundation/UiSpace';
 import { UiResourceUtil } from '../util/UiResourceUtil';
 import { StatusPillTone, StatusPillView } from './StatusPillView';
-import { YoActionButton, YoActionButtonKind } from './YoActionButton';
 
+/**
+ * Compact mode entry tile: title + status + one-line hint.
+ * Whole card is tappable to maximize space on dual-entry rows.
+ */
 @ComponentV2
 export struct ModeEntryCard {
   @Param title: ResourceStr = '';
   @Param description: ResourceStr = '';
   @Param statusLabel: ResourceStr = '';
   @Param statusTone: StatusPillTone = 'brand';
-  @Param primaryLabel: ResourceStr = '';
-  @Param secondaryLabel: ResourceStr = '';
   @Param disabled: boolean = false;
   @Param disabledReason: ResourceStr = '';
-  @Event onPrimary: () => void = () => {
-  };
-  @Event onSecondary: () => void = () => {
+  @Event onTap: () => void = () => {
   };
 
   build() {
-    Column({ space: UiSpace.M }) {
-      Column({ space: UiSpace.M }) {
-        Row({ space: UiSpace.M }) {
-          Text(this.title)
-            .fontSize(UiTypeStyle.SUBTITLE_M.size)
-            .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
-            .fontColor(UiColor.TEXT_PRIMARY)
-            .layoutWeight(1)
-          if (UiResourceUtil.hasText(this.statusLabel)) {
-            StatusPillView({ label: this.statusLabel, tone: this.statusTone })
-          }
-        }
+    Column({ space: UiSpace.S }) {
+      Text(this.title)
+        .fontSize(UiTypeStyle.SUBTITLE_M.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
+        .fontColor(this.disabled ? UiColor.TEXT_TERTIARY : UiColor.TEXT_PRIMARY)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width('100%')
-        .alignItems(VerticalAlign.Center)
+      if (UiResourceUtil.hasText(this.statusLabel)) {
+        StatusPillView({ label: this.statusLabel, tone: this.statusTone })
+      }
+      if (UiResourceUtil.hasText(this.description)) {
         Text(this.description)
-          .fontSize(UiTypeStyle.BODY_M.size)
+          .fontSize(UiTypeStyle.BODY_S.size)
           .fontColor(UiColor.TEXT_SECONDARY)
-          .width('100%')
-          .maxLines(3)
+          .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-        if (this.disabled && UiResourceUtil.hasText(this.disabledReason)) {
-          Text(this.disabledReason)
-            .fontSize(UiTypeStyle.BODY_S.size)
-            .fontColor(UiColor.WARNING)
-            .width('100%')
-        }
+          .width('100%')
       }
-      .width('100%')
-      .accessibilityGroup(true)
-      .accessibilityText(this.buildInfoAccessibilityLabel())
-      Row({ space: UiSpace.M }) {
-        if (UiResourceUtil.hasText(this.secondaryLabel)) {
-          YoActionButton({
-            label: this.secondaryLabel,
-            kind: YoActionButtonKind.SECONDARY,
-            fullWidth: false,
-            compact: true,
-            isEnabled: !this.disabled,
-            onTap: () => this.onSecondary()
-          })
-            .layoutWeight(1)
-        }
-        if (UiResourceUtil.hasText(this.primaryLabel)) {
-          YoActionButton({
-            label: this.primaryLabel,
-            kind: YoActionButtonKind.PRIMARY,
-            fullWidth: false,
-            compact: true,
-            isEnabled: !this.disabled,
-            disabledReason: this.disabledReason,
-            onTap: () => this.onPrimary()
-          })
-            .layoutWeight(1)
-        }
+      if (this.disabled && UiResourceUtil.hasText(this.disabledReason)) {
+        Text(this.disabledReason)
+          .fontSize(UiTypeStyle.BODY_S.size)
+          .fontColor(UiColor.WARNING)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
       }
-      .width('100%')
     }
     .width('100%')
-    .padding(CardToken.PADDING)
+    .padding(CardToken.PADDING_COMPACT)
     .backgroundColor(CardToken.BACKGROUND)
     .borderRadius(CardToken.RADIUS)
+    .opacity(this.disabled ? 0.72 : 1)
+    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Start)
+    .accessibilityGroup(true)
+    .accessibilityText(this.buildInfoAccessibilityLabel())
+    .onClick(() => {
+      if (!this.disabled) {
+        this.onTap();
+      }
+    })
   }
 
   private buildInfoAccessibilityLabel(): string {
@@ -94,11 +74,13 @@ export struct ModeEntryCard {
         UiResourceUtil.resolveText(this.statusLabel)
       );
     }
-    label = UiResourceUtil.format(
-      $r('app.string.ui_a11y_join_two'),
-      label,
-      UiResourceUtil.resolveText(this.description)
-    );
+    if (UiResourceUtil.hasText(this.description)) {
+      label = UiResourceUtil.format(
+        $r('app.string.ui_a11y_join_two'),
+        label,
+        UiResourceUtil.resolveText(this.description)
+      );
+    }
     if (this.disabled && UiResourceUtil.hasText(this.disabledReason)) {
       label = UiResourceUtil.format(
         $r('app.string.ui_a11y_join_two'),

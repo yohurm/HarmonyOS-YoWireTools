@@ -11,9 +11,12 @@ import { ButtonToken } from '../main/ets/token/component/ButtonToken';
 import { CardToken } from '../main/ets/token/component/CardToken';
 import { ChipToken } from '../main/ets/token/component/ChipToken';
 import { DialogToken } from '../main/ets/token/component/DialogToken';
+import { ListToken } from '../main/ets/token/component/ListToken';
+import { MenuToken } from '../main/ets/token/component/MenuToken';
 import { NavigationToken } from '../main/ets/token/component/NavigationToken';
 import { CommandDockToken } from '../main/ets/token/component/CommandDockToken';
 import { InputToken } from '../main/ets/token/component/InputToken';
+import { PageLayoutToken } from '../main/ets/token/component/PageLayoutToken';
 import { UiStroke } from '../main/ets/token/foundation/UiStroke';
 
 export default function uiTokenContractTest() {
@@ -57,8 +60,20 @@ export default function uiTokenContractTest() {
     it('component_radius_tokens', 0, () => {
       expect(ButtonToken.RADIUS).assertEqual(UiRadius.LARGE);
       expect(CardToken.RADIUS).assertEqual(UiRadius.MEDIUM);
+      expect(CardToken.RADIUS_DEVICE_ROW).assertEqual(UiRadius.SMALL);
       expect(ChipToken.RADIUS).assertEqual(UiRadius.LARGE);
       expect(DialogToken.RADIUS).assertEqual(UiRadius.XLARGE);
+      expect(MenuToken.RADIUS).assertEqual(UiRadius.LARGE);
+    });
+
+    it('list_and_menu_layout_tokens', 0, () => {
+      expect(ListToken.SCROLLBAR_WIDTH).assertEqual(4);
+      expect(ListToken.ITEM_GAP).assertEqual(UiSpace.XXS);
+      expect(ListToken.ITEM_SHADOW_BLEED).assertEqual(UiSpace.XXS);
+      expect(MenuToken.MIN_WIDTH).assertEqual(64);
+      expect(MenuToken.COMPACT_MAX_WIDTH < 224).assertTrue();
+      expect(PageLayoutToken.SECTION_GAP).assertEqual(UiResponsive.SECTION_GAP);
+      expect(PageLayoutToken.CARD_GAP).assertEqual(UiResponsive.CARD_GAP);
     });
 
     it('responsive_breakpoints', 0, () => {

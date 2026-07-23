@@ -99,8 +99,16 @@ export class HdsTitleBarPolicy {
       iconColor: $r('sys.color.icon_primary'),
       backgroundColor: $r('sys.color.comp_background_tertiary')
     };
+    const menuStyle: HdsNavigationIconItemStyle = onPrimary ? {
+      iconColor: $r('sys.color.icon_on_primary'),
+      backgroundColor: Color.Transparent
+    } : {
+      iconColor: $r('sys.color.icon_primary'),
+      backgroundColor: $r('sys.color.comp_background_tertiary')
+    };
     const contentStyle: HdsTitleBarContentStyle = {
       titleStyle,
+      menuStyle,
       backIconStyle
     };
     const style: HdsTitleBarStyle = { contentStyle };

@@ -1,4 +1,4 @@
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit';
+import { HdsNavigation, HdsNavigationTitleMode, HdsNavigationMenuItemOptions, HdsNavigationIconOptions, HdsNavigationMenuContentOptions } from '@kit.UIDesignKit';
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import { NavigationToken } from '../token/component/NavigationToken';
 import { UiColor } from '../token/semantic/UiColor';
@@ -13,6 +13,7 @@ import {
   YoTitleBarContent
 } from '../theme/HdsTitleBarPolicy';
 import { UiResourceUtil } from '../util/UiResourceUtil';
+import { YoTitleBarMenuItem } from '../model/YoTitleBarMenuItem';
 import { YoContextStrip, YoContextStripItem } from './YoContextStrip';
 
 /**
@@ -26,7 +27,13 @@ export struct YoPageShell {
   @Param destinationKind: YoNavDestinationKind = YoNavDestinationKind.ROOT_TAB;
   @Param contextItems: YoContextStripItem[] = [];
   @Param contextRiskMessage: ResourceStr = '';
+  @Param titleBarMenus: YoTitleBarMenuItem[] = [];
   @Param scrollable: boolean = true;
+  /**
+   * When true, page content owns horizontal insets (typical for full-width List pages).
+   * Keeps scrollbar flush to the content viewport edge per ArkUI scrollable guidance.
+   */
+  @Param contentEdgeToEdge: boolean = false;
   @Param immersiveTitleBar: boolean = true;
   @Param immersiveHeroContent: boolean = false;
   @Param bottomPaddingVp: number = -1;
@@ -43,6 +50,10 @@ export struct YoPageShell {
 
   @Builder
   defaultActionDock() {
+  }
+
+  private isEdgeToEdgeFill(): boolean {
+    return this.contentEdgeToEdge && !this.scrollable;
   }
 
   build() {
@@ -84,7 +95,7 @@ export struct YoPageShell {
           .scrollBar(BarState.Auto)
           .clipContent(ContentClipMode.SAFE_AREA)
         } else {
-          Column({ space: UiResponsive.SECTION_GAP }) {
+          Column({ space: this.isEdgeToEdgeFill() ? 0 : UiResponsive.SECTION_GAP }) {
             YoContextStrip({
               items: this.contextItems,
               riskMessage: this.contextRiskMessage
@@ -93,15 +104,19 @@ export struct YoPageShell {
               this.content()
             }
             .width('100%')
+            .height('100%')
             .padding({
               left: this.resolveHorizontalPadding(),
               right: this.resolveHorizontalPadding()
             })
             .layoutWeight(1)
+            .clip(true)
           }
           .width('100%')
           .height('100%')
           .padding({ bottom: this.resolveBottomPadding() })
+          .clip(true)
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         }
       }
       .titleBar(this.buildTitleBarConfig())
@@ -112,7 +127,12 @@ export struct YoPageShell {
       .bindToScrollable(this.scrollable ? [this.scroller] : [])
       .titleMode(HdsNavigationTitleMode.MINI)
       .hideBackButton(!this.showBack)
-      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+      .ignoreLayoutSafeArea(
+        [LayoutSafeAreaType.SYSTEM],
+        this.isEdgeToEdgeFill() ?
+          [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM] :
+          [LayoutSafeAreaEdge.TOP]
+      )
       .width('100%')
       .layoutWeight(1)
       .backgroundColor(Color.Transparent)
@@ -121,6 +141,7 @@ export struct YoPageShell {
     .width('100%')
     .height('100%')
     .backgroundColor(UiColor.BACKGROUND_PRIMARY)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   private buildTitleBarConfig(): YoNavigationTitleBarConfig {
@@ -136,6 +157,12 @@ export struct YoPageShell {
         }
       };
     }
+    if (this.titleBarMenus.length > 0) {
+      const menu: HdsNavigationMenuContentOptions = {
+        value: this.buildTitleBarMenuValues()
+      };
+      content.menu = menu;
+    }
     const config: YoNavigationTitleBarConfig = {
       avoidLayoutSafeArea: true,
       enableComponentSafeArea: true,
@@ -143,6 +170,27 @@ export struct YoPageShell {
       content
     };
     return config;
+  }
+
+  private buildTitleBarMenuValues(): Array<HdsNavigationMenuItemOptions> {
+    const menus: Array<HdsNavigationMenuItemOptions> = [];
+    for (let i = 0; i < this.titleBarMenus.length; i++) {
+      const item = this.titleBarMenus[i];
+      const iconContent: HdsNavigationIconOptions = {
+        label: item.label,
+        icon: item.icon,
+        isEnabled: item.enabled,
+        componentId: item.componentId,
+        action: (): void => {
+          item.action();
+        }
+      };
+      const menuItem: HdsNavigationMenuItemOptions = {
+        content: iconContent
+      };
+      menus.push(menuItem);
+    }
+    return menus;
   }
 
   private resolveSystemBarOriginalStyle(): HdsSystemBarStyleBundle | undefined {
@@ -164,12 +212,20 @@ export struct YoPageShell {
   }
 
   private resolveHorizontalPadding(): number {
+    if (this.contentEdgeToEdge) {
+      return 0;
+    }
     return WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint);
   }
 
   private resolveBottomPadding(): number {
     if (this.bottomPaddingVp >= 0) {
       return this.bottomPaddingVp;
+    }
+    // Edge-to-edge fill pages draw under the gesture bar; list footer owns the inset.
+    // Adding navInset here would create a double blank band under full-screen layout.
+    if (this.isEdgeToEdgeFill()) {
+      return 0;
     }
     const navInset = this.metrics.navigationBottomInsetVp;
     if (this.destinationKind === YoNavDestinationKind.ROOT_TAB) {
@@ -183,3 +239,4 @@ export struct YoPageShell {
 }
 
 export { YoContextStripItem };
+export { YoTitleBarMenuItem };
