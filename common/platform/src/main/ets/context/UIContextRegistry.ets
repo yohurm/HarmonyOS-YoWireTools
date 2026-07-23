@@ -1,6 +1,6 @@
 /**
  * Holds the active UIContext bound when the main window is ready.
- * Static dialogs (e.g. RiskConfirmDialog) must use this instead of deprecated AlertDialog.show.
+ * Prefer this over deprecated AlertDialog.show for imperative UI prompts.
  */
 export class UIContextRegistry {
   private static instance: UIContextRegistry | undefined;

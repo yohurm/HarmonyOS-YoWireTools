@@ -1,13 +1,13 @@
-import {
-  CardToken,
-  UiColor,
-  UiResourceUtil,
-  UiSize,
-  UiSpace,
-  UiTypeStyle,
+﻿import {
+  YoCardToken,
+  YoColor,
+  YoResourceUtil,
+  YoSize,
+  YoSpace,
+  YoTypeStyle,
   YoActionButton,
   YoActionButtonKind
-} from 'common_ui';
+} from 'youi_kit';
 import { ClassicDeviceSymbolResolver } from '../util/ClassicDeviceSymbolResolver';
 
 /**
@@ -15,7 +15,7 @@ import { ClassicDeviceSymbolResolver } from '../util/ClassicDeviceSymbolResolver
  *
  * Layout:
  * [Symbol] | name / MAC | rssi / pair / transport | [Connect]
- * Radius: CardToken.RADIUS (UiRadius.MEDIUM / 16vp).
+ * Radius: YoCardToken.RADIUS (YoRadius.MEDIUM / 16vp).
  */
 @ComponentV2
 export struct ClassicDeviceCard {
@@ -34,26 +34,26 @@ export struct ClassicDeviceCard {
   };
 
   build() {
-    Row({ space: UiSpace.M }) {
-      Row({ space: UiSpace.M }) {
+    Row({ space: YoSpace.M }) {
+      Row({ space: YoSpace.M }) {
         SymbolGlyph(ClassicDeviceSymbolResolver.resolve(this.majorClass, this.majorMinorClass))
-          .fontSize(UiSize.ICON_L)
-          .fontColor([UiColor.TEXT_SECONDARY])
+          .fontSize(YoSize.ICON_L)
+          .fontColor([YoColor.TEXT_SECONDARY])
           .fontWeight(FontWeight.Medium)
 
-        Column({ space: UiSpace.XXS }) {
+        Column({ space: YoSpace.XXS }) {
           Text(this.displayName)
-            .fontSize(UiTypeStyle.BODY_M.size)
-            .fontWeight(UiTypeStyle.BODY_M.weight)
-            .fontColor(UiColor.TEXT_PRIMARY)
+            .fontSize(YoTypeStyle.BODY_M.size)
+            .fontWeight(YoTypeStyle.BODY_M.weight)
+            .fontColor(YoColor.TEXT_PRIMARY)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .width('100%')
           if (this.address.length > 0) {
             Text(this.address)
-              .fontSize(UiTypeStyle.BODY_S.size)
-              .fontColor(UiColor.TEXT_SECONDARY)
-              .fontFamily(UiTypeStyle.MONO_S.family)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_SECONDARY)
+              .fontFamily(YoTypeStyle.MONO_S.family)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .width('100%')
@@ -62,24 +62,24 @@ export struct ClassicDeviceCard {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
 
-        Column({ space: UiSpace.XXS }) {
+        Column({ space: YoSpace.XXS }) {
           if (this.rssiText.length > 0) {
             Text(this.rssiText)
-              .fontSize(UiTypeStyle.BODY_S.size)
-              .fontColor(UiColor.TEXT_SECONDARY)
-              .fontFamily(UiTypeStyle.MONO_S.family)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_SECONDARY)
+              .fontFamily(YoTypeStyle.MONO_S.family)
               .maxLines(1)
           }
-          if (UiResourceUtil.hasText(this.statusLabel)) {
+          if (YoResourceUtil.hasText(this.statusLabel)) {
             Text(this.statusLabel)
-              .fontSize(UiTypeStyle.BODY_S.size)
-              .fontColor(UiColor.TEXT_TERTIARY)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_TERTIARY)
               .maxLines(1)
           }
-          if (UiResourceUtil.hasText(this.transportLabel)) {
+          if (YoResourceUtil.hasText(this.transportLabel)) {
             Text(this.transportLabel)
-              .fontSize(UiTypeStyle.BODY_S.size)
-              .fontColor(UiColor.TEXT_TERTIARY)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_TERTIARY)
               .maxLines(1)
           }
         }
@@ -106,40 +106,40 @@ export struct ClassicDeviceCard {
       }
     }
     .width('100%')
-    .constraintSize({ minHeight: CardToken.HEIGHT_DEVICE_ROW })
+    .constraintSize({ minHeight: YoCardToken.HEIGHT_DEVICE_ROW })
     .padding({
-      left: CardToken.PADDING_COMPACT,
-      right: CardToken.PADDING_COMPACT,
-      top: CardToken.PADDING_ROW_V,
-      bottom: CardToken.PADDING_ROW_V
+      left: YoCardToken.PADDING_COMPACT,
+      right: YoCardToken.PADDING_COMPACT,
+      top: YoCardToken.PADDING_ROW_V,
+      bottom: YoCardToken.PADDING_ROW_V
     })
-    .backgroundColor(CardToken.BACKGROUND)
-    .borderRadius(CardToken.RADIUS)
-    .shadow(CardToken.SHADOW_COMPACT)
+    .backgroundColor(YoCardToken.BACKGROUND)
+    .borderRadius(YoCardToken.RADIUS)
+    .shadow(YoCardToken.SHADOW_COMPACT)
     .accessibilityGroup(true)
     .accessibilityText(this.buildAccessibilityLabel())
   }
 
   private buildAccessibilityLabel(): string {
-    let label = UiResourceUtil.resolveText(this.displayName);
+    let label = YoResourceUtil.resolveText(this.displayName);
     if (this.address.length > 0) {
-      label = UiResourceUtil.format($r('app.string.ui_a11y_join_two'), label, this.address);
+      label = YoResourceUtil.format($r('app.string.youi_a11y_join_two'), label, this.address);
     }
     if (this.rssiText.length > 0) {
-      label = UiResourceUtil.format($r('app.string.ui_a11y_join_two'), label, this.rssiText);
+      label = YoResourceUtil.format($r('app.string.youi_a11y_join_two'), label, this.rssiText);
     }
-    if (UiResourceUtil.hasText(this.statusLabel)) {
-      label = UiResourceUtil.format(
-        $r('app.string.ui_a11y_join_two'),
+    if (YoResourceUtil.hasText(this.statusLabel)) {
+      label = YoResourceUtil.format(
+        $r('app.string.youi_a11y_join_two'),
         label,
-        UiResourceUtil.resolveText(this.statusLabel)
+        YoResourceUtil.resolveText(this.statusLabel)
       );
     }
-    if (UiResourceUtil.hasText(this.transportLabel)) {
-      label = UiResourceUtil.format(
-        $r('app.string.ui_a11y_join_two'),
+    if (YoResourceUtil.hasText(this.transportLabel)) {
+      label = YoResourceUtil.format(
+        $r('app.string.youi_a11y_join_two'),
         label,
-        UiResourceUtil.resolveText(this.transportLabel)
+        YoResourceUtil.resolveText(this.transportLabel)
       );
     }
     return label;

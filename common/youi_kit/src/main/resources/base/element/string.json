@@ -1,0 +1,52 @@
+﻿{
+  "string": [
+    {
+      "name": "youi_error_default_title",
+      "value": "出错了"
+    },
+    {
+      "name": "youi_retry",
+      "value": "重试"
+    },
+    {
+      "name": "youi_empty_default_title",
+      "value": "暂无数据"
+    },
+    {
+      "name": "youi_empty_default_message",
+      "value": "当前没有可显示的内容"
+    },
+    {
+      "name": "youi_loading_default_message",
+      "value": "加载中..."
+    },
+    {
+      "name": "youi_grant_permission",
+      "value": "去授权"
+    },
+    {
+      "name": "youi_open_settings",
+      "value": "打开设置"
+    },
+    {
+      "name": "youi_action_processing",
+      "value": "处理中…"
+    },
+    {
+      "name": "youi_more_actions",
+      "value": "更多"
+    },
+    {
+      "name": "youi_a11y_join_two",
+      "value": "%s，%s"
+    },
+    {
+      "name": "youi_a11y_selected",
+      "value": "%s，已选中"
+    },
+    {
+      "name": "youi_a11y_disabled",
+      "value": "%s，已禁用"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { YoNavDestinationKind, YoPageShell } from 'common_ui';
+﻿import { YoNavDestinationKind, YoPageShell } from 'youi_kit';
 
 /**
  * BLE main page — intentionally empty shell until BLE UI is rebuilt.

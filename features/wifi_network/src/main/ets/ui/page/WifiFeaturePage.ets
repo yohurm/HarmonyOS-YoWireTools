@@ -1,7 +1,7 @@
-import {
+﻿import {
   YoNavDestinationKind,
   YoPageShell
-} from 'common_ui';
+} from 'youi_kit';
 
 @ComponentV2
 export struct WifiFeaturePage {

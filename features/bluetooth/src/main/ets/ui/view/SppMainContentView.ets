@@ -1,5 +1,4 @@
-import { UiColor, UiResponsive } from 'common_ui';
-import { SppTabSegmentButton } from '../component/SppTabSegmentButton';
+﻿import { YoColor, YoResponsive, YoSegmentButton } from 'youi_kit';
 import { SppDeviceListView } from './SppDeviceListView';
 import {
   SppActiveSessionItem,
@@ -32,11 +31,15 @@ export struct SppMainContentView {
   }
 
   build() {
-    Column({ space: UiResponsive.CONTROL_GAP }) {
+    Column({ space: YoResponsive.CONTROL_GAP }) {
       Column() {
-        SppTabSegmentButton({
+        YoSegmentButton({
+          labels: [
+            $r('app.string.bt_spp_segment_scan'),
+            $r('app.string.bt_spp_segment_active')
+          ],
           initialIndex: this.vm.selectedIndex,
-          onIndexChange: (index: number) => {
+          onSelectedIndexChange: (index: number) => {
             this.onSegmentIndexChange(index);
           }
         })
@@ -81,7 +84,7 @@ export struct SppMainContentView {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(UiColor.BACKGROUND_PRIMARY)
+    .backgroundColor(YoColor.BACKGROUND_PRIMARY)
     .clip(true)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }

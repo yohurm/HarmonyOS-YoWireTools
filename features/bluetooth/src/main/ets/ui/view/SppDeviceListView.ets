@@ -1,9 +1,9 @@
 import { LengthMetrics } from '@kit.ArkUI';
 import {
-  EmptyStateModel,
-  EmptyStateView,
-  ListToken
-} from 'common_ui';
+  YoEmptyStateModel,
+  YoEmpty,
+  YoListToken
+} from 'youi_kit';
 import { ClassicDeviceCard } from '../component/ClassicDeviceCard';
 import { SppActiveSessionItem, SppDeviceListItem } from '../../viewmodel/SppMainViewModel';
 
@@ -39,8 +39,8 @@ export struct SppDeviceListView {
   build() {
     if (this.isEmpty()) {
       Column() {
-        EmptyStateView({
-          model: new EmptyStateModel(this.emptyTitle, this.emptyMessage)
+        YoEmpty({
+          model: new YoEmptyStateModel(this.emptyTitle, this.emptyMessage)
         })
       }
       .width('100%')
@@ -52,7 +52,7 @@ export struct SppDeviceListView {
       })
       .justifyContent(FlexAlign.Center)
     } else {
-      List({ space: ListToken.ITEM_GAP, scroller: this.listScroller }) {
+      List({ space: YoListToken.ITEM_GAP, scroller: this.listScroller }) {
         if (this.mode === 'scan') {
           ForEach(this.devices, (item: SppDeviceListItem) => {
             ListItem() {
@@ -80,8 +80,8 @@ export struct SppDeviceListView {
                 .margin({
                   left: this.horizontalPadding,
                   right: this.horizontalPadding,
-                  top: ListToken.ITEM_SHADOW_BLEED,
-                  bottom: ListToken.ITEM_SHADOW_BLEED
+                  top: YoListToken.ITEM_SHADOW_BLEED,
+                  bottom: YoListToken.ITEM_SHADOW_BLEED
                 })
             }
           }, (item: SppDeviceListItem) => item.primaryDeviceId)
@@ -105,8 +105,8 @@ export struct SppDeviceListView {
                 .margin({
                   left: this.horizontalPadding,
                   right: this.horizontalPadding,
-                  top: ListToken.ITEM_SHADOW_BLEED,
-                  bottom: ListToken.ITEM_SHADOW_BLEED
+                  top: YoListToken.ITEM_SHADOW_BLEED,
+                  bottom: YoListToken.ITEM_SHADOW_BLEED
                 })
             }
           }, (item: SppActiveSessionItem) => item.sessionId)
@@ -122,7 +122,7 @@ export struct SppDeviceListView {
       .width('100%')
       .height('100%')
       .scrollBar(BarState.Auto)
-      .scrollBarWidth(ListToken.SCROLLBAR_WIDTH)
+      .scrollBarWidth(YoListToken.SCROLLBAR_WIDTH)
       .scrollBarMargin({
         start: LengthMetrics.vp(0),
         end: LengthMetrics.vp(0)

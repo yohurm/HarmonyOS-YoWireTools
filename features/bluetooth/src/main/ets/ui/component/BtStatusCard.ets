@@ -1,15 +1,15 @@
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import {
-  StatusPillTone,
-  StatusPillView,
-  UiColor,
-  UiResourceUtil,
-  UiResponsive,
-  UiTypeStyle,
+  YoStatusPillTone,
+  YoStatusPill,
+  YoColor,
+  YoResourceUtil,
+  YoResponsive,
+  YoTypeStyle,
   YoActionButton,
   YoActionButtonKind,
   YoImmersiveSurface
-} from 'common_ui';
+} from 'youi_kit';
 
 export type BtStatusCellKind = 'adapter' | 'permission' | 'classic' | 'ble';
 
@@ -17,7 +17,7 @@ export interface BtStatusCellModel {
   kind: BtStatusCellKind;
   label: ResourceStr;
   value: ResourceStr;
-  tone: StatusPillTone;
+  tone: YoStatusPillTone;
   actionEnabled: boolean;
 }
 
@@ -55,15 +55,15 @@ export struct BtStatusCard {
 
   @Builder
   private statusCell(model: BtStatusCellModel) {
-    Column({ space: UiResponsive.LABEL_STACK_GAP }) {
-      Column({ space: UiResponsive.LABEL_STACK_GAP }) {
+    Column({ space: YoResponsive.LABEL_STACK_GAP }) {
+      Column({ space: YoResponsive.LABEL_STACK_GAP }) {
         Text(model.label)
-          .fontSize(UiTypeStyle.BODY_S.size)
-          .fontColor(UiColor.TEXT_TERTIARY)
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_TERTIARY)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
-        StatusPillView({ label: model.value, tone: model.tone })
+        YoStatusPill({ label: model.value, tone: model.tone })
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
@@ -85,10 +85,10 @@ export struct BtStatusCard {
   }
 
   private buildCellAccessibilityLabel(model: BtStatusCellModel): string {
-    return UiResourceUtil.format(
-      $r('app.string.ui_a11y_join_two'),
-      UiResourceUtil.resolveText(model.label),
-      UiResourceUtil.resolveText(model.value)
+    return YoResourceUtil.format(
+      $r('app.string.youi_a11y_join_two'),
+      YoResourceUtil.resolveText(model.label),
+      YoResourceUtil.resolveText(model.value)
     );
   }
 
@@ -102,8 +102,8 @@ export struct BtStatusCard {
 
   private resolveCellGap(): number {
     return WindowWidthBreakpointUtil.isSplitCapable(this.metrics.breakpoint)
-      ? UiResponsive.CARD_GAP
-      : UiResponsive.CONTROL_GAP;
+      ? YoResponsive.CARD_GAP
+      : YoResponsive.CONTROL_GAP;
   }
 
   private buildAdapterCell(): BtStatusCellModel {

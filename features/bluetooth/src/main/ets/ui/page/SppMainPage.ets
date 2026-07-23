@@ -1,12 +1,12 @@
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
 import {
-  ContentStateHost,
-  LoadingStateModel,
-  UiPageState,
+  YoContentState,
+  YoLoadingStateModel,
+  YoPageState,
   YoNavDestinationKind,
   YoPageShell,
   YoTitleBarMenuItem
-} from 'common_ui';
+} from 'youi_kit';
 import { openSppTitleMoreMenu, SPP_TITLE_MORE_MENU_ID } from '../menu/SppTitleMoreMenu';
 import { SppMainContentView } from '../view/SppMainContentView';
 import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
@@ -37,9 +37,9 @@ export struct SppMainPage {
 
   @LocalBuilder
   pageContent() {
-    ContentStateHost({
-      state: this.vm.isLoading ? UiPageState.LOADING : UiPageState.CONTENT,
-      loadingModel: new LoadingStateModel($r('app.string.ui_loading_default_message')),
+    YoContentState({
+      state: this.vm.isLoading ? YoPageState.LOADING : YoPageState.CONTENT,
+      loadingModel: new YoLoadingStateModel($r('app.string.youi_loading_default_message')),
       content: this.pageBody
     })
   }
@@ -80,7 +80,7 @@ export struct SppMainPage {
       new YoTitleBarMenuItem(
         'more',
         $r('sys.symbol.more'),
-        $r('app.string.ui_more_actions'),
+        $r('app.string.youi_more_actions'),
         () => {
           openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID);
         },

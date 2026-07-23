@@ -1,5 +1,5 @@
-import { ComponentContent, LengthMetrics } from '@kit.ArkUI';
-import { MenuToken } from 'common_ui';
+﻿import { ComponentContent, LengthMetrics } from '@kit.ArkUI';
+import { YoMenuToken } from 'youi_kit';
 
 export const SPP_TITLE_MORE_MENU_ID: string = 'spp_title_more_menu';
 
@@ -15,10 +15,10 @@ export function buildSppTitleMoreMenu() {
   Menu() {
     MenuItem({ content: $r('app.string.bt_action_open_settings') })
   }
-  .radius(MenuToken.RADIUS)
+  .radius(YoMenuToken.RADIUS)
   .constraintSize({
-    minWidth: MenuToken.MIN_WIDTH,
-    maxWidth: MenuToken.COMPACT_MAX_WIDTH
+    minWidth: YoMenuToken.MIN_WIDTH,
+    maxWidth: YoMenuToken.COMPACT_MAX_WIDTH
   })
   .menuItemDivider({
     strokeWidth: LengthMetrics.vp(1),

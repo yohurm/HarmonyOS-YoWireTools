@@ -1,15 +1,15 @@
 import {
-  ContentStateHost,
-  LoadingStateModel,
-  ModeEntryCard,
-  UiColor,
-  UiPageState,
-  UiResponsive,
-  UiSpace,
-  UiTypeStyle,
+  YoContentState,
+  YoLoadingStateModel,
+  YoModeEntryCard,
+  YoColor,
+  YoPageState,
+  YoResponsive,
+  YoSpace,
+  YoTypeStyle,
   YoNavDestinationKind,
   YoPageShell
-} from 'common_ui';
+} from 'youi_kit';
 import { PermissionScenario, PermissionScenarioCoordinator } from 'feature_debug_core';
 import { BtStatusCard } from '../component/BtStatusCard';
 import { BtOverviewViewModel } from '../../viewmodel/BtOverviewViewModel';
@@ -30,14 +30,14 @@ export struct BluetoothFeaturePage {
     this.vm.onPageDisappear();
   }
 
-  private resolvePageState(): UiPageState {
+  private resolvePageState(): YoPageState {
     if (this.vm.isLoading) {
-      return UiPageState.LOADING;
+      return YoPageState.LOADING;
     }
     if (!this.vm.permissionGranted) {
-      return UiPageState.PERMISSION;
+      return YoPageState.PERMISSION;
     }
-    return UiPageState.CONTENT;
+    return YoPageState.CONTENT;
   }
 
   private async handleRequestPermission(): Promise<void> {
@@ -52,9 +52,9 @@ export struct BluetoothFeaturePage {
 
   @LocalBuilder
   pageContent() {
-    ContentStateHost({
+    YoContentState({
       state: this.resolvePageState(),
-      loadingModel: new LoadingStateModel($r('app.string.ui_loading_default_message')),
+      loadingModel: new YoLoadingStateModel($r('app.string.youi_loading_default_message')),
       permissionState: this.vm.permissionUiState,
       content: this.pageBody,
       onRequestPermission: () => {
@@ -68,7 +68,7 @@ export struct BluetoothFeaturePage {
 
   @LocalBuilder
   pageBody() {
-    Column({ space: UiResponsive.SECTION_GAP }) {
+    Column({ space: YoResponsive.SECTION_GAP }) {
       BtStatusCard({
         isLoading: this.vm.isLoading,
         adapterEnabled: this.vm.adapterEnabled,
@@ -102,14 +102,14 @@ export struct BluetoothFeaturePage {
 
   @LocalBuilder
   bluetoothEntryOverview() {
-    Column({ space: UiSpace.M }) {
+    Column({ space: YoSpace.M }) {
       Text($r('app.string.bt_entry_section_title'))
-        .fontSize(UiTypeStyle.SUBTITLE_S.size)
-        .fontWeight(UiTypeStyle.SUBTITLE_S.weight)
-        .fontColor(UiColor.TEXT_SECONDARY)
+        .fontSize(YoTypeStyle.SUBTITLE_S.size)
+        .fontWeight(YoTypeStyle.SUBTITLE_S.weight)
+        .fontColor(YoColor.TEXT_SECONDARY)
         .width('100%')
-      Row({ space: UiSpace.M }) {
-        ModeEntryCard({
+      Row({ space: YoSpace.M }) {
+        YoModeEntryCard({
           title: $r('app.string.bt_entry_spp_title'),
           description: $r('app.string.bt_entry_spp_subtitle'),
           statusLabel: this.vm.isClassicReady() ?
@@ -122,7 +122,7 @@ export struct BluetoothFeaturePage {
         })
           .layoutWeight(1)
           .constraintSize({ minHeight: 108 })
-        ModeEntryCard({
+        YoModeEntryCard({
           title: $r('app.string.bt_entry_ble_title'),
           description: $r('app.string.bt_entry_ble_subtitle'),
           statusLabel: this.vm.isBleReady() ?

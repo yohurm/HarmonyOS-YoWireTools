@@ -45,6 +45,26 @@
       "value": "NearLink wireless debugging"
     },
     {
+      "name": "tab_workbench",
+      "value": "工作台"
+    },
+    {
+      "name": "tab_bluetooth",
+      "value": "蓝牙"
+    },
+    {
+      "name": "tab_network",
+      "value": "网络"
+    },
+    {
+      "name": "tab_nearlink",
+      "value": "星闪"
+    },
+    {
+      "name": "tab_more",
+      "value": "更多"
+    },
+    {
       "name": "more_hub_title",
       "value": "更多"
     },

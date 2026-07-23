@@ -1,17 +1,17 @@
 import {
-  EmptyStateModel,
-  EmptyStateView,
-  UiResponsive,
+  YoEmptyStateModel,
+  YoEmpty,
+  YoResponsive,
   YoNavDestinationKind,
   YoPageShell,
   YoSplitScaffold
-} from 'common_ui';
+} from 'youi_kit';
 
 @Builder
 function nearLinkListPane() {
   Column() {
-    EmptyStateView({
-      model: new EmptyStateModel(
+    YoEmpty({
+      model: new YoEmptyStateModel(
         $r('app.string.nl_placeholder_list'),
         $r('app.string.nl_placeholder_list_message')
       )
@@ -19,15 +19,15 @@ function nearLinkListPane() {
   }
   .width('100%')
   .height('100%')
-  .padding(UiResponsive.CARD_CONTENT_PADDING)
+  .padding(YoResponsive.CARD_CONTENT_PADDING)
   .justifyContent(FlexAlign.Center)
 }
 
 @Builder
 function nearLinkDetailPane() {
   Column() {
-    EmptyStateView({
-      model: new EmptyStateModel(
+    YoEmpty({
+      model: new YoEmptyStateModel(
         $r('app.string.nl_placeholder_detail'),
         $r('app.string.nl_placeholder_detail_message')
       )
@@ -35,7 +35,7 @@ function nearLinkDetailPane() {
   }
   .width('100%')
   .height('100%')
-  .padding(UiResponsive.CARD_CONTENT_PADDING)
+  .padding(YoResponsive.CARD_CONTENT_PADDING)
   .justifyContent(FlexAlign.Center)
 }
 

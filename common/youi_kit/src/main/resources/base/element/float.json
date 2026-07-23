@@ -1,0 +1,15 @@
+﻿{
+  "float": [
+    { "name": "youi_display_s", "value": "36fp" },
+    { "name": "youi_title_l", "value": "30fp" },
+    { "name": "youi_title_m", "value": "24fp" },
+    { "name": "youi_title_s", "value": "20fp" },
+    { "name": "youi_subtitle_l", "value": "18fp" },
+    { "name": "youi_subtitle_m", "value": "16fp" },
+    { "name": "youi_subtitle_s", "value": "14fp" },
+    { "name": "youi_body_l", "value": "16fp" },
+    { "name": "youi_body_m", "value": "14fp" },
+    { "name": "youi_body_s", "value": "12fp" },
+    { "name": "youi_caption_l", "value": "12fp" }
+  ]
+}

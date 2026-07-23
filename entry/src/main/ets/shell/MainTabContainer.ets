@@ -1,4 +1,4 @@
-import { YoAppShell } from 'common_ui';
+﻿import { YoAppShell, YoSideNavItem } from 'youi_kit';
 import { BluetoothFeaturePage } from 'feature_bluetooth';
 import { HomeFeaturePage } from 'feature_home';
 import { NearLinkFeaturePage } from 'feature_nearlink';
@@ -35,6 +35,13 @@ export struct MainTabContainer {
   };
   @Event onOpenBluetoothBle: () => void = () => {
   };
+  private readonly tabItems: YoSideNavItem[] = [
+    { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
+    { index: 1, label: $r('app.string.tab_bluetooth'), symbol: $r('sys.symbol.trunk') },
+    { index: 2, label: $r('app.string.tab_network'), symbol: $r('sys.symbol.ohos_wifi') },
+    { index: 3, label: $r('app.string.tab_nearlink'), symbol: $r('sys.symbol.card_writer') },
+    { index: 4, label: $r('app.string.tab_more'), symbol: $r('sys.symbol.more') }
+  ];
 
   @LocalBuilder
   bluetoothTab() {
@@ -47,14 +54,15 @@ export struct MainTabContainer {
   build() {
     YoAppShell({
       currentTabIndex: this.currentTabIndex,
+      items: this.tabItems,
       onTabChange: (index: number) => {
         this.onTabChange(index);
       },
-      workbenchContent: workbenchTab,
-      bluetoothContent: this.bluetoothTab,
-      networkContent: networkTab,
-      nearlinkContent: nearlinkTab,
-      moreContent: moreTab
+      tabContent0: workbenchTab,
+      tabContent1: this.bluetoothTab,
+      tabContent2: networkTab,
+      tabContent3: nearlinkTab,
+      tabContent4: moreTab
     })
   }
 }

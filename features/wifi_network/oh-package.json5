@@ -9,7 +9,7 @@
     "common_core": "file:../../common/core",
     "common_platform": "file:../../common/platform",
     "common_storage": "file:../../common/storage",
-    "common_ui": "file:../../common/ui",
+    "youi_kit": "file:../../common/youi_kit",
     "feature_debug_core": "file:../debug_core"
   }
 }

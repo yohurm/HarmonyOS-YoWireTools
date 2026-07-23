@@ -1,5 +1,5 @@
-/**
- * Global appearance preference for V2 ThemeModeSelect.
+﻿/**
+ * Global appearance preference.
  */
 
 export enum AppThemeMode {
@@ -9,8 +9,7 @@ export enum AppThemeMode {
 }
 
 /**
- * Display labels/subtitles for theme modes live in common_ui resources
- * (ui_theme_system, ui_theme_light, ui_theme_dark and *_subtitle variants).
+ * Theme mode labels belong in product/entry resources when a settings UI is present.
  * Do not add hardcoded user-visible strings here.
  */
 export class AppThemeModeUtil {
