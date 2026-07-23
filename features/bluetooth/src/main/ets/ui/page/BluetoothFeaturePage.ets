@@ -5,6 +5,7 @@ import {
   UiColor,
   UiPageState,
   UiResponsive,
+  UiSpace,
   UiTypeStyle,
   YoNavDestinationKind,
   YoPageShell
@@ -101,36 +102,42 @@ export struct BluetoothFeaturePage {
 
   @LocalBuilder
   bluetoothEntryOverview() {
-    Column({ space: UiResponsive.CONTROL_GAP }) {
+    Column({ space: UiSpace.M }) {
       Text($r('app.string.bt_entry_section_title'))
-        .fontSize(UiTypeStyle.SUBTITLE_M.size)
-        .fontWeight(UiTypeStyle.SUBTITLE_M.weight)
-        .fontColor(UiColor.TEXT_PRIMARY)
+        .fontSize(UiTypeStyle.SUBTITLE_S.size)
+        .fontWeight(UiTypeStyle.SUBTITLE_S.weight)
+        .fontColor(UiColor.TEXT_SECONDARY)
         .width('100%')
-      ModeEntryCard({
-        title: $r('app.string.bt_entry_spp_title'),
-        description: $r('app.string.bt_entry_spp_subtitle'),
-        statusLabel: this.vm.isClassicReady() ?
-          $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
-        statusTone: this.vm.isClassicReady() ? 'success' : 'warning',
-        primaryLabel: $r('app.string.ui_session_enter'),
-        disabled: !this.vm.isClassicReady(),
-        onPrimary: () => {
-          this.onOpenSpp();
-        }
-      })
-      ModeEntryCard({
-        title: $r('app.string.bt_entry_ble_title'),
-        description: $r('app.string.bt_entry_ble_subtitle'),
-        statusLabel: this.vm.isBleReady() ?
-          $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
-        statusTone: this.vm.isBleReady() ? 'success' : 'warning',
-        primaryLabel: $r('app.string.ui_session_enter'),
-        disabled: !this.vm.isBleReady(),
-        onPrimary: () => {
-          this.onOpenBle();
-        }
-      })
+      Row({ space: UiSpace.M }) {
+        ModeEntryCard({
+          title: $r('app.string.bt_entry_spp_title'),
+          description: $r('app.string.bt_entry_spp_subtitle'),
+          statusLabel: this.vm.isClassicReady() ?
+            $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
+          statusTone: this.vm.isClassicReady() ? 'success' : 'warning',
+          disabled: !this.vm.isClassicReady(),
+          onTap: () => {
+            this.onOpenSpp();
+          }
+        })
+          .layoutWeight(1)
+          .constraintSize({ minHeight: 108 })
+        ModeEntryCard({
+          title: $r('app.string.bt_entry_ble_title'),
+          description: $r('app.string.bt_entry_ble_subtitle'),
+          statusLabel: this.vm.isBleReady() ?
+            $r('app.string.bt_entry_status_ready') : $r('app.string.bt_entry_status_blocked'),
+          statusTone: this.vm.isBleReady() ? 'success' : 'warning',
+          disabled: !this.vm.isBleReady(),
+          onTap: () => {
+            this.onOpenBle();
+          }
+        })
+          .layoutWeight(1)
+          .constraintSize({ minHeight: 108 })
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Top)
     }
     .width('100%')
   }

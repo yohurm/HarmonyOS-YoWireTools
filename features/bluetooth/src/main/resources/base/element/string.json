@@ -78,7 +78,7 @@
     },
     {
       "name": "bt_entry_ble_subtitle",
-      "value": "低功耗蓝牙"
+      "value": "GATT 浏览器"
     },
     {
       "name": "bt_entry_status_ready",
@@ -90,7 +90,11 @@
     },
     {
       "name": "bt_spp_page_title",
-      "value": "SPP"
+      "value": "经典 SPP"
+    },
+    {
+      "name": "bt_spp_action_disconnect",
+      "value": "断开"
     },
     {
       "name": "bt_ble_page_title",
@@ -107,6 +111,82 @@
     {
       "name": "bt_metric_sessions",
       "value": "会话"
+    },
+    {
+      "name": "bt_spp_segment_scan",
+      "value": "蓝牙扫描"
+    },
+    {
+      "name": "bt_spp_segment_active",
+      "value": "活动连接"
+    },
+    {
+      "name": "bt_spp_action_refresh",
+      "value": "刷新"
+    },
+    {
+      "name": "bt_spp_action_connect",
+      "value": "连接"
+    },
+    {
+      "name": "bt_spp_status_paired",
+      "value": "已配对"
+    },
+    {
+      "name": "bt_spp_status_needs_bridge",
+      "value": "需配对获取经典地址"
+    },
+    {
+      "name": "bt_transport_classic",
+      "value": "经典"
+    },
+    {
+      "name": "bt_transport_dual",
+      "value": "双模"
+    },
+    {
+      "name": "bt_transport_ble",
+      "value": "BLE"
+    },
+    {
+      "name": "bt_transport_unknown",
+      "value": "未知"
+    },
+    {
+      "name": "bt_spp_device_unknown_name",
+      "value": "未知设备"
+    },
+    {
+      "name": "bt_spp_empty_scan_title",
+      "value": "暂无经典蓝牙设备"
+    },
+    {
+      "name": "bt_spp_empty_scan_message",
+      "value": "点击右上角刷新，扫描附近经典蓝牙设备"
+    },
+    {
+      "name": "bt_spp_empty_scanning_title",
+      "value": "正在扫描"
+    },
+    {
+      "name": "bt_spp_empty_scanning_message",
+      "value": "正在查找附近的经典蓝牙设备…"
+    },
+    {
+      "name": "bt_spp_empty_active_title",
+      "value": "暂无活动连接"
+    },
+    {
+      "name": "bt_spp_empty_active_message",
+      "value": "连接设备后，活动会话将显示在这里"
+    },
+    {
+      "name": "bt_spp_empty_not_ready_title",
+      "value": "蓝牙未就绪"
+    },
+    {
+      "name": "bt_spp_empty_not_ready_message",
+      "value": "请开启蓝牙并授权后，再刷新设备列表"
     },
     {
       "name": "bt_terminal_empty",

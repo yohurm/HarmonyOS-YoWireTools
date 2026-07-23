@@ -1,33 +1,38 @@
-import {
-  CommandDockAction,
-  CommandDockView,
-  ContentStateHost,
-  DataTerminalView,
-  LoadingStateModel,
-  RiskConfirmVariant,
-  UiPageState,
-  UiResponsive,
-  UiResourceUtil,
-  YoNavDestinationKind,
-  YoPageShell
-} from 'common_ui';
 import { WindowMetricsRegistry, WindowMetricsState, WindowWidthBreakpointUtil } from 'common_platform';
+import {
+  ContentStateHost,
+  LoadingStateModel,
+  UiPageState,
+  YoNavDestinationKind,
+  YoPageShell,
+  YoTitleBarMenuItem
+} from 'common_ui';
+import { openSppTitleMoreMenu, SPP_TITLE_MORE_MENU_ID } from '../menu/SppTitleMoreMenu';
+import { SppMainContentView } from '../view/SppMainContentView';
 import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
-import { BtSummaryCard } from '../component/BtSummaryCard';
 
+/**
+ * Classic SPP page assembly — binds ViewModel lifecycle to YoPageShell only.
+ */
 @ComponentV2
 export struct SppMainPage {
   @Event onBack: () => void = () => {
   };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
+  @Local private titleMenus: YoTitleBarMenuItem[] = [];
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
-  @Local private commandInput: string = '';
-  @Local private isSending: boolean = false;
-  @Local private periodicActive: boolean = false;
-  @Local private terminalLines: string[] = [];
 
   aboutToAppear(): void {
+    this.titleMenus = this.buildTitleMenus();
     void this.vm.onPageAppear();
+  }
+
+  aboutToDisappear(): void {
+    void this.vm.onPageDisappear();
+  }
+
+  private pageHorizontalPadding(): number {
+    return WindowWidthBreakpointUtil.pagePaddingVp(this.metrics.breakpoint);
   }
 
   @LocalBuilder
@@ -41,45 +46,11 @@ export struct SppMainPage {
 
   @LocalBuilder
   pageBody() {
-    Column({ space: UiResponsive.SECTION_GAP }) {
-      BtSummaryCard({
-        title: $r('app.string.bt_spp_page_title'),
-        ready: this.vm.ready,
-        primaryMetricLabel: $r('app.string.bt_spp_metric_devices'),
-        primaryMetricValue: this.vm.pairedDeviceCount,
-        sessionMetricValue: this.vm.activeSessionCount
-      })
-      DataTerminalView({
-        lines: this.terminalLines,
-        emptyHint: $r('app.string.bt_terminal_empty')
-      })
-        .layoutWeight(1)
-      CommandDockView({
-        inputValue: this.commandInput,
-        placeholder: $r('app.string.bt_command_placeholder'),
-        canSubmit: this.vm.ready,
-        isSendEnabled: this.vm.ready,
-        isLoading: this.isSending,
-        sendDisabledReason: this.vm.ready ? '' : $r('app.string.ui_send_disabled_not_connected'),
-        collapsed: !WindowWidthBreakpointUtil.isSplitCapable(this.metrics.breakpoint),
-        periodicActive: this.periodicActive,
-        secondaryActions: this.buildSecondaryActions(),
-        onInputChange: (value: string) => {
-          this.commandInput = value;
-        },
-        onSend: (text: string) => {
-          void this.handleSend(text);
-        },
-        onSecondaryAction: (key: string) => {
-          this.handleSecondaryAction(key);
-        },
-        onStopPeriodic: () => {
-          this.periodicActive = false;
-        }
-      })
-    }
-    .width('100%')
-    .height('100%')
+    SppMainContentView({
+      vm: this.vm,
+      horizontalPadding: this.pageHorizontalPadding(),
+      bottomInsetVp: this.metrics.navigationBottomInsetVp
+    })
   }
 
   build() {
@@ -88,48 +59,34 @@ export struct SppMainPage {
       showBack: true,
       destinationKind: YoNavDestinationKind.MODULE,
       scrollable: false,
+      contentEdgeToEdge: true,
       immersiveTitleBar: true,
+      titleBarMenus: this.titleMenus,
       onBack: this.onBack,
       content: this.pageContent
     })
   }
 
-  private buildSecondaryActions(): CommandDockAction[] {
+  private buildTitleMenus(): YoTitleBarMenuItem[] {
     return [
-      new CommandDockAction('hex', $r('app.string.ui_action_hex')),
-      new CommandDockAction('periodic', $r('app.string.ui_action_periodic'), {
-        variant: RiskConfirmVariant.WARNING,
-        title: $r('app.string.ui_risk_periodic_title'),
-        message: $r('app.string.ui_risk_periodic_message'),
-        confirmLabel: $r('app.string.ui_risk_periodic_confirm')
-      }),
-      new CommandDockAction('disconnect', $r('app.string.ui_action_disconnect'), {
-        variant: RiskConfirmVariant.DANGER,
-        title: $r('app.string.ui_risk_disconnect_title'),
-        message: $r('app.string.ui_risk_disconnect_message'),
-        confirmLabel: $r('app.string.ui_risk_disconnect_confirm')
-      })
+      new YoTitleBarMenuItem(
+        'refresh',
+        $r('sys.symbol.arrow_clockwise'),
+        $r('app.string.bt_spp_action_refresh'),
+        () => {
+          void this.vm.refresh(false);
+        }
+      ),
+      new YoTitleBarMenuItem(
+        'more',
+        $r('sys.symbol.more'),
+        $r('app.string.ui_more_actions'),
+        () => {
+          openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID);
+        },
+        true,
+        SPP_TITLE_MORE_MENU_ID
+      )
     ];
-  }
-
-  private async handleSend(text: string): Promise<void> {
-    if (!this.vm.ready || text.length === 0) {
-      return;
-    }
-    this.isSending = true;
-    this.terminalLines = [...this.terminalLines, UiResourceUtil.format($r('app.string.bt_terminal_tx_line'), text)];
-    this.commandInput = '';
-    this.isSending = false;
-  }
-
-  private handleSecondaryAction(key: string): void {
-    if (key === 'periodic') {
-      this.periodicActive = true;
-      return;
-    }
-    if (key === 'disconnect') {
-      this.periodicActive = false;
-      this.terminalLines = [...this.terminalLines, UiResourceUtil.resolveText($r('app.string.bt_terminal_disconnected'))];
-    }
   }
 }
