@@ -5,12 +5,17 @@ import { ClassicBluetoothDataSource, PlatformDiscoveryPayload } from '../datasou
 import { BleDiscoveryPayload, BleScannerDataSource } from '../datasource/platform/BleScannerDataSource';
 import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
 import { GattClientDataSource } from '../datasource/platform/GattClientDataSource';
-import { BluetoothDeviceMapper } from '../mapper/BluetoothDeviceMapper';
+import { BluetoothDeviceMapper, PlatformPairedSnapshot } from '../mapper/BluetoothDeviceMapper';
 import {
   BluetoothAdapterSnapshot,
   BluetoothDevice,
   BluetoothOverviewSnapshot
 } from '../../domain/model/BluetoothDevice';
+import {
+  BluetoothTransportPolicy,
+  BluetoothListRail,
+  BluetoothTransportType
+} from '../../domain/model/BluetoothTransportType';
 import { ClassicScanPhase } from '../../domain/model/ClassicScanPhase';
 import { BleScanPhase } from '../../domain/model/BleScanPhase';
 import { BleScanFilter } from '../../domain/model/BleScanFilter';
@@ -27,6 +32,9 @@ import { BleManufacturerMaskMatcher } from '../../domain/service/BleManufacturer
 import { BluetoothRepositoryContract } from '../../domain/repository/BluetoothRepositoryContract';
 import { SppConnectParams } from '../../domain/model/SppConnectParams';
 import { SppTransportSession } from '../transport/SppTransportSession';
+import { DeviceIdentity } from '../../domain/model/DeviceIdentity';
+import { DeviceRegistry } from '../../domain/service/registry/DeviceRegistry';
+import { BluetoothConstants } from '../../constants/BluetoothConstants';
 
 /**
  * Bluetooth repository facade per architecture 02-§6.1.
@@ -40,6 +48,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private readonly bleMerger: ScanResultMerger = new ScanResultMerger();
   private readonly bleAdvertisingMap: Map<string, BleAdvertisingPacket> = new Map();
   private readonly gattClients: Map<string, GattClientDataSource> = new Map();
+  /** Application-layer BLE connection slots (GATT browser / UART / GATT serial). */
+  private bleConnectionCount: number = 0;
   private readonly gattTrees: Map<string, GattServiceTreeSnapshot> = new Map();
   private readonly classicDevicesObservable: Observable<BluetoothDevice[]>;
   private readonly bleDevicesObservable: Observable<BluetoothDevice[]>;
@@ -91,8 +101,103 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return new SppTransportSession(sessionId);
   }
 
-  getPairedDevices(): Promise<Result<BluetoothDevice[]>> {
-    return this.loadPairedDevices();
+  /**
+   * Load paired devices eligible for classic / SPP rail (BR_EDR | DUAL).
+   * LE-only entries are excluded per architecture bluetooth/00.
+   */
+  async loadPairedClassicCandidates(): Promise<Result<BluetoothDevice[]>> {
+    const paired = await this.classicDataSource.getPairedDeviceSnapshots();
+    if (!paired.success || paired.value === undefined) {
+      return Result.fail(paired.error ?? new ResultError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, 'paired failed'));
+    }
+    await this.refreshFavorites();
+    this.reconcileDualModeFromSnapshots(paired.value);
+    const devices: BluetoothDevice[] = [];
+    for (let i = 0; i < paired.value.length; i++) {
+      const snapshot: PlatformPairedSnapshot = paired.value[i];
+      const admitted = await this.admitPairedClassicSnapshot(snapshot);
+      if (!admitted.admit) {
+        continue;
+      }
+      let mapped = snapshot;
+      if (admitted.resolvedTransport !== snapshot.transport) {
+        mapped = new PlatformPairedSnapshot(
+          snapshot.address,
+          snapshot.deviceName,
+          admitted.resolvedTransport,
+          snapshot.deviceClassCod,
+          snapshot.majorClass,
+          snapshot.majorMinorClass
+        );
+      }
+      let device = BluetoothDeviceMapper.fromPairedSnapshot(mapped, BluetoothListRail.CLASSIC_SCAN);
+      device = this.applyFavoriteMeta(device);
+      devices.push(device);
+    }
+    this.classicMerger.upsertAll(devices);
+    this.publishClassicDevices();
+    return Result.ok(this.listClassicDevices());
+  }
+
+  async loadPairedBleCandidates(): Promise<Result<BluetoothDevice[]>> {
+    const paired = await this.classicDataSource.getPairedDeviceSnapshots();
+    if (!paired.success || paired.value === undefined) {
+      return Result.fail(paired.error ?? new ResultError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, 'paired failed'));
+    }
+    await this.refreshFavorites();
+    this.reconcileDualModeFromSnapshots(paired.value);
+    const devices: BluetoothDevice[] = [];
+    for (let i = 0; i < paired.value.length; i++) {
+      const snapshot = paired.value[i];
+      if (snapshot.transport === BluetoothTransportType.BR_EDR) {
+        continue;
+      }
+      if (!BluetoothTransportPolicy.isBleCandidate(snapshot.transport) &&
+        snapshot.transport !== BluetoothTransportType.UNKNOWN) {
+        continue;
+      }
+      let device = BluetoothDeviceMapper.fromPairedSnapshot(snapshot, BluetoothListRail.BLE_SCAN);
+      device = this.applyFavoriteMeta(device);
+      devices.push(device);
+    }
+    this.bleMerger.upsertAll(devices);
+    this.publishBleDevices();
+    return Result.ok(this.listBleDevices());
+  }
+
+  getRemoteDeviceTransport(deviceId: string): Result<BluetoothTransportType> {
+    return this.classicDataSource.getRemoteDeviceTransport(deviceId);
+  }
+
+  linkDualModeIdentity(classicDeviceId: string, bleDeviceId: string, displayNameHint: string = ''): DeviceIdentity {
+    return this.identityDataSource.linkDualModeIdentity(classicDeviceId, bleDeviceId, displayNameHint);
+  }
+
+  resolveClassicIdForSpp(device: BluetoothDevice): Result<string> {
+    if (device.classicDeviceId.length > 0 &&
+      BluetoothTransportPolicy.isClassicCandidate(device.transport)) {
+      return Result.ok(device.classicDeviceId);
+    }
+    if (device.transport === BluetoothTransportType.LE) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.SPP_TARGET_LE_ONLY,
+        'LE-only device cannot use SPP'
+      ));
+    }
+    if (device.bleDeviceId.length > 0 && device.classicDeviceId.length === 0) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.SPP_BLE_ADDRESS_REJECTED,
+        'BLE address cannot be used for sppConnect; bridge dual-mode first'
+      ));
+    }
+    if (device.primaryDeviceId.length > 0 &&
+      device.listRail === BluetoothListRail.CLASSIC_SCAN) {
+      return Result.ok(device.primaryDeviceId);
+    }
+    return Result.fail(new ResultError(
+      BluetoothErrorCodes.SPP_BLE_ADDRESS_REJECTED,
+      'No classic address resolved for SPP'
+    ));
   }
 
   static getInstance(): BluetoothRepository {
@@ -166,7 +271,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       permissionGranted,
       true,
       true,
-      this.classicMerger.listSorted().filter((d: BluetoothDevice) => d.paired).length,
+      this.classicMerger.listSorted().filter((d: BluetoothDevice) =>
+        d.paired && BluetoothTransportPolicy.admitClassicPaired(d.transport)).length,
       this.favoritesCache.length,
       this.classicScanPhase,
       this.bleScanPhase,
@@ -178,11 +284,33 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   listRecentConnections(): BluetoothRecentConnection[] {
-    return this.identityDataSource.listRecentConnections();
+    return DeviceRegistry.getInstance().listRecentConnections();
   }
 
   recordRecentConnection(deviceId: string, displayName: string, protocol: string): void {
-    this.identityDataSource.recordRecentConnection(deviceId, displayName, protocol);
+    DeviceRegistry.getInstance().recordRecentConnection(deviceId, displayName, protocol);
+  }
+
+  getActiveGattSessionCount(): number {
+    return this.bleConnectionCount;
+  }
+
+  canOpenGattSession(): boolean {
+    return this.bleConnectionCount < BluetoothConstants.GATT_MAX_SESSIONS;
+  }
+
+  tryReserveBleConnection(): boolean {
+    if (this.bleConnectionCount >= BluetoothConstants.GATT_MAX_SESSIONS) {
+      return false;
+    }
+    this.bleConnectionCount++;
+    return true;
+  }
+
+  releaseBleConnection(): void {
+    if (this.bleConnectionCount > 0) {
+      this.bleConnectionCount--;
+    }
   }
 
   async refreshFavorites(): Promise<Result<DeviceFavoriteRecord[]>> {
@@ -191,23 +319,6 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       this.favoritesCache = listed.value;
     }
     return listed;
-  }
-
-  async loadPairedDevices(): Promise<Result<BluetoothDevice[]>> {
-    const paired = await this.classicDataSource.getPairedDevices();
-    if (!paired.success || paired.value === undefined) {
-      return Result.fail(paired.error ?? new ResultError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, 'paired failed'));
-    }
-    await this.refreshFavorites();
-    const devices: BluetoothDevice[] = [];
-    for (let i = 0; i < paired.value.length; i++) {
-      let device = BluetoothDeviceMapper.fromPaired(paired.value[i]);
-      device = this.applyFavoriteMeta(device);
-      devices.push(device);
-    }
-    this.classicMerger.replaceAll(devices);
-    this.publishClassicDevices();
-    return Result.ok(this.classicMerger.listSorted());
   }
 
   setClassicDeviceFilter(name: string, address: string, pairedOnly: boolean, favoritesOnly: boolean): void {
@@ -302,11 +413,24 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   applyPairingEvent(event: PairingEvent): void {
     const devices = this.classicMerger.listSorted();
     for (let i = 0; i < devices.length; i++) {
-      if (devices[i].deviceId === event.deviceId) {
-        this.classicMerger.merge(devices[i].withPairState(event.state, event.state === PairingState.PAIRED));
+      const device = devices[i];
+      if (device.primaryDeviceId === event.address ||
+        device.classicDeviceId === event.address ||
+        device.bleDeviceId === event.address) {
+        this.classicMerger.merge(device.withPairState(event.state, event.state === PairingState.PAIRED));
+      }
+    }
+    const bleDevices = this.bleMerger.listSorted();
+    for (let i = 0; i < bleDevices.length; i++) {
+      const device = bleDevices[i];
+      if (device.primaryDeviceId === event.address ||
+        device.classicDeviceId === event.address ||
+        device.bleDeviceId === event.address) {
+        this.bleMerger.merge(device.withPairState(event.state, event.state === PairingState.PAIRED));
       }
     }
     this.publishClassicDevices();
+    this.publishBleDevices();
   }
 
   startBleScan(sessionId: string, filter: BleScanFilter = new BleScanFilter()): Result<void> {
@@ -341,17 +465,17 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return stopped;
   }
 
-  getBleAdvertising(deviceId: string): BleAdvertisingPacket | undefined {
-    return this.bleAdvertisingMap.get(deviceId);
+  getBleAdvertising(bleDeviceId: string): BleAdvertisingPacket | undefined {
+    return this.bleAdvertisingMap.get(bleDeviceId);
   }
 
-  createGattClient(sessionId: string, deviceId: string): GattClientDataSource {
+  createGattClient(sessionId: string, bleDeviceId: string): GattClientDataSource {
     const existing = this.gattClients.get(sessionId);
     if (existing !== undefined) {
       existing.release();
     }
     const client = new GattClientDataSource();
-    client.createClient(deviceId);
+    client.createClient(bleDeviceId);
     this.gattClients.set(sessionId, client);
     return client;
   }
@@ -360,7 +484,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return this.gattClients.get(sessionId);
   }
 
-  async discoverGattServices(sessionId: string, deviceId: string, mtu: number = 23): Promise<Result<GattServiceTreeSnapshot>> {
+  async discoverGattServices(sessionId: string, bleDeviceId: string, mtu: number = 23): Promise<Result<GattServiceTreeSnapshot>> {
     const client = this.gattClients.get(sessionId);
     if (client === undefined) {
       return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'GATT client missing'));
@@ -370,7 +494,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       return Result.fail(services.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'discover failed'));
     }
     const tree = GattPlatformMapper.fromPlatformServices(services.value);
-    const snapshot = new GattServiceTreeSnapshot(sessionId, deviceId, mtu, tree, GattClientState.READY);
+    const snapshot = new GattServiceTreeSnapshot(sessionId, bleDeviceId, mtu, tree, GattClientState.READY);
     this.gattTrees.set(sessionId, snapshot);
     this.gattTreeObservable.next(snapshot);
     return Result.ok(snapshot);
@@ -389,8 +513,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     this.gattTrees.delete(sessionId);
   }
 
-  async connectGattBrowser(sessionId: string, deviceId: string, timeoutMs: number = 15000): Promise<Result<void>> {
-    this.createGattClient(sessionId, deviceId);
+  async connectGattBrowser(sessionId: string, bleDeviceId: string, timeoutMs: number = 15000): Promise<Result<void>> {
+    this.createGattClient(sessionId, bleDeviceId);
     const client = this.gattClients.get(sessionId);
     if (client === undefined) {
       return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, 'GATT client missing'));
@@ -452,8 +576,11 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   async saveFavorite(device: BluetoothDevice, alias: string, protocol: string, uuid: string = ''): Promise<Result<void>> {
+    const address = protocol === 'ble_gatt' || protocol === 'ble'
+      ? (device.bleDeviceId.length > 0 ? device.bleDeviceId : device.primaryDeviceId)
+      : (device.classicDeviceId.length > 0 ? device.classicDeviceId : device.primaryDeviceId);
     const saved = await this.identityDataSource.saveFavorite(
-      device.deviceId,
+      address,
       device.displayName,
       alias,
       protocol,
@@ -496,17 +623,17 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   private async onBleDiscovered(payload: BleDiscoveryPayload, filter: BleScanFilter): Promise<void> {
     await this.refreshFavorites();
-    const favorite = this.identityDataSource.isFavorite(payload.deviceId, this.favoritesCache);
-    const alias = this.identityDataSource.findAlias(payload.deviceId, this.favoritesCache);
+    const favorite = this.identityDataSource.isFavorite(payload.bleDeviceId, this.favoritesCache);
+    const alias = this.identityDataSource.findAlias(payload.bleDeviceId, this.favoritesCache);
     if (filter.favoritesOnly && !favorite) {
       return;
     }
-    const existing = this.bleAdvertisingMap.get(payload.deviceId);
+    const existing = this.bleAdvertisingMap.get(payload.bleDeviceId);
     let advertising = existing !== undefined
       ? payload.advertising.withUpdate(payload.rssi, Date.now(), existing.discoveryCount + 1)
       : payload.advertising;
     advertising = BluetoothRepository.applyManufacturerMask(advertising, filter);
-    this.bleAdvertisingMap.set(payload.deviceId, advertising);
+    this.bleAdvertisingMap.set(payload.bleDeviceId, advertising);
     let device = BluetoothDeviceMapper.fromBleAdvertising(advertising, favorite, alias);
     device = this.applyFavoriteMeta(device);
     this.bleMerger.merge(device);
@@ -514,19 +641,112 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   private onClassicDiscovered(payload: PlatformDiscoveryPayload): void {
-    let device = BluetoothDeviceMapper.fromDiscovery(payload, false);
+    let transport = BluetoothTransportType.UNKNOWN;
+    const transportResult = this.classicDataSource.getRemoteDeviceTransport(payload.classicDeviceId);
+    if (transportResult.success && transportResult.value !== undefined) {
+      transport = transportResult.value;
+    }
+    if (!BluetoothTransportPolicy.admitClassicDiscovery(transport, true)) {
+      return;
+    }
+    let device = BluetoothDeviceMapper.fromDiscovery(payload, transport, false);
     device = this.applyFavoriteMeta(device);
     this.classicMerger.merge(device);
     this.publishClassicDevices();
   }
 
   private applyFavoriteMeta(device: BluetoothDevice): BluetoothDevice {
-    const favorite = this.identityDataSource.isFavorite(device.deviceId, this.favoritesCache);
-    const alias = this.identityDataSource.findAlias(device.deviceId, this.favoritesCache);
+    const ids: string[] = [device.primaryDeviceId, device.classicDeviceId, device.bleDeviceId];
+    let favorite = false;
+    let alias = '';
+    for (let i = 0; i < ids.length; i++) {
+      if (ids[i].length === 0) {
+        continue;
+      }
+      if (this.identityDataSource.isFavorite(ids[i], this.favoritesCache)) {
+        favorite = true;
+      }
+      const foundAlias = this.identityDataSource.findAlias(ids[i], this.favoritesCache);
+      if (foundAlias.length > 0 && alias.length === 0) {
+        alias = foundAlias;
+      }
+    }
     if (!favorite && alias.length === 0) {
       return device;
     }
     return device.withFavorite(favorite, alias);
+  }
+
+  /**
+   * Link classic + BLE virtual MACs that share the same remote name after dual-mode pairing.
+   */
+  private reconcileDualModeFromSnapshots(snapshots: PlatformPairedSnapshot[]): void {
+    const classicSide: PlatformPairedSnapshot[] = [];
+    const bleSide: PlatformPairedSnapshot[] = [];
+    for (let i = 0; i < snapshots.length; i++) {
+      const item = snapshots[i];
+      if (item.transport === BluetoothTransportType.BR_EDR ||
+        item.transport === BluetoothTransportType.DUAL ||
+        item.transport === BluetoothTransportType.UNKNOWN) {
+        classicSide.push(item);
+      }
+      if (item.transport === BluetoothTransportType.LE ||
+        item.transport === BluetoothTransportType.DUAL) {
+        bleSide.push(item);
+      }
+    }
+    for (let c = 0; c < classicSide.length; c++) {
+      const classic = classicSide[c];
+      const classicName = classic.deviceName.trim().toLowerCase();
+      if (classicName.length === 0) {
+        continue;
+      }
+      for (let b = 0; b < bleSide.length; b++) {
+        const ble = bleSide[b];
+        if (classic.address === ble.address) {
+          continue;
+        }
+        const bleName = ble.deviceName.trim().toLowerCase();
+        if (bleName.length === 0 || bleName !== classicName) {
+          continue;
+        }
+        this.identityDataSource.linkDualModeIdentity(
+          classic.address,
+          ble.address,
+          classic.deviceName
+        );
+      }
+    }
+  }
+
+  private async admitPairedClassicSnapshot(
+    snapshot: PlatformPairedSnapshot
+  ): Promise<PairedClassicAdmitResult> {
+    if (BluetoothTransportPolicy.admitClassicPaired(snapshot.transport)) {
+      return new PairedClassicAdmitResult(true, snapshot.transport);
+    }
+    if (snapshot.transport === BluetoothTransportType.LE) {
+      return new PairedClassicAdmitResult(false, snapshot.transport);
+    }
+    if (snapshot.transport !== BluetoothTransportType.UNKNOWN) {
+      return new PairedClassicAdmitResult(false, snapshot.transport);
+    }
+    const retry = this.classicDataSource.getRemoteDeviceTransport(snapshot.address);
+    if (retry.success && retry.value !== undefined) {
+      if (BluetoothTransportPolicy.admitClassicPaired(retry.value)) {
+        return new PairedClassicAdmitResult(true, retry.value);
+      }
+      if (retry.value === BluetoothTransportType.LE) {
+        return new PairedClassicAdmitResult(false, retry.value);
+      }
+    }
+    const uuids = await this.classicDataSource.getRemoteProfileUuids(snapshot.address);
+    if (uuids.success &&
+      uuids.value !== undefined &&
+      BluetoothTransportPolicy.hasClassicProfileHint(uuids.value)) {
+      return new PairedClassicAdmitResult(true, BluetoothTransportType.BR_EDR);
+    }
+    return new PairedClassicAdmitResult(false, BluetoothTransportType.UNKNOWN);
   }
 
   private publishClassicDevices(): void {
@@ -554,7 +774,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       ));
     }
     return new BleAdvertisingPacket(
-      packet.deviceId,
+      packet.bleDeviceId,
       packet.rssi,
       packet.connectable,
       packet.rawHex,
@@ -569,5 +789,15 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       packet.discoveredAtMs,
       packet.discoveryCount
     );
+  }
+}
+
+class PairedClassicAdmitResult {
+  readonly admit: boolean;
+  readonly resolvedTransport: BluetoothTransportType;
+
+  constructor(admit: boolean, resolvedTransport: BluetoothTransportType) {
+    this.admit = admit;
+    this.resolvedTransport = resolvedTransport;
   }
 }

@@ -5,12 +5,12 @@ import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
 
 export class SppConnectOptions {
-  readonly deviceId: string;
+  readonly classicDeviceId: string;
   readonly uuid: string;
   readonly secure: boolean;
 
-  constructor(deviceId: string, uuid: string, secure: boolean) {
-    this.deviceId = deviceId;
+  constructor(classicDeviceId: string, uuid: string, secure: boolean) {
+    this.classicDeviceId = classicDeviceId;
     this.uuid = uuid;
     this.secure = secure;
   }
@@ -44,7 +44,7 @@ export class SppSocketDataSource {
           secure: options.secure,
           type: socket.SppType.SPP_RFCOMM
         };
-        socket.sppConnect(options.deviceId, sppOptions, (err: BusinessError, clientSocket: number) => {
+        socket.sppConnect(options.classicDeviceId, sppOptions, (err: BusinessError, clientSocket: number) => {
           if (err) {
             resolve(Result.fail(SppSocketDataSource.mapConnectError(err)));
             return;

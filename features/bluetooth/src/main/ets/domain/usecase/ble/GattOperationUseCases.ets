@@ -13,8 +13,8 @@ export class DiscoverGattServicesUseCase {
     this.repository = repository;
   }
 
-  async execute(sessionId: string, deviceId: string, mtu: number = 23): Promise<Result<GattServiceTreeSnapshot>> {
-    return this.repository.discoverGattServices(sessionId, deviceId, mtu);
+  async execute(sessionId: string, bleDeviceId: string, mtu: number = 23): Promise<Result<GattServiceTreeSnapshot>> {
+    return this.repository.discoverGattServices(sessionId, bleDeviceId, mtu);
   }
 }
 
@@ -212,7 +212,7 @@ export class RequestBleMtuUseCase {
     if (result.success) {
       const tree = this.repository.getGattTree(sessionId);
       if (tree !== undefined) {
-        await this.repository.discoverGattServices(sessionId, tree.deviceId, mtu);
+        await this.repository.discoverGattServices(sessionId, tree.bleDeviceId, mtu);
       }
     }
     return result;

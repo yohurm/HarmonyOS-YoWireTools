@@ -1,14 +1,17 @@
-import { Result, ResultError } from 'common_core';
+import { Result, ResultError, Subscription } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
+  DebugSessionSummary,
   ModuleType,
   ProtocolType,
+  SessionRuntimeStore,
   SessionType,
   StopSessionUseCase
 } from 'feature_debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothDevice } from '../../model/BluetoothDevice';
 import { PairingCoordinator } from '../../service/PairingCoordinator';
 import { PairingEvent } from '../../model/PairingState';
 import { BluetoothScanLogger } from '../../service/BluetoothScanLogger';
@@ -35,7 +38,7 @@ export class StartClassicScanUseCase {
     if (!ready.success) {
       return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.PERMISSION_DENIED, 'Not ready'));
     }
-    await this.repository.loadPairedDevices();
+    await this.repository.loadPairedClassicCandidates();
     const input = new CreateSessionInput(
       SessionType.SCAN,
       ModuleType.BLUETOOTH,
@@ -115,5 +118,58 @@ export class ObservePairingEventsUseCase {
 
   execute(listener: (event: PairingEvent) => void) {
     return this.coordinator.subscribe(listener);
+  }
+}
+
+export class LoadPairedClassicDevicesUseCase {
+  private readonly repository: BluetoothRepository;
+  private readonly guard: BluetoothOperationGuard;
+
+  constructor(
+    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+  ) {
+    this.repository = repository;
+    this.guard = guard;
+  }
+
+  async execute(): Promise<Result<BluetoothDevice[]>> {
+    const ready = await this.guard.ensureOperational();
+    if (!ready.success) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.PERMISSION_DENIED, 'Not ready'));
+    }
+    return this.repository.loadPairedClassicCandidates();
+  }
+}
+
+export class ObserveClassicDevicesUseCase {
+  private readonly repository: BluetoothRepository;
+
+  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(onDevices: (devices: BluetoothDevice[]) => void): Subscription {
+    return this.repository.observeClassicDevices().subscribe(onDevices);
+  }
+}
+
+export class ListActiveSppSessionsUseCase {
+  private readonly runtimeStore: SessionRuntimeStore;
+
+  constructor(runtimeStore: SessionRuntimeStore = SessionRuntimeStore.getInstance()) {
+    this.runtimeStore = runtimeStore;
+  }
+
+  execute(): DebugSessionSummary[] {
+    const summaries = this.runtimeStore.listActiveSummaries();
+    const result: DebugSessionSummary[] = [];
+    for (let i = 0; i < summaries.length; i++) {
+      const item = summaries[i];
+      if (item.module === ModuleType.BLUETOOTH && item.protocol === ProtocolType.SPP) {
+        result.push(item);
+      }
+    }
+    return result;
   }
 }

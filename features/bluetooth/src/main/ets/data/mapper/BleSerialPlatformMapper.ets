@@ -20,6 +20,15 @@ export class BleSerialPlatformMapper {
     if (nordic !== undefined) {
       return nordic;
     }
+    const ti = BleSerialPlatformMapper.resolveByUuids(
+      services,
+      BluetoothConstants.TI_UART_SERVICE_UUID,
+      BluetoothConstants.TI_UART_CHAR_UUID,
+      BluetoothConstants.TI_UART_CHAR_UUID
+    );
+    if (ti !== undefined) {
+      return ti;
+    }
     for (let i = 0; i < services.length; i++) {
       const service = services[i];
       const rx = BleSerialPlatformMapper.detectWritableCandidate(service);

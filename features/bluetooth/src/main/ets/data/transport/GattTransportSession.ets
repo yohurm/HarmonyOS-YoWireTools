@@ -68,24 +68,28 @@ export class GattTransportSession implements ITransportSession {
   }
 
   async connect(params: Record<string, string | number | boolean>): Promise<void> {
-    const deviceId = `${params['deviceId'] ?? ''}`;
-    const displayName = `${params['displayName'] ?? deviceId}`;
+    const bleDeviceId = `${params['bleDeviceId'] ?? ''}`;
+    if (bleDeviceId.length === 0) {
+      throw new Error('bleDeviceId required for GATT');
+    }
+    const displayName = `${params['displayName'] ?? bleDeviceId}`;
     const usePreset = params['useNordicPreset'] !== false;
     const autoDetect = params['autoDetect'] === true;
     const serviceUuid = `${params['serviceUuid'] ?? BluetoothConstants.NORDIC_UART_SERVICE_UUID}`;
     const rxUuid = `${params['rxCharacteristicUuid'] ?? BluetoothConstants.NORDIC_UART_RX_UUID}`;
     const txUuid = `${params['txCharacteristicUuid'] ?? BluetoothConstants.NORDIC_UART_TX_UUID}`;
     this.connectParams = new GattConnectParams(
-      deviceId,
+      bleDeviceId,
       displayName,
       serviceUuid,
       rxUuid,
       txUuid,
-      usePreset
+      usePreset,
+      autoDetect
     );
     this.userDisconnect = false;
     this.transition(TransportState.CONNECTING);
-    const created = this.dataSource.createClient(deviceId);
+    const created = this.dataSource.createClient(bleDeviceId);
     if (!created.success) {
       this.transition(TransportState.FAILED, created.error?.message ?? 'create client failed');
       throw new Error(created.error?.message ?? 'GATT create failed');

@@ -75,8 +75,11 @@ export class SppTransportSession implements ITransportSession {
   }
 
   async connect(params: Record<string, string | number | boolean>): Promise<void> {
-    const deviceId = `${params['deviceId'] ?? ''}`;
-    const displayName = `${params['displayName'] ?? deviceId}`;
+    const classicDeviceId = `${params['classicDeviceId'] ?? ''}`;
+    if (classicDeviceId.length === 0) {
+      throw new Error('classicDeviceId required for SPP');
+    }
+    const displayName = `${params['displayName'] ?? classicDeviceId}`;
     const uuid = `${params['uuid'] ?? BluetoothConstants.DEFAULT_SPP_UUID}`;
     const secure = params['secure'] === true || params['secure'] === 1;
     const autoReconnect = params['autoReconnect'] === true || params['autoReconnect'] === 1;
@@ -87,7 +90,7 @@ export class SppTransportSession implements ITransportSession {
       Number(params['reconnectBackoffFactor'] ?? 2)
     );
     this.connectParams = new SppConnectParams(
-      deviceId,
+      classicDeviceId,
       displayName,
       uuid,
       secure,
@@ -107,7 +110,7 @@ export class SppTransportSession implements ITransportSession {
     this.transition(TransportState.CONNECTING);
     const params = this.connectParams;
     const connected = await this.socketDataSource.connect(
-      new SppConnectOptions(params.deviceId, params.uuid, params.secure)
+      new SppConnectOptions(params.classicDeviceId, params.uuid, params.secure)
     );
     if (!connected.success || connected.value === undefined) {
       this.transition(TransportState.FAILED, connected.error?.message ?? 'connect failed');
@@ -249,7 +252,7 @@ export class SppTransportSession implements ITransportSession {
       return;
     }
     if (this.connectParams.reconnectPolicy.stopOnPairLost) {
-      const pairState = await BluetoothRepository.getInstance().getPairState(this.connectParams.deviceId);
+      const pairState = await BluetoothRepository.getInstance().getPairState(this.connectParams.classicDeviceId);
       if (pairState.success && pairState.value === PairingState.UNPAIRED) {
         this.transition(TransportState.FAILED, 'pair lost');
         return;

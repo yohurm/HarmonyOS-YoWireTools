@@ -1,48 +1,37 @@
 import { BluetoothDevice } from '../model/BluetoothDevice';
 
 /**
- * Merges classic/BLE scan results per architecture bluetooth/01-§8.
+ * Merges classic/BLE scan results per architecture bluetooth/00 + 01-§8.
+ * Map key is primaryDeviceId (rail address).
  */
 export class ScanResultMerger {
   private readonly devices: Map<string, BluetoothDevice> = new Map();
 
   merge(device: BluetoothDevice): BluetoothDevice {
-    const existing = this.devices.get(device.deviceId);
+    const key = device.primaryDeviceId;
+    const existing = this.devices.get(key);
     if (existing === undefined) {
-      this.devices.set(device.deviceId, device);
+      this.devices.set(key, device);
       return device;
     }
-    const merged = existing.withSeen(device.rssi, device.lastSeenMs);
-    const withMeta = new BluetoothDevice(
-      merged.deviceId,
-      device.displayName.length > 0 ? device.displayName : merged.displayName,
-      merged.rssi,
-      merged.paired || device.paired,
-      merged.kind,
-      device.deviceType !== 0 ? device.deviceType : merged.deviceType,
-      device.connectable,
-      merged.lastSeenMs,
-      device.serviceUuids.length > 0 ? device.serviceUuids : merged.serviceUuids,
-      merged.identityId,
-      merged.alias.length > 0 ? merged.alias : device.alias,
-      merged.addressKind,
-      merged.identityType,
-      device.pairState !== merged.pairState ? device.pairState : merged.pairState,
-      merged.favorite || device.favorite,
-      merged.firstSeenMs,
-      device.profileUuids.length > 0 ? device.profileUuids : merged.profileUuids,
-      device.discoverySource,
-      merged.identityStability,
-      device.rawHex.length > 0 ? device.rawHex : merged.rawHex
-    );
-    this.devices.set(device.deviceId, withMeta);
+    const withMeta = existing.mergeFrom(device);
+    this.devices.set(key, withMeta);
     return withMeta;
   }
 
   replaceAll(devices: BluetoothDevice[]): void {
     this.devices.clear();
     for (let i = 0; i < devices.length; i++) {
-      this.devices.set(devices[i].deviceId, devices[i]);
+      this.devices.set(devices[i].primaryDeviceId, devices[i]);
+    }
+  }
+
+  /**
+   * Upsert without clearing discovery-only entries that are not in devices.
+   */
+  upsertAll(devices: BluetoothDevice[]): void {
+    for (let i = 0; i < devices.length; i++) {
+      this.merge(devices[i]);
     }
   }
 
@@ -88,8 +77,13 @@ export class ScanResultMerger {
       if (nameQuery.length > 0 && !item.effectiveName.includes(nameQuery)) {
         continue;
       }
-      if (addressQuery.length > 0 && !item.deviceId.includes(addressQuery)) {
-        continue;
+      if (addressQuery.length > 0) {
+        const hitClassic = item.classicDeviceId.includes(addressQuery);
+        const hitBle = item.bleDeviceId.includes(addressQuery);
+        const hitPrimary = item.primaryDeviceId.includes(addressQuery);
+        if (!hitClassic && !hitBle && !hitPrimary) {
+          continue;
+        }
       }
       filtered.push(item);
     }

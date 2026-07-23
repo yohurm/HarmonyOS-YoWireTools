@@ -1,19 +1,18 @@
-import { Subscription } from 'common_core';
 import { LifecycleCoordinator, PlatformEvent, PlatformEventType } from 'common_platform';
 import { IdentityStability } from '../model/DeviceIdentity';
 import { BluetoothRepository } from '../../data/repository/BluetoothRepository';
-import { GattClientState } from '../model/GattServiceTree';
 
 type GattReconnectAction = () => Promise<void>;
 
 /**
  * BLE GATT auto-reconnect per architecture 02-§8.2.
+ * Always binds bleDeviceId (never classic-only address).
  */
 export class BleGattReconnectCoordinator {
   private static instance: BleGattReconnectCoordinator | undefined;
   private lifecycleUnsub: (() => void) | undefined;
   private pendingAction: GattReconnectAction | undefined;
-  private deviceId: string = '';
+  private bleDeviceId: string = '';
   private identityStability: IdentityStability = IdentityStability.UNKNOWN;
   private userDisconnect: boolean = false;
 
@@ -25,11 +24,11 @@ export class BleGattReconnectCoordinator {
   }
 
   bind(
-    deviceId: string,
+    bleDeviceId: string,
     identityStability: IdentityStability,
     action: GattReconnectAction
   ): void {
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.identityStability = identityStability;
     this.pendingAction = action;
     this.userDisconnect = false;
@@ -50,7 +49,7 @@ export class BleGattReconnectCoordinator {
     this.lifecycleUnsub?.();
     this.lifecycleUnsub = undefined;
     this.pendingAction = undefined;
-    this.deviceId = '';
+    this.bleDeviceId = '';
   }
 
   async onUnexpectedDisconnect(): Promise<void> {
@@ -61,7 +60,7 @@ export class BleGattReconnectCoordinator {
   }
 
   async tryReconnect(): Promise<void> {
-    if (this.userDisconnect || this.pendingAction === undefined || this.deviceId.length === 0) {
+    if (this.userDisconnect || this.pendingAction === undefined || this.bleDeviceId.length === 0) {
       return;
     }
     if (this.identityStability === IdentityStability.EPHEMERAL_RANDOM) {

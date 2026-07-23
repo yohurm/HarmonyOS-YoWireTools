@@ -10,6 +10,7 @@ export enum ProtocolType {
   SPP = 'spp',
   BLE_SCAN = 'ble_scan',
   BLE_GATT = 'ble_gatt',
+  BLE_UART = 'ble_uart',
   WIFI_SCAN = 'wifi_scan',
   NETWORK_DIAGNOSTICS = 'network_diagnostics',
   TCP_CLIENT = 'tcp_client',

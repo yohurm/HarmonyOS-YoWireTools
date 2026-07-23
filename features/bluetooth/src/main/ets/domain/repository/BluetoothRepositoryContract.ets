@@ -6,6 +6,8 @@ import {
   BluetoothDevice,
   BluetoothOverviewSnapshot
 } from '../model/BluetoothDevice';
+import { BluetoothTransportType } from '../model/BluetoothTransportType';
+import { DeviceIdentity } from '../model/DeviceIdentity';
 import { BleScanFilter } from '../model/BleScanFilter';
 import { BleAdvertisingPacket } from '../model/BleAdvertisingPacket';
 import { BluetoothRecentConnection } from '../model/BluetoothRecentConnection';
@@ -14,24 +16,27 @@ import { GattServiceTreeSnapshot } from '../model/GattServiceTree';
 import { SppConnectParams } from '../model/SppConnectParams';
 
 /**
- * Domain repository contract per architecture 02-§6.1.
- * Implemented by data/repository/BluetoothRepository.
+ * Domain repository contract per architecture 02-§6.1 + bluetooth/00.
  */
 export interface BluetoothRepositoryContract {
   getAdapterState(): Promise<Result<BluetoothAdapterSnapshot>>;
   observeAdapterState(): Observable<BluetoothAdapterSnapshot>;
-  getPairedDevices(): Promise<Result<BluetoothDevice[]>>;
+  loadPairedClassicCandidates(): Promise<Result<BluetoothDevice[]>>;
+  loadPairedBleCandidates(): Promise<Result<BluetoothDevice[]>>;
+  getRemoteDeviceTransport(deviceId: string): Result<BluetoothTransportType>;
+  resolveClassicIdForSpp(device: BluetoothDevice): Result<string>;
+  linkDualModeIdentity(classicDeviceId: string, bleDeviceId: string, displayNameHint?: string): DeviceIdentity;
   startClassicScan(sessionId: string): Promise<Result<void>>;
   stopClassicScan(scanId: string): Promise<Result<void>>;
   createSppTransport(sessionId: string, params: SppConnectParams): object;
   startBleScan(sessionId: string, filter: BleScanFilter): Result<void>;
   stopBleScan(scanId: string): Result<void>;
-  createGattClient(sessionId: string, deviceId: string): object;
+  createGattClient(sessionId: string, bleDeviceId: string): object;
   loadOverview(permissionGranted: boolean): Promise<BluetoothOverviewSnapshot>;
   listRecentConnections(): BluetoothRecentConnection[];
   recordRecentConnection(deviceId: string, displayName: string, protocol: string): void;
   listFavorites(): DeviceFavoriteRecord[];
-  getBleAdvertising(deviceId: string): BleAdvertisingPacket | undefined;
+  getBleAdvertising(bleDeviceId: string): BleAdvertisingPacket | undefined;
   observeGattTree(): Observable<GattServiceTreeSnapshot>;
   getPairState(deviceId: string): Promise<Result<PairingState>>;
   applyPairingEvent(event: PairingEvent): void;

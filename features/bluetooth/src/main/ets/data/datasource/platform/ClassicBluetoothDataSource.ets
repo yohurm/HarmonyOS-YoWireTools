@@ -3,38 +3,51 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { Observable, Result, ResultError } from 'common_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothAdapterSnapshot } from '../../../domain/model/BluetoothDevice';
+import {
+  BluetoothTransportPolicy,
+  BluetoothTransportType
+} from '../../../domain/model/BluetoothTransportType';
 import { PairingEvent, PairingState } from '../../../domain/model/PairingState';
-import { BluetoothDeviceMapper, PlatformPairedDevice } from '../../mapper/BluetoothDeviceMapper';
+import {
+  BluetoothDeviceMapper,
+  PlatformPairedSnapshot
+} from '../../mapper/BluetoothDeviceMapper';
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
 
 export class PlatformDiscoveryPayload {
-  readonly deviceId: string;
+  readonly classicDeviceId: string;
   readonly deviceName: string;
   readonly rssi: number;
   readonly deviceClass: number;
+  readonly majorClass: number;
+  readonly majorMinorClass: number;
   readonly fromLegacyFind: boolean;
 
   constructor(
-    deviceId: string,
+    classicDeviceId: string,
     deviceName: string,
     rssi: number,
     deviceClass: number,
-    fromLegacyFind: boolean = false
+    fromLegacyFind: boolean = false,
+    majorClass: number = 0,
+    majorMinorClass: number = 0
   ) {
-    this.deviceId = deviceId;
+    this.classicDeviceId = classicDeviceId;
     this.deviceName = deviceName;
     this.rssi = rssi;
     this.deviceClass = deviceClass;
     this.fromLegacyFind = fromLegacyFind;
+    this.majorClass = majorClass;
+    this.majorMinorClass = majorMinorClass;
   }
 }
 
 type DiscoveryResultListener = (payload: PlatformDiscoveryPayload) => void;
 type BondStateListener = (event: PairingEvent) => void;
 type AdapterStateListener = (snapshot: BluetoothAdapterSnapshot) => void;
+
 /**
- * Platform wrapper for classic Bluetooth adapter, discovery and pairing APIs.
- * WSL: connection.startBluetoothDiscovery, discoveryResult, pairDevice, bondStateChange.
+ * Platform wrapper for classic Bluetooth adapter, discovery, pairing and transport APIs.
  */
 export class ClassicBluetoothDataSource {
   private static instance: ClassicBluetoothDataSource | undefined;
@@ -46,6 +59,7 @@ export class ClassicBluetoothDataSource {
   private adapterHandler: ((state: access.BluetoothState) => void) | undefined;
   private adapterListener: AdapterStateListener | undefined;
   private readonly adapterObservable: Observable<BluetoothAdapterSnapshot>;
+
   private constructor() {
     this.adapterObservable = new Observable<BluetoothAdapterSnapshot>(
       new BluetoothAdapterSnapshot(false, access.BluetoothState.STATE_OFF, 'Off')
@@ -96,6 +110,26 @@ export class ClassicBluetoothDataSource {
     this.adapterListener = undefined;
   }
 
+  getRemoteDeviceTransport(deviceId: string): Result<BluetoothTransportType> {
+    try {
+      const code = connection.getRemoteDeviceTransport(deviceId) as number;
+      return Result.ok(BluetoothTransportPolicy.fromPlatformCode(code));
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ResultError.fromError(BluetoothErrorCodes.TRANSPORT_QUERY_FAILED, err));
+    }
+  }
+
+  getRemoteDeviceClassCod(deviceId: string): Result<DeviceClassCod> {
+    try {
+      const deviceClass = connection.getRemoteDeviceClass(deviceId);
+      return Result.ok(ClassicBluetoothDataSource.parseDeviceClass(deviceClass));
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ResultError.fromError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, err));
+    }
+  }
+
   async getRemoteProfileUuids(deviceId: string): Promise<Result<string[]>> {
     try {
       const profiles = await connection.getRemoteProfileUuids(deviceId);
@@ -110,22 +144,50 @@ export class ClassicBluetoothDataSource {
     }
   }
 
-  async getPairedDevices(): Promise<Result<Array<PlatformPairedDevice>>> {
+  getRemoteDeviceNameSafe(deviceId: string): string {
+    try {
+      const remoteName = connection.getRemoteDeviceName(deviceId);
+      if (remoteName.length > 0) {
+        return remoteName;
+      }
+    } catch (_error) {
+      // best-effort
+    }
+    return deviceId;
+  }
+
+  /**
+   * Full paired snapshots with transport + CoD. Application filters by rail.
+   */
+  async getPairedDeviceSnapshots(): Promise<Result<Array<PlatformPairedSnapshot>>> {
     try {
       const deviceIds: Array<string> = connection.getPairedDevices();
-      const devices: PlatformPairedDevice[] = [];
+      const devices: PlatformPairedSnapshot[] = [];
       for (let i = 0; i < deviceIds.length; i++) {
         const deviceId = deviceIds[i];
-        let deviceName = deviceId;
-        try {
-          const remoteName = connection.getRemoteDeviceName(deviceId);
-          if (remoteName.length > 0) {
-            deviceName = remoteName;
-          }
-        } catch (_error) {
-          // Name lookup is best-effort; virtual MAC remains the fallback label.
+        const deviceName = this.getRemoteDeviceNameSafe(deviceId);
+        let transport = BluetoothTransportType.UNKNOWN;
+        const transportResult = this.getRemoteDeviceTransport(deviceId);
+        if (transportResult.success && transportResult.value !== undefined) {
+          transport = transportResult.value;
         }
-        devices.push(new PlatformPairedDevice(deviceId, deviceName, 0));
+        let deviceClassCod = 0;
+        let majorClass = 0;
+        let majorMinorClass = 0;
+        const codResult = this.getRemoteDeviceClassCod(deviceId);
+        if (codResult.success && codResult.value !== undefined) {
+          deviceClassCod = codResult.value.classOfDevice;
+          majorClass = codResult.value.majorClass;
+          majorMinorClass = codResult.value.majorMinorClass;
+        }
+        devices.push(new PlatformPairedSnapshot(
+          deviceId,
+          deviceName,
+          transport,
+          deviceClassCod,
+          majorClass,
+          majorMinorClass
+        ));
       }
       return Result.ok(devices);
     } catch (error) {
@@ -179,12 +241,15 @@ export class ClassicBluetoothDataSource {
     this.discoveryResultHandler = (results: Array<connection.DiscoveryResult>) => {
       for (let i = 0; i < results.length; i++) {
         const item = results[i];
+        const cod = ClassicBluetoothDataSource.parseDeviceClass(item.deviceClass);
         const payload = new PlatformDiscoveryPayload(
           item.deviceId,
           item.deviceName ?? item.deviceId,
           item.rssi ?? 0,
-          typeof item.deviceClass === 'number' ? item.deviceClass : 0,
-          false
+          cod.classOfDevice,
+          false,
+          cod.majorClass,
+          cod.majorMinorClass
         );
         listener(payload);
       }
@@ -246,5 +311,30 @@ export class ClassicBluetoothDataSource {
       }
       return Result.fail(ResultError.fromError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, err));
     }
+  }
+
+  private static parseDeviceClass(deviceClass: connection.DeviceClass | number | undefined): DeviceClassCod {
+    if (deviceClass === undefined) {
+      return new DeviceClassCod(0, 0, 0);
+    }
+    if (typeof deviceClass === 'number') {
+      return new DeviceClassCod(deviceClass, 0, 0);
+    }
+    const major = typeof deviceClass.majorClass === 'number' ? deviceClass.majorClass : 0;
+    const minor = typeof deviceClass.majorMinorClass === 'number' ? deviceClass.majorMinorClass : 0;
+    const cod = typeof deviceClass.classOfDevice === 'number' ? deviceClass.classOfDevice : 0;
+    return new DeviceClassCod(cod, major, minor);
+  }
+}
+
+export class DeviceClassCod {
+  readonly classOfDevice: number;
+  readonly majorClass: number;
+  readonly majorMinorClass: number;
+
+  constructor(classOfDevice: number, majorClass: number, majorMinorClass: number) {
+    this.classOfDevice = classOfDevice;
+    this.majorClass = majorClass;
+    this.majorMinorClass = majorMinorClass;
   }
 }

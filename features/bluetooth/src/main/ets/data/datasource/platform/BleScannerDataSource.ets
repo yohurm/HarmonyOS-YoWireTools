@@ -9,20 +9,20 @@ import { BleAdvertisingPacket } from '../../../domain/model/BleAdvertisingPacket
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
 
 export class BleDiscoveryPayload {
-  readonly deviceId: string;
+  readonly bleDeviceId: string;
   readonly deviceName: string;
   readonly rssi: number;
   readonly connectable: boolean;
   readonly advertising: BleAdvertisingPacket;
 
   constructor(
-    deviceId: string,
+    bleDeviceId: string,
     deviceName: string,
     rssi: number,
     connectable: boolean,
     advertising: BleAdvertisingPacket
   ) {
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.deviceName = deviceName;
     this.rssi = rssi;
     this.connectable = connectable;

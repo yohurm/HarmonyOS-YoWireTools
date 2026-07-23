@@ -1,29 +1,43 @@
-import { connection } from '@kit.ConnectivityKit';
 import { TimeUtil } from 'common_core';
 import { PlatformDiscoveryPayload } from '../datasource/platform/ClassicBluetoothDataSource';
+import { IdentityStability } from '../../domain/model/DeviceIdentity';
 import {
-  AddressKind,
-  IdentityStability
-} from '../../domain/model/DeviceIdentity';
-import {
-  IdentityType,
   BluetoothDevice,
-  BluetoothDeviceKind
+  BluetoothDeviceDraft
 } from '../../domain/model/BluetoothDevice';
 import { DiscoverySource } from '../../domain/model/DiscoverySource';
 import { PairingState } from '../../domain/model/PairingState';
-import { BleAdvertisingPacket, DeviceNameSource } from '../../domain/model/BleAdvertisingPacket';
+import { BleAdvertisingPacket } from '../../domain/model/BleAdvertisingPacket';
+import {
+  AddressPrivacyKind,
+  BluetoothListRail,
+  BluetoothTransportType
+} from '../../domain/model/BluetoothTransportType';
 import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
+import { connection } from '@kit.ConnectivityKit';
 
-export class PlatformPairedDevice {
-  readonly deviceId: string;
+export class PlatformPairedSnapshot {
+  readonly address: string;
   readonly deviceName: string;
-  readonly deviceClass: number;
+  readonly transport: BluetoothTransportType;
+  readonly deviceClassCod: number;
+  readonly majorClass: number;
+  readonly majorMinorClass: number;
 
-  constructor(deviceId: string, deviceName: string, deviceClass: number) {
-    this.deviceId = deviceId;
+  constructor(
+    address: string,
+    deviceName: string,
+    transport: BluetoothTransportType,
+    deviceClassCod: number = 0,
+    majorClass: number = 0,
+    majorMinorClass: number = 0
+  ) {
+    this.address = address;
     this.deviceName = deviceName;
-    this.deviceClass = deviceClass;
+    this.transport = transport;
+    this.deviceClassCod = deviceClassCod;
+    this.majorClass = majorClass;
+    this.majorMinorClass = majorMinorClass;
   }
 }
 
@@ -31,88 +45,125 @@ export class BluetoothDeviceMapper {
   private static readonly identitySource: BluetoothIdentityDataSource =
     BluetoothIdentityDataSource.getInstance();
 
-  static fromPaired(platform: PlatformPairedDevice): BluetoothDevice {
-    const identity = BluetoothDeviceMapper.identitySource.buildIdentity(platform.deviceId, true);
-    return new BluetoothDevice(
-      platform.deviceId,
-      platform.deviceName.length > 0 ? platform.deviceName : platform.deviceId,
-      0,
-      true,
-      BluetoothDeviceKind.CLASSIC,
-      platform.deviceClass,
-      true,
-      TimeUtil.nowMs(),
-      [],
-      identity.identityId,
-      '',
-      AddressKind.VIRTUAL,
-      IdentityType.CLASSIC,
-      PairingState.PAIRED,
-      false,
-      TimeUtil.nowMs(),
-      [],
-      DiscoverySource.PAIRED,
-      IdentityStability.PAIRED_STABLE
-    );
+  /**
+   * Map paired snapshot onto a specific list rail.
+   * Dual-mode devices may appear twice (classic MAC + BLE MAC); each side writes its own address field.
+   */
+  static fromPairedSnapshot(
+    snapshot: PlatformPairedSnapshot,
+    listRail: BluetoothListRail = BluetoothListRail.CLASSIC_SCAN
+  ): BluetoothDevice {
+    const linked = BluetoothDeviceMapper.identitySource.findLinkedByAnyAddress(snapshot.address);
+    const draft = new BluetoothDeviceDraft();
+    const identity = linked !== undefined
+      ? linked
+      : BluetoothDeviceMapper.identitySource.buildIdentityForRail(
+        snapshot.address,
+        true,
+        listRail,
+        snapshot.transport
+      );
+    draft.identityId = identity.identityId;
+    draft.displayName = snapshot.deviceName.length > 0 ? snapshot.deviceName : snapshot.address;
+    draft.transport = snapshot.transport;
+    draft.deviceClassCod = snapshot.deviceClassCod;
+    draft.majorClass = snapshot.majorClass;
+    draft.majorMinorClass = snapshot.majorMinorClass;
+    draft.paired = true;
+    draft.pairState = PairingState.PAIRED;
+    draft.connectable = true;
+    draft.lastSeenMs = TimeUtil.nowMs();
+    draft.firstSeenMs = draft.lastSeenMs;
+    draft.discoverySource = DiscoverySource.PAIRED;
+    draft.identityStability = IdentityStability.PAIRED_STABLE;
+    draft.addressPrivacy = AddressPrivacyKind.VIRTUAL;
+    draft.listRail = listRail;
+    draft.primaryDeviceId = snapshot.address;
+    if (listRail === BluetoothListRail.BLE_SCAN) {
+      draft.bleDeviceId = snapshot.address;
+      if (linked !== undefined && linked.classicDeviceId.length > 0) {
+        draft.classicDeviceId = linked.classicDeviceId;
+        draft.transport = BluetoothTransportType.DUAL;
+        draft.discoverySource = DiscoverySource.BRIDGED;
+      }
+    } else {
+      draft.classicDeviceId = snapshot.address;
+      if (linked !== undefined && linked.bleDeviceId.length > 0) {
+        draft.bleDeviceId = linked.bleDeviceId;
+        draft.transport = BluetoothTransportType.DUAL;
+        draft.discoverySource = DiscoverySource.BRIDGED;
+      }
+    }
+    return new BluetoothDevice(draft);
   }
 
-  static fromDiscovery(payload: PlatformDiscoveryPayload, paired: boolean = false): BluetoothDevice {
-    const identity = BluetoothDeviceMapper.identitySource.buildIdentity(payload.deviceId, paired);
-    const source = payload.fromLegacyFind ? DiscoverySource.DEVICE_FIND : DiscoverySource.DISCOVERY_RESULT;
-    return new BluetoothDevice(
-      payload.deviceId,
-      payload.deviceName.length > 0 ? payload.deviceName : payload.deviceId,
-      payload.rssi,
+  static fromDiscovery(
+    payload: PlatformDiscoveryPayload,
+    transport: BluetoothTransportType = BluetoothTransportType.UNKNOWN,
+    paired: boolean = false
+  ): BluetoothDevice {
+    const identity = BluetoothDeviceMapper.identitySource.buildIdentityForRail(
+      payload.classicDeviceId,
       paired,
-      BluetoothDeviceKind.CLASSIC,
-      payload.deviceClass,
-      true,
-      TimeUtil.nowMs(),
-      [],
-      identity.identityId,
-      '',
-      AddressKind.VIRTUAL,
-      IdentityType.VIRTUAL,
-      paired ? PairingState.PAIRED : PairingState.UNPAIRED,
-      false,
-      TimeUtil.nowMs(),
-      [],
-      source,
-      paired ? IdentityStability.PAIRED_STABLE : IdentityStability.CURRENT_SESSION
+      BluetoothListRail.CLASSIC_SCAN,
+      transport
     );
+    const draft = new BluetoothDeviceDraft();
+    draft.identityId = identity.identityId;
+    draft.displayName = payload.deviceName.length > 0 ? payload.deviceName : payload.classicDeviceId;
+    draft.classicDeviceId = payload.classicDeviceId;
+    draft.primaryDeviceId = payload.classicDeviceId;
+    draft.listRail = BluetoothListRail.CLASSIC_SCAN;
+    draft.transport = transport;
+    draft.deviceClassCod = payload.deviceClass;
+    draft.majorClass = payload.majorClass;
+    draft.majorMinorClass = payload.majorMinorClass;
+    draft.rssi = payload.rssi;
+    draft.paired = paired;
+    draft.pairState = paired ? PairingState.PAIRED : PairingState.UNPAIRED;
+    draft.connectable = true;
+    draft.lastSeenMs = TimeUtil.nowMs();
+    draft.firstSeenMs = draft.lastSeenMs;
+    draft.discoverySource = payload.fromLegacyFind ?
+      DiscoverySource.DEVICE_FIND :
+      DiscoverySource.DISCOVERY_RESULT;
+    draft.identityStability = paired ?
+      IdentityStability.PAIRED_STABLE :
+      IdentityStability.CURRENT_SESSION;
+    draft.addressPrivacy = AddressPrivacyKind.VIRTUAL;
+    return new BluetoothDevice(draft);
   }
 
   static fromBleAdvertising(packet: BleAdvertisingPacket, favorite: boolean, alias: string): BluetoothDevice {
-    const identity = BluetoothDeviceMapper.identitySource.buildIdentity(packet.deviceId, false);
-    const displayName = alias.length > 0
-      ? alias
-      : (packet.localName.length > 0 ? packet.localName : packet.deviceId);
-    return new BluetoothDevice(
-      packet.deviceId,
-      displayName,
-      packet.rssi,
+    const identity = BluetoothDeviceMapper.identitySource.buildIdentityForRail(
+      packet.bleDeviceId,
       false,
-      BluetoothDeviceKind.BLE,
-      0,
-      packet.connectable,
-      packet.discoveredAtMs,
-      packet.serviceUuids,
-      identity.identityId,
-      alias,
-      AddressKind.VIRTUAL,
-      IdentityType.BLE,
-      PairingState.UNPAIRED,
-      favorite,
-      packet.discoveredAtMs,
-      [],
-      DiscoverySource.DISCOVERY_RESULT,
-      IdentityStability.CURRENT_SESSION,
-      packet.rawHex
+      BluetoothListRail.BLE_SCAN,
+      BluetoothTransportType.LE
     );
-  }
-
-  static applyFavorite(device: BluetoothDevice, favorite: boolean, alias: string): BluetoothDevice {
-    return device.withFavorite(favorite, alias);
+    const draft = new BluetoothDeviceDraft();
+    draft.identityId = identity.identityId;
+    draft.displayName = alias.length > 0
+      ? alias
+      : (packet.localName.length > 0 ? packet.localName : packet.bleDeviceId);
+    draft.alias = alias;
+    draft.bleDeviceId = packet.bleDeviceId;
+    draft.primaryDeviceId = packet.bleDeviceId;
+    draft.listRail = BluetoothListRail.BLE_SCAN;
+    draft.transport = BluetoothTransportType.LE;
+    draft.rssi = packet.rssi;
+    draft.paired = false;
+    draft.pairState = PairingState.UNPAIRED;
+    draft.connectable = packet.connectable;
+    draft.favorite = favorite;
+    draft.lastSeenMs = packet.discoveredAtMs;
+    draft.firstSeenMs = packet.discoveredAtMs;
+    draft.serviceUuids = packet.serviceUuids.slice();
+    draft.discoverySource = DiscoverySource.BLE_ADV;
+    draft.identityStability = IdentityStability.CURRENT_SESSION;
+    draft.addressPrivacy = AddressPrivacyKind.VIRTUAL;
+    draft.rawHex = packet.rawHex;
+    return new BluetoothDevice(draft);
   }
 
   static pairStateFromPlatform(state: connection.BondState): PairingState {
@@ -123,22 +174,5 @@ export class BluetoothDeviceMapper {
       return PairingState.PAIRING;
     }
     return PairingState.UNPAIRED;
-  }
-
-  static discoverySourceLabel(source: DiscoverySource): string {
-    if (source === DiscoverySource.DISCOVERY_RESULT) {
-      return 'discoveryResult';
-    }
-    if (source === DiscoverySource.DEVICE_FIND) {
-      return 'bluetoothDeviceFind';
-    }
-    if (source === DiscoverySource.PAIRED) {
-      return 'pairedDevice';
-    }
-    return `${source}`;
-  }
-
-  static nameSourceLabel(source: DeviceNameSource): string {
-    return `${source}`;
   }
 }

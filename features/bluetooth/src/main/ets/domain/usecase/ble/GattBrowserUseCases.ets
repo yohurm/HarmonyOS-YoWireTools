@@ -32,18 +32,30 @@ export class ConnectGattBrowserUseCase {
     this.discoverServices = discoverServices;
   }
 
-  async execute(deviceId: string, displayName: string): Promise<Result<ConnectGattResult>> {
+  async execute(bleDeviceId: string, displayName: string): Promise<Result<ConnectGattResult>> {
     const ready = await this.guard.ensureOperational();
     if (!ready.success) {
       return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.PERMISSION_DENIED, 'Not ready'));
     }
+    if (bleDeviceId.length === 0) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.GATT_CLASSIC_ADDRESS_REJECTED,
+        'bleDeviceId required for GATT browser'
+      ));
+    }
+    if (!this.repository.tryReserveBleConnection()) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.BLE_GATT_SESSION_LIMIT,
+        'GATT session limit'
+      ));
+    }
     this.repository.stopBleScan();
     const target = new DebugTarget(
-      deviceId,
+      bleDeviceId,
       ModuleType.BLUETOOTH,
       displayName,
       ProtocolType.BLE_GATT,
-      deviceId,
+      bleDeviceId,
       'virtual'
     );
     const input = new CreateSessionInput(
@@ -56,19 +68,22 @@ export class ConnectGattBrowserUseCase {
     );
     const session = await this.sessionBootstrap.createAndStart(input);
     if (!session.success || session.value === undefined) {
+      this.repository.releaseBleConnection();
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
-    const connected = await this.repository.connectGattBrowser(session.value.id, deviceId);
+    const connected = await this.repository.connectGattBrowser(session.value.id, bleDeviceId);
     if (!connected.success) {
       this.repository.releaseGattClient(session.value.id);
+      this.repository.releaseBleConnection();
       return Result.fail(connected.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, 'connect failed'));
     }
-    const discovered = await this.discoverServices.execute(session.value.id, deviceId);
+    const discovered = await this.discoverServices.execute(session.value.id, bleDeviceId);
     if (!discovered.success) {
       this.repository.releaseGattClient(session.value.id);
+      this.repository.releaseBleConnection();
       return Result.fail(discovered.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'discover failed'));
     }
-    this.repository.recordRecentConnection(deviceId, displayName, 'ble_gatt_browser');
+    this.repository.recordRecentConnection(bleDeviceId, displayName, 'ble_gatt_browser');
     return Result.ok(new ConnectGattResult(session.value.id, session.value.id));
   }
 }

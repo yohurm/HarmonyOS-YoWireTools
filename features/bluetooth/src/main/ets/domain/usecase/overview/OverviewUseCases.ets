@@ -26,7 +26,7 @@ export class LoadBluetoothOverviewUseCase {
     if (!permission.granted) {
       return Result.ok([]);
     }
-    return this.repository.loadPairedDevices();
+    return this.repository.loadPairedClassicCandidates();
   }
 }
 

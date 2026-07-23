@@ -8,8 +8,8 @@ export class BleScanPlatformMapper {
   static toPlatformFilters(filter: BleScanFilter): Array<ble.ScanFilter> {
     const filters: Array<ble.ScanFilter> = [];
     const platformFilter: ble.ScanFilter = {};
-    if (filter.deviceId.length > 0) {
-      platformFilter.deviceId = filter.deviceId;
+    if (filter.bleDeviceId.length > 0) {
+      platformFilter.deviceId = filter.bleDeviceId;
     }
     if (filter.serviceUuid.length > 0) {
       platformFilter.serviceUuid = filter.serviceUuid;

@@ -8,12 +8,12 @@ export enum PairingState {
 }
 
 export class PairingEvent {
-  readonly deviceId: string;
+  readonly address: string;
   readonly state: PairingState;
   readonly timestampMs: number;
 
-  constructor(deviceId: string, state: PairingState, timestampMs: number) {
-    this.deviceId = deviceId;
+  constructor(address: string, state: PairingState, timestampMs: number) {
+    this.address = address;
     this.state = state;
     this.timestampMs = timestampMs;
   }

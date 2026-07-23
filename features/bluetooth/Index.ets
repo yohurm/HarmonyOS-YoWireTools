@@ -5,6 +5,7 @@ export { BtOverviewViewModel } from './src/main/ets/viewmodel/BtOverviewViewMode
 export { SppMainViewModel } from './src/main/ets/viewmodel/SppMainViewModel';
 export { BleMainViewModel } from './src/main/ets/viewmodel/BleMainViewModel';
 export { BtStatusCard } from './src/main/ets/ui/component/BtStatusCard';
+export { ClassicDeviceCard } from './src/main/ets/ui/component/ClassicDeviceCard';
 export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
 export { SppTransportSession } from './src/main/ets/data/transport/SppTransportSession';
 export { GattTransportSession } from './src/main/ets/data/transport/GattTransportSession';
@@ -12,18 +13,51 @@ export {
   StartClassicScanUseCase,
   StopClassicScanUseCase,
   PairBluetoothDeviceUseCase,
-  ObservePairingEventsUseCase
+  ObservePairingEventsUseCase,
+  LoadPairedClassicDevicesUseCase,
+  ObserveClassicDevicesUseCase,
+  ListActiveSppSessionsUseCase
 } from './src/main/ets/domain/usecase/classic/ClassicScanUseCases';
 export {
   ConnectSppUseCase,
   DisconnectSppUseCase
 } from './src/main/ets/domain/usecase/classic/SppConnectionUseCases';
+export {
+  ResolveSppTargetAddressUseCase,
+  BridgeBleToClassicPairUseCase,
+  ResolveGattTargetAddressUseCase
+} from './src/main/ets/domain/usecase/classic/SppAddressUseCases';
 export { SendSppCommandUseCase } from './src/main/ets/domain/usecase/classic/SppCommandUseCases';
 export {
   StartBleScanUseCase,
   StopBleScanUseCase,
-  StartBleScanWithFilterUseCase
+  StartBleScanWithFilterUseCase,
+  LoadPairedBleDevicesUseCase,
+  ObserveBleDevicesUseCase
 } from './src/main/ets/domain/usecase/ble/BleScanUseCases';
+export {
+  ConnectUartUseCase,
+  DisconnectUartUseCase
+} from './src/main/ets/domain/usecase/uart/UartConnectionUseCases';
+export { SerialProfileMatcher } from './src/main/ets/domain/service/uart/SerialProfileMatcher';
+export { CommandWriteQueue } from './src/main/ets/domain/service/queue/CommandWriteQueue';
+export { SppActiveWritePolicy } from './src/main/ets/domain/service/spp/SppActiveWritePolicy';
+export {
+  ClassicBluetoothRepositoryFacet,
+  SppBluetoothRepositoryFacet,
+  BleScanRepositoryFacet,
+  GattBluetoothRepositoryFacet
+} from './src/main/ets/domain/repository/BluetoothRepositoryFacets';
+export {
+  BluetoothSessionKind,
+  SessionLifecycle,
+  BluetoothSessionSummary
+} from './src/main/ets/domain/model/session/BluetoothSessionKind';
+export {
+  UartConnectPhase,
+  SerialProfileId,
+  ProfileMatchResult
+} from './src/main/ets/domain/model/uart/UartConnectPhase';
 export {
   ConnectGattUseCase,
   DisconnectGattUseCase
@@ -47,7 +81,21 @@ export {
   LoadRemoteProfileUuidsUseCase
 } from './src/main/ets/domain/usecase/device/DeviceFavoriteUseCases';
 export { BluetoothSubscriptionBundle } from './src/main/ets/domain/usecase/shared/BluetoothSubscriptionBundle';
-export { BluetoothDevice, BluetoothOverviewSnapshot, BluetoothAdapterSnapshot, BluetoothCapabilitySnapshot } from './src/main/ets/domain/model/BluetoothDevice';
+export {
+  BluetoothDevice,
+  BluetoothDeviceDraft,
+  BluetoothOverviewSnapshot,
+  BluetoothAdapterSnapshot,
+  BluetoothCapabilitySnapshot
+} from './src/main/ets/domain/model/BluetoothDevice';
+export {
+  BluetoothTransportType,
+  BluetoothListRail,
+  AddressPrivacyKind,
+  BluetoothRawAddrKind,
+  BluetoothTransportPolicy
+} from './src/main/ets/domain/model/BluetoothTransportType';
+export { DeviceIdentity, IdentityStability } from './src/main/ets/domain/model/DeviceIdentity';
 export { SppConnectParams } from './src/main/ets/domain/model/SppConnectParams';
 export { GattConnectParams } from './src/main/ets/domain/model/GattConnectParams';
 export { BleScanFilter } from './src/main/ets/domain/model/BleScanFilter';
@@ -60,3 +108,4 @@ export { BluetoothErrorCodes } from './src/main/ets/constants/BluetoothErrorCode
 export { BluetoothRepositoryContract } from './src/main/ets/domain/repository/BluetoothRepositoryContract';
 export { BluetoothDeviceVerificationChecklist } from './src/main/ets/data/verification/BluetoothDeviceVerificationChecklist';
 export { ScanResultMergeQueue } from './src/main/ets/domain/service/ScanResultMergeQueue';
+export { SppSegmentTab, SppDeviceListItem, SppActiveSessionItem } from './src/main/ets/viewmodel/SppMainViewModel';

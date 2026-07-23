@@ -10,7 +10,7 @@ export enum BleScanDutyPreset {
  */
 export class BleScanFilter {
   readonly namePrefix: string;
-  readonly deviceId: string;
+  readonly bleDeviceId: string;
   readonly serviceUuid: string;
   readonly manufacturerId: number;
   readonly manufacturerData: string;
@@ -21,7 +21,7 @@ export class BleScanFilter {
 
   constructor(
     namePrefix: string = '',
-    deviceId: string = '',
+    bleDeviceId: string = '',
     serviceUuid: string = '',
     manufacturerId: number = -1,
     manufacturerData: string = '',
@@ -31,7 +31,7 @@ export class BleScanFilter {
     dutyPreset: BleScanDutyPreset = BleScanDutyPreset.BALANCED
   ) {
     this.namePrefix = namePrefix;
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.serviceUuid = serviceUuid;
     this.manufacturerId = manufacturerId;
     this.manufacturerData = manufacturerData;

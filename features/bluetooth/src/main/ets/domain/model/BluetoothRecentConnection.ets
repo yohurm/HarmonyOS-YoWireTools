@@ -1,18 +1,18 @@
 export class BluetoothRecentConnection {
-  readonly deviceId: string;
+  readonly targetAddress: string;
   readonly displayName: string;
   readonly protocol: string;
   readonly connectedAtMs: number;
 
-  constructor(deviceId: string, displayName: string, protocol: string, connectedAtMs: number) {
-    this.deviceId = deviceId;
+  constructor(targetAddress: string, displayName: string, protocol: string, connectedAtMs: number) {
+    this.targetAddress = targetAddress;
     this.displayName = displayName;
     this.protocol = protocol;
     this.connectedAtMs = connectedAtMs;
   }
 
   toJson(): string {
-    return `${this.deviceId}|${this.displayName}|${this.protocol}|${this.connectedAtMs}`;
+    return `${this.targetAddress}|${this.displayName}|${this.protocol}|${this.connectedAtMs}`;
   }
 
   static fromJson(line: string): BluetoothRecentConnection | undefined {

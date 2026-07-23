@@ -1,36 +1,48 @@
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
 import { ReconnectPolicy } from './ReconnectPolicy';
+import { BluetoothTransportType } from './BluetoothTransportType';
 
+/**
+ * SPP connect params — classicDeviceId only (architecture bluetooth/00 + 02).
+ */
 export class SppConnectParams {
-  readonly deviceId: string;
+  readonly classicDeviceId: string;
   readonly displayName: string;
   readonly uuid: string;
   readonly secure: boolean;
   readonly timeoutMs: number;
   readonly autoReconnect: boolean;
   readonly reconnectPolicy: ReconnectPolicy;
+  readonly transport: BluetoothTransportType;
+  readonly bleDeviceId: string;
 
   constructor(
-    deviceId: string,
+    classicDeviceId: string,
     displayName: string,
     uuid: string = BluetoothConstants.DEFAULT_SPP_UUID,
     secure: boolean = false,
     timeoutMs: number = BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS,
     autoReconnect: boolean = false,
-    reconnectPolicy: ReconnectPolicy = ReconnectPolicy.defaultPolicy()
+    reconnectPolicy: ReconnectPolicy = ReconnectPolicy.defaultPolicy(),
+    transport: BluetoothTransportType = BluetoothTransportType.BR_EDR,
+    bleDeviceId: string = ''
   ) {
-    this.deviceId = deviceId;
+    this.classicDeviceId = classicDeviceId;
     this.displayName = displayName;
     this.uuid = uuid;
     this.secure = secure;
     this.timeoutMs = timeoutMs;
     this.autoReconnect = autoReconnect;
     this.reconnectPolicy = reconnectPolicy;
+    this.transport = transport;
+    this.bleDeviceId = bleDeviceId;
   }
 
   toConnectRecord(): Record<string, string | number | boolean> {
     const record: Record<string, string | number | boolean> = {};
-    record['deviceId'] = this.deviceId;
+    record['classicDeviceId'] = this.classicDeviceId;
+    record['bleDeviceId'] = this.bleDeviceId;
+    record['transport'] = this.transport;
     record['displayName'] = this.displayName;
     record['uuid'] = this.uuid;
     record['secure'] = this.secure;

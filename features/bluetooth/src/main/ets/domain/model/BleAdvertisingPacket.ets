@@ -32,7 +32,7 @@ export class BleManufacturerDataEntry {
  * Parsed BLE advertising packet per architecture bluetooth/03-§3.4.
  */
 export class BleAdvertisingPacket {
-  readonly deviceId: string;
+  readonly bleDeviceId: string;
   readonly rssi: number;
   readonly connectable: boolean;
   readonly rawHex: string;
@@ -48,7 +48,7 @@ export class BleAdvertisingPacket {
   readonly discoveryCount: number;
 
   constructor(
-    deviceId: string,
+    bleDeviceId: string,
     rssi: number,
     connectable: boolean,
     rawHex: string,
@@ -63,7 +63,7 @@ export class BleAdvertisingPacket {
     discoveredAtMs: number = Date.now(),
     discoveryCount: number = 1
   ) {
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.rssi = rssi;
     this.connectable = connectable;
     this.rawHex = rawHex;
@@ -81,7 +81,7 @@ export class BleAdvertisingPacket {
 
   withUpdate(rssi: number, discoveredAtMs: number, discoveryCount: number): BleAdvertisingPacket {
     return new BleAdvertisingPacket(
-      this.deviceId,
+      this.bleDeviceId,
       rssi,
       this.connectable,
       this.rawHex,

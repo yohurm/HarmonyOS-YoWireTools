@@ -16,10 +16,10 @@ export class GattClientDataSource {
   private characteristicHandler: CharacteristicChangeListener | undefined;
   private cachedServices: Array<ble.GattService> = [];
 
-  createClient(deviceId: string): Result<void> {
+  createClient(bleDeviceId: string): Result<void> {
     try {
       this.release();
-      this.client = ble.createGattClientDevice(deviceId);
+      this.client = ble.createGattClientDevice(bleDeviceId);
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;

@@ -126,20 +126,20 @@ export class GattServiceNode {
 
 export class GattServiceTreeSnapshot {
   readonly sessionId: string;
-  readonly deviceId: string;
+  readonly bleDeviceId: string;
   readonly mtu: number;
   readonly services: GattServiceNode[];
   readonly state: GattClientState;
 
   constructor(
     sessionId: string,
-    deviceId: string,
+    bleDeviceId: string,
     mtu: number,
     services: GattServiceNode[],
     state: GattClientState = GattClientState.READY
   ) {
     this.sessionId = sessionId;
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.mtu = mtu;
     this.services = services;
     this.state = state;

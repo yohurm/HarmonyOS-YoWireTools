@@ -29,6 +29,7 @@ export default function localUnitTest() {
         scanResponse: new Uint8Array([0x05, 0x08, 0x41, 0x42, 0x43]).buffer
       } as ble.ScanResult;
       const packet = BleAdvertisingPlatformMapper.parse(result);
+      expect(packet.bleDeviceId).assertEqual('AA:BB:CC:DD:EE:FF');
       expect(packet.localName).assertEqual('ABC');
       expect(packet.nameSource).assertEqual(DeviceNameSource.SCAN_RESPONSE);
     });

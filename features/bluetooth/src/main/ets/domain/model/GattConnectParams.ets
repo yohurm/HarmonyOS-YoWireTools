@@ -1,7 +1,10 @@
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
 
+/**
+ * GATT connect params — bleDeviceId only (architecture bluetooth/00 + 03).
+ */
 export class GattConnectParams {
-  readonly deviceId: string;
+  readonly bleDeviceId: string;
   readonly displayName: string;
   readonly serviceUuid: string;
   readonly rxCharacteristicUuid: string;
@@ -10,7 +13,7 @@ export class GattConnectParams {
   readonly autoDetect: boolean;
 
   constructor(
-    deviceId: string,
+    bleDeviceId: string,
     displayName: string,
     serviceUuid: string = BluetoothConstants.NORDIC_UART_SERVICE_UUID,
     rxCharacteristicUuid: string = BluetoothConstants.NORDIC_UART_RX_UUID,
@@ -18,7 +21,7 @@ export class GattConnectParams {
     useNordicPreset: boolean = true,
     autoDetect: boolean = false
   ) {
-    this.deviceId = deviceId;
+    this.bleDeviceId = bleDeviceId;
     this.displayName = displayName;
     this.serviceUuid = serviceUuid;
     this.rxCharacteristicUuid = rxCharacteristicUuid;
@@ -29,7 +32,7 @@ export class GattConnectParams {
 
   toConnectRecord(): Record<string, string | number | boolean> {
     const record: Record<string, string | number | boolean> = {};
-    record['deviceId'] = this.deviceId;
+    record['bleDeviceId'] = this.bleDeviceId;
     record['displayName'] = this.displayName;
     record['serviceUuid'] = this.serviceUuid;
     record['rxCharacteristicUuid'] = this.rxCharacteristicUuid;

@@ -1,38 +1,65 @@
 import { ModuleType, ProtocolType } from 'feature_debug_core';
-import { AddressKind, IdentityStability } from './DeviceIdentity';
+import { IdentityStability } from './DeviceIdentity';
 import { DiscoverySource } from './DiscoverySource';
 import { PairingState } from './PairingState';
 import { BleScanPhase } from './BleScanPhase';
 import { ClassicScanPhase } from './ClassicScanPhase';
-
-export enum BluetoothDeviceKind {
-  CLASSIC = 'classic',
-  BLE = 'ble'
-}
-
-export enum IdentityType {
-  CLASSIC = 'classic',
-  BLE = 'ble',
-  PERSISTENT = 'persistent',
-  VIRTUAL = 'virtual',
-  UNKNOWN = 'unknown'
-}
+import {
+  AddressPrivacyKind,
+  BluetoothListRail,
+  BluetoothRawAddrKind,
+  BluetoothTransportType
+} from './BluetoothTransportType';
 
 /**
- * Unified Bluetooth device model per architecture 02-§5.
+ * Unified Bluetooth device model per architecture bluetooth/00.
+ * Uses draft-based construction to avoid positional-arg copy bugs.
  */
+export class BluetoothDeviceDraft {
+  identityId: string = '';
+  displayName: string = '';
+  alias: string = '';
+  classicDeviceId: string = '';
+  bleDeviceId: string = '';
+  primaryDeviceId: string = '';
+  addressPrivacy: AddressPrivacyKind = AddressPrivacyKind.VIRTUAL;
+  rawAddressKind: BluetoothRawAddrKind = BluetoothRawAddrKind.UNKNOWN;
+  transport: BluetoothTransportType = BluetoothTransportType.UNKNOWN;
+  deviceClassCod: number = 0;
+  majorClass: number = 0;
+  majorMinorClass: number = 0;
+  listRail: BluetoothListRail = BluetoothListRail.CLASSIC_SCAN;
+  rssi: number = 0;
+  paired: boolean = false;
+  pairState: PairingState = PairingState.UNKNOWN;
+  connectable: boolean = true;
+  favorite: boolean = false;
+  lastSeenMs: number = Date.now();
+  firstSeenMs: number = Date.now();
+  serviceUuids: string[] = [];
+  profileUuids: string[] = [];
+  discoverySource: DiscoverySource = DiscoverySource.DISCOVERY_RESULT;
+  identityStability: IdentityStability = IdentityStability.UNKNOWN;
+  rawHex: string = '';
+}
+
 export class BluetoothDevice {
   readonly identityId: string;
-  readonly deviceId: string;
   readonly displayName: string;
   readonly alias: string;
-  readonly addressKind: AddressKind;
-  readonly identityType: IdentityType;
+  readonly classicDeviceId: string;
+  readonly bleDeviceId: string;
+  readonly primaryDeviceId: string;
+  readonly addressPrivacy: AddressPrivacyKind;
+  readonly rawAddressKind: BluetoothRawAddrKind;
+  readonly transport: BluetoothTransportType;
+  readonly deviceClassCod: number;
+  readonly majorClass: number;
+  readonly majorMinorClass: number;
+  readonly listRail: BluetoothListRail;
   readonly rssi: number;
   readonly paired: boolean;
   readonly pairState: PairingState;
-  readonly kind: BluetoothDeviceKind;
-  readonly deviceType: number;
   readonly connectable: boolean;
   readonly favorite: boolean;
   readonly lastSeenMs: number;
@@ -43,48 +70,34 @@ export class BluetoothDevice {
   readonly identityStability: IdentityStability;
   readonly rawHex: string;
 
-  constructor(
-    deviceId: string,
-    displayName: string,
-    rssi: number = 0,
-    paired: boolean = false,
-    kind: BluetoothDeviceKind = BluetoothDeviceKind.CLASSIC,
-    deviceType: number = 0,
-    connectable: boolean = true,
-    lastSeenMs: number = Date.now(),
-    serviceUuids: string[] = [],
-    identityId: string = deviceId,
-    alias: string = '',
-    addressKind: AddressKind = AddressKind.VIRTUAL,
-    identityType: IdentityType = IdentityType.UNKNOWN,
-    pairState: PairingState = PairingState.UNKNOWN,
-    favorite: boolean = false,
-    firstSeenMs: number = lastSeenMs,
-    profileUuids: string[] = [],
-    discoverySource: DiscoverySource = DiscoverySource.DISCOVERY_RESULT,
-    identityStability: IdentityStability = IdentityStability.UNKNOWN,
-    rawHex: string = ''
-  ) {
-    this.identityId = identityId;
-    this.deviceId = deviceId;
-    this.displayName = displayName;
-    this.alias = alias;
-    this.addressKind = addressKind;
-    this.identityType = identityType;
-    this.rssi = rssi;
-    this.paired = paired;
-    this.pairState = pairState;
-    this.kind = kind;
-    this.deviceType = deviceType;
-    this.connectable = connectable;
-    this.favorite = favorite;
-    this.lastSeenMs = lastSeenMs;
-    this.firstSeenMs = firstSeenMs;
-    this.serviceUuids = serviceUuids;
-    this.profileUuids = profileUuids;
-    this.discoverySource = discoverySource;
-    this.identityStability = identityStability;
-    this.rawHex = rawHex;
+  constructor(draft: BluetoothDeviceDraft) {
+    this.identityId = draft.identityId.length > 0 ? draft.identityId : draft.primaryDeviceId;
+    this.displayName = draft.displayName;
+    this.alias = draft.alias;
+    this.classicDeviceId = draft.classicDeviceId;
+    this.bleDeviceId = draft.bleDeviceId;
+    this.primaryDeviceId = draft.primaryDeviceId.length > 0
+      ? draft.primaryDeviceId
+      : (draft.classicDeviceId.length > 0 ? draft.classicDeviceId : draft.bleDeviceId);
+    this.addressPrivacy = draft.addressPrivacy;
+    this.rawAddressKind = draft.rawAddressKind;
+    this.transport = draft.transport;
+    this.deviceClassCod = draft.deviceClassCod;
+    this.majorClass = draft.majorClass;
+    this.majorMinorClass = draft.majorMinorClass;
+    this.listRail = draft.listRail;
+    this.rssi = draft.rssi;
+    this.paired = draft.paired;
+    this.pairState = draft.pairState;
+    this.connectable = draft.connectable;
+    this.favorite = draft.favorite;
+    this.lastSeenMs = draft.lastSeenMs;
+    this.firstSeenMs = draft.firstSeenMs;
+    this.serviceUuids = draft.serviceUuids;
+    this.profileUuids = draft.profileUuids;
+    this.discoverySource = draft.discoverySource;
+    this.identityStability = draft.identityStability;
+    this.rawHex = draft.rawHex;
   }
 
   get effectiveName(): string {
@@ -94,104 +107,128 @@ export class BluetoothDevice {
     return this.displayName;
   }
 
+  toDraft(): BluetoothDeviceDraft {
+    const draft = new BluetoothDeviceDraft();
+    draft.identityId = this.identityId;
+    draft.displayName = this.displayName;
+    draft.alias = this.alias;
+    draft.classicDeviceId = this.classicDeviceId;
+    draft.bleDeviceId = this.bleDeviceId;
+    draft.primaryDeviceId = this.primaryDeviceId;
+    draft.addressPrivacy = this.addressPrivacy;
+    draft.rawAddressKind = this.rawAddressKind;
+    draft.transport = this.transport;
+    draft.deviceClassCod = this.deviceClassCod;
+    draft.majorClass = this.majorClass;
+    draft.majorMinorClass = this.majorMinorClass;
+    draft.listRail = this.listRail;
+    draft.rssi = this.rssi;
+    draft.paired = this.paired;
+    draft.pairState = this.pairState;
+    draft.connectable = this.connectable;
+    draft.favorite = this.favorite;
+    draft.lastSeenMs = this.lastSeenMs;
+    draft.firstSeenMs = this.firstSeenMs;
+    draft.serviceUuids = this.serviceUuids.slice();
+    draft.profileUuids = this.profileUuids.slice();
+    draft.discoverySource = this.discoverySource;
+    draft.identityStability = this.identityStability;
+    draft.rawHex = this.rawHex;
+    return draft;
+  }
+
   withSeen(rssi: number, lastSeenMs: number): BluetoothDevice {
-    return new BluetoothDevice(
-      this.deviceId,
-      this.displayName,
-      rssi !== 0 ? rssi : this.rssi,
-      this.paired,
-      this.kind,
-      this.deviceType,
-      this.connectable,
-      lastSeenMs,
-      this.serviceUuids,
-      this.identityId,
-      this.alias,
-      this.addressKind,
-      this.identityType,
-      this.pairState,
-      this.favorite,
-      this.firstSeenMs,
-      this.profileUuids,
-      this.discoverySource,
-      this.identityStability,
-      this.rawHex
-    );
+    const draft = this.toDraft();
+    if (rssi !== 0) {
+      draft.rssi = rssi;
+    }
+    draft.lastSeenMs = lastSeenMs;
+    return new BluetoothDevice(draft);
   }
 
   withPairState(pairState: PairingState, paired: boolean): BluetoothDevice {
-    return new BluetoothDevice(
-      this.deviceId,
-      this.displayName,
-      this.rssi,
-      paired,
-      this.kind,
-      this.deviceType,
-      this.connectable,
-      this.lastSeenMs,
-      this.serviceUuids,
-      this.identityId,
-      this.alias,
-      this.addressKind,
-      this.identityType,
-      pairState,
-      this.favorite,
-      this.firstSeenMs,
-      this.profileUuids,
-      this.discoverySource,
-      paired ? IdentityStability.PAIRED_STABLE : this.identityStability,
-      this.rawHex
-    );
+    const draft = this.toDraft();
+    draft.pairState = pairState;
+    draft.paired = paired;
+    if (paired) {
+      draft.identityStability = IdentityStability.PAIRED_STABLE;
+    }
+    return new BluetoothDevice(draft);
   }
 
   withFavorite(favorite: boolean, alias: string = this.alias): BluetoothDevice {
-    return new BluetoothDevice(
-      this.deviceId,
-      this.displayName,
-      this.rssi,
-      this.paired,
-      this.kind,
-      this.deviceType,
-      this.connectable,
-      this.lastSeenMs,
-      this.serviceUuids,
-      this.identityId,
-      alias,
-      this.addressKind,
-      this.identityType,
-      this.pairState,
-      favorite,
-      this.firstSeenMs,
-      this.profileUuids,
-      this.discoverySource,
-      this.identityStability,
-      this.rawHex
-    );
+    const draft = this.toDraft();
+    draft.favorite = favorite;
+    draft.alias = alias;
+    return new BluetoothDevice(draft);
   }
 
   withProfileUuids(profileUuids: string[]): BluetoothDevice {
-    return new BluetoothDevice(
-      this.deviceId,
-      this.displayName,
-      this.rssi,
-      this.paired,
-      this.kind,
-      this.deviceType,
-      this.connectable,
-      this.lastSeenMs,
-      this.serviceUuids,
-      this.identityId,
-      this.alias,
-      this.addressKind,
-      this.identityType,
-      this.pairState,
-      this.favorite,
-      this.firstSeenMs,
-      profileUuids,
-      this.discoverySource,
-      this.identityStability,
-      this.rawHex
-    );
+    const draft = this.toDraft();
+    draft.profileUuids = profileUuids.slice();
+    return new BluetoothDevice(draft);
+  }
+
+  withTransport(transport: BluetoothTransportType): BluetoothDevice {
+    const draft = this.toDraft();
+    draft.transport = transport;
+    return new BluetoothDevice(draft);
+  }
+
+  withDualAddresses(classicDeviceId: string, bleDeviceId: string): BluetoothDevice {
+    const draft = this.toDraft();
+    draft.classicDeviceId = classicDeviceId;
+    draft.bleDeviceId = bleDeviceId;
+    draft.transport = BluetoothTransportType.DUAL;
+    if (draft.listRail === BluetoothListRail.CLASSIC_SCAN) {
+      draft.primaryDeviceId = classicDeviceId;
+    } else {
+      draft.primaryDeviceId = bleDeviceId;
+    }
+    return new BluetoothDevice(draft);
+  }
+
+  mergeFrom(other: BluetoothDevice): BluetoothDevice {
+    const draft = this.toDraft();
+    if (other.displayName.length > 0) {
+      draft.displayName = other.displayName;
+    }
+    draft.rssi = other.rssi !== 0 ? other.rssi : draft.rssi;
+    draft.paired = draft.paired || other.paired;
+    draft.connectable = other.connectable;
+    draft.lastSeenMs = other.lastSeenMs > 0 ? other.lastSeenMs : draft.lastSeenMs;
+    if (other.serviceUuids.length > 0) {
+      draft.serviceUuids = other.serviceUuids.slice();
+    }
+    if (other.alias.length > 0 && draft.alias.length === 0) {
+      draft.alias = other.alias;
+    }
+    if (other.pairState !== draft.pairState) {
+      draft.pairState = other.pairState;
+    }
+    draft.favorite = draft.favorite || other.favorite;
+    if (other.profileUuids.length > 0) {
+      draft.profileUuids = other.profileUuids.slice();
+    }
+    if (other.deviceClassCod !== 0) {
+      draft.deviceClassCod = other.deviceClassCod;
+      draft.majorClass = other.majorClass;
+      draft.majorMinorClass = other.majorMinorClass;
+    }
+    if (other.transport !== BluetoothTransportType.UNKNOWN) {
+      draft.transport = other.transport;
+    }
+    if (other.classicDeviceId.length > 0) {
+      draft.classicDeviceId = other.classicDeviceId;
+    }
+    if (other.bleDeviceId.length > 0) {
+      draft.bleDeviceId = other.bleDeviceId;
+    }
+    if (other.rawHex.length > 0) {
+      draft.rawHex = other.rawHex;
+    }
+    draft.discoverySource = other.discoverySource;
+    return new BluetoothDevice(draft);
   }
 }
 
