@@ -6,25 +6,27 @@ import {
 } from '@kit.ArkUI';
 
 /**
- * Official SegmentButton (V1) tab — same call pattern as API reference example 1:
- * SegmentButtonOptions.tab + selectedIndexes: $tabSelectedIndexes.
- * Hosted in @Component so @Link / $ binding keeps the system indicator slide.
+ * SegmentButton tab — official call pattern + dark-safe selected text.
+ *
+ * Evidence (docs + GitCode + device screenshot):
+ * - Design guide: 页签类选中为「白色背板」.
+ * - Docs default selectedFontColor = ohos_id_color_text_primary, which becomes light in dark mode.
+ * - GitCode segmentbutton.ets maps segment_button_checked_text_color → font_primary (same light-in-dark).
+ * - SDK resources: dark font_primary = #e5ffffff on white/light board → unreadable selected label.
+ * - Light-theme / seaxiang static default for selected text is #ff182431 (dark on white board).
  */
 @Component
 export struct SppTabSegmentButton {
   @Prop initialIndex: number = 0;
   onIndexChange: (index: number) => void = (_index: number) => {
   };
-  /**
-   * Height: design guide has no fixed height; API min is 28vp (content-adaptive).
-   * Default text buttonPadding vertical is 4vp; use 8vp for a modest taller control.
-   */
   @State private tabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
     buttons: [
       { text: $r('app.string.bt_spp_segment_scan') },
       { text: $r('app.string.bt_spp_segment_active') }
     ] as ItemRestriction<SegmentButtonTextItem>,
-    buttonPadding: { top: 8, right: 8, bottom: 8, left: 8 }
+    // Keep dark ink on the white selected board in both color modes.
+    selectedFontColor: '#ff182431'
   });
   @State @Watch('onTabSelectedIndexesChange') private tabSelectedIndexes: number[] = [0];
 

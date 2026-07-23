@@ -11,7 +11,7 @@ import {
 /**
  * SPP main content.
  *
- * Segment: official SegmentButton tab defaults (see SppTabSegmentButton).
+ * Segment: official SegmentButton tab defaults.
  * Panels: if/else switch only (no Swiper page slide).
  */
 @ComponentV2
