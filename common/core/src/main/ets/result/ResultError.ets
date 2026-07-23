@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Generic error carrier for Result without business domain codes.
- * Domain-specific errors (DebugError) live in feature_debug_core.
+ * Domain-specific errors (DebugError) live in debug_core.
  */
 export class ResultError {
   readonly code: string;

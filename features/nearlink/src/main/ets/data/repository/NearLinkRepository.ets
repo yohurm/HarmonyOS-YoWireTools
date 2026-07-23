@@ -1,7 +1,7 @@
-import { ssap } from '@kit.NearLinkKit';
+﻿import { ssap } from '@kit.NearLinkKit';
 import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError, Subscription, TimeUtil } from 'common_core';
-import { ITransportSession, IncomingPayload, ModuleType, SessionRuntimeStore } from 'feature_debug_core';
+import { ITransportSession, IncomingPayload, ModuleType, SessionRuntimeStore } from 'debug_core';
 import { NearLinkManagerDataSource } from '../datasource/platform/NearLinkManagerDataSource';
 import { NearLinkScanDataSource, NearLinkDiscoveryPayload } from '../datasource/platform/NearLinkScanDataSource';
 import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';

@@ -1,24 +1,22 @@
-import { Subscription } from 'common_core';
+﻿import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
   LifecycleCoordinator
 } from 'common_platform';
-import { DebugSessionSummary } from 'feature_debug_core';
-import { BluetoothDevice } from '../domain/model/BluetoothDevice';
-import { ClassicScanPhase } from '../domain/model/ClassicScanPhase';
+import { DebugSessionSummary } from 'debug_core';
 import {
-  BluetoothTransportType
-} from '../domain/model/BluetoothTransportType';
-import { BluetoothRepository } from '../data/repository/BluetoothRepository';
-import { LoadBluetoothOverviewSnapshotUseCase } from '../domain/usecase/overview/OverviewUseCases';
-import {
+  BluetoothDevice,
+  BluetoothRepository,
+  BluetoothTransportType,
+  ClassicScanPhase,
   ListActiveSppSessionsUseCase,
+  LoadBluetoothOverviewSnapshotUseCase,
   LoadPairedClassicDevicesUseCase,
   ObserveClassicDevicesUseCase,
   StartClassicScanUseCase,
   StopClassicScanUseCase
-} from '../domain/usecase/classic/ClassicScanUseCases';
+} from 'yo_bluetooth';
 
 export enum SppSegmentTab {
   SCAN = 0,
@@ -206,8 +204,8 @@ export class SppMainViewModel {
   }
 
   /**
-   * Refresh scan rail: stop → clear/seed paired → start Inquiry.
-   * Matches architecture bluetooth/01 §3.2–3.3 and official
+   * Refresh scan rail: stop 鈫?clear/seed paired 鈫?start Inquiry.
+   * Matches architecture bluetooth/01 搂3.2鈥?.3 and official
    * startBluetoothDiscovery (must stop before the next start).
    */
   private async refreshScanSegment(): Promise<void> {

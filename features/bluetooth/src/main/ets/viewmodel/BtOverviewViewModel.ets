@@ -1,4 +1,4 @@
-import { Subscription } from 'common_core';
+﻿import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
@@ -9,10 +9,13 @@ import {
   EnsurePermissionUseCase,
   PermissionScenario,
   PermissionScenarioCoordinator
-} from 'feature_debug_core';
-import { BluetoothAdapterSnapshot, BluetoothOverviewSnapshot } from '../domain/model/BluetoothDevice';
-import { BluetoothRepository } from '../data/repository/BluetoothRepository';
-import { LoadBluetoothOverviewSnapshotUseCase } from '../domain/usecase/overview/OverviewUseCases';
+} from 'debug_core';
+import {
+  BluetoothAdapterSnapshot,
+  BluetoothOverviewSnapshot,
+  BluetoothRepository,
+  LoadBluetoothOverviewSnapshotUseCase
+} from 'yo_bluetooth';
 
 @ObservedV2
 export class BtOverviewViewModel {

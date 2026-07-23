@@ -1,10 +1,10 @@
-import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
+﻿import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
 import {
   Direction,
   ModuleType,
   ProtocolType,
   TransportState
-} from 'feature_debug_core';
+} from 'debug_core';
 import {
   ITransportSession,
   IncomingPayload,
@@ -12,7 +12,7 @@ import {
   TransportStateSnapshot,
   WriteOptions,
   WriteResult
-} from 'feature_debug_core';
+} from 'debug_core';
 import { ssap } from '@kit.NearLinkKit';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
@@ -21,7 +21,7 @@ import { SsapOperationQueue } from '../../domain/service/SsapOperationQueue';
 import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';
 
 /**
- * SSAP property transport for command panel per architecture 01-§4.1.
+ * SSAP property transport for command panel per architecture 01-搂4.1.
  * Attaches to an existing SSAP client session; endpoints bound via bindEndpoints().
  */
 export class SsapTransportSession implements ITransportSession {

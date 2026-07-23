@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "feature_home",
   "version": "1.0.0",
   "description": "YoWire home workbench: active sessions, permissions, log preview",
@@ -10,6 +10,6 @@
     "common_platform": "file:../../common/platform",
     "common_storage": "file:../../common/storage",
     "youi_kit": "file:../../common/youi_kit",
-    "feature_debug_core": "file:../debug_core"
+    "debug_core": "file:../../common/debug_core"
   }
 }

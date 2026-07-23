@@ -1,4 +1,4 @@
-import { IdGenerator, Observable, TimeUtil } from 'common_core';
+﻿import { IdGenerator, Observable, TimeUtil } from 'common_core';
 import { socket } from '@kit.NetworkKit';
 import {
   ITransportSession,
@@ -10,12 +10,12 @@ import {
   TransportStateSnapshot,
   WriteOptions,
   WriteResult
-} from 'feature_debug_core';
+} from 'debug_core';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 import { NetworkKitEventBridge } from '../kit/NetworkKitEventBridge';
 
 /**
- * UDP datagram transport session per architecture 03-§6.3.
+ * UDP datagram transport session per architecture 03-搂6.3.
  */
 
 export class UdpTransportSession implements ITransportSession {

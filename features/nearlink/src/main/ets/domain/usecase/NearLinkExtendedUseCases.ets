@@ -1,4 +1,4 @@
-import { Result, ResultError, Subscription } from 'common_core';
+﻿import { Result, ResultError, Subscription } from 'common_core';
 
 import {
   AppMode,
@@ -19,7 +19,7 @@ import {
   PayloadEncoding,
   SendCommandInput,
   SendCommandUseCase
-} from 'feature_debug_core';
+} from 'debug_core';
 import { DeviceFavoriteRecord } from 'common_storage';
 
 import { PermissionDecision } from 'common_platform';

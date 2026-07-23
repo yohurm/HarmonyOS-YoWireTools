@@ -1,4 +1,4 @@
-import { LoadBluetoothOverviewSnapshotUseCase } from '../domain/usecase/overview/OverviewUseCases';
+import { LoadBluetoothOverviewSnapshotUseCase } from 'yo_bluetooth';
 
 @ObservedV2
 export class BleMainViewModel {

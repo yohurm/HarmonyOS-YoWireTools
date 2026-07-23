@@ -1,5 +1,5 @@
-import { Result, ResultError } from 'common_core';
-import { TransportSessionRegistry } from 'feature_debug_core';
+﻿import { Result, ResultError } from 'common_core';
+import { TransportSessionRegistry } from 'debug_core';
 import { TcpSocketDataSource } from '../datasource/TcpSocketDataSource';
 import { TcpClientTransportSession } from './TcpClientTransportSession';
 import { SocketConnectionParams } from '../../domain/model/SocketModels';

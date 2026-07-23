@@ -1,4 +1,3 @@
-import localUnitTest from './LocalUnit.test';
-export default function testsuite() {
-  localUnitTest();
+﻿export default function testsuite() {
+  // Engine unit tests live in common/yo_bluetooth.
 }

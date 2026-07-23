@@ -1,15 +1,15 @@
-{
+﻿{
   "name": "feature_bluetooth",
   "version": "1.0.0",
-  "description": "YoWire Bluetooth feature: classic scan, SPP terminal, BLE scan",
+  "description": "YoWire Bluetooth feature UI: ViewModels and views",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
     "common_core": "file:../../common/core",
     "common_platform": "file:../../common/platform",
-    "common_storage": "file:../../common/storage",
     "youi_kit": "file:../../common/youi_kit",
-    "feature_debug_core": "file:../debug_core"
+    "debug_core": "file:../../common/debug_core",
+    "yo_bluetooth": "file:../../common/yo_bluetooth"
   }
 }

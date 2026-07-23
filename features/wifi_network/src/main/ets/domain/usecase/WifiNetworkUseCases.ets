@@ -1,4 +1,4 @@
-import { Result, ResultError } from 'common_core';
+﻿import { Result, ResultError } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
@@ -10,7 +10,7 @@ import {
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase
-} from 'feature_debug_core';
+} from 'debug_core';
 import { WifiScanLogger } from '../service/WifiScanLogger';
 import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';

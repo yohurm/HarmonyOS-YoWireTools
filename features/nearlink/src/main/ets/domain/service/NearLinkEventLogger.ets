@@ -1,4 +1,4 @@
-import { IdGenerator, TimeUtil } from 'common_core';
+﻿import { IdGenerator, TimeUtil } from 'common_core';
 import {
   DebugEvent,
   Direction,
@@ -7,10 +7,10 @@ import {
   LogRecordType,
   ModuleType,
   ProtocolType
-} from 'feature_debug_core';
+} from 'debug_core';
 
 /**
- * Unified NearLink log pipeline per architecture 04-§8 and nearlink sub-docs.
+ * Unified NearLink log pipeline per architecture 04-搂8 and nearlink sub-docs.
  */
 export class NearLinkEventLogger {
   private static readonly logCapture: LogCaptureService = LogCaptureService.getInstance();

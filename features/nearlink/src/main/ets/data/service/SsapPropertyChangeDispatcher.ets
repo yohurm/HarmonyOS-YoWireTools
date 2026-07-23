@@ -1,5 +1,5 @@
-import { Observable, TimeUtil } from 'common_core';
-import { Direction } from 'feature_debug_core';
+﻿import { Observable, TimeUtil } from 'common_core';
+import { Direction } from 'debug_core';
 import { NearLinkAdvParser } from '../../domain/service/NearLinkAdvParser';
 import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
 import { SsapPropertyNode, SsapServiceNode, SsapServiceTreeSnapshot } from '../../domain/model/SsapServiceTree';
@@ -7,7 +7,7 @@ import { SsapPropertyNotifyPayload } from '../../domain/model/SsapPropertyNotify
 import { SsapPropertySnapshot } from '../../domain/model/SsapPropertySnapshot';
 
 /**
- * Dispatches SSAP propertyChange events per architecture nearlink/02-§4.3.
+ * Dispatches SSAP propertyChange events per architecture nearlink/02-搂4.3.
  */
 export class SsapPropertyChangeDispatcher {
   private readonly notifyObservable: Observable<SsapPropertyNotifyPayload>;

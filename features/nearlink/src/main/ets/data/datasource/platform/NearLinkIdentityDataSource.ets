@@ -1,6 +1,6 @@
-import { IdGenerator, Result } from 'common_core';
+﻿import { IdGenerator, Result } from 'common_core';
 import { DeviceFavoriteRecord, TargetRepository } from 'common_storage';
-import { ModuleType } from 'feature_debug_core';
+import { ModuleType } from 'debug_core';
 import { NearLinkRecentConnection } from '../../../domain/model/NearLinkRecentConnection';
 import { NearLinkDevice } from '../../../domain/model/NearLinkDevice';
 

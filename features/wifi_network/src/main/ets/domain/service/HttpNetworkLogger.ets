@@ -1,4 +1,4 @@
-import { IdGenerator, TimeUtil } from 'common_core';
+﻿import { IdGenerator, TimeUtil } from 'common_core';
 import {
   DebugEvent,
   Direction,
@@ -7,12 +7,12 @@ import {
   LogRecordType,
   ModuleType,
   ProtocolType
-} from 'feature_debug_core';
+} from 'debug_core';
 import { HttpHeaderSanitizer } from './HttpHeaderSanitizer';
 import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';
 
 /**
- * HTTP exchange logger per architecture 03-§7.3.
+ * HTTP exchange logger per architecture 03-搂7.3.
  */
 
 export class HttpNetworkLogger {

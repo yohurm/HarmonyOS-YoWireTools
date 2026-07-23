@@ -1,5 +1,5 @@
-import { TimeUtil } from 'common_core';
-import { CapabilityId } from 'feature_debug_core';
+﻿import { TimeUtil } from 'common_core';
+import { CapabilityId } from 'debug_core';
 import {
   CapabilityRegistry,
   CapabilityResult,
@@ -98,7 +98,7 @@ class NearLinkDataTransferProbe implements ICapabilityProbe {
 }
 
 /**
- * Registers and probes NearLink capabilities per architecture 04-§4.1 and PRD §5.
+ * Registers and probes NearLink capabilities per architecture 04-搂4.1 and PRD 搂5.
  */
 export class NearLinkCapabilityService {
   private static registered: boolean = false;

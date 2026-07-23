@@ -1,4 +1,4 @@
-import { Result, ResultError } from 'common_core';
+﻿import { Result, ResultError } from 'common_core';
 import { IdGenerator } from 'common_core';
 import {
   AppMode,
@@ -12,7 +12,7 @@ import {
   StartSessionUseCase,
   StopSessionUseCase,
   TransportSessionRegistry
-} from 'feature_debug_core';
+} from 'debug_core';
 import { DeviceFavoriteRecord, TargetRepository } from 'common_storage';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 import { MqttClientDataSource } from '../../data/datasource/MqttClientDataSource';

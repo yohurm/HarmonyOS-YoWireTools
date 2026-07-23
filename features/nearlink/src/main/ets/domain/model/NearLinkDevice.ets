@@ -1,4 +1,4 @@
-import { ModuleType, ProtocolType } from 'feature_debug_core';
+﻿import { ModuleType, ProtocolType } from 'debug_core';
 import { NearLinkScanPhase } from './NearLinkScanPhase';
 
 export class NearLinkDevice {

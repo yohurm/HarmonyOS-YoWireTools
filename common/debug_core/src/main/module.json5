@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "debug_core",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

@@ -1,11 +1,11 @@
-import { IdGenerator, TimeUtil } from 'common_core';
+﻿import { IdGenerator, TimeUtil } from 'common_core';
 import {
   DebugEvent,
   ErrorSeverity,
   LogCaptureService,
   LogRecordType,
   ModuleType
-} from 'feature_debug_core';
+} from 'debug_core';
 
 export class WifiScanLogger {
   private static readonly logCapture: LogCaptureService = LogCaptureService.getInstance();

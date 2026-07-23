@@ -1,9 +1,9 @@
-import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
+﻿import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
 import {
   ModuleType,
   ProtocolType,
   TransportState
-} from 'feature_debug_core';
+} from 'debug_core';
 import {
   ITransportSession,
   IncomingPayload,
@@ -11,7 +11,7 @@ import {
   TransportStateSnapshot,
   WriteOptions,
   WriteResult
-} from 'feature_debug_core';
+} from 'debug_core';
 import { dataTransfer } from '@kit.NearLinkKit';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
@@ -20,7 +20,7 @@ import { NearLinkExtendedUseCases } from '../../domain/usecase/NearLinkExtendedU
 import { DataTransferDataSource } from '../datasource/platform/DataTransferDataSource';
 
 /**
- * NearLink dataTransfer transport per architecture 01-§4.1 and nearlink/03.
+ * NearLink dataTransfer transport per architecture 01-搂4.1 and nearlink/03.
  */
 export class NearLinkDataTransferSession implements ITransportSession {
   readonly id: string;

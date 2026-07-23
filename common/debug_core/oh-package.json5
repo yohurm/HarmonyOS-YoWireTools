@@ -1,0 +1,13 @@
+{
+  "name": "debug_core",
+  "version": "1.0.0",
+  "description": "YoWire debug core: session, runtime bus, transport contract, log capture",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "common_core": "file:../core",
+    "common_platform": "file:../platform",
+    "common_storage": "file:../storage"
+  }
+}

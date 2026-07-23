@@ -1,4 +1,4 @@
-import { CommandRepository, CommandTemplateRecord } from 'common_storage';
+﻿import { CommandRepository, CommandTemplateRecord } from 'common_storage';
 import { AbilityContextRegistry } from 'common_platform';
 import { IdGenerator, Result, ResultError } from 'common_core';
 import {
@@ -13,7 +13,7 @@ import {
   StartSessionUseCase,
   StopSessionUseCase,
   TransportSessionRegistry
-} from 'feature_debug_core';
+} from 'debug_core';
 import { MulticastSessionCoordinator } from '../../data/transport/MulticastSessionCoordinator';
 import { MdnsDataSource } from '../../data/datasource/MdnsDataSource';
 import { MulticastSocketDataSource } from '../../data/datasource/MulticastSocketDataSource';

@@ -1,4 +1,4 @@
-import { ProtocolType } from 'feature_debug_core';
+﻿import { ProtocolType } from 'debug_core';
 import { NearLinkEventLogger } from './NearLinkEventLogger';
 
 export class NearLinkScanLogger {

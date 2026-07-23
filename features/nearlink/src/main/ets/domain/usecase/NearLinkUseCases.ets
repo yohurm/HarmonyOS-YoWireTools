@@ -1,4 +1,4 @@
-import { Result, ResultError, Subscription } from 'common_core';
+﻿import { Result, ResultError, Subscription } from 'common_core';
 import {
   AppMode,
   CapabilityId,
@@ -12,7 +12,7 @@ import {
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase
-} from 'feature_debug_core';
+} from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';

@@ -105,7 +105,7 @@ B站APP shortcut 中暴露了显式 Want 参数：
 {
   "targetBundle": "yylx.danmaku.bili",
   "targetClass": "EntryAbility",
-  "targetModule": "entry"
+  "targetModule": "phone"
 }
 ```
 

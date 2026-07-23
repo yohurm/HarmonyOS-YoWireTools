@@ -1,0 +1,14 @@
+{
+  "name": "yo_bluetooth",
+  "version": "1.0.0",
+  "description": "YoBluetooth engine: classic SPP, BLE GATT, scan, identity",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "common_core": "file:../core",
+    "common_platform": "file:../platform",
+    "common_storage": "file:../storage",
+    "debug_core": "file:../debug_core"
+  }
+}
