@@ -15,7 +15,7 @@ import { ClassicDeviceSymbolResolver } from '../util/ClassicDeviceSymbolResolver
  *
  * Layout:
  * [Symbol] | name / MAC | rssi / pair / transport | [Connect]
- * Radius: CardToken.RADIUS_DEVICE_ROW (UiRadius.SMALL / 8vp).
+ * Radius: CardToken.RADIUS (UiRadius.MEDIUM / 16vp).
  */
 @ComponentV2
 export struct ClassicDeviceCard {
@@ -114,7 +114,7 @@ export struct ClassicDeviceCard {
       bottom: CardToken.PADDING_ROW_V
     })
     .backgroundColor(CardToken.BACKGROUND)
-    .borderRadius(CardToken.RADIUS_DEVICE_ROW)
+    .borderRadius(CardToken.RADIUS)
     .shadow(CardToken.SHADOW_COMPACT)
     .accessibilityGroup(true)
     .accessibilityText(this.buildAccessibilityLabel())

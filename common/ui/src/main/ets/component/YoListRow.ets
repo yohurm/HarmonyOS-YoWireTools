@@ -79,7 +79,7 @@ export struct YoListRow {
       bottom: UiSpace.M
     })
     .backgroundColor(this.resolveBackground())
-    .borderRadius(CardToken.RADIUS_SMALL)
+    .borderRadius(CardToken.RADIUS)
     .borderWidth(this.isFocused && !this.disabled ? 2 : 0)
     .borderColor(UiColor.BORDER_FOCUSED)
     .opacity(this.disabled ? UiOpacity.DISABLED_CONTAINER : UiOpacity.ENABLED)

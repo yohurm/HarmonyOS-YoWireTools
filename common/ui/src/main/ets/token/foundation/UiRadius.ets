@@ -19,9 +19,9 @@ export class UiRadius {
   static readonly NONE: number = 0;
   /** 4vp — 标签、角标、状态标识 */
   static readonly XS: number = 4;
-  /** 8vp — 图标、列表内模块、设备行卡片 */
+  /** 8vp — 图标、列表内小模块 */
   static readonly SMALL: number = 8;
-  /** 16vp — 内容卡片、通知容器 */
+  /** 16vp — 内容卡片、设备行卡片、通知容器 */
   static readonly MEDIUM: number = 16;
   /** 20vp — 按钮、菜单 */
   static readonly LARGE: number = 20;

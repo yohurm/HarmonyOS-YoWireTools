@@ -60,7 +60,6 @@ export default function uiTokenContractTest() {
     it('component_radius_tokens', 0, () => {
       expect(ButtonToken.RADIUS).assertEqual(UiRadius.LARGE);
       expect(CardToken.RADIUS).assertEqual(UiRadius.MEDIUM);
-      expect(CardToken.RADIUS_DEVICE_ROW).assertEqual(UiRadius.SMALL);
       expect(ChipToken.RADIUS).assertEqual(UiRadius.LARGE);
       expect(DialogToken.RADIUS).assertEqual(UiRadius.XLARGE);
       expect(MenuToken.RADIUS).assertEqual(UiRadius.LARGE);
