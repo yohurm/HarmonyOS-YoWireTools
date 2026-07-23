@@ -217,6 +217,10 @@ export class ClassicBluetoothDataSource {
 
   async startBluetoothDiscovery(): Promise<Result<void>> {
     try {
+      // Official: do not call start while already discovering; stop first then start.
+      if (connection.isBluetoothDiscovering()) {
+        connection.stopBluetoothDiscovery();
+      }
       connection.startBluetoothDiscovery();
       return Result.ok(undefined);
     } catch (error) {
@@ -227,7 +231,10 @@ export class ClassicBluetoothDataSource {
 
   async stopBluetoothDiscovery(): Promise<Result<void>> {
     try {
-      connection.stopBluetoothDiscovery();
+      // Official: do not call stop when not discovering.
+      if (connection.isBluetoothDiscovering()) {
+        connection.stopBluetoothDiscovery();
+      }
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;

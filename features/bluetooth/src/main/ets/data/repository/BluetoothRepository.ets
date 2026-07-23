@@ -134,7 +134,9 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       device = this.applyFavoriteMeta(device);
       devices.push(device);
     }
-    this.classicMerger.upsertAll(devices);
+    // Architecture bluetooth/01 §3.2: refresh / scan bootstrap replaces the classic list
+    // with paired candidates only (clears stale Inquiry results before rediscovery).
+    this.classicMerger.replaceAll(devices);
     this.publishClassicDevices();
     return Result.ok(this.listClassicDevices());
   }

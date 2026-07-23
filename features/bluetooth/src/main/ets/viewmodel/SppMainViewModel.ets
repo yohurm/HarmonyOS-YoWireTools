@@ -205,28 +205,29 @@ export class SppMainViewModel {
     }
   }
 
+  /**
+   * Refresh scan rail: stop → clear/seed paired → start Inquiry.
+   * Matches architecture bluetooth/01 §3.2–3.3 and official
+   * startBluetoothDiscovery (must stop before the next start).
+   */
   private async refreshScanSegment(): Promise<void> {
     if (!this.ready) {
       this.scanDevices = [];
       return;
     }
+    await this.stopScanIfNeeded();
+    this.scanDevices = [];
     const paired = await this.loadPaired.execute();
     if (paired.success && paired.value !== undefined) {
       this.applyScanDevices(paired.value);
-    }
-    await this.restartClassicScan();
-  }
-
-  private async restartClassicScan(): Promise<void> {
-    if (this.isScanning || this.scanSessionId.length > 0) {
-      await this.stopScan.execute(this.scanSessionId);
-      this.scanSessionId = '';
-      this.isScanning = false;
     }
     const started = await this.startScan.execute();
     if (started.success && started.value !== undefined) {
       this.scanSessionId = started.value;
       this.isScanning = true;
+    } else {
+      this.scanSessionId = '';
+      this.isScanning = false;
     }
   }
 
