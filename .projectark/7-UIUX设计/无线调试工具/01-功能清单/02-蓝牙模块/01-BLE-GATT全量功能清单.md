@@ -491,9 +491,25 @@
 
 ---
 
-## 18. 变更记录
+## 18. 架构重设计缺口回写（2026-07-23）
+
+> 总册见 [`00-蓝牙功能总清单与优先级矩阵.md`](00-蓝牙功能总清单与优先级矩阵.md)。以下为相对当前 `features/bluetooth` 的实现缺口。
+
+| 缺口 | 定稿优先级 | 架构落点 |
+| --- | --- | --- |
+| `BleScanViewModel` 与 `GattBrowserViewModel` 拆分（现 BleMain 过载） | P0 | `viewmodel/ble` · `viewmodel/gatt` |
+| Filter Sheet UX（含 Manufacturer Mask SET-FIL-10） | P0 | `ui/view` + BleScanFilter |
+| GATT 树页 + Log pane + SessionLog 导出 | P0 | `GattBrowserPage` + debug_core |
+| 多 GATT Session UI（应用层上限 4） | **P1**（总册上调，原 APP-04 P2） | Repository sessionId 索引 |
+| 连接前强制 stopBleScan | P0 | ConnectGatt UseCase 硬约束 |
+| CONNECT⋮ / Reliable Write / Parse UUID | P1 | Gatt UseCase 扩展 |
+
+---
+
+## 19. 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-07-03 | 初稿：S-01~S-14、CM/LOG/SET 全 ID、28 Macro tag、PRD/Gap 映射 |
 | 2026-07-03 | 深扩：§13 GATT-OP 全矩阵、§14 CM-01~14、§15 LOG SAVE、§16 Tests 27 tag、§17 Web 证据 |
+| 2026-07-23 | §18 架构重设计缺口回写；多会话上调 P1 |

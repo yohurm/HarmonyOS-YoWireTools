@@ -1,43 +1,49 @@
-# SPP 终端连接、收发与日志设计
+# 02 — SPP 终端连接、收发与日志设计
+
+> **状态**：架构更新（v1.1 · 2026-07-23）  
+> **依赖**：`00-传输类型与双地址身份模型设计.md`、`01-经典蓝牙发现配对与设备身份设计.md`  
+> **官方依据**：`ohos.bluetooth.socket`、FAQ「BLE 虚拟 MAC → 经典连接」、错误码
 
 ## 1. 官方能力边界
 
-依据 WSL `ohos.bluetooth.socket` 官方文档：
+依据 WSL `ohos.bluetooth.socket` 与 connection FAQ：
 
 1. `socket.sppConnect(deviceId, SppOptions, callback)` 创建客户端套接字并连接远端服务。
-2. `SppOptions` 通过 `uuid`、`secure`、`type` 指定服务，首期使用 `SPP_RFCOMM`。
-3. 连接成功后 callback 返回 `clientSocket`，后续读写和关闭都依赖该 socket id。
-4. `socket.sppWrite()` 同步发起写；API 18+ `socket.sppWriteAsync()` 可在异常断连时抛错，适合终端工具。
-5. `socket.on('sppRead')` 和 API 18+ `socket.sppReadAsync()` 不能混用，同一路 socket 只能选一种读取方式。
-6. `sppReadAsync()` 需要业务循环调用，且需等上一次返回后再下一次调用；不及时调用会丢失接收数据。
-7. RFCOMM 接收数据超过 1024 字节会自动分多次接收，每次范围 [1,1024]。
-8. 数据通道空闲 5-7 秒会进入休眠，下一次发送可能多耗时约 500ms；每 3 秒心跳可保活但增加功耗。
-9. `socket.sppCloseClientSocket()` 是关闭客户端连接的正式释放路径。
-10. `socket.getDeviceId(clientSocket)` 获取的是虚拟 MAC；已配对地址相对稳定，蓝牙重启可变化。
+2. **`deviceId` 必须是经典侧地址**（经典虚拟 MAC；API21+/5.1 起亦可真实 MAC）。  
+   **禁止**把 `ble.startBLEScan` 得到的 BLE 虚拟 MAC 直接传入 `sppConnect`。
+3. `SppOptions`：`uuid`（RFCOMM 必选）、`secure`、`type`（首期 `SPP_RFCOMM=0`）；标准 SPP UUID：`00001101-0000-1000-8000-00805F9B34FB`。
+4. 连接成功返回 `clientSocket`；读写与关闭均依赖该 id。
+5. 写：`sppWrite` / API18+ `sppWriteAsync`；FAQ 建议单次 **&lt;600B，不建议 &gt;1024**。
+6. 读：`on('sppRead')` 与 `sppReadAsync` **不可混用**；`sppReadAsync` 需串行循环，否则丢数据。
+7. RFCOMM 接收 &gt;1024 自动分片，每片 [1,1024]。
+8. 空闲 5–7s 可能休眠，下次发送多约 500ms；心跳可保活但增功耗。
+9. 关闭：先 `off('sppRead')`，再 `sppCloseClientSocket`。
+10. `getDeviceId(clientSocket)` 仍为虚拟 MAC。
+11. `connectAllowedProfiles` **永不**用于 SPP。
+12. API20+ 可选 `SPP_L2CAP` / `SPP_L2CAP_BLE` —— 首期不做。
 
 ## 2. 功能范围
 
 首期实现：
 
-1. SPP Client。
-2. UUID 输入与收藏。
-3. secure 开关。
-4. RFCOMM 类型。
-5. 连接、断开、重连。
-6. 文本/hex/base64 发送。
-7. 行结束符。
-8. 周期发送。
-9. 可选心跳。
-10. 原始字节日志。
-11. 文本/hex/混合展示。
-12. 连接状态和错误日志。
+1. SPP Client（仅经典/双模候选）；**单活跃写端** + 多会话摘要列表。
+2. 连接前 `ResolveSppTargetAddressUseCase`（保证 classicDeviceId）。
+3. UUID 输入与收藏；默认标准 SPP UUID。
+4. secure 开关；RFCOMM。
+5. 连接、断开、重连；连接前强制停止 classic discovery。
+6. 文本/hex/base64 发送经 **CommandWriteQueue**；行结束符；周期发送；可选心跳。
+7. 原始字节日志；文本/hex/混合展示；连接状态与错误日志。
+8. 活动连接列表（SessionRuntimeStore 中 `ProtocolType.SPP`）。
 
 暂不实现：
 
-1. SPP Server。
-2. L2CAP 与 L2CAP_BLE。
-3. 业务帧解析。
-4. Channel 直连，除非平台验证存在公开 API。
+1. SPP Server / 并行多 RFCOMM 写端。
+2. L2CAP / L2CAP_BLE。
+3. 业务帧解析插件。
+4. Channel 直连（无公开 API 验证前不做）。
+5. 以 BLE MAC 直连 SPP（违反官方约束）。
+
+> 队列与会话细节见 `05-会话队列与统一后端集成设计.md`。
 
 ## 3. 页面架构
 
@@ -54,14 +60,16 @@
 7. 心跳配置。
 8. 连接前停止扫描开关，默认开启且不可关闭。
 
-连接前校验：
+连接前校验（顺序固定）：
 
-1. `ACCESS_BLUETOOTH`。
-2. 蓝牙开启。
-3. 设备地址存在。
+1. `ACCESS_BLUETOOTH` + 蓝牙开启。
+2. `ResolveSppTargetAddressUseCase` 成功拿到 `classicDeviceId`。  
+   - 失败：`YW-BT-1302`（LE-only）/ `YW-BT-1303`（BLE 地址）/ `YW-BT-1304`（桥接未完成）。
+3. `transport ∈ {BR_EDR, DUAL}`（UNKNOWN 仅在用户确认风险后可尝试，默认拒绝）。
 4. UUID 格式合法。
-5. 若 classic discovery 正在运行，先 stop。
-6. 若设备未配对，提示先配对或继续尝试。
+5. classic discovery 若在运行 → 强制 stop。
+6. 未配对 → PairingGuide；双模仅有 bleDeviceId → 走 `BridgeBleToClassicPairUseCase`。
+7. 禁止调用 `connectAllowedProfiles`。
 
 ### 3.2 SppTerminalPage
 
@@ -87,16 +95,19 @@ UI 约束：
 ```mermaid
 sequenceDiagram
   participant VM as SppConnectViewModel
+  participant Resolve as ResolveSppTargetAddressUseCase
   participant UC as ConnectSppUseCase
-  participant Scan as ClassicScanUseCase
+  participant Scan as StopClassicScanUseCase
   participant DS as SppSocketDataSource
   participant RT as SessionRuntimeStore
   participant LOG as LogCaptureService
 
-  VM->>UC: connect(params)
+  VM->>Resolve: resolve(device)
+  Resolve-->>VM: classicDeviceId
+  VM->>UC: connect(classicDeviceId, options)
   UC->>Scan: stop if discovering
-  UC->>RT: create connection session
-  UC->>DS: sppConnect(deviceId, options)
+  UC->>RT: create CONNECTION session ProtocolType.SPP
+  UC->>DS: sppConnect(classicDeviceId, options)
   DS-->>UC: clientSocket
   UC->>DS: startReadLoop(clientSocket)
   UC->>RT: connected
@@ -176,7 +187,9 @@ stateDiagram-v2
 
 ```text
 SppConnectionParams
-  targetDeviceId: string
+  classicDeviceId: string          # 仅经典虚拟/真实 MAC；禁止 BLE MAC
+  bleDeviceId?: string             # 可选，仅用于展示双模关联
+  transport: BR_EDR | DUAL         # 连接前已校验
   targetDisplayName: string
   uuid: string
   uuidSource: standard | favorite | manual | history
@@ -187,6 +200,8 @@ SppConnectionParams
   reconnectPolicy: ReconnectPolicy
   heartbeat?: SppHeartbeatConfig
 ```
+
+字段约束：`classicDeviceId` 由 `ResolveSppTargetAddressUseCase` 产出；UI/上层不得把扫描轨 BLE 地址直接填入。
 
 ### 6.2 SppRuntimeState
 

@@ -401,9 +401,27 @@
 
 ---
 
-## 16. 变更记录
+## 16. 架构缝约定（2026-07-23）
+
+> 总册见 [`00-蓝牙功能总清单与优先级矩阵.md`](00-蓝牙功能总清单与优先级矩阵.md)。  
+> **v1 不实现**本分册能力；仅在架构中预留：
+
+| 缝 | 目录/类型预留 | 说明 |
+| --- | --- | --- |
+| Advertiser | `ui/lab/` + `BluetoothSessionKind.ADVERTISER` | Kit `ble` 广播 API 可用，入口专家门控 |
+| GATT Server | `ui/lab/` + SessionKind | `createGattServer` 预留 |
+| DFU | 文档引用 Nordic；无 in-app 引擎 | P3 |
+| Macros 28-tag | 可挂 GattOperationQueue 步骤编排 | P3；P1 仅单命令收藏 |
+| Automated Tests | 无 in-app UI | P3 |
+
+`features/bluetooth/Index.ets` **不导出**实验室实现符号，避免误用。
+
+---
+
+## 17. 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-07-03 | 初稿：Advertiser/GATT Server/DFU/Macros 28/Tests 27 全 ID 与 P2/P3 分级 |
 | 2026-07-03 | 深扩：§12 DFU Nordic URL、§13 Macros 28 FULL、§14 ADV、§15 GSRV 扩展 |
+| 2026-07-23 | §16 架构缝约定：v1 不实现、目录预留 |

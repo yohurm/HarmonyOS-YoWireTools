@@ -1,20 +1,26 @@
-# BLE 扫描、GATT 与串口预设设计
+# 03 — BLE 扫描、GATT 与串口预设设计
+
+> **状态**：架构更新（v1.1 · 2026-07-23）  
+> **依赖**：`00-传输类型与双地址身份模型设计.md`  
+> **官方依据**：`ohos.bluetooth.ble`、GATT Client 指南、FAQ（同名设备 / BLE→经典桥接）
 
 ## 1. 官方能力边界
 
 依据 WSL BLE 官方文档：
 
 1. BLE 扫描需要 `ACCESS_BLUETOOTH`。
-2. API 15+ 推荐 `ble.createBleScanner()` 创建扫描实例，支持应用管理多路扫描。
-3. API 14 及以前 `ble.startBLEScan()` 只支持单路扫描，再次扫描前必须停止上一路。
-4. 扫描过滤支持 manufacturer id、manufacturer data、mask。
-5. `filters` 传 null 会扫描所有可发现 BLE 设备，但官方不建议，可能增加功耗并扫到非预期设备。
-6. BLE 广播报文长度通常受 31 字节限制；携带设备名可能导致广播启动失败。扫描端也不能假设设备名完整。
-7. GATT Client 必须先 `createGattClientDevice(deviceId)`。
-8. 连接状态通过 `BLEConnectionStateChange` 获取。
-9. 连接完成后需要 `getServices()` 服务发现，后续 read/write/notify 必须基于服务发现结果。
-10. Notify/Indicate 必须先订阅 `BLECharacteristicChange`，再调用 `setCharacteristicChangeNotification` 或 `setCharacteristicChangeIndication`。
-11. GATT Client 不再使用时必须 `disconnect()`，若实例不再使用必须 `close()`。
+2. API 15+ 推荐 `ble.createBleScanner()` 多路扫描；旧 `startBLEScan` 单路，再次扫描前必须 stop。
+3. `ScanFilter` 可按 name / service UUID / manufacturer /（API23+）address+类型 / rssiThreshold 等过滤；经典 Inquiry **无**等价过滤。
+4. `filters` 传 null 会扫全量，官方不建议（功耗与噪声）。
+5. 广播报文传统上限约 31 字节；设备名可能缺失或不完整。
+6. GATT：`createGattClientDevice(deviceId)` → `connect` → `getServices` → 串行 R/W/Notify；写长度受 **MTU−3** 限制。
+7. Notify/Indicate 必须先订阅变化事件再 `setCharacteristicChangeNotification/Indication`。
+8. 不用时 `disconnect()`；实例废弃必须 `close()`。
+9. **地址约束**：BLE 扫描得到的是 `bleDeviceId`（虚拟 MAC）。  
+   - GATT 只用 `bleDeviceId`。  
+   - **禁止**将该地址直接 `sppConnect`。  
+   - 双模若需 SPP：走文档 00 的 BLE→Classic 桥接后使用 `classicDeviceId`。
+10. 列表轨：`listRail=BLE_SCAN`；`transport` 初值可为 LE，桥接成功后升为 DUAL 并回写双地址。
 
 ## 2. 功能拆分
 

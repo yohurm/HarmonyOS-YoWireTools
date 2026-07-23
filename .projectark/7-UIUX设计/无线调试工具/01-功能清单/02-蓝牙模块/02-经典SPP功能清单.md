@@ -365,9 +365,27 @@ YoWire 映射：**更多·权限与后台** 全局默认 + **蓝牙 ⚙·连接*
 
 ---
 
-## 14. 变更记录
+## 14. 架构重设计缺口回写（2026-07-23）
+
+> 总册见 [`00-蓝牙功能总清单与优先级矩阵.md`](00-蓝牙功能总清单与优先级矩阵.md)。
+
+| 缺口 | 定稿优先级 | 架构落点 |
+| --- | --- | --- |
+| 连接模型：**单活跃写端** + 多会话摘要列表 | P0 | `05-会话队列` · SppTransportSession |
+| 独立 `SppTerminalPage` / `SppTerminalViewModel` | P0 | `ui/page` · `viewmodel/spp` |
+| Connect Sheet（UUID/自定义 UUID/配对引导） | P0 | `ui/view` |
+| 发送经 **CommandWriteQueue**（非直调 sppWrite） | P0 | `domain/service/queue` |
+| HEX / Newline / Clear / SessionLog 终端闭环 | P0 | 终端 VM + debug_core |
+| 连接前强制 stopClassicScan | P0 | ConnectSpp UseCase |
+| 返回保持 Dialog、自动重连 UX | P1 | Settings + ReconnectCoordinator |
+| 命令收藏 / 周期发送 | P1 | command UseCase + ⚙ |
+
+---
+
+## 15. 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-07-03 | 初稿：B-SPP-01~N-04 全 ID、双路径流程、PRD/Gap 映射 |
 | 2026-07-03 | 深扩：§10 SPP-01~29 源码对照、§11 YoWire 增值、§12 Web 证据、§13 追溯矩阵 |
+| 2026-07-23 | §14 架构重设计缺口：单活跃写、终端拆分、TX 队列 |

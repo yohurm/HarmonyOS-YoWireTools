@@ -258,12 +258,30 @@
 
 ---
 
-## 13. 变更记录
+## 13. 架构重设计缺口回写（2026-07-23）
+
+> 总册见 [`00-蓝牙功能总清单与优先级矩阵.md`](00-蓝牙功能总清单与优先级矩阵.md)。
+
+| 缺口 | 定稿优先级 | 架构落点 |
+| --- | --- | --- |
+| **独立 L1 入口** `UartMainPage`（首页三路径并列） | P0 | `ui/page` · BluetoothFeaturePage |
+| `SerialProfileMatcher` 服务（Nordic P0；其余 P1） | P0 | `domain/service/uart` |
+| 四步+阶段条 UI（B-UART-C-*） | P0 | `UartMainViewModel` |
+| 失败 → **改用 GATT** 跳转契约（禁止页内复刻 GATT 树） | P0 | navigation + Event |
+| 终端同构 SPP + 复用 CommandWriteQueue / GattTransport | P0 | queue + transport |
+| MTU / payloadSize=mtu-3 顶栏展示 | P0 | VM Trace |
+| 四 Profile（TI/Microchip/Telit） | P1 | matcher 扩展 |
+| 自定义 Profile | P2 | ⚙·BLE 连接 |
+
+---
+
+## 14. 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-07-03 | 初稿：Profile/MTU/阶段 B-UART-* 全 ID、双流程、PRD 映射 |
 | 2026-07-03 | **v2**：§5 终端 15 项 · N/MATCH/840 专节 · C 工具栏 · `07/04` 链 |
+| 2026-07-23 | §13 架构缺口：独立页、ProfileMatcher、失败跳转 GATT |
 
 ---
 

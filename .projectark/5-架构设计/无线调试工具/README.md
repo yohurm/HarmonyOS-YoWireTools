@@ -11,7 +11,7 @@
 2. `01-公共底座架构设计.md`
    - 统一会话、日志、命令面板、权限、后台任务、能力探测、错误码、观测性、存储与导出。
 3. `02-蓝牙模块架构设计.md`
-   - 经典蓝牙 SPP、BLE GATT、扫描、配对、设备身份、MTU/分片、自动重连、蓝牙模块验证清单。
+   - 经典蓝牙 SPP、BLE GATT、传输类型/双地址底座、扫描配对、MTU/分片、自动重连与验证清单。
 4. `03-WiFi与网络模块架构设计.md`
    - WiFi 环境分析、网络诊断、Socket/TCP/UDP、HTTP、WebSocket、MQTT、LAN 发现与端口扫描。
 5. `04-星闪模块架构设计.md`
@@ -23,14 +23,16 @@
 
 ### Bluetooth
 
-目录：`bluetooth/`
+目录：`bluetooth/`（建议先读 `00`）
 
-1. `bluetooth/01-经典蓝牙发现配对与设备身份设计.md`
-   - 经典蓝牙扫描、已配对设备、配对状态、虚拟地址、收藏与最近设备。
-2. `bluetooth/02-SPP终端连接收发与日志设计.md`
-   - SPP/RFCOMM Client、`sppReadAsync`/`sppRead` 选择、byte stream 日志、自动重连、保活与功耗。
-3. `bluetooth/03-BLE扫描GATT与串口预设设计.md`
-   - BLE 多路/单路扫描、广播解析、GATT 服务树、读写、Notify/Indicate、MTU 与 BLE 串口预设。
+1. `bluetooth/00-传输类型与双地址身份模型设计.md`
+   - `getRemoteDeviceTransport`（BR_EDR/LE/DUAL）、classic/ble 双地址、SPP 非 LE 白名单、BLE→Classic 桥接。
+2. `bluetooth/01-经典蓝牙发现配对与设备身份设计.md`
+   - Inquiry、已配对经典候选、配对状态、CoD 与 transport 分字段、收藏与最近设备。
+3. `bluetooth/02-SPP终端连接收发与日志设计.md`
+   - 仅经典地址 `sppConnect`、RFCOMM 收发、byte stream 日志、重连与保活。
+4. `bluetooth/03-BLE扫描GATT与串口预设设计.md`
+   - BLE 多路/单路扫描、广播解析、GATT 服务树、读写、Notify/Indicate、MTU 与串口预设。
 
 ### WiFi And Network
 
