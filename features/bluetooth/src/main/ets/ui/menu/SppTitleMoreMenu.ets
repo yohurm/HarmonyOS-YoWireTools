@@ -3,6 +3,11 @@ import { YoMenuToken } from 'youi_kit';
 
 export const SPP_TITLE_MORE_MENU_ID: string = 'spp_title_more_menu';
 
+export class SppTitleMoreMenuParams {
+  onOpenSettings: () => void = () => {
+  };
+}
+
 /**
  * System Menu for HdsNavigation more icon (PromptAction.openMenu).
  *
@@ -11,9 +16,12 @@ export const SPP_TITLE_MORE_MENU_ID: string = 'spp_title_more_menu';
  * Unset → ~2-grid default, content may grow; constraintSize caps compact menus.
  */
 @Builder
-export function buildSppTitleMoreMenu() {
+export function buildSppTitleMoreMenu(params: SppTitleMoreMenuParams) {
   Menu() {
     MenuItem({ content: $r('app.string.bt_action_open_settings') })
+      .onClick(() => {
+        params.onOpenSettings();
+      })
   }
   .radius(YoMenuToken.RADIUS)
   .constraintSize({
@@ -30,9 +38,16 @@ export function buildSppTitleMoreMenu() {
  * Opens the title-bar more dropdown anchored to HdsNavigation componentId.
  * Official path: HdsNavigationIconOptions.componentId + promptAction.openMenu.
  */
-export function openSppTitleMoreMenu(uiContext: UIContext, targetComponentId: string): void {
-  const contentNode: ComponentContent<Object> =
-    new ComponentContent(uiContext, wrapBuilder(buildSppTitleMoreMenu));
+export function openSppTitleMoreMenu(
+  uiContext: UIContext,
+  targetComponentId: string,
+  onOpenSettings: () => void = () => {
+  }
+): void {
+  const params = new SppTitleMoreMenuParams();
+  params.onOpenSettings = onOpenSettings;
+  const contentNode: ComponentContent<SppTitleMoreMenuParams> =
+    new ComponentContent(uiContext, wrapBuilder(buildSppTitleMoreMenu), params);
   try {
     void uiContext.getPromptAction().openMenu(
       contentNode,

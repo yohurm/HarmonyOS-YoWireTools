@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from '@ohos/hypium';
+import { describe, it, expect } from '@ohos/hypium';
 import { BleManufacturerMaskMatcher } from '../main/ets/domain/service/BleManufacturerMaskMatcher';
 import { GattWriteChunker } from '../main/ets/domain/service/GattWriteChunker';
 import { ReconnectPolicy } from '../main/ets/domain/model/ReconnectPolicy';
@@ -6,6 +6,12 @@ import { GattPlatformMapper } from '../main/ets/data/mapper/GattPlatformMapper';
 import { BleAdvertisingPlatformMapper } from '../main/ets/data/mapper/BleAdvertisingPlatformMapper';
 import { BleAdStructureParser } from '../main/ets/domain/service/BleAdStructureParser';
 import { DeviceNameSource } from '../main/ets/domain/model/BleAdvertisingPacket';
+import { ScanResultMerger } from '../main/ets/domain/service/ScanResultMerger';
+import { ClassicScanVisibilityPolicy } from '../main/ets/domain/service/ClassicScanVisibilityPolicy';
+import { ClassicDeviceMajorFilter, ClassicScanFilter } from '../main/ets/domain/model/ClassicScanFilter';
+import { BluetoothDevice, BluetoothDeviceDraft } from '../main/ets/domain/model/BluetoothDevice';
+import { DiscoverySource } from '../main/ets/domain/model/DiscoverySource';
+import { BluetoothListRail, BluetoothTransportType } from '../main/ets/domain/model/BluetoothTransportType';
 import { PayloadTextCodec } from 'debug_core';
 import { PayloadEncoding } from 'debug_core';
 import { DebugLogRecord, Direction, DisplayHint, LogRecordType, ModuleType, ProtocolType } from 'debug_core';
@@ -97,5 +103,89 @@ export default function localUnitTest() {
       expect(record.summary).assertEqual('010203');
       expect(record.payloadSize).assertEqual(3);
     });
+
+    it('ScanResultMerger_filters_name_rssi_major', 0, () => {
+      const merger = new ScanResultMerger();
+      merger.replaceAll([
+        makeClassicDevice('Speaker X', '11:11:11:11:11:11', -45, ClassicDeviceMajorFilter.AUDIO_VIDEO as number),
+        makeClassicDevice('Phone Y', '22:22:22:22:22:22', -90, ClassicDeviceMajorFilter.PHONE as number),
+        makeClassicDevice('Speaker Far', '33:33:33:33:33:33', -95, ClassicDeviceMajorFilter.AUDIO_VIDEO as number)
+      ]);
+      const filtered = merger.filter(new ClassicScanFilter(
+        'Speaker',
+        '',
+        -70,
+        ClassicDeviceMajorFilter.AUDIO_VIDEO
+      ));
+      expect(filtered.length).assertEqual(1);
+      expect(filtered[0].classicDeviceId).assertEqual('11:11:11:11:11:11');
+      expect(new ClassicScanFilter('a', '', -70).hasActiveConstraints()).assertTrue();
+      expect(ClassicScanFilter.empty().hasActiveConstraints()).assertFalse();
+    });
+
+    it('ClassicScanVisibilityPolicy_hides_silent_paired_only', 0, () => {
+      const pairedOnly = makeClassicDevice(
+        'Paired Silent',
+        'AA:AA:AA:AA:AA:AA',
+        0,
+        ClassicDeviceMajorFilter.PHONE as number,
+        DiscoverySource.PAIRED,
+        true
+      );
+      const live = makeClassicDevice(
+        'Live Speaker',
+        'BB:BB:BB:BB:BB:BB',
+        -55,
+        ClassicDeviceMajorFilter.AUDIO_VIDEO as number,
+        DiscoverySource.DISCOVERY_RESULT,
+        false
+      );
+      const activeAddresses = new Set<string>();
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(pairedOnly, activeAddresses)).assertFalse();
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(live, activeAddresses)).assertTrue();
+    });
+
+    it('ClassicScanVisibilityPolicy_keeps_active_session_without_broadcast', 0, () => {
+      const pairedOnly = makeClassicDevice(
+        'Connecting',
+        'CC:CC:CC:CC:CC:CC',
+        0,
+        ClassicDeviceMajorFilter.PHONE as number,
+        DiscoverySource.PAIRED,
+        true
+      );
+      const activeAddresses = new Set<string>(['CC:CC:CC:CC:CC:CC']);
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(pairedOnly, activeAddresses)).assertTrue();
+    });
+
+    it('ScanResultMerger_excludes_rssi_zero_without_active_session', 0, () => {
+      const merger = new ScanResultMerger();
+      merger.replaceAll([
+        makeClassicDevice('Silent', '44:44:44:44:44:44', 0, ClassicDeviceMajorFilter.PHONE as number)
+      ]);
+      const filtered = merger.filter(new ClassicScanFilter('', '', -70), new Set());
+      expect(filtered.length).assertEqual(0);
+    });
   });
+}
+
+function makeClassicDevice(
+  name: string,
+  address: string,
+  rssi: number,
+  majorClass: number,
+  discoverySource: DiscoverySource = DiscoverySource.DISCOVERY_RESULT,
+  paired: boolean = false
+): BluetoothDevice {
+  const draft = new BluetoothDeviceDraft();
+  draft.primaryDeviceId = address;
+  draft.classicDeviceId = address;
+  draft.displayName = name;
+  draft.rssi = rssi;
+  draft.majorClass = majorClass;
+  draft.transport = BluetoothTransportType.BR_EDR;
+  draft.listRail = BluetoothListRail.CLASSIC_SCAN;
+  draft.discoverySource = discoverySource;
+  draft.paired = paired;
+  return new BluetoothDevice(draft);
 }

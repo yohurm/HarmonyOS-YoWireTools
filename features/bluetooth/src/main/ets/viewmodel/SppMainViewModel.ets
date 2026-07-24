@@ -1,4 +1,4 @@
-﻿import { Subscription } from 'common_core';
+import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
@@ -9,6 +9,8 @@ import {
   BluetoothDevice,
   BluetoothRepository,
   BluetoothTransportType,
+  ClassicDeviceMajorFilter,
+  ClassicScanFilter,
   ClassicScanPhase,
   ListActiveSppSessionsUseCase,
   LoadBluetoothOverviewSnapshotUseCase,
@@ -90,6 +92,13 @@ export class SppMainViewModel {
   @Trace isScanning: boolean = false;
   @Trace emptyTitle: ResourceStr = $r('app.string.bt_spp_empty_scan_title');
   @Trace emptyMessage: ResourceStr = $r('app.string.bt_spp_empty_scan_message');
+  /** Scan-only: filter panel expanded under the segment control. */
+  @Trace filterPanelExpanded: boolean = false;
+  @Trace filterName: string = '';
+  @Trace filterAddress: string = '';
+  @Trace filterMinRssi: number = ClassicScanFilter.RSSI_DEFAULT;
+  @Trace filterMajor: ClassicDeviceMajorFilter = ClassicDeviceMajorFilter.ALL;
+  @Trace filterActive: boolean = false;
 
   private readonly loadOverview: LoadBluetoothOverviewSnapshotUseCase;
   private readonly loadPaired: LoadPairedClassicDevicesUseCase;
@@ -148,6 +157,8 @@ export class SppMainViewModel {
       this.scanRemainingSubscription.dispose();
       this.scanRemainingSubscription = undefined;
     }
+    this.filterPanelExpanded = false;
+    this.repository.setClassicDeviceFilter(ClassicScanFilter.empty());
     await this.stopScanIfNeeded();
   }
 
@@ -169,10 +180,47 @@ export class SppMainViewModel {
     }
     this.selectedSegment = segment;
     this.selectedIndex = segment === SppSegmentTab.ACTIVE ? 1 : 0;
-    this.updateEmptyState();
     if (segment === SppSegmentTab.ACTIVE) {
+      this.filterPanelExpanded = false;
       this.refreshActiveSessions();
     }
+    this.updateEmptyState();
+  }
+
+  toggleFilterPanel(): void {
+    if (this.selectedSegment !== SppSegmentTab.SCAN) {
+      this.filterPanelExpanded = false;
+      return;
+    }
+    this.filterPanelExpanded = !this.filterPanelExpanded;
+  }
+
+  setFilterName(name: string): void {
+    this.filterName = name;
+    this.commitScanFilter();
+  }
+
+  setFilterAddress(address: string): void {
+    this.filterAddress = address;
+    this.commitScanFilter();
+  }
+
+  setFilterMinRssi(minRssi: number): void {
+    this.filterMinRssi = minRssi;
+    this.commitScanFilter();
+  }
+
+  setFilterMajor(major: ClassicDeviceMajorFilter): void {
+    this.filterMajor = major;
+    this.commitScanFilter();
+  }
+
+  resetScanFilter(): void {
+    this.filterName = '';
+    this.filterAddress = '';
+    this.filterMinRssi = ClassicScanFilter.RSSI_DEFAULT;
+    this.filterMajor = ClassicDeviceMajorFilter.ALL;
+    this.commitScanFilter();
   }
 
   async refresh(showLoading: boolean = false): Promise<void> {
@@ -204,9 +252,8 @@ export class SppMainViewModel {
   }
 
   /**
-   * Refresh scan rail: stop 鈫?clear/seed paired 鈫?start Inquiry.
-   * Matches architecture bluetooth/01 搂3.2鈥?.3 and official
-   * startBluetoothDiscovery (must stop before the next start).
+   * Refresh scan rail: stop → clear live list → start Inquiry.
+   * Paired cache refreshes inside startClassicDiscovery; scan list不再预置静默配对项。
    */
   private async refreshScanSegment(): Promise<void> {
     if (!this.ready) {
@@ -215,10 +262,6 @@ export class SppMainViewModel {
     }
     await this.stopScanIfNeeded();
     this.scanDevices = [];
-    const paired = await this.loadPaired.execute();
-    if (paired.success && paired.value !== undefined) {
-      this.applyScanDevices(paired.value);
-    }
     const started = await this.startScan.execute();
     if (started.success && started.value !== undefined) {
       this.scanSessionId = started.value;
@@ -286,7 +329,7 @@ export class SppMainViewModel {
 
   private formatRssi(rssi: number): string {
     if (rssi === 0) {
-      return '';
+      return '--';
     }
     return `${rssi} dBm`;
   }
@@ -320,7 +363,25 @@ export class SppMainViewModel {
       this.emptyMessage = $r('app.string.bt_spp_empty_scanning_message');
       return;
     }
+    if (this.filterActive && this.scanDevices.length === 0) {
+      this.emptyTitle = $r('app.string.bt_spp_empty_filter_title');
+      this.emptyMessage = $r('app.string.bt_spp_empty_filter_message');
+      return;
+    }
     this.emptyTitle = $r('app.string.bt_spp_empty_scan_title');
     this.emptyMessage = $r('app.string.bt_spp_empty_scan_message');
+  }
+
+  private commitScanFilter(): void {
+    const filter = new ClassicScanFilter(
+      this.filterName,
+      this.filterAddress,
+      this.filterMinRssi,
+      this.filterMajor,
+      false,
+      false
+    );
+    this.filterActive = filter.hasActiveConstraints();
+    this.repository.setClassicDeviceFilter(filter);
   }
 }

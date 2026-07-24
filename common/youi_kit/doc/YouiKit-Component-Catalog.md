@@ -14,6 +14,7 @@
 | `YoImmersiveSurface` | 自研 | 沉浸表面 |
 | `YoEmpty` / `EmptyStateView` | 自研反馈 | 空态（迁移期保留旧名导出至收敛） |
 | `ErrorStateView` / `LoadingStateView` / `PermissionDeniedView` | 自研反馈 | 状态视图 |
+| `YoToast` | 自研反馈 | 命令式轻提示；默认居中；`openCustomDialog` 自定义样式 |
 | `ContentStateHost` | 自研 | 页面状态宿主 |
 | `ModeEntryCard` | 自研容器 | 模式入口卡 |
 | `StatusPillView` | 自研 | 状态胶囊 |

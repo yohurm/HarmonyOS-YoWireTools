@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from '@ohos/hypium';
+import { describe, it, expect } from '@ohos/hypium';
 import { WindowWidthBreakpointUtil } from 'common_platform';
 import { YoRadius } from '../main/ets/token/foundation/YoRadius';
 import { YoSpace } from '../main/ets/token/foundation/YoSpace';
@@ -15,6 +15,7 @@ import { YoListToken } from '../main/ets/token/component/YoListToken';
 import { YoMenuToken } from '../main/ets/token/component/YoMenuToken';
 import { YoNavigationToken } from '../main/ets/token/component/YoNavigationToken';
 import { YoSegmentToken } from '../main/ets/token/component/YoSegmentToken';
+import { YoToastToken } from '../main/ets/token/component/YoToastToken';
 import { YoStroke } from '../main/ets/token/foundation/YoStroke';
 
 export default function uiTokenContractTest() {
@@ -61,12 +62,18 @@ export default function uiTokenContractTest() {
       expect(YoChipToken.RADIUS).assertEqual(YoRadius.LARGE);
       expect(YoDialogToken.RADIUS).assertEqual(YoRadius.XLARGE);
       expect(YoMenuToken.RADIUS).assertEqual(YoRadius.LARGE);
+      expect(YoToastToken.CORNER_RADIUS).assertEqual(12);
+      expect(YoToastToken.DURATION_SHORT_MS).assertEqual(2000);
+      expect(YoToastToken.DURATION_LONG_MS).assertEqual(3500);
+      expect(YoToastToken.MAX_WIDTH).assertEqual(280);
     });
 
     it('list_and_menu_layout_tokens', 0, () => {
       expect(YoListToken.SCROLLBAR_WIDTH).assertEqual(4);
-      expect(YoListToken.ITEM_GAP).assertEqual(YoSpace.XXS);
+      expect(YoListToken.ITEM_GAP).assertEqual(YoSpace.NONE);
       expect(YoListToken.ITEM_SHADOW_BLEED).assertEqual(YoSpace.XXS);
+      expect(YoListToken.DIVIDER_STROKE).assertEqual(0.5);
+      expect(YoListToken.DIVIDER_INSET_LEADING).assertEqual(YoSpace.L + YoSize.ICON_M + YoSpace.L);
       expect(YoMenuToken.MIN_WIDTH).assertEqual(64);
       expect(YoMenuToken.COMPACT_MAX_WIDTH < 224).assertTrue();
       expect(YoResponsive.SECTION_GAP).assertEqual(YoSpace.XL);

@@ -107,6 +107,12 @@ export class BluetoothDevice {
     return this.displayName;
   }
 
+  /** 是否来自 Inquiry / discovery 回调（非仅配对缓存 seed）。 */
+  hasLiveDiscoverySignal(): boolean {
+    return this.discoverySource === DiscoverySource.DISCOVERY_RESULT ||
+      this.discoverySource === DiscoverySource.DEVICE_FIND;
+  }
+
   toDraft(): BluetoothDeviceDraft {
     const draft = new BluetoothDeviceDraft();
     draft.identityId = this.identityId;

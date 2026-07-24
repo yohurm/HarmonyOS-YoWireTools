@@ -38,7 +38,6 @@ export class StartClassicScanUseCase {
     if (!ready.success) {
       return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.PERMISSION_DENIED, 'Not ready'));
     }
-    await this.repository.loadPairedClassicCandidates();
     const input = new CreateSessionInput(
       SessionType.SCAN,
       ModuleType.BLUETOOTH,

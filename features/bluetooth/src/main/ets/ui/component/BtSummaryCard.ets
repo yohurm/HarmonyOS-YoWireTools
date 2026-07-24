@@ -37,7 +37,7 @@ export struct BtSummaryCard {
       .width('100%')
     }
     .width('100%')
-    .padding(YoCardToken.PADDING)
+    .padding(YoCardToken.PADDING_COMPACT)
     .backgroundColor(YoCardToken.BACKGROUND)
     .borderRadius(YoCardToken.RADIUS)
   }

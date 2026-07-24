@@ -125,6 +125,90 @@
       "value": "刷新"
     },
     {
+      "name": "bt_spp_action_filter",
+      "value": "筛选"
+    },
+    {
+      "name": "bt_spp_filter_name_label",
+      "value": "设备名称"
+    },
+    {
+      "name": "bt_spp_filter_name_placeholder",
+      "value": "输入名称关键字"
+    },
+    {
+      "name": "bt_spp_filter_mac_label",
+      "value": "MAC 地址"
+    },
+    {
+      "name": "bt_spp_filter_mac_placeholder",
+      "value": "如 AA:BB:CC"
+    },
+    {
+      "name": "bt_spp_filter_rssi_label",
+      "value": "最小信号强度"
+    },
+    {
+      "name": "bt_spp_filter_rssi_weak",
+      "value": "弱"
+    },
+    {
+      "name": "bt_spp_filter_rssi_strong",
+      "value": "强"
+    },
+    {
+      "name": "bt_spp_filter_type_label",
+      "value": "设备类型"
+    },
+    {
+      "name": "bt_spp_filter_type_all",
+      "value": "全部"
+    },
+    {
+      "name": "bt_spp_filter_type_audio",
+      "value": "音频 / 视频"
+    },
+    {
+      "name": "bt_spp_filter_type_phone",
+      "value": "手机"
+    },
+    {
+      "name": "bt_spp_filter_type_computer",
+      "value": "电脑"
+    },
+    {
+      "name": "bt_spp_filter_type_peripheral",
+      "value": "外设"
+    },
+    {
+      "name": "bt_spp_filter_type_wearable",
+      "value": "可穿戴"
+    },
+    {
+      "name": "bt_spp_filter_type_imaging",
+      "value": "影像"
+    },
+    {
+      "name": "bt_spp_filter_type_health",
+      "value": "健康"
+    },
+    {
+      "name": "bt_spp_filter_type_other",
+      "value": "其他"
+    },
+    {
+      "name": "bt_spp_filter_reset",
+      "value": "重置"
+    },
+    {
+      "name": "bt_spp_empty_filter_title",
+      "value": "无匹配设备"
+    },
+    {
+      "name": "bt_spp_empty_filter_message",
+      "value": "当前筛选条件下没有设备，试试放宽条件或重置"
+    },
+    {
       "name": "bt_spp_action_connect",
       "value": "连接"
     },
@@ -134,7 +218,7 @@
     },
     {
       "name": "bt_spp_status_needs_bridge",
-      "value": "需配对获取经典地址"
+      "value": "需桥接"
     },
     {
       "name": "bt_transport_classic",

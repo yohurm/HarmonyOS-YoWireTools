@@ -11,7 +11,8 @@ import {
   openSppTitleMoreMenu,
   SPP_TITLE_MORE_MENU_ID,
   SppMainContentView,
-  SppMainViewModel
+  SppMainViewModel,
+  SppSegmentTab
 } from 'feature_bluetooth';
 
 /**
@@ -22,11 +23,9 @@ export struct SppMainPage {
   @Event onBack: () => void = () => {
   };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
-  @Local private titleMenus: YoTitleBarMenuItem[] = [];
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
   aboutToAppear(): void {
-    this.titleMenus = this.buildTitleMenus();
     void this.vm.onPageAppear();
   }
 
@@ -64,32 +63,48 @@ export struct SppMainPage {
       scrollable: false,
       contentEdgeToEdge: true,
       immersiveTitleBar: true,
-      titleBarMenus: this.titleMenus,
+      titleBarMenus: this.buildTitleMenus(),
       onBack: this.onBack,
       content: this.pageContent
     })
   }
 
+  /**
+   * Filter icon is scan-rail only (left of refresh).
+   * Rebuilt when selectedSegment / filterPanelExpanded changes via @Trace.
+   */
   private buildTitleMenus(): YoTitleBarMenuItem[] {
-    return [
-      new YoTitleBarMenuItem(
-        'refresh',
-        $r('sys.symbol.arrow_clockwise'),
-        $r('app.string.bt_spp_action_refresh'),
+    const menus: YoTitleBarMenuItem[] = [];
+    if (this.vm.selectedSegment === SppSegmentTab.SCAN) {
+      menus.push(new YoTitleBarMenuItem(
+        'filter',
+        $r('sys.symbol.funnel'),
+        $r('app.string.bt_spp_action_filter'),
         () => {
-          void this.vm.refresh(false);
+          this.vm.toggleFilterPanel();
         }
-      ),
-      new YoTitleBarMenuItem(
-        'more',
-        $r('sys.symbol.more'),
-        $r('app.string.youi_more_actions'),
-        () => {
-          openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID);
-        },
-        true,
-        SPP_TITLE_MORE_MENU_ID
-      )
-    ];
+      ));
+    }
+    menus.push(new YoTitleBarMenuItem(
+      'refresh',
+      $r('sys.symbol.arrow_clockwise'),
+      $r('app.string.bt_spp_action_refresh'),
+      () => {
+        void this.vm.refresh(false);
+      }
+    ));
+    menus.push(new YoTitleBarMenuItem(
+      'more',
+      $r('sys.symbol.more'),
+      $r('app.string.youi_more_actions'),
+      () => {
+        openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID, () => {
+          void this.vm.openBluetoothSettings();
+        });
+      },
+      true,
+      SPP_TITLE_MORE_MENU_ID
+    ));
+    return menus;
   }
 }

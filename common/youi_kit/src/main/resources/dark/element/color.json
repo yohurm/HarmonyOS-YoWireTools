@@ -1,4 +1,4 @@
-﻿{
+{
   "color": [
     { "name": "youi_primary", "value": "#317AF7" },
     { "name": "youi_primary_pressed", "value": "#5E9DFF" },
@@ -37,6 +37,8 @@
     { "name": "youi_info_container", "value": "#19317AF7" },
     { "name": "youi_on_info_container", "value": "#317AF7" },
     { "name": "youi_emphasize_tertiary", "value": "#19317AF7" },
-    { "name": "youi_scrim", "value": "#80000000" }
+    { "name": "youi_scrim", "value": "#80000000" },
+    { "name": "youi_toast_background", "value": "#E6000000" },
+    { "name": "youi_toast_text", "value": "#FFFFFFFF" }
   ]
 }

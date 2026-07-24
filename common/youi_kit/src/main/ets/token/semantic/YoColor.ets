@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 语义色 Token — 三层模型（foundation → semantic → component）。
  * base/dark color.json 中的资源名须保持对称。
  */
@@ -55,4 +55,8 @@ export class YoColor {
   static readonly INFO: Resource = $r('app.color.youi_info');
   static readonly INFO_CONTAINER: Resource = $r('app.color.youi_info_container');
   static readonly ON_INFO_CONTAINER: Resource = $r('app.color.youi_on_info_container');
+
+  // Toast（深色半透明背板，浅/深色主题保持一致，对齐 Android TOAST_BACKGROUND）
+  static readonly TOAST_BACKGROUND: Resource = $r('app.color.youi_toast_background');
+  static readonly TOAST_TEXT: Resource = $r('app.color.youi_toast_text');
 }

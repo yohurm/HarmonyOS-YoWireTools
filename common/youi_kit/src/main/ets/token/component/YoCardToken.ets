@@ -12,11 +12,13 @@ export class YoCardToken {
   static readonly RADIUS: number = YoRadius.MEDIUM;
   static readonly PADDING: number = YoSpace.XL;
   static readonly PADDING_COMPACT: number = YoSpace.L;
-  /** 紧凑设备行的垂直内边距（nRF / 设置页密度）。 */
-  static readonly PADDING_ROW_V: number = YoSpace.M;
   static readonly HEIGHT_LIST: number = YoSize.LIST_CARD_HEIGHT;
-  /** 紧凑设备列表行目标高度。 */
+  /** 效率型设备行目标高度（鸿蒙列表 48/56 档，取 56）。 */
   static readonly HEIGHT_DEVICE_ROW: number = YoSize.LIST_ROW_HEIGHT;
+  /** 行内右操作区与主内容间距（列表规范 12vp）。 */
+  static readonly TRAILING_GAP: number = YoSpace.L;
+  /** 行垂直内边距（主次文本已紧凑，外圈 6vp）。 */
+  static readonly PADDING_ROW_V: number = YoSpace.S;
   static readonly BACKGROUND: Resource = YoColor.SURFACE_CARD;
   static readonly SELECTED_BORDER_WIDTH: number = 1;
   /** 抬升卡片阴影（概览 / 会话表面）。 */

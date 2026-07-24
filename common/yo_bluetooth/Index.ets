@@ -1,4 +1,4 @@
-﻿export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
+export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
 export { SppTransportSession } from './src/main/ets/data/transport/SppTransportSession';
 export { GattTransportSession } from './src/main/ets/data/transport/GattTransportSession';
 export {
@@ -91,6 +91,7 @@ export { DeviceIdentity, IdentityStability } from './src/main/ets/domain/model/D
 export { SppConnectParams } from './src/main/ets/domain/model/SppConnectParams';
 export { GattConnectParams } from './src/main/ets/domain/model/GattConnectParams';
 export { BleScanFilter } from './src/main/ets/domain/model/BleScanFilter';
+export { ClassicScanFilter, ClassicDeviceMajorFilter } from './src/main/ets/domain/model/ClassicScanFilter';
 export { BleAdvertisingPacket, DeviceNameSource } from './src/main/ets/domain/model/BleAdvertisingPacket';
 export { GattServiceTreeSnapshot } from './src/main/ets/domain/model/GattServiceTree';
 export { ReconnectPolicy } from './src/main/ets/domain/model/ReconnectPolicy';

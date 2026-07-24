@@ -123,7 +123,7 @@ export struct BluetoothOverviewPage {
           }
         })
           .layoutWeight(1)
-          .constraintSize({ minHeight: 108 })
+          .constraintSize({ minHeight: 88 })
         YoModeEntryCard({
           title: $r('app.string.bt_entry_ble_title'),
           description: $r('app.string.bt_entry_ble_subtitle'),
@@ -136,7 +136,7 @@ export struct BluetoothOverviewPage {
           }
         })
           .layoutWeight(1)
-          .constraintSize({ minHeight: 108 })
+          .constraintSize({ minHeight: 88 })
       }
       .width('100%')
       .alignItems(VerticalAlign.Top)

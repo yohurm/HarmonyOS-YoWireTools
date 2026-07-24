@@ -1,6 +1,6 @@
-﻿import { DeviceFavoriteRecord } from 'common_storage';
+import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError } from 'common_core';
-import { ModuleType, SessionRuntimeStore } from 'debug_core';
+import { ModuleType, ProtocolType, SessionRuntimeStore } from 'debug_core';
 import { ClassicBluetoothDataSource, PlatformDiscoveryPayload } from '../datasource/platform/ClassicBluetoothDataSource';
 import { BleDiscoveryPayload, BleScannerDataSource } from '../datasource/platform/BleScannerDataSource';
 import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
@@ -9,6 +9,7 @@ import { BluetoothDeviceMapper, PlatformPairedSnapshot } from '../mapper/Bluetoo
 import {
   BluetoothAdapterSnapshot,
   BluetoothDevice,
+  BluetoothDeviceDraft,
   BluetoothOverviewSnapshot
 } from '../../domain/model/BluetoothDevice';
 import {
@@ -19,7 +20,10 @@ import {
 import { ClassicScanPhase } from '../../domain/model/ClassicScanPhase';
 import { BleScanPhase } from '../../domain/model/BleScanPhase';
 import { BleScanFilter } from '../../domain/model/BleScanFilter';
+import { ClassicScanFilter } from '../../domain/model/ClassicScanFilter';
+import { DiscoverySource } from '../../domain/model/DiscoverySource';
 import { ScanResultMerger } from '../../domain/service/ScanResultMerger';
+import { ClassicScanVisibilityPolicy, ActiveSppSessionRef } from '../../domain/service/ClassicScanVisibilityPolicy';
 import { PairingEvent, PairingState } from '../../domain/model/PairingState';
 import { ClassicScanTimer } from '../../domain/service/ClassicScanTimer';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
@@ -46,6 +50,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private readonly identityDataSource: BluetoothIdentityDataSource;
   private readonly classicMerger: ScanResultMerger = new ScanResultMerger();
   private readonly bleMerger: ScanResultMerger = new ScanResultMerger();
+  /** 已配对经典候选缓存：供 SPP 解析 / 连接态补全，不直接 seed 扫描列表。 */
+  private readonly pairedClassicCache: Map<string, BluetoothDevice> = new Map();
   private readonly bleAdvertisingMap: Map<string, BleAdvertisingPacket> = new Map();
   private readonly gattClients: Map<string, GattClientDataSource> = new Map();
   /** Application-layer BLE connection slots (GATT browser / UART / GATT serial). */
@@ -62,10 +68,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private favoritesCache: DeviceFavoriteRecord[] = [];
   private readonly scanTimer: ClassicScanTimer = new ClassicScanTimer();
   private scanTimeoutHandler: (() => void) | undefined;
-  private classicFilterName: string = '';
-  private classicFilterAddress: string = '';
-  private classicFilterPairedOnly: boolean = false;
-  private classicFilterFavoritesOnly: boolean = false;
+  private classicFilter: ClassicScanFilter = ClassicScanFilter.empty();
   private activeBleScanFilter: BleScanFilter = new BleScanFilter();
 
   private constructor(
@@ -102,16 +105,17 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   /**
-   * Load paired devices eligible for classic / SPP rail (BR_EDR | DUAL).
-   * LE-only entries are excluded per architecture bluetooth/00.
+   * 刷新已配对经典缓存（BR_EDR | DUAL），不写入扫描 merger。
+   * LE-only 仍排除（architecture bluetooth/00）。
    */
-  async loadPairedClassicCandidates(): Promise<Result<BluetoothDevice[]>> {
+  async refreshPairedClassicCache(): Promise<Result<BluetoothDevice[]>> {
     const paired = await this.classicDataSource.getPairedDeviceSnapshots();
     if (!paired.success || paired.value === undefined) {
       return Result.fail(paired.error ?? new ResultError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, 'paired failed'));
     }
     await this.refreshFavorites();
     this.reconcileDualModeFromSnapshots(paired.value);
+    this.pairedClassicCache.clear();
     const devices: BluetoothDevice[] = [];
     for (let i = 0; i < paired.value.length; i++) {
       const snapshot: PlatformPairedSnapshot = paired.value[i];
@@ -133,12 +137,20 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       let device = BluetoothDeviceMapper.fromPairedSnapshot(mapped, BluetoothListRail.CLASSIC_SCAN);
       device = this.applyFavoriteMeta(device);
       devices.push(device);
+      this.pairedClassicCache.set(device.primaryDeviceId, device);
     }
-    // Architecture bluetooth/01 搂3.2: refresh / scan bootstrap replaces the classic list
-    // with paired candidates only (clears stale Inquiry results before rediscovery).
-    this.classicMerger.replaceAll(devices);
+    return Result.ok(devices);
+  }
+
+  /** 兼容旧调用方：仅刷新配对缓存，不 seed 扫描列表。 */
+  async loadPairedClassicCandidates(): Promise<Result<BluetoothDevice[]>> {
+    return this.refreshPairedClassicCache();
+  }
+
+  /** 新一轮 Inquiry 前清空实时发现列表（不预置静默配对项）。 */
+  prepareClassicScanList(): void {
+    this.classicMerger.clear();
     this.publishClassicDevices();
-    return Result.ok(this.listClassicDevices());
   }
 
   async loadPairedBleCandidates(): Promise<Result<BluetoothDevice[]>> {
@@ -273,8 +285,10 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       permissionGranted,
       true,
       true,
-      this.classicMerger.listSorted().filter((d: BluetoothDevice) =>
-        d.paired && BluetoothTransportPolicy.admitClassicPaired(d.transport)).length,
+      this.pairedClassicCache.size > 0 ?
+        this.pairedClassicCache.size :
+        this.classicMerger.listSorted().filter((d: BluetoothDevice) =>
+          d.paired && BluetoothTransportPolicy.admitClassicPaired(d.transport)).length,
       this.favoritesCache.length,
       this.classicScanPhase,
       this.bleScanPhase,
@@ -323,12 +337,13 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return listed;
   }
 
-  setClassicDeviceFilter(name: string, address: string, pairedOnly: boolean, favoritesOnly: boolean): void {
-    this.classicFilterName = name;
-    this.classicFilterAddress = address;
-    this.classicFilterPairedOnly = pairedOnly;
-    this.classicFilterFavoritesOnly = favoritesOnly;
+  setClassicDeviceFilter(filter: ClassicScanFilter): void {
+    this.classicFilter = filter;
     this.publishClassicDevices();
+  }
+
+  getClassicDeviceFilter(): ClassicScanFilter {
+    return this.classicFilter;
   }
 
   async startClassicDiscovery(sessionId: string, onTimeout?: () => void): Promise<Result<void>> {
@@ -339,6 +354,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     if (discovering.success && discovering.value === true) {
       await this.classicDataSource.stopBluetoothDiscovery();
     }
+    await this.refreshPairedClassicCache();
+    this.prepareClassicScanList();
     this.classicScanPhase = ClassicScanPhase.SCANNING;
     this.activeClassicScanSessionId = sessionId;
     this.classicDataSource.onDiscoveryResult((payload: PlatformDiscoveryPayload) => {
@@ -599,11 +616,15 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   listClassicDevices(): BluetoothDevice[] {
-    return this.classicMerger.filter(
-      this.classicFilterName,
-      this.classicFilterAddress,
-      this.classicFilterPairedOnly,
-      this.classicFilterFavoritesOnly
+    const activeAddresses = this.collectActiveSppClassicAddresses();
+    const filtered = this.classicMerger.filter(this.classicFilter, activeAddresses);
+    const visible = ClassicScanVisibilityPolicy.filterVisible(filtered, activeAddresses);
+    const fallbackByAddress = this.buildActiveSessionFallbackDevices(activeAddresses);
+    return ClassicScanVisibilityPolicy.augmentMissingActiveSessions(
+      visible,
+      activeAddresses,
+      this.pairedClassicCache,
+      fallbackByAddress
     );
   }
 
@@ -617,6 +638,11 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   resetClassicScanPhase(): void {
     this.classicScanPhase = ClassicScanPhase.IDLE;
+  }
+
+  /** 会话态变化后刷新扫描列表可见性（注入正在连接的 SPP 目标）。 */
+  republishClassicDevices(): void {
+    this.publishClassicDevices();
   }
 
   resetBleScanPhase(): void {
@@ -653,8 +679,88 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     }
     let device = BluetoothDeviceMapper.fromDiscovery(payload, transport, false);
     device = this.applyFavoriteMeta(device);
+    device = this.enrichFromPairedCache(device);
     this.classicMerger.merge(device);
     this.publishClassicDevices();
+  }
+
+  private enrichFromPairedCache(device: BluetoothDevice): BluetoothDevice {
+    const cached = this.findPairedCacheDevice(device);
+    if (cached === undefined) {
+      return device;
+    }
+    return device.mergeFrom(cached);
+  }
+
+  private findPairedCacheDevice(device: BluetoothDevice): BluetoothDevice | undefined {
+    const byPrimary = this.pairedClassicCache.get(device.primaryDeviceId);
+    if (byPrimary !== undefined) {
+      return byPrimary;
+    }
+    if (device.classicDeviceId.length > 0) {
+      return this.pairedClassicCache.get(device.classicDeviceId);
+    }
+    return undefined;
+  }
+
+  private collectActiveSppClassicAddresses(): Set<string> {
+    const store = SessionRuntimeStore.getInstance();
+    const rawSummaries = store.listActiveSummaries();
+    const summaries: ActiveSppSessionRef[] = [];
+    for (let i = 0; i < rawSummaries.length; i++) {
+      const item = rawSummaries[i];
+      summaries.push(new ActiveSppSessionRef(item.module, item.protocol, item.state, item.id));
+    }
+    return ClassicScanVisibilityPolicy.collectActiveSppClassicAddresses(
+      summaries,
+      (sessionId: string) => {
+        const session = store.getSession(sessionId);
+        return session?.target?.address ?? '';
+      }
+    );
+  }
+
+  private buildActiveSessionFallbackDevices(activeAddresses: Set<string>): Map<string, BluetoothDevice> {
+    const fallbacks = new Map<string, BluetoothDevice>();
+    if (activeAddresses.size === 0) {
+      return fallbacks;
+    }
+    const store = SessionRuntimeStore.getInstance();
+    const summaries = store.listActiveSummaries();
+    for (let i = 0; i < summaries.length; i++) {
+      const summary = summaries[i];
+      if (summary.module !== ModuleType.BLUETOOTH || summary.protocol !== ProtocolType.SPP) {
+        continue;
+      }
+      if (!ClassicScanVisibilityPolicy.isActiveSppSessionState(summary.state)) {
+        continue;
+      }
+      const session = store.getSession(summary.id);
+      const address = session?.target?.address ?? '';
+      if (address.length === 0 || !activeAddresses.has(address) || fallbacks.has(address)) {
+        continue;
+      }
+      if (this.pairedClassicCache.has(address)) {
+        continue;
+      }
+      fallbacks.set(address, this.buildSessionFallbackDevice(
+        address,
+        session?.displayName ?? summary.displayName
+      ));
+    }
+    return fallbacks;
+  }
+
+  private buildSessionFallbackDevice(address: string, displayName: string): BluetoothDevice {
+    const draft = new BluetoothDeviceDraft();
+    draft.primaryDeviceId = address;
+    draft.classicDeviceId = address;
+    draft.displayName = displayName.length > 0 ? displayName : address;
+    draft.paired = true;
+    draft.transport = BluetoothTransportType.BR_EDR;
+    draft.listRail = BluetoothListRail.CLASSIC_SCAN;
+    draft.discoverySource = DiscoverySource.MANUAL;
+    return new BluetoothDevice(draft);
   }
 
   private applyFavoriteMeta(device: BluetoothDevice): BluetoothDevice {

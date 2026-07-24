@@ -1,4 +1,5 @@
 import { BluetoothDevice } from '../model/BluetoothDevice';
+import { ClassicDeviceMajorFilter, ClassicScanFilter } from '../model/ClassicScanFilter';
 
 /**
  * Merges classic/BLE scan results per architecture bluetooth/00 + 01-§8.
@@ -58,20 +59,17 @@ export class ScanResultMerger {
     return items;
   }
 
-  filter(
-    nameQuery: string,
-    addressQuery: string,
-    pairedOnly: boolean,
-    favoritesOnly: boolean
-  ): BluetoothDevice[] {
+  filter(filter: ClassicScanFilter, activeClassicAddresses: Set<string> = new Set()): BluetoothDevice[] {
     const all = this.listSorted();
     const filtered: BluetoothDevice[] = [];
+    const nameQuery = filter.nameQuery.trim();
+    const addressQuery = filter.addressQuery.trim();
     for (let i = 0; i < all.length; i++) {
       const item = all[i];
-      if (pairedOnly && !item.paired) {
+      if (filter.pairedOnly && !item.paired) {
         continue;
       }
-      if (favoritesOnly && !item.favorite) {
+      if (filter.favoritesOnly && !item.favorite) {
         continue;
       }
       if (nameQuery.length > 0 && !item.effectiveName.includes(nameQuery)) {
@@ -85,12 +83,60 @@ export class ScanResultMerger {
           continue;
         }
       }
+      const rssiExempt = ScanResultMerger.isActiveSessionDevice(item, activeClassicAddresses);
+      if (!ScanResultMerger.matchesRssi(item.rssi, filter.minRssi, rssiExempt)) {
+        continue;
+      }
+      if (!ScanResultMerger.matchesMajor(item.majorClass, filter.majorFilter)) {
+        continue;
+      }
       filtered.push(item);
     }
     return filtered;
   }
 
+  private static isActiveSessionDevice(device: BluetoothDevice, activeClassicAddresses: Set<string>): boolean {
+    if (activeClassicAddresses.size === 0) {
+      return false;
+    }
+    return activeClassicAddresses.has(device.primaryDeviceId) ||
+      (device.classicDeviceId.length > 0 && activeClassicAddresses.has(device.classicDeviceId));
+  }
+
   clear(): void {
     this.devices.clear();
+  }
+
+  private static matchesRssi(rssi: number, minRssi: number, exempt: boolean = false): boolean {
+    if (exempt) {
+      return true;
+    }
+    if (minRssi <= ClassicScanFilter.RSSI_SLIDER_MIN) {
+      return true;
+    }
+    if (rssi === 0) {
+      return false;
+    }
+    return rssi >= minRssi;
+  }
+
+  private static matchesMajor(majorClass: number, majorFilter: ClassicDeviceMajorFilter): boolean {
+    if (majorFilter === ClassicDeviceMajorFilter.ALL) {
+      return true;
+    }
+    if (majorFilter === ClassicDeviceMajorFilter.OTHER) {
+      return !ScanResultMerger.isKnownMajor(majorClass);
+    }
+    return majorClass === (majorFilter as number);
+  }
+
+  private static isKnownMajor(majorClass: number): boolean {
+    return majorClass === (ClassicDeviceMajorFilter.COMPUTER as number) ||
+      majorClass === (ClassicDeviceMajorFilter.PHONE as number) ||
+      majorClass === (ClassicDeviceMajorFilter.AUDIO_VIDEO as number) ||
+      majorClass === (ClassicDeviceMajorFilter.PERIPHERAL as number) ||
+      majorClass === (ClassicDeviceMajorFilter.IMAGING as number) ||
+      majorClass === (ClassicDeviceMajorFilter.WEARABLE as number) ||
+      majorClass === (ClassicDeviceMajorFilter.HEALTH as number);
   }
 }

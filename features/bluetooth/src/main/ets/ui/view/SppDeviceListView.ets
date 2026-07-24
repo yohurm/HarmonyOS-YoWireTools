@@ -4,13 +4,14 @@ import {
   YoEmpty,
   YoListToken
 } from 'youi_kit';
-import { ClassicDeviceCard } from '../component/ClassicDeviceCard';
+import { ClassicDeviceCard, ClassicDeviceGroupRole } from '../component/ClassicDeviceCard';
 import { SppActiveSessionItem, SppDeviceListItem } from '../../viewmodel/SppMainViewModel';
 
 /**
  * SPP device / session list surface.
- * Owns edge-to-edge List clipping so items never paint over the title bar.
- * Bottom inset is applied as a list footer (immersive edge-to-edge, no shell blank band).
+ *
+ * 分组卡片表面：同组内 0 间距 + 内部分割线，避免逐卡阴影/圆角浪费纵向空间。
+ * Bottom inset 作为 list footer（沉浸式底栏，无壳层空白带）。
  */
 @ComponentV2
 export struct SppDeviceListView {
@@ -36,6 +37,19 @@ export struct SppDeviceListView {
     return this.devices.length === 0;
   }
 
+  private resolveGroupRole(index: number, total: number): ClassicDeviceGroupRole {
+    if (total <= 1) {
+      return 'only';
+    }
+    if (index === 0) {
+      return 'first';
+    }
+    if (index === total - 1) {
+      return 'last';
+    }
+    return 'middle';
+  }
+
   build() {
     if (this.isEmpty()) {
       Column() {
@@ -54,7 +68,7 @@ export struct SppDeviceListView {
     } else {
       List({ space: YoListToken.ITEM_GAP, scroller: this.listScroller }) {
         if (this.mode === 'scan') {
-          ForEach(this.devices, (item: SppDeviceListItem) => {
+          ForEach(this.devices, (item: SppDeviceListItem, index: number) => {
             ListItem() {
               ClassicDeviceCard({
                 displayName: item.displayName.length > 0 ?
@@ -63,13 +77,15 @@ export struct SppDeviceListView {
                 address: item.address,
                 rssiText: item.rssiText,
                 statusLabel: item.needsBridge ?
-                  $r('app.string.bt_spp_status_needs_bridge') :
-                  (item.paired ? $r('app.string.bt_spp_status_paired') : ''),
+                  $r('app.string.bt_spp_status_needs_bridge') : '',
+                statusWarning: item.needsBridge,
+                isPaired: item.paired && !item.needsBridge,
                 transportLabel: item.transportLabel,
                 majorClass: item.majorClass,
                 majorMinorClass: item.majorMinorClass,
                 showConnectButton: true,
                 connectEnabled: item.sppConnectable,
+                groupRole: this.resolveGroupRole(index, this.devices.length),
                 onConnect: () => {
                   this.onDeviceConnect(item);
                 },
@@ -79,14 +95,12 @@ export struct SppDeviceListView {
               })
                 .margin({
                   left: this.horizontalPadding,
-                  right: this.horizontalPadding,
-                  top: YoListToken.ITEM_SHADOW_BLEED,
-                  bottom: YoListToken.ITEM_SHADOW_BLEED
+                  right: this.horizontalPadding
                 })
             }
           }, (item: SppDeviceListItem) => item.primaryDeviceId)
         } else {
-          ForEach(this.sessions, (item: SppActiveSessionItem) => {
+          ForEach(this.sessions, (item: SppActiveSessionItem, index: number) => {
             ListItem() {
               ClassicDeviceCard({
                 displayName: item.displayName,
@@ -97,16 +111,16 @@ export struct SppDeviceListView {
                 majorClass: 0,
                 majorMinorClass: 0,
                 showConnectButton: false,
+                showDisclosure: true,
                 connectEnabled: false,
+                groupRole: this.resolveGroupRole(index, this.sessions.length),
                 onTap: () => {
                   this.onSessionTap(item);
                 }
               })
                 .margin({
                   left: this.horizontalPadding,
-                  right: this.horizontalPadding,
-                  top: YoListToken.ITEM_SHADOW_BLEED,
-                  bottom: YoListToken.ITEM_SHADOW_BLEED
+                  right: this.horizontalPadding
                 })
             }
           }, (item: SppActiveSessionItem) => item.sessionId)

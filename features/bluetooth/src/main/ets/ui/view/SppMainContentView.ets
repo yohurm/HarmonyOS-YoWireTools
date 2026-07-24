@@ -1,17 +1,14 @@
-﻿import { YoColor, YoResponsive, YoSegmentButton } from 'youi_kit';
-import { SppDeviceListView } from './SppDeviceListView';
-import {
-  SppActiveSessionItem,
-  SppDeviceListItem,
-  SppMainViewModel,
-  SppSegmentTab
-} from '../../viewmodel/SppMainViewModel';
+import { YoColor, YoResponsive, YoSegmentButton } from 'youi_kit';
+import { SppActivePanelView } from './SppActivePanelView';
+import { SppScanPanelView } from './SppScanPanelView';
+import { SppMainViewModel, SppSegmentTab } from '../../viewmodel/SppMainViewModel';
 
 /**
- * SPP main content.
+ * SPP main content orchestrator.
  *
- * Segment: official SegmentButton tab defaults.
- * Panels: if/else switch only (no Swiper page slide).
+ * Segment switches between fully decoupled rails:
+ * - SppScanPanelView (filter + scan list)
+ * - SppActivePanelView (active sessions only)
  */
 @ComponentV2
 export struct SppMainContentView {
@@ -51,33 +48,17 @@ export struct SppMainContentView {
       })
 
       if (this.segmentIndex === SppSegmentTab.ACTIVE) {
-        SppDeviceListView({
-          mode: 'active',
-          sessions: this.vm.activeSessions,
-          emptyTitle: this.vm.ready ?
-            $r('app.string.bt_spp_empty_active_title') :
-            this.vm.emptyTitle,
-          emptyMessage: this.vm.ready ?
-            $r('app.string.bt_spp_empty_active_message') :
-            this.vm.emptyMessage,
+        SppActivePanelView({
+          vm: this.vm,
           horizontalPadding: this.horizontalPadding,
-          bottomInsetVp: this.bottomInsetVp,
-          onSessionTap: (_item: SppActiveSessionItem) => {
-          }
+          bottomInsetVp: this.bottomInsetVp
         })
           .layoutWeight(1)
       } else {
-        SppDeviceListView({
-          mode: 'scan',
-          devices: this.vm.scanDevices,
-          emptyTitle: this.vm.emptyTitle,
-          emptyMessage: this.vm.emptyMessage,
+        SppScanPanelView({
+          vm: this.vm,
           horizontalPadding: this.horizontalPadding,
-          bottomInsetVp: this.bottomInsetVp,
-          onDeviceConnect: (_item: SppDeviceListItem) => {
-          },
-          onDeviceTap: (_item: SppDeviceListItem) => {
-          }
+          bottomInsetVp: this.bottomInsetVp
         })
           .layoutWeight(1)
       }

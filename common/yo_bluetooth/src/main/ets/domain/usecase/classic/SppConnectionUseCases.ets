@@ -111,6 +111,7 @@ export class ConnectSppUseCase {
     }
     this.transportRegistry.register(session.value.id, transport);
     this.repository.recordRecentConnection(classicId, connectParams.displayName, 'spp');
+    this.repository.republishClassicDevices();
     return Result.ok(new ConnectSppResult(session.value.id, transport.id));
   }
 }
@@ -118,13 +119,16 @@ export class ConnectSppUseCase {
 export class DisconnectSppUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
   private readonly stopSession: StopSessionUseCase;
+  private readonly repository: BluetoothRepository;
 
   constructor(
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase()
+    stopSession: StopSessionUseCase = new StopSessionUseCase(),
+    repository: BluetoothRepository = BluetoothRepository.getInstance()
   ) {
     this.transportRegistry = transportRegistry;
     this.stopSession = stopSession;
+    this.repository = repository;
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
@@ -135,6 +139,8 @@ export class DisconnectSppUseCase {
       await transport.disconnect('user_disconnect');
       this.transportRegistry.remove(sessionId);
     }
-    return this.stopSession.execute(sessionId, 'spp_disconnected');
+    const stopped = await this.stopSession.execute(sessionId, 'spp_disconnected');
+    this.repository.republishClassicDevices();
+    return stopped;
   }
 }
