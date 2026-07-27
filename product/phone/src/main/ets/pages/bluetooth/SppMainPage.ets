@@ -8,6 +8,7 @@ import {
   YoTitleBarMenuItem
 } from 'youi_kit';
 import {
+  ClassicDeviceListItem,
   openSppTitleMoreMenu,
   SPP_TITLE_MORE_MENU_ID,
   SppMainContentView,
@@ -21,6 +22,10 @@ import {
 @ComponentV2
 export struct SppMainPage {
   @Event onBack: () => void = () => {
+  };
+  @Event onOpenConnect: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
+  @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
   };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
@@ -51,7 +56,13 @@ export struct SppMainPage {
     SppMainContentView({
       vm: this.vm,
       horizontalPadding: this.pageHorizontalPadding(),
-      bottomInsetVp: this.metrics.navigationBottomInsetVp
+      bottomInsetVp: this.metrics.navigationBottomInsetVp,
+      onOpenConnect: (item: ClassicDeviceListItem) => {
+        this.onOpenConnect(item);
+      },
+      onOpenTerminal: (sessionId: string) => {
+        this.onOpenTerminal(sessionId);
+      }
     })
   }
 
