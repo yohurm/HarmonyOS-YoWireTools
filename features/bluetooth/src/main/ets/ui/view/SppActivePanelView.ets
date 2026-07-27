@@ -4,12 +4,15 @@ import { SppActiveSessionItem, SppMainViewModel } from '../../viewmodel/SppMainV
 /**
  * SPP 活动连接轨。
  * 与 ClassicScanPanelView（经典 Inquiry）完全解耦。
+ * 行点击 → Terminal；尾部断开按钮可选。
  */
 @ComponentV2
 export struct SppActivePanelView {
   @Param @Require vm: SppMainViewModel;
   @Param horizontalPadding: number = 16;
   @Param bottomInsetVp: number = 0;
+  @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
+  };
 
   build() {
     SppDeviceListView({
@@ -23,7 +26,11 @@ export struct SppActivePanelView {
         this.vm.emptyMessage,
       horizontalPadding: this.horizontalPadding,
       bottomInsetVp: this.bottomInsetVp,
-      onSessionTap: (_item: SppActiveSessionItem) => {
+      onSessionTap: (item: SppActiveSessionItem) => {
+        this.onOpenTerminal(item.sessionId);
+      },
+      onSessionDisconnect: (item: SppActiveSessionItem) => {
+        void this.vm.disconnectSession(item.sessionId);
       }
     })
       .width('100%')

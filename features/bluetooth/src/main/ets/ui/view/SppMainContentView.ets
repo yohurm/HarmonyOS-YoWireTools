@@ -1,7 +1,7 @@
 import { YoColor, YoResponsive, YoSegmentButton } from 'youi_kit';
 import { SppActivePanelView } from './SppActivePanelView';
 import { ClassicScanPanelView } from './ClassicScanPanelView';
-import { SppMainViewModel, SppSegmentTab } from '../../viewmodel/SppMainViewModel';
+import { ClassicDeviceListItem, SppMainViewModel, SppSegmentTab } from '../../viewmodel/SppMainViewModel';
 
 /**
  * SPP 主内容编排。
@@ -16,6 +16,10 @@ export struct SppMainContentView {
   @Param horizontalPadding: number = 16;
   /** Gesture-bar inset; list content pads bottom so last rows remain tappable. */
   @Param bottomInsetVp: number = 0;
+  @Event onOpenConnect: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
+  @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
+  };
   @Local private segmentIndex: number = 0;
 
   aboutToAppear(): void {
@@ -51,14 +55,20 @@ export struct SppMainContentView {
         SppActivePanelView({
           vm: this.vm,
           horizontalPadding: this.horizontalPadding,
-          bottomInsetVp: this.bottomInsetVp
+          bottomInsetVp: this.bottomInsetVp,
+          onOpenTerminal: (sessionId: string) => {
+            this.onOpenTerminal(sessionId);
+          }
         })
           .layoutWeight(1)
       } else {
         ClassicScanPanelView({
           vm: this.vm,
           horizontalPadding: this.horizontalPadding,
-          bottomInsetVp: this.bottomInsetVp
+          bottomInsetVp: this.bottomInsetVp,
+          onOpenConnect: (item: ClassicDeviceListItem) => {
+            this.onOpenConnect(item);
+          }
         })
           .layoutWeight(1)
       }

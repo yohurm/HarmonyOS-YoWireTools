@@ -42,6 +42,8 @@ export struct ClassicDeviceCard {
   @Param majorMinorClass: number = 0;
   @Param showConnectButton: boolean = true;
   @Param connectEnabled: boolean = false;
+  /** 覆盖连接按钮文案；默认「连接」。 */
+  @Param connectButtonLabel: ResourceStr = $r('app.string.bt_spp_action_connect');
   /** 已配对：显示在尾区传输类型左侧，不贴 MAC。 */
   @Param isPaired: boolean = false;
   /** 状态是否为需强调的警告（如需桥接）。 */
@@ -150,7 +152,7 @@ export struct ClassicDeviceCard {
           }
 
           if (this.showConnectButton) {
-            Button($r('app.string.bt_spp_action_connect'), { type: ButtonType.Capsule })
+            Button(this.connectButtonLabel, { type: ButtonType.Capsule })
               .fontSize(YoTypeStyle.BODY_S.size)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.connectEnabled ? YoColor.BRAND_PRIMARY : YoColor.TEXT_DISABLED)

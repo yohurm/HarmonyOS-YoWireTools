@@ -4,8 +4,8 @@ import {
   BluetoothSettingsNavigator,
   LifecycleCoordinator
 } from 'common_platform';
-import { DebugSessionSummary } from 'debug_core';
 import {
+  BluetoothConstants,
   BluetoothDevice,
   BluetoothRepository,
   BluetoothTransportType,
@@ -13,10 +13,15 @@ import {
   ClassicProfileCapability,
   ClassicScanFilter,
   ClassicScanPhase,
-  ListActiveSppSessionsUseCase,
+  DisconnectSppUseCase,
+  ListSppSessionsUseCase,
   LoadBluetoothOverviewSnapshotUseCase,
   LoadPairedClassicDevicesUseCase,
   ObserveClassicDevicesUseCase,
+  ObserveSppSessionsUseCase,
+  SppSessionDescriptor,
+  SppSessionKey,
+  SppSessionLedger,
   StartClassicScanUseCase,
   StopClassicScanUseCase
 } from 'yo_bluetooth';
@@ -30,7 +35,6 @@ export enum SppSegmentTab {
 
 /**
  * 经典扫描列表设备投影（architecture bluetooth/01 §6.1）。
- * 供 SPP 页扫描段消费；字段来自经典发现轨，不是 SPP socket 状态。
  */
 export class ClassicDeviceListItem {
   readonly primaryDeviceId: string;
@@ -45,8 +49,9 @@ export class ClassicDeviceListItem {
   readonly needsBridge: boolean;
   readonly majorClass: number;
   readonly majorMinorClass: number;
-  /** Profile 能力短文案，如 `SPP · A2DP`；未知为空。 */
   readonly profileCapabilitiesText: string;
+  /** 该 classicDeviceId 是否已有任意活跃 Ledger key（任意 UUID）。 */
+  readonly alreadyConnected: boolean;
 
   constructor(
     primaryDeviceId: string,
@@ -61,7 +66,8 @@ export class ClassicDeviceListItem {
     needsBridge: boolean,
     majorClass: number = 0,
     majorMinorClass: number = 0,
-    profileCapabilitiesText: string = ''
+    profileCapabilitiesText: string = '',
+    alreadyConnected: boolean = false
   ) {
     this.primaryDeviceId = primaryDeviceId;
     this.classicDeviceId = classicDeviceId;
@@ -76,39 +82,61 @@ export class ClassicDeviceListItem {
     this.majorClass = majorClass;
     this.majorMinorClass = majorMinorClass;
     this.profileCapabilitiesText = profileCapabilitiesText;
+    this.alreadyConnected = alreadyConnected;
   }
 }
 
+/** SPP RFCOMM 活动会话投影（含 UUID / MAC / socket）。 */
 export class SppActiveSessionItem {
   readonly sessionId: string;
   readonly displayName: string;
+  readonly classicAddress: string;
+  readonly uuidShortLabel: string;
   readonly stateLabel: string;
+  readonly clientSocket: number;
 
-  constructor(sessionId: string, displayName: string, stateLabel: string) {
+  constructor(
+    sessionId: string,
+    displayName: string,
+    classicAddress: string,
+    uuidShortLabel: string,
+    stateLabel: string,
+    clientSocket: number = -1
+  ) {
     this.sessionId = sessionId;
     this.displayName = displayName;
+    this.classicAddress = classicAddress;
+    this.uuidShortLabel = uuidShortLabel;
     this.stateLabel = stateLabel;
+    this.clientSocket = clientSocket;
+  }
+
+  static fromDescriptor(descriptor: SppSessionDescriptor): SppActiveSessionItem {
+    return new SppActiveSessionItem(
+      descriptor.sessionId,
+      descriptor.displayName,
+      descriptor.classicAddress,
+      descriptor.uuidShortLabel,
+      descriptor.stateLabel,
+      descriptor.clientSocket
+    );
   }
 }
 
 /**
- * SPP 主页 ViewModel：编排「经典扫描轨」+「SPP 活动连接轨」。
- * 扫描能力来自 Start/Stop/ObserveClassic* UseCase，不是 SPP 扫描。
+ * SPP 主页 ViewModel：经典扫描轨 + 多路 SPP 活动连接轨。
  */
 @ObservedV2
 export class SppMainViewModel {
   @Trace isLoading: boolean = true;
   @Trace ready: boolean = false;
   @Trace selectedSegment: SppSegmentTab = SppSegmentTab.SCAN;
-  /** Bound to SegmentButton tab index (0=classic scan, 1=active SPP). */
   @Trace selectedIndex: number = 0;
-  /** 经典 Inquiry 扫描结果（CLASSIC_SCAN rail）。 */
   @Trace classicScanDevices: ClassicDeviceListItem[] = [];
   @Trace activeSessions: SppActiveSessionItem[] = [];
   @Trace isScanning: boolean = false;
   @Trace emptyTitle: ResourceStr = $r('app.string.bt_spp_empty_scan_title');
   @Trace emptyMessage: ResourceStr = $r('app.string.bt_spp_empty_scan_message');
-  /** Classic-scan-only: filter panel expanded under the segment control. */
   @Trace filterPanelExpanded: boolean = false;
   @Trace filterName: string = '';
   @Trace filterAddress: string = '';
@@ -119,11 +147,14 @@ export class SppMainViewModel {
   private readonly loadOverview: LoadBluetoothOverviewSnapshotUseCase;
   private readonly loadPaired: LoadPairedClassicDevicesUseCase;
   private readonly observeClassic: ObserveClassicDevicesUseCase;
+  private readonly observeSessions: ObserveSppSessionsUseCase;
   private readonly startScan: StartClassicScanUseCase;
   private readonly stopScan: StopClassicScanUseCase;
-  private readonly listActiveSessions: ListActiveSppSessionsUseCase;
+  private readonly listSessions: ListSppSessionsUseCase;
+  private readonly disconnectSpp: DisconnectSppUseCase;
   private readonly repository: BluetoothRepository;
   private classicSubscription: Subscription | undefined;
+  private sessionsSubscription: Subscription | undefined;
   private scanRemainingSubscription: Subscription | undefined;
   private lifecycleUnsubscribe: (() => void) | undefined;
   private scanSessionId: string = '';
@@ -135,7 +166,9 @@ export class SppMainViewModel {
     observeClassic: ObserveClassicDevicesUseCase = new ObserveClassicDevicesUseCase(),
     startScan: StartClassicScanUseCase = new StartClassicScanUseCase(),
     stopScan: StopClassicScanUseCase = new StopClassicScanUseCase(),
-    listActiveSessions: ListActiveSppSessionsUseCase = new ListActiveSppSessionsUseCase(),
+    listSessions: ListSppSessionsUseCase = new ListSppSessionsUseCase(),
+    observeSessions: ObserveSppSessionsUseCase = new ObserveSppSessionsUseCase(),
+    disconnectSpp: DisconnectSppUseCase = new DisconnectSppUseCase(),
     repository: BluetoothRepository = BluetoothRepository.getInstance()
   ) {
     this.loadOverview = loadOverview;
@@ -143,13 +176,18 @@ export class SppMainViewModel {
     this.observeClassic = observeClassic;
     this.startScan = startScan;
     this.stopScan = stopScan;
-    this.listActiveSessions = listActiveSessions;
+    this.listSessions = listSessions;
+    this.observeSessions = observeSessions;
+    this.disconnectSpp = disconnectSpp;
     this.repository = repository;
   }
 
   async onPageAppear(): Promise<void> {
     this.classicSubscription = this.observeClassic.execute((devices: BluetoothDevice[]) => {
       this.applyScanDevices(devices);
+    });
+    this.sessionsSubscription = this.observeSessions.execute((descriptors: SppSessionDescriptor[]) => {
+      this.applyActiveSessions(descriptors);
     });
     this.scanRemainingSubscription = this.repository.observeScanRemainingMs().subscribe((_remainingMs: number) => {
       this.syncScanPhase();
@@ -168,6 +206,10 @@ export class SppMainViewModel {
     if (this.classicSubscription !== undefined) {
       this.classicSubscription.dispose();
       this.classicSubscription = undefined;
+    }
+    if (this.sessionsSubscription !== undefined) {
+      this.sessionsSubscription.dispose();
+      this.sessionsSubscription = undefined;
     }
     if (this.scanRemainingSubscription !== undefined) {
       this.scanRemainingSubscription.dispose();
@@ -239,6 +281,13 @@ export class SppMainViewModel {
     this.commitScanFilter();
   }
 
+  async disconnectSession(sessionId: string): Promise<void> {
+    await this.disconnectSpp.execute(sessionId);
+    this.refreshActiveSessions();
+    this.applyScanDevices(this.repository.listClassicDevices());
+    this.updateEmptyState();
+  }
+
   async refresh(showLoading: boolean = false): Promise<void> {
     if (showLoading || !this.hasLoadedOnce) {
       this.isLoading = true;
@@ -267,16 +316,14 @@ export class SppMainViewModel {
     }
   }
 
-  /**
-   * Refresh scan rail: stop → clear live list → start Inquiry.
-   * Paired cache refreshes inside startClassicDiscovery; scan list不再预置静默配对项。
-   */
   private async refreshScanSegment(): Promise<void> {
     if (!this.ready) {
       this.classicScanDevices = [];
       return;
     }
     await this.stopScanIfNeeded();
+    // Arch 01: preload paired classic candidates before Inquiry so list is not empty-only-scan.
+    await this.loadPaired.execute();
     this.classicScanDevices = [];
     const started = await this.startScan.execute();
     if (started.success && started.value !== undefined) {
@@ -289,13 +336,20 @@ export class SppMainViewModel {
   }
 
   private refreshActiveSessions(): void {
-    const summaries: DebugSessionSummary[] = this.listActiveSessions.execute();
+    this.applyActiveSessions(this.listSessions.execute());
+  }
+
+  private applyActiveSessions(descriptors: SppSessionDescriptor[]): void {
     const items: SppActiveSessionItem[] = [];
-    for (let i = 0; i < summaries.length; i++) {
-      const summary = summaries[i];
-      items.push(new SppActiveSessionItem(summary.id, summary.displayName, `${summary.state}`));
+    for (let i = 0; i < descriptors.length; i++) {
+      items.push(SppActiveSessionItem.fromDescriptor(descriptors[i]));
     }
     this.activeSessions = items;
+    // Refresh alreadyConnected flags on scan rows without restarting Inquiry.
+    if (this.classicScanDevices.length > 0 || this.selectedSegment === SppSegmentTab.SCAN) {
+      this.applyScanDevices(this.repository.listClassicDevices());
+    }
+    this.updateEmptyState();
   }
 
   private async stopScanIfNeeded(): Promise<void> {
@@ -318,6 +372,8 @@ export class SppMainViewModel {
       const needsBridge = !resolved.success &&
         device.bleDeviceId.length > 0 &&
         device.classicDeviceId.length === 0;
+      const alreadyConnected = this.hasAnyActiveLedgerKey(classicId);
+      const atSessionCap = this.isSessionCapReached();
       items.push(new ClassicDeviceListItem(
         device.primaryDeviceId,
         classicId,
@@ -327,15 +383,39 @@ export class SppMainViewModel {
         device.paired,
         device.transport,
         this.formatTransportLabel(device.transport),
-        resolved.success,
+        resolved.success && !alreadyConnected && !atSessionCap,
         needsBridge,
         device.majorClass,
         device.majorMinorClass,
-        ClassicProfileCapability.formatDisplayText(device.profileUuids)
+        ClassicProfileCapability.formatDisplayText(device.profileUuids),
+        alreadyConnected
       ));
     }
     this.classicScanDevices = items;
     this.syncScanPhase();
+  }
+
+  /**
+   * Scan-row "already connected" considers any Ledger key for the classicDeviceId
+   * (not only DEFAULT_SPP_UUID). Reserved / connecting slots count.
+   */
+  private hasAnyActiveLedgerKey(classicDeviceId: string): boolean {
+    const normalized = SppSessionKey.normalizeClassicId(classicDeviceId);
+    if (normalized.length === 0) {
+      return false;
+    }
+    const entries = SppSessionLedger.getInstance().listActive();
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i].sessionKey.classicDeviceId === normalized) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Cap ≥ SPP_MAX_SESSIONS disables new connects from the scan list. */
+  private isSessionCapReached(): boolean {
+    return SppSessionLedger.getInstance().getActiveCount() >= BluetoothConstants.SPP_MAX_SESSIONS;
   }
 
   private syncScanPhase(): void {

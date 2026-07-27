@@ -225,6 +225,10 @@
       "value": "需桥接"
     },
     {
+      "name": "bt_spp_status_connected",
+      "value": "已连接"
+    },
+    {
       "name": "bt_transport_classic",
       "value": "经典"
     },
@@ -291,6 +295,90 @@
     {
       "name": "bt_terminal_disconnected",
       "value": "SYS 已断开连接"
+    },
+    {
+      "name": "bt_spp_connect_dialog_title",
+      "value": "连接 SPP"
+    },
+    {
+      "name": "bt_spp_action_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "bt_spp_terminal_page_title",
+      "value": "SPP 终端"
+    },
+    {
+      "name": "bt_spp_connect_uuid_label",
+      "value": "服务 UUID"
+    },
+    {
+      "name": "bt_spp_connect_uuid_placeholder",
+      "value": "00001101-0000-1000-8000-00805F9B34FB"
+    },
+    {
+      "name": "bt_spp_connect_secure_label",
+      "value": "安全连接"
+    },
+    {
+      "name": "bt_spp_connect_timeout_label",
+      "value": "超时 (ms)"
+    },
+    {
+      "name": "bt_spp_connect_auto_reconnect_label",
+      "value": "自动重连"
+    },
+    {
+      "name": "bt_spp_action_send",
+      "value": "发送"
+    },
+    {
+      "name": "bt_spp_terminal_bytes",
+      "value": "RX %d · TX %d"
+    },
+    {
+      "name": "bt_spp_terminal_sessions",
+      "value": "会话"
+    },
+    {
+      "name": "bt_spp_terminal_clear",
+      "value": "清屏"
+    },
+    {
+      "name": "bt_spp_connect_device_label",
+      "value": "目标设备"
+    },
+    {
+      "name": "bt_pairing_guide_title",
+      "value": "配对引导"
+    },
+    {
+      "name": "bt_pairing_guide_body",
+      "value": "系统将弹出配对确认窗口。请在系统对话框中完成配对；本页仅作引导，不会替代系统 PIN/密钥界面。"
+    },
+    {
+      "name": "bt_pairing_hint_pin",
+      "value": "如需输入 PIN 或密钥，请在系统弹窗中操作。"
+    },
+    {
+      "name": "bt_pairing_action_pair",
+      "value": "配对"
+    },
+    {
+      "name": "bt_pairing_action_retry",
+      "value": "重试"
+    },
+    {
+      "name": "bt_pairing_action_open_settings",
+      "value": "打开系统蓝牙设置"
+    },
+    {
+      "name": "bt_pairing_error_cancelled",
+      "value": "配对已取消"
+    },
+    {
+      "name": "bt_pairing_error_failed",
+      "value": "配对失败，请重试"
     }
   ]
 }

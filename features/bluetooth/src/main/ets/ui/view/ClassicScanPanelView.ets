@@ -7,12 +7,15 @@ import { ClassicDeviceListItem, SppMainViewModel } from '../../viewmodel/SppMain
  *
  * 能力：ClassicScanFilter + Inquiry 设备列表。
  * 不属于 SPP 协议扫描；SPP 页将其作为连接候选轨消费。
+ * 连接按钮 → PairingGuideDialog（未配对）/ SppConnectDialog（已配对）；非直接 ConnectSppUseCase。
  */
 @ComponentV2
 export struct ClassicScanPanelView {
   @Param @Require vm: SppMainViewModel;
   @Param horizontalPadding: number = 16;
   @Param bottomInsetVp: number = 0;
+  @Event onOpenConnect: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
 
   build() {
     Column({ space: 0 }) {
@@ -36,9 +39,13 @@ export struct ClassicScanPanelView {
         emptyMessage: this.vm.emptyMessage,
         horizontalPadding: this.horizontalPadding,
         bottomInsetVp: this.bottomInsetVp,
-        onDeviceConnect: (_item: ClassicDeviceListItem) => {
+        onDeviceConnect: (item: ClassicDeviceListItem) => {
+          this.onOpenConnect(item);
         },
-        onDeviceTap: (_item: ClassicDeviceListItem) => {
+        onDeviceTap: (item: ClassicDeviceListItem) => {
+          if (item.sppConnectable) {
+            this.onOpenConnect(item);
+          }
         }
       })
         .layoutWeight(1)

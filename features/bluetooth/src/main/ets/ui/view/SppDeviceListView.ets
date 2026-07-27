@@ -29,6 +29,8 @@ export struct SppDeviceListView {
   };
   @Event onSessionTap: (item: SppActiveSessionItem) => void = (_item: SppActiveSessionItem) => {
   };
+  @Event onSessionDisconnect: (item: SppActiveSessionItem) => void = (_item: SppActiveSessionItem) => {
+  };
 
   private isEmpty(): boolean {
     if (this.mode === 'active') {
@@ -77,7 +79,8 @@ export struct SppDeviceListView {
                 address: item.address,
                 rssiText: item.rssiText,
                 statusLabel: item.needsBridge ?
-                  $r('app.string.bt_spp_status_needs_bridge') : '',
+                  $r('app.string.bt_spp_status_needs_bridge') :
+                  (item.alreadyConnected ? $r('app.string.bt_spp_status_connected') : ''),
                 statusWarning: item.needsBridge,
                 isPaired: item.paired && !item.needsBridge,
                 transportLabel: item.transportLabel,
@@ -105,17 +108,21 @@ export struct SppDeviceListView {
             ListItem() {
               ClassicDeviceCard({
                 displayName: item.displayName,
-                address: '',
-                rssiText: '',
+                address: item.classicAddress,
+                rssiText: item.uuidShortLabel,
                 statusLabel: item.stateLabel,
                 transportLabel: '',
                 profileCapabilitiesText: '',
                 majorClass: 0,
                 majorMinorClass: 0,
-                showConnectButton: false,
-                showDisclosure: true,
-                connectEnabled: false,
+                showConnectButton: true,
+                connectButtonLabel: $r('app.string.bt_spp_action_disconnect'),
+                connectEnabled: true,
+                showDisclosure: false,
                 groupRole: this.resolveGroupRole(index, this.sessions.length),
+                onConnect: () => {
+                  this.onSessionDisconnect(item);
+                },
                 onTap: () => {
                   this.onSessionTap(item);
                 }
