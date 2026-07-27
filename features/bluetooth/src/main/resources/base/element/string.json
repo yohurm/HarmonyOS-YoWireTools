@@ -113,8 +113,12 @@
       "value": "会话"
     },
     {
+      "name": "bt_classic_segment_scan",
+      "value": "经典扫描"
+    },
+    {
       "name": "bt_spp_segment_scan",
-      "value": "蓝牙扫描"
+      "value": "经典扫描"
     },
     {
       "name": "bt_spp_segment_active",
@@ -250,7 +254,7 @@
     },
     {
       "name": "bt_spp_empty_scanning_title",
-      "value": "正在扫描"
+      "value": "正在扫描经典设备"
     },
     {
       "name": "bt_spp_empty_scanning_message",

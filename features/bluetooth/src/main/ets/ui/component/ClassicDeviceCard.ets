@@ -20,13 +20,14 @@ export type ClassicDeviceGroupRole = 'standalone' | 'only' | 'first' | 'middle' 
 /**
  * Classic Bluetooth device row — HarmonyOS 效率型列表密度。
  *
- * 自底而上功能排布：
+ * 自底而上功能排布（扫描模式）：
  * ┌────────────────────────────────────────────────────────────┐
  * │ [Symbol]  设备名                         -62 dBm / --  [连接] │
  * │           MAC                            已配对  经典/双模    │
+ * │           Profile: SPP · A2DP · HFP                          │
  * └────────────────────────────────────────────────────────────┘
  * 尾区信号栈：上 RSSI（无值显示 --）；下「已配对」在传输类型左侧。
- * 警告态（需桥接）仍贴主信息区，不与配对态混排。
+ * Profile 行属经典扫描展示能力，不是 SPP socket 状态。
  */
 @ComponentV2
 export struct ClassicDeviceCard {
@@ -35,6 +36,8 @@ export struct ClassicDeviceCard {
   @Param rssiText: string = '';
   @Param statusLabel: ResourceStr = '';
   @Param transportLabel: ResourceStr = '';
+  /** Profile 能力短文案；空则不占行。 */
+  @Param profileCapabilitiesText: string = '';
   @Param majorClass: number = 0;
   @Param majorMinorClass: number = 0;
   @Param showConnectButton: boolean = true;
@@ -61,7 +64,6 @@ export struct ClassicDeviceCard {
           .width(YoSize.ICON_M)
           .height(YoSize.ICON_M)
 
-        // 主信息：L1 设备名 / L2 MAC（警告态胶囊可贴 MAC 后）
         Column({ space: YoSpace.XXS }) {
           Text(this.displayName)
             .fontSize(YoTypeStyle.BODY_M.size)
@@ -97,12 +99,20 @@ export struct ClassicDeviceCard {
           .width('100%')
           .alignItems(VerticalAlign.Center)
           .clip(true)
+
+          if (this.profileCapabilitiesText.length > 0) {
+            Text(this.profileCapabilitiesText)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_TERTIARY)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('100%')
+          }
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         .onClick(() => this.onTap())
 
-        // 尾区：上 RSSI/-- ；下 已配对（左）+ 传输类型（右）；再右 连接/披露
         Row({ space: YoSpace.M }) {
           if (this.shouldShowSignalStack()) {
             Column({ space: YoSpace.XXS }) {
@@ -244,6 +254,13 @@ export struct ClassicDeviceCard {
         $r('app.string.youi_a11y_join_two'),
         label,
         YoResourceUtil.resolveText(this.transportLabel)
+      );
+    }
+    if (this.profileCapabilitiesText.length > 0) {
+      label = YoResourceUtil.format(
+        $r('app.string.youi_a11y_join_two'),
+        label,
+        this.profileCapabilitiesText
       );
     }
     if (YoResourceUtil.hasText(this.statusLabel) && this.statusWarning) {

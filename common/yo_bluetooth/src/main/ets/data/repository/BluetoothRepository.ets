@@ -136,6 +136,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       }
       let device = BluetoothDeviceMapper.fromPairedSnapshot(mapped, BluetoothListRail.CLASSIC_SCAN);
       device = this.applyFavoriteMeta(device);
+      device = await this.attachProfileUuids(device, admitted.profileUuids);
       devices.push(device);
       this.pairedClassicCache.set(device.primaryDeviceId, device);
     }
@@ -852,9 +853,31 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     if (uuids.success &&
       uuids.value !== undefined &&
       BluetoothTransportPolicy.hasClassicProfileHint(uuids.value)) {
-      return new PairedClassicAdmitResult(true, BluetoothTransportType.BR_EDR);
+      return new PairedClassicAdmitResult(true, BluetoothTransportType.BR_EDR, uuids.value);
     }
     return new PairedClassicAdmitResult(false, BluetoothTransportType.UNKNOWN);
+  }
+
+  /**
+   * 已配对设备写入 profileUuids（展示用）。
+   * 失败不阻断列表（architecture bluetooth/01 · YW-BT-1202）。
+   */
+  private async attachProfileUuids(
+    device: BluetoothDevice,
+    knownUuids: string[]
+  ): Promise<BluetoothDevice> {
+    if (knownUuids.length > 0) {
+      return device.withProfileUuids(knownUuids);
+    }
+    const address = device.classicDeviceId.length > 0 ? device.classicDeviceId : device.primaryDeviceId;
+    if (address.length === 0) {
+      return device;
+    }
+    const uuids = await this.classicDataSource.getRemoteProfileUuids(address);
+    if (uuids.success && uuids.value !== undefined && uuids.value.length > 0) {
+      return device.withProfileUuids(uuids.value);
+    }
+    return device;
   }
 
   private publishClassicDevices(): void {
@@ -903,9 +926,16 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 class PairedClassicAdmitResult {
   readonly admit: boolean;
   readonly resolvedTransport: BluetoothTransportType;
+  /** UNKNOWN 降级路径已查询到的 UUID，避免 refresh 时重复 SDP。 */
+  readonly profileUuids: string[];
 
-  constructor(admit: boolean, resolvedTransport: BluetoothTransportType) {
+  constructor(
+    admit: boolean,
+    resolvedTransport: BluetoothTransportType,
+    profileUuids: string[] = []
+  ) {
     this.admit = admit;
     this.resolvedTransport = resolvedTransport;
+    this.profileUuids = profileUuids;
   }
 }

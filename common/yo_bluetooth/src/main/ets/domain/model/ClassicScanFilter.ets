@@ -1,5 +1,6 @@
 /**
- * Classic SPP scan filter (architecture bluetooth/01 §8).
+ * Classic Bluetooth (BR/EDR) Inquiry 列表过滤器（architecture bluetooth/01 §8）。
+ * 不属于 SPP 协议过滤；SPP 页扫描段复用本过滤器。
  * RSSI slider range aligns with common BT tools: -100 (all) … -40 (nearby).
  */
 export enum ClassicDeviceMajorFilter {

@@ -2,8 +2,8 @@ import { SppDeviceListView } from './SppDeviceListView';
 import { SppActiveSessionItem, SppMainViewModel } from '../../viewmodel/SppMainViewModel';
 
 /**
- * Active-connection rail only.
- * No scan filter panel — fully decoupled from SppScanPanelView.
+ * SPP 活动连接轨。
+ * 与 ClassicScanPanelView（经典 Inquiry）完全解耦。
  */
 @ComponentV2
 export struct SppActivePanelView {

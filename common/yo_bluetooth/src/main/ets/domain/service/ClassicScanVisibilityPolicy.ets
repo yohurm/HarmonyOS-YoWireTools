@@ -18,7 +18,10 @@ export class ActiveSppSessionRef {
 }
 
 /**
- * 经典扫描列表可见性策略。
+ * 经典扫描（CLASSIC_SCAN rail）列表可见性策略。
+ *
+ * 本策略属于经典 Inquiry 列表，不是 SPP 协议扫描。
+ * 当前 SPP 页是唯一 UI 消费者，故用活跃 SPP 会话地址作「保活行」锚点。
  *
  * 扫描轨只展示：
  * 1. 本轮 Inquiry / discoveryResult 真实回调（含 RSSI 或 deviceFind）

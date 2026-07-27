@@ -1,13 +1,13 @@
 export { BtOverviewViewModel } from './src/main/ets/viewmodel/BtOverviewViewModel';
-export { SppMainViewModel, SppSegmentTab, SppDeviceListItem, SppActiveSessionItem } from './src/main/ets/viewmodel/SppMainViewModel';
+export { SppMainViewModel, SppSegmentTab, ClassicDeviceListItem, SppActiveSessionItem } from './src/main/ets/viewmodel/SppMainViewModel';
 export { BleMainViewModel } from './src/main/ets/viewmodel/BleMainViewModel';
 export { BtStatusCard } from './src/main/ets/ui/component/BtStatusCard';
 export { BtSummaryCard } from './src/main/ets/ui/component/BtSummaryCard';
 export { ClassicDeviceCard } from './src/main/ets/ui/component/ClassicDeviceCard';
 export { SppMainContentView } from './src/main/ets/ui/view/SppMainContentView';
-export { SppScanPanelView } from './src/main/ets/ui/view/SppScanPanelView';
+export { ClassicScanPanelView } from './src/main/ets/ui/view/ClassicScanPanelView';
 export { SppActivePanelView } from './src/main/ets/ui/view/SppActivePanelView';
-export { SppScanFilterPanelView } from './src/main/ets/ui/view/SppScanFilterPanelView';
+export { ClassicScanFilterPanelView } from './src/main/ets/ui/view/ClassicScanFilterPanelView';
 export { SppDeviceListView } from './src/main/ets/ui/view/SppDeviceListView';
 export { openSppTitleMoreMenu, SPP_TITLE_MORE_MENU_ID } from './src/main/ets/ui/menu/SppTitleMoreMenu';
 export { ClassicDeviceSymbolResolver } from './src/main/ets/ui/util/ClassicDeviceSymbolResolver';

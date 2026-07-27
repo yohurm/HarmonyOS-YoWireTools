@@ -92,6 +92,8 @@ export { SppConnectParams } from './src/main/ets/domain/model/SppConnectParams';
 export { GattConnectParams } from './src/main/ets/domain/model/GattConnectParams';
 export { BleScanFilter } from './src/main/ets/domain/model/BleScanFilter';
 export { ClassicScanFilter, ClassicDeviceMajorFilter } from './src/main/ets/domain/model/ClassicScanFilter';
+export { ClassicScanCapability } from './src/main/ets/domain/model/ClassicScanCapability';
+export { ClassicProfileCapability } from './src/main/ets/domain/service/ClassicProfileCapability';
 export { BleAdvertisingPacket, DeviceNameSource } from './src/main/ets/domain/model/BleAdvertisingPacket';
 export { GattServiceTreeSnapshot } from './src/main/ets/domain/model/GattServiceTree';
 export { ReconnectPolicy } from './src/main/ets/domain/model/ReconnectPolicy';

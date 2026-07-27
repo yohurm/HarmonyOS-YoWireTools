@@ -8,21 +8,18 @@ import { ClassicDeviceMajorFilter, ClassicScanFilter } from 'yo_bluetooth';
 import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
 
 /**
- * Scan filter panel — 紧凑表单密度（展开于 Segment 下方）。
+ * 经典蓝牙 Inquiry 列表过滤器面板（≠ SPP 协议过滤）。
+ * 绑定 ClassicScanFilter；由 SPP 页扫描段展开使用。
  *
  * 功能清单与排布：
  * ┌────────────────────────────────────────────┐
- * │ [名称________] [MAC________]      [重置]   │  ← 双列输入，省纵向
- * │ 信号  弱──●──强              ≥ -70 dBm    │  ← 单行 Slider + 读数
- * │ 设备类型                        [全部 ▼]   │  ← 系统 Select，右贴自适应
+ * │ [名称________] [MAC________]      [重置]   │
+ * │ 信号  弱──●──强              ≥ -70 dBm    │
+ * │ 设备类型                        [全部 ▼]   │
  * └────────────────────────────────────────────┘
- *
- * 依据：间隔参数控件普通间距 8vp；用 placeholder 代替独立 label 行。
- * Select：走系统默认 API（controlSize / selected / value / onSelect），
- * 不覆盖 width/height/font/背景，由 controlSize 自适应文字宽度。
  */
 @ComponentV2
-export struct SppScanFilterPanelView {
+export struct ClassicScanFilterPanelView {
   @Param @Require vm: SppMainViewModel;
   private readonly majorOptions: SelectOption[] = [
     { value: $r('app.string.bt_spp_filter_type_all') },
@@ -144,7 +141,6 @@ export struct SppScanFilterPanelView {
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.TEXT_SECONDARY)
         Blank()
-        // 系统 Select 默认下拉按钮：仅设 controlSize，宽高随文字自适应
         Select(this.majorOptions)
           .selected(this.majorIndex())
           .value(this.majorOptions[this.majorIndex()].value)

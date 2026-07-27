@@ -8,7 +8,9 @@ import { BleAdStructureParser } from '../main/ets/domain/service/BleAdStructureP
 import { DeviceNameSource } from '../main/ets/domain/model/BleAdvertisingPacket';
 import { ScanResultMerger } from '../main/ets/domain/service/ScanResultMerger';
 import { ClassicScanVisibilityPolicy } from '../main/ets/domain/service/ClassicScanVisibilityPolicy';
+import { ClassicProfileCapability } from '../main/ets/domain/service/ClassicProfileCapability';
 import { ClassicDeviceMajorFilter, ClassicScanFilter } from '../main/ets/domain/model/ClassicScanFilter';
+import { ClassicScanCapability } from '../main/ets/domain/model/ClassicScanCapability';
 import { BluetoothDevice, BluetoothDeviceDraft } from '../main/ets/domain/model/BluetoothDevice';
 import { DiscoverySource } from '../main/ets/domain/model/DiscoverySource';
 import { BluetoothListRail, BluetoothTransportType } from '../main/ets/domain/model/BluetoothTransportType';
@@ -121,6 +123,20 @@ export default function localUnitTest() {
       expect(filtered[0].classicDeviceId).assertEqual('11:11:11:11:11:11');
       expect(new ClassicScanFilter('a', '', -70).hasActiveConstraints()).assertTrue();
       expect(ClassicScanFilter.empty().hasActiveConstraints()).assertFalse();
+    });
+
+    it('ClassicProfileCapability_formats_labels', 0, () => {
+      const text = ClassicProfileCapability.formatDisplayText([
+        '00001101-0000-1000-8000-00805F9B34FB',
+        '0000110B-0000-1000-8000-00805F9B34FB',
+        '0000111E-0000-1000-8000-00805F9B34FB'
+      ]);
+      expect(text).assertEqual('SPP · A2DP · HFP');
+      expect(ClassicProfileCapability.hasClassicHint([])).assertFalse();
+      expect(ClassicProfileCapability.hasClassicHint([
+        '00001101-0000-1000-8000-00805F9B34FB'
+      ])).assertTrue();
+      expect(ClassicScanCapability.LIST_RAIL).assertEqual(BluetoothListRail.CLASSIC_SCAN);
     });
 
     it('ClassicScanVisibilityPolicy_hides_silent_paired_only', 0, () => {

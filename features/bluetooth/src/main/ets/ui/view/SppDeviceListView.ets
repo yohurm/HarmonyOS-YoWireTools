@@ -5,17 +5,17 @@ import {
   YoListToken
 } from 'youi_kit';
 import { ClassicDeviceCard, ClassicDeviceGroupRole } from '../component/ClassicDeviceCard';
-import { SppActiveSessionItem, SppDeviceListItem } from '../../viewmodel/SppMainViewModel';
+import { ClassicDeviceListItem, SppActiveSessionItem } from '../../viewmodel/SppMainViewModel';
 
 /**
- * SPP device / session list surface.
+ * 共享列表表面：经典扫描设备行 / SPP 活动会话行。
  *
- * 分组卡片表面：同组内 0 间距 + 内部分割线，避免逐卡阴影/圆角浪费纵向空间。
- * Bottom inset 作为 list footer（沉浸式底栏，无壳层空白带）。
+ * mode=scan → ClassicDeviceListItem（CLASSIC_SCAN rail）
+ * mode=active → SppActiveSessionItem（SPP 协议会话）
  */
 @ComponentV2
 export struct SppDeviceListView {
-  @Param devices: SppDeviceListItem[] = [];
+  @Param devices: ClassicDeviceListItem[] = [];
   @Param sessions: SppActiveSessionItem[] = [];
   @Param mode: 'scan' | 'active' = 'scan';
   @Param emptyTitle: ResourceStr = '';
@@ -23,9 +23,9 @@ export struct SppDeviceListView {
   @Param horizontalPadding: number = 16;
   @Param bottomInsetVp: number = 0;
   @Param listScroller: Scroller = new Scroller();
-  @Event onDeviceConnect: (item: SppDeviceListItem) => void = (_item: SppDeviceListItem) => {
+  @Event onDeviceConnect: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
   };
-  @Event onDeviceTap: (item: SppDeviceListItem) => void = (_item: SppDeviceListItem) => {
+  @Event onDeviceTap: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
   };
   @Event onSessionTap: (item: SppActiveSessionItem) => void = (_item: SppActiveSessionItem) => {
   };
@@ -68,7 +68,7 @@ export struct SppDeviceListView {
     } else {
       List({ space: YoListToken.ITEM_GAP, scroller: this.listScroller }) {
         if (this.mode === 'scan') {
-          ForEach(this.devices, (item: SppDeviceListItem, index: number) => {
+          ForEach(this.devices, (item: ClassicDeviceListItem, index: number) => {
             ListItem() {
               ClassicDeviceCard({
                 displayName: item.displayName.length > 0 ?
@@ -81,6 +81,7 @@ export struct SppDeviceListView {
                 statusWarning: item.needsBridge,
                 isPaired: item.paired && !item.needsBridge,
                 transportLabel: item.transportLabel,
+                profileCapabilitiesText: item.profileCapabilitiesText,
                 majorClass: item.majorClass,
                 majorMinorClass: item.majorMinorClass,
                 showConnectButton: true,
@@ -98,7 +99,7 @@ export struct SppDeviceListView {
                   right: this.horizontalPadding
                 })
             }
-          }, (item: SppDeviceListItem) => item.primaryDeviceId)
+          }, (item: ClassicDeviceListItem) => item.primaryDeviceId)
         } else {
           ForEach(this.sessions, (item: SppActiveSessionItem, index: number) => {
             ListItem() {
@@ -108,6 +109,7 @@ export struct SppDeviceListView {
                 rssiText: '',
                 statusLabel: item.stateLabel,
                 transportLabel: '',
+                profileCapabilitiesText: '',
                 majorClass: 0,
                 majorMinorClass: 0,
                 showConnectButton: false,

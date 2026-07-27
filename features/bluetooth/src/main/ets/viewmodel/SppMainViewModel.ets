@@ -10,6 +10,7 @@ import {
   BluetoothRepository,
   BluetoothTransportType,
   ClassicDeviceMajorFilter,
+  ClassicProfileCapability,
   ClassicScanFilter,
   ClassicScanPhase,
   ListActiveSppSessionsUseCase,
@@ -21,11 +22,17 @@ import {
 } from 'yo_bluetooth';
 
 export enum SppSegmentTab {
+  /** 经典蓝牙 Inquiry 扫描轨（CLASSIC_SCAN），非 SPP 协议扫描。 */
   SCAN = 0,
+  /** SPP 活动连接轨。 */
   ACTIVE = 1
 }
 
-export class SppDeviceListItem {
+/**
+ * 经典扫描列表设备投影（architecture bluetooth/01 §6.1）。
+ * 供 SPP 页扫描段消费；字段来自经典发现轨，不是 SPP socket 状态。
+ */
+export class ClassicDeviceListItem {
   readonly primaryDeviceId: string;
   readonly classicDeviceId: string;
   readonly displayName: string;
@@ -38,6 +45,8 @@ export class SppDeviceListItem {
   readonly needsBridge: boolean;
   readonly majorClass: number;
   readonly majorMinorClass: number;
+  /** Profile 能力短文案，如 `SPP · A2DP`；未知为空。 */
+  readonly profileCapabilitiesText: string;
 
   constructor(
     primaryDeviceId: string,
@@ -51,7 +60,8 @@ export class SppDeviceListItem {
     sppConnectable: boolean,
     needsBridge: boolean,
     majorClass: number = 0,
-    majorMinorClass: number = 0
+    majorMinorClass: number = 0,
+    profileCapabilitiesText: string = ''
   ) {
     this.primaryDeviceId = primaryDeviceId;
     this.classicDeviceId = classicDeviceId;
@@ -65,6 +75,7 @@ export class SppDeviceListItem {
     this.needsBridge = needsBridge;
     this.majorClass = majorClass;
     this.majorMinorClass = majorMinorClass;
+    this.profileCapabilitiesText = profileCapabilitiesText;
   }
 }
 
@@ -80,19 +91,24 @@ export class SppActiveSessionItem {
   }
 }
 
+/**
+ * SPP 主页 ViewModel：编排「经典扫描轨」+「SPP 活动连接轨」。
+ * 扫描能力来自 Start/Stop/ObserveClassic* UseCase，不是 SPP 扫描。
+ */
 @ObservedV2
 export class SppMainViewModel {
   @Trace isLoading: boolean = true;
   @Trace ready: boolean = false;
   @Trace selectedSegment: SppSegmentTab = SppSegmentTab.SCAN;
-  /** Bound to SegmentButton tab index (0=scan, 1=active). */
+  /** Bound to SegmentButton tab index (0=classic scan, 1=active SPP). */
   @Trace selectedIndex: number = 0;
-  @Trace scanDevices: SppDeviceListItem[] = [];
+  /** 经典 Inquiry 扫描结果（CLASSIC_SCAN rail）。 */
+  @Trace classicScanDevices: ClassicDeviceListItem[] = [];
   @Trace activeSessions: SppActiveSessionItem[] = [];
   @Trace isScanning: boolean = false;
   @Trace emptyTitle: ResourceStr = $r('app.string.bt_spp_empty_scan_title');
   @Trace emptyMessage: ResourceStr = $r('app.string.bt_spp_empty_scan_message');
-  /** Scan-only: filter panel expanded under the segment control. */
+  /** Classic-scan-only: filter panel expanded under the segment control. */
   @Trace filterPanelExpanded: boolean = false;
   @Trace filterName: string = '';
   @Trace filterAddress: string = '';
@@ -257,11 +273,11 @@ export class SppMainViewModel {
    */
   private async refreshScanSegment(): Promise<void> {
     if (!this.ready) {
-      this.scanDevices = [];
+      this.classicScanDevices = [];
       return;
     }
     await this.stopScanIfNeeded();
-    this.scanDevices = [];
+    this.classicScanDevices = [];
     const started = await this.startScan.execute();
     if (started.success && started.value !== undefined) {
       this.scanSessionId = started.value;
@@ -292,7 +308,7 @@ export class SppMainViewModel {
   }
 
   private applyScanDevices(devices: BluetoothDevice[]): void {
-    const items: SppDeviceListItem[] = [];
+    const items: ClassicDeviceListItem[] = [];
     for (let i = 0; i < devices.length; i++) {
       const device = devices[i];
       const resolved = this.repository.resolveClassicIdForSpp(device);
@@ -302,7 +318,7 @@ export class SppMainViewModel {
       const needsBridge = !resolved.success &&
         device.bleDeviceId.length > 0 &&
         device.classicDeviceId.length === 0;
-      items.push(new SppDeviceListItem(
+      items.push(new ClassicDeviceListItem(
         device.primaryDeviceId,
         classicId,
         device.effectiveName.length > 0 ? device.effectiveName : '',
@@ -314,10 +330,11 @@ export class SppMainViewModel {
         resolved.success,
         needsBridge,
         device.majorClass,
-        device.majorMinorClass
+        device.majorMinorClass,
+        ClassicProfileCapability.formatDisplayText(device.profileUuids)
       ));
     }
-    this.scanDevices = items;
+    this.classicScanDevices = items;
     this.syncScanPhase();
   }
 
@@ -358,12 +375,12 @@ export class SppMainViewModel {
       this.emptyMessage = $r('app.string.bt_spp_empty_active_message');
       return;
     }
-    if (this.isScanning && this.scanDevices.length === 0) {
+    if (this.isScanning && this.classicScanDevices.length === 0) {
       this.emptyTitle = $r('app.string.bt_spp_empty_scanning_title');
       this.emptyMessage = $r('app.string.bt_spp_empty_scanning_message');
       return;
     }
-    if (this.filterActive && this.scanDevices.length === 0) {
+    if (this.filterActive && this.classicScanDevices.length === 0) {
       this.emptyTitle = $r('app.string.bt_spp_empty_filter_title');
       this.emptyMessage = $r('app.string.bt_spp_empty_filter_message');
       return;

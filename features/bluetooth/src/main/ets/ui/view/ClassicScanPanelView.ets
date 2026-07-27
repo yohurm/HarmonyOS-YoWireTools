@@ -1,13 +1,15 @@
 import { SppDeviceListView } from './SppDeviceListView';
-import { SppScanFilterPanelView } from './SppScanFilterPanelView';
-import { SppDeviceListItem, SppMainViewModel } from '../../viewmodel/SppMainViewModel';
+import { ClassicScanFilterPanelView } from './ClassicScanFilterPanelView';
+import { ClassicDeviceListItem, SppMainViewModel } from '../../viewmodel/SppMainViewModel';
 
 /**
- * Scan rail only: optional filter panel + device list.
- * Decoupled from the active-connection rail.
+ * 经典蓝牙扫描轨面板（CLASSIC_SCAN rail）。
+ *
+ * 能力：ClassicScanFilter + Inquiry 设备列表。
+ * 不属于 SPP 协议扫描；SPP 页将其作为连接候选轨消费。
  */
 @ComponentV2
-export struct SppScanPanelView {
+export struct ClassicScanPanelView {
   @Param @Require vm: SppMainViewModel;
   @Param horizontalPadding: number = 16;
   @Param bottomInsetVp: number = 0;
@@ -16,7 +18,7 @@ export struct SppScanPanelView {
     Column({ space: 0 }) {
       if (this.vm.filterPanelExpanded) {
         Column() {
-          SppScanFilterPanelView({ vm: this.vm })
+          ClassicScanFilterPanelView({ vm: this.vm })
         }
         .width('100%')
         .padding({
@@ -29,14 +31,14 @@ export struct SppScanPanelView {
 
       SppDeviceListView({
         mode: 'scan',
-        devices: this.vm.scanDevices,
+        devices: this.vm.classicScanDevices,
         emptyTitle: this.vm.emptyTitle,
         emptyMessage: this.vm.emptyMessage,
         horizontalPadding: this.horizontalPadding,
         bottomInsetVp: this.bottomInsetVp,
-        onDeviceConnect: (_item: SppDeviceListItem) => {
+        onDeviceConnect: (_item: ClassicDeviceListItem) => {
         },
-        onDeviceTap: (_item: SppDeviceListItem) => {
+        onDeviceTap: (_item: ClassicDeviceListItem) => {
         }
       })
         .layoutWeight(1)

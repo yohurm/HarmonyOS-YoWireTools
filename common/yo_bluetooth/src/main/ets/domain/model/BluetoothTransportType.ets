@@ -9,6 +9,10 @@ export enum BluetoothTransportType {
   UNKNOWN = 'unknown'
 }
 
+/**
+ * 列表轨（非协议本身）。
+ * CLASSIC_SCAN = BR/EDR Inquiry 结果轨；今日由 SPP 页扫描段消费，≠ SPP 扫描。
+ */
 export enum BluetoothListRail {
   CLASSIC_SCAN = 'classicScan',
   BLE_SCAN = 'bleScan'
@@ -27,7 +31,7 @@ export enum BluetoothRawAddrKind {
 }
 
 /**
- * Classic / SPP list admission and BLE list admission.
+ * Classic / BLE 列表准入策略（与 SPP 连接协议解耦）。
  */
 export class BluetoothTransportPolicy {
   static isClassicCandidate(transport: BluetoothTransportType): boolean {
@@ -76,17 +80,19 @@ export class BluetoothTransportPolicy {
 
   /**
    * Typical BR/EDR profile UUID short forms from getRemoteProfileUuids.
-   * Used only as UNKNOWN paired fallback (architecture bluetooth/00 §5.1).
+   * Used as UNKNOWN paired fallback (architecture bluetooth/00 §5.1).
+   * Implementation: ClassicProfileCapability.hasClassicHint.
    */
   static hasClassicProfileHint(uuids: string[]): boolean {
+    // Local short-form check kept here to avoid circular import with service layer.
     for (let i = 0; i < uuids.length; i++) {
       const uuid = uuids[i].toLowerCase();
-      if (uuid.indexOf('1101') >= 0 || // SPP
-        uuid.indexOf('110a') >= 0 || // A2DP Source
-        uuid.indexOf('110b') >= 0 || // A2DP Sink
-        uuid.indexOf('111e') >= 0 || // HFP HF
-        uuid.indexOf('111f') >= 0 || // HFP AG
-        uuid.indexOf('1124') >= 0) { // HID
+      if (uuid.indexOf('1101') >= 0 ||
+        uuid.indexOf('110a') >= 0 ||
+        uuid.indexOf('110b') >= 0 ||
+        uuid.indexOf('111e') >= 0 ||
+        uuid.indexOf('111f') >= 0 ||
+        uuid.indexOf('1124') >= 0) {
         return true;
       }
     }

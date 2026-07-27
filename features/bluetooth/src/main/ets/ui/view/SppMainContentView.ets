@@ -1,14 +1,14 @@
 import { YoColor, YoResponsive, YoSegmentButton } from 'youi_kit';
 import { SppActivePanelView } from './SppActivePanelView';
-import { SppScanPanelView } from './SppScanPanelView';
+import { ClassicScanPanelView } from './ClassicScanPanelView';
 import { SppMainViewModel, SppSegmentTab } from '../../viewmodel/SppMainViewModel';
 
 /**
- * SPP main content orchestrator.
+ * SPP 主内容编排。
  *
- * Segment switches between fully decoupled rails:
- * - SppScanPanelView (filter + scan list)
- * - SppActivePanelView (active sessions only)
+ * Segment 切换两轨（职责解耦）：
+ * - ClassicScanPanelView：经典 Inquiry 扫描 + ClassicScanFilter
+ * - SppActivePanelView：SPP 活动连接
  */
 @ComponentV2
 export struct SppMainContentView {
@@ -32,7 +32,7 @@ export struct SppMainContentView {
       Column() {
         YoSegmentButton({
           labels: [
-            $r('app.string.bt_spp_segment_scan'),
+            $r('app.string.bt_classic_segment_scan'),
             $r('app.string.bt_spp_segment_active')
           ],
           initialIndex: this.vm.selectedIndex,
@@ -55,7 +55,7 @@ export struct SppMainContentView {
         })
           .layoutWeight(1)
       } else {
-        SppScanPanelView({
+        ClassicScanPanelView({
           vm: this.vm,
           horizontalPadding: this.horizontalPadding,
           bottomInsetVp: this.bottomInsetVp
