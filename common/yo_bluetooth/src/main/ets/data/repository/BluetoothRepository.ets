@@ -39,6 +39,7 @@ import { SppTransportSession } from '../transport/SppTransportSession';
 import { DeviceIdentity } from '../../domain/model/DeviceIdentity';
 import { DeviceRegistry } from '../../domain/service/registry/DeviceRegistry';
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
+import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
 
 /**
  * Bluetooth repository facade per architecture 02-搂6.1.
@@ -102,6 +103,14 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   createSppTransport(sessionId: string, _params: SppConnectParams): SppTransportSession {
     return new SppTransportSession(sessionId);
+  }
+
+  getActiveSppSessionCount(): number {
+    return SppSessionLedger.getInstance().getActiveCount();
+  }
+
+  canOpenSppSession(): boolean {
+    return SppSessionLedger.getInstance().getActiveCount() < BluetoothConstants.SPP_MAX_SESSIONS;
   }
 
   /**

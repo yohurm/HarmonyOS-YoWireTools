@@ -1,5 +1,5 @@
 export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
-export { SppTransportSession } from './src/main/ets/data/transport/SppTransportSession';
+// L1–L3 SPP concretes (SppPlatformGateway / SppRfcommClient / SppTransportSession) stay module-internal.
 export { GattTransportSession } from './src/main/ets/data/transport/GattTransportSession';
 export {
   StartClassicScanUseCase,
@@ -8,12 +8,16 @@ export {
   ObservePairingEventsUseCase,
   LoadPairedClassicDevicesUseCase,
   ObserveClassicDevicesUseCase,
-  ListActiveSppSessionsUseCase
+  ListSppSessionsUseCase
 } from './src/main/ets/domain/usecase/classic/ClassicScanUseCases';
 export {
   ConnectSppUseCase,
   DisconnectSppUseCase
 } from './src/main/ets/domain/usecase/classic/SppConnectionUseCases';
+export {
+  QuerySppConnectEligibilityUseCase,
+  ObserveSppSessionsUseCase
+} from './src/main/ets/domain/usecase/classic/SppSessionQueryUseCases';
 export {
   ResolveSppTargetAddressUseCase,
   BridgeBleToClassicPairUseCase,
@@ -33,7 +37,17 @@ export {
 } from './src/main/ets/domain/usecase/uart/UartConnectionUseCases';
 export { SerialProfileMatcher } from './src/main/ets/domain/service/uart/SerialProfileMatcher';
 export { CommandWriteQueue } from './src/main/ets/domain/service/queue/CommandWriteQueue';
-export { SppActiveWritePolicy } from './src/main/ets/domain/service/spp/SppActiveWritePolicy';
+export { SppSessionAdmissionPolicy } from './src/main/ets/domain/service/spp/SppSessionAdmissionPolicy';
+export { SppSessionLedger, SppLedgerEntry } from './src/main/ets/domain/service/spp/SppSessionLedger';
+export { SppSessionCatalog } from './src/main/ets/domain/service/spp/SppSessionCatalog';
+export { SppUuidLabel } from './src/main/ets/domain/service/spp/SppUuidLabel';
+export { SppLedgerPhase } from './src/main/ets/domain/model/spp/SppLedgerPhase';
+export {
+  ISppTransportFacet,
+  asSppTransportFacet
+} from './src/main/ets/domain/model/spp/ISppTransportFacet';
+export { SppSessionTeardown } from './src/main/ets/domain/service/spp/SppSessionTeardown';
+export { SppReconnectCoordinator } from './src/main/ets/domain/service/SppReconnectCoordinator';
 export {
   ClassicBluetoothRepositoryFacet,
   SppBluetoothRepositoryFacet,
@@ -88,7 +102,10 @@ export {
   BluetoothTransportPolicy
 } from './src/main/ets/domain/model/BluetoothTransportType';
 export { DeviceIdentity, IdentityStability } from './src/main/ets/domain/model/DeviceIdentity';
+export { PairingState, PairingEvent } from './src/main/ets/domain/model/PairingState';
 export { SppConnectParams } from './src/main/ets/domain/model/SppConnectParams';
+export { SppSessionKey } from './src/main/ets/domain/model/SppSessionKey';
+export { SppSessionDescriptor } from './src/main/ets/domain/model/SppSessionDescriptor';
 export { GattConnectParams } from './src/main/ets/domain/model/GattConnectParams';
 export { BleScanFilter } from './src/main/ets/domain/model/BleScanFilter';
 export { ClassicScanFilter, ClassicDeviceMajorFilter } from './src/main/ets/domain/model/ClassicScanFilter';
@@ -100,6 +117,7 @@ export { ReconnectPolicy } from './src/main/ets/domain/model/ReconnectPolicy';
 export { BleSerialEndpoints } from './src/main/ets/domain/model/BleSerialPreset';
 export { GattCharacteristicRef, GattDescriptorRef, GattCharacteristicChangeEvent } from './src/main/ets/domain/model/GattCharacteristicRef';
 export { BluetoothErrorCodes } from './src/main/ets/constants/BluetoothErrorCodes';
+export { BluetoothConstants } from './src/main/ets/constants/BluetoothConstants';
 export { BluetoothRepositoryContract } from './src/main/ets/domain/repository/BluetoothRepositoryContract';
 export { BluetoothDeviceVerificationChecklist } from './src/main/ets/data/verification/BluetoothDeviceVerificationChecklist';
 export { ScanResultMergeQueue } from './src/main/ets/domain/service/ScanResultMergeQueue';
@@ -110,3 +128,4 @@ export {
   ClassicScanStatusKind,
   BleScanStatusKind
 } from './src/main/ets/domain/model/BluetoothStatusKind';
+export { SppConnectFailureHints } from './src/main/ets/domain/service/SppConnectFailureHints';

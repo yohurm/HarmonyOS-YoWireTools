@@ -29,6 +29,12 @@ export class BluetoothErrorCodes {
   static readonly SPP_PROFILE_UNSUPPORTED: string = 'YW-BT-1314';
   static readonly SPP_IO_ERROR: string = 'YW-BT-1315';
   static readonly SPP_CONNECT_FAILED: string = 'YW-BT-1399';
+  /** Same classicDeviceId + serviceUuid already connected or reserved */
+  static readonly SPP_DUPLICATE_SESSION: string = 'YW-BT-1316';
+  /** Active SPP session count reached SPP_MAX_SESSIONS */
+  static readonly SPP_SESSION_LIMIT: string = 'YW-BT-1317';
+  /** sppConnect exceeded configured timeoutMs */
+  static readonly SPP_CONNECT_TIMEOUT: string = 'YW-BT-1318';
   /** TX queue full — backpressure reject */
   static readonly WRITE_QUEUE_FULL: string = 'YW-BT-1401';
 

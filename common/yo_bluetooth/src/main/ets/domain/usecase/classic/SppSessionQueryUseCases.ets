@@ -1,0 +1,49 @@
+import { Result, Subscription } from 'common_core';
+import { SessionRuntimeStore } from 'debug_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
+import { SppSessionDescriptor } from '../../model/SppSessionDescriptor';
+import { SppSessionKey } from '../../model/SppSessionKey';
+import { SppSessionAdmissionPolicy } from '../../service/spp/SppSessionAdmissionPolicy';
+import { SppSessionCatalog } from '../../service/spp/SppSessionCatalog';
+
+/**
+ * Pre-flight check for scan-list connect button state.
+ */
+export class QuerySppConnectEligibilityUseCase {
+  private readonly admissionPolicy: SppSessionAdmissionPolicy;
+
+  constructor(admissionPolicy: SppSessionAdmissionPolicy = new SppSessionAdmissionPolicy()) {
+    this.admissionPolicy = admissionPolicy;
+  }
+
+  execute(classicDeviceId: string, serviceUuid: string = BluetoothConstants.DEFAULT_SPP_UUID): Result<void> {
+    return this.admissionPolicy.ensureCanConnect(SppSessionKey.fromParts(classicDeviceId, serviceUuid));
+  }
+
+  isKeyActive(classicDeviceId: string, serviceUuid: string = BluetoothConstants.DEFAULT_SPP_UUID): boolean {
+    return this.admissionPolicy.hasActiveKey(SppSessionKey.fromParts(classicDeviceId, serviceUuid));
+  }
+}
+
+/**
+ * Observes RuntimeStore active-session list; Catalog merges with Ledger
+ * (no active row without Ledger key — architecture bluetooth/02).
+ */
+export class ObserveSppSessionsUseCase {
+  private readonly runtimeStore: SessionRuntimeStore;
+  private readonly catalog: SppSessionCatalog;
+
+  constructor(
+    runtimeStore: SessionRuntimeStore = SessionRuntimeStore.getInstance(),
+    catalog: SppSessionCatalog = new SppSessionCatalog()
+  ) {
+    this.runtimeStore = runtimeStore;
+    this.catalog = catalog;
+  }
+
+  execute(onSessions: (sessions: SppSessionDescriptor[]) => void): Subscription {
+    return this.runtimeStore.observeActiveSessions().subscribe((_summaries) => {
+      onSessions(this.catalog.listActiveDescriptors());
+    });
+  }
+}

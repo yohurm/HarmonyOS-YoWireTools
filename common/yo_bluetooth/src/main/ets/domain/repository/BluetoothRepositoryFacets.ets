@@ -27,6 +27,8 @@ export interface SppBluetoothRepositoryFacet {
   resolveClassicIdForSpp(device: BluetoothDevice): Result<string>;
   createSppTransport(sessionId: string, params: SppConnectParams): object;
   linkDualModeIdentity(classicDeviceId: string, bleDeviceId: string, displayNameHint?: string): DeviceIdentity;
+  getActiveSppSessionCount(): number;
+  canOpenSppSession(): boolean;
 }
 
 export interface BleScanRepositoryFacet {

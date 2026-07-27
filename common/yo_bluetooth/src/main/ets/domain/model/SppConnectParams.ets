@@ -1,6 +1,7 @@
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
 import { ReconnectPolicy } from './ReconnectPolicy';
 import { BluetoothTransportType } from './BluetoothTransportType';
+import { SppSessionKey } from './SppSessionKey';
 
 /**
  * SPP connect params — classicDeviceId only (architecture bluetooth/00 + 02).
@@ -27,15 +28,15 @@ export class SppConnectParams {
     transport: BluetoothTransportType = BluetoothTransportType.BR_EDR,
     bleDeviceId: string = ''
   ) {
-    this.classicDeviceId = classicDeviceId;
+    this.classicDeviceId = SppSessionKey.normalizeClassicId(classicDeviceId);
     this.displayName = displayName;
-    this.uuid = uuid;
+    this.uuid = SppSessionKey.normalizeUuid(uuid);
     this.secure = secure;
     this.timeoutMs = timeoutMs;
     this.autoReconnect = autoReconnect;
     this.reconnectPolicy = reconnectPolicy;
     this.transport = transport;
-    this.bleDeviceId = bleDeviceId;
+    this.bleDeviceId = bleDeviceId.trim();
   }
 
   toConnectRecord(): Record<string, string | number | boolean> {
@@ -52,6 +53,8 @@ export class SppConnectParams {
     record['reconnectInitialDelayMs'] = this.reconnectPolicy.initialDelayMs;
     record['reconnectMaxDelayMs'] = this.reconnectPolicy.maxDelayMs;
     record['reconnectBackoffFactor'] = this.reconnectPolicy.backoffFactor;
+    record['stopOnPairLost'] = this.reconnectPolicy.stopOnPairLost;
+    record['stopOnPermissionLost'] = this.reconnectPolicy.stopOnPermissionLost;
     return record;
   }
 }
@@ -59,9 +62,11 @@ export class SppConnectParams {
 export class ConnectSppResult {
   readonly sessionId: string;
   readonly transportId: string;
+  readonly sessionKey: SppSessionKey;
 
-  constructor(sessionId: string, transportId: string) {
+  constructor(sessionId: string, transportId: string, sessionKey: SppSessionKey) {
     this.sessionId = sessionId;
     this.transportId = transportId;
+    this.sessionKey = sessionKey;
   }
 }

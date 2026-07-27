@@ -1,16 +1,16 @@
-﻿import { Result, ResultError, Subscription } from 'common_core';
+import { Result, ResultError, Subscription } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
-  DebugSessionSummary,
   ModuleType,
   ProtocolType,
-  SessionRuntimeStore,
   SessionType,
   StopSessionUseCase
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { SppSessionDescriptor } from '../../model/SppSessionDescriptor';
+import { SppSessionCatalog } from '../../service/spp/SppSessionCatalog';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import { PairingCoordinator } from '../../service/PairingCoordinator';
 import { PairingEvent } from '../../model/PairingState';
@@ -153,22 +153,14 @@ export class ObserveClassicDevicesUseCase {
   }
 }
 
-export class ListActiveSppSessionsUseCase {
-  private readonly runtimeStore: SessionRuntimeStore;
+export class ListSppSessionsUseCase {
+  private readonly catalog: SppSessionCatalog;
 
-  constructor(runtimeStore: SessionRuntimeStore = SessionRuntimeStore.getInstance()) {
-    this.runtimeStore = runtimeStore;
+  constructor(catalog: SppSessionCatalog = new SppSessionCatalog()) {
+    this.catalog = catalog;
   }
 
-  execute(): DebugSessionSummary[] {
-    const summaries = this.runtimeStore.listActiveSummaries();
-    const result: DebugSessionSummary[] = [];
-    for (let i = 0; i < summaries.length; i++) {
-      const item = summaries[i];
-      if (item.module === ModuleType.BLUETOOTH && item.protocol === ProtocolType.SPP) {
-        result.push(item);
-      }
-    }
-    return result;
+  execute(): SppSessionDescriptor[] {
+    return this.catalog.listActiveDescriptors();
   }
 }

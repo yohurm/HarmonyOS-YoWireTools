@@ -11,6 +11,17 @@ import { ClassicScanVisibilityPolicy } from '../main/ets/domain/service/ClassicS
 import { ClassicProfileCapability } from '../main/ets/domain/service/ClassicProfileCapability';
 import { ClassicDeviceMajorFilter, ClassicScanFilter } from '../main/ets/domain/model/ClassicScanFilter';
 import { ClassicScanCapability } from '../main/ets/domain/model/ClassicScanCapability';
+import { SppSessionKey } from '../main/ets/domain/model/SppSessionKey';
+import { SppLedgerPhase } from '../main/ets/domain/model/spp/SppLedgerPhase';
+import { SppSessionLedger } from '../main/ets/domain/service/spp/SppSessionLedger';
+import { SppSessionAdmissionPolicy } from '../main/ets/domain/service/spp/SppSessionAdmissionPolicy';
+import { QuerySppConnectEligibilityUseCase } from '../main/ets/domain/usecase/classic/SppSessionQueryUseCases';
+import { SppSessionCatalog } from '../main/ets/domain/service/spp/SppSessionCatalog';
+import { asSppTransportFacet } from '../main/ets/domain/model/spp/ISppTransportFacet';
+import { SppReadStrategy } from '../main/ets/domain/model/SppRuntimeState';
+import { SppUuidLabel } from '../main/ets/domain/service/spp/SppUuidLabel';
+import { BluetoothConstants } from '../main/ets/constants/BluetoothConstants';
+import { BluetoothErrorCodes } from '../main/ets/constants/BluetoothErrorCodes';
 import { BluetoothDevice, BluetoothDeviceDraft } from '../main/ets/domain/model/BluetoothDevice';
 import { DiscoverySource } from '../main/ets/domain/model/DiscoverySource';
 import { BluetoothListRail, BluetoothTransportType } from '../main/ets/domain/model/BluetoothTransportType';
@@ -182,7 +193,229 @@ export default function localUnitTest() {
       const filtered = merger.filter(new ClassicScanFilter('', '', -70), new Set());
       expect(filtered.length).assertEqual(0);
     });
+
+    it('SppSessionKey_normalizes_uuid_and_composite', 0, () => {
+      const key = SppSessionKey.fromParts('AA:BB:CC:DD:EE:FF', '00001101-0000-1000-8000-00805F9B34FB');
+      expect(key.compositeKey()).assertEqual('AA:BB:CC:DD:EE:FF#00001101-0000-1000-8000-00805f9b34fb');
+      expect(key.isValid()).assertTrue();
+      const upper = SppSessionKey.fromParts('AA:BB:CC:DD:EE:FF', '00001101-0000-1000-8000-00805F9B34FB');
+      const mixed = SppSessionKey.fromParts('AA:BB:CC:DD:EE:FF', '00001101-0000-1000-8000-00805f9b34fb');
+      expect(upper.compositeKey()).assertEqual(mixed.compositeKey());
+    });
+
+    it('SppSessionKey_normalizes_mac_case_and_rejects_empty', 0, () => {
+      const lower = SppSessionKey.fromParts('aa:bb:cc:dd:ee:ff', ' 00001101-0000-1000-8000-00805F9B34FB ');
+      expect(lower.classicDeviceId).assertEqual('AA:BB:CC:DD:EE:FF');
+      expect(lower.serviceUuid).assertEqual('00001101-0000-1000-8000-00805f9b34fb');
+      expect(lower.compositeKey()).assertEqual(
+        SppSessionKey.fromParts('AA:BB:CC:DD:EE:FF', BluetoothConstants.DEFAULT_SPP_UUID).compositeKey()
+      );
+      expect(SppSessionKey.fromParts('', BluetoothConstants.DEFAULT_SPP_UUID).isValid()).assertFalse();
+      expect(SppSessionKey.fromParts('AA:BB:CC:DD:EE:FF', '').isValid()).assertFalse();
+      expect(SppSessionKey.normalizeClassicId(' aa:bb ')).assertEqual('AA:BB');
+      expect(SppSessionKey.normalizeUuid(' ABC ')).assertEqual('abc');
+    });
+
+    it('SppSessionLedger_reserve_duplicate_limit_release', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const keyA = SppSessionKey.fromParts('11:11:11:11:11:11', BluetoothConstants.DEFAULT_SPP_UUID);
+      const keyB = SppSessionKey.fromParts('22:22:22:22:22:22', BluetoothConstants.DEFAULT_SPP_UUID);
+      const keyC = SppSessionKey.fromParts('33:33:33:33:33:33', BluetoothConstants.DEFAULT_SPP_UUID);
+      const keyD = SppSessionKey.fromParts('44:44:44:44:44:44', BluetoothConstants.DEFAULT_SPP_UUID);
+      const keyE = SppSessionKey.fromParts('55:55:55:55:55:55', BluetoothConstants.DEFAULT_SPP_UUID);
+
+      const reservedA = ledger.tryReserve(keyA, 'spp-a');
+      expect(reservedA.success).assertTrue();
+      expect(ledger.getActiveCount()).assertEqual(1);
+      expect(ledger.hasKey(keyA)).assertTrue();
+      expect(ledger.findBySessionId('spp-a')?.phase).assertEqual(SppLedgerPhase.RESERVED);
+
+      const duplicate = ledger.tryReserve(keyA, 'spp-a2');
+      expect(duplicate.success).assertFalse();
+      expect(duplicate.error?.code).assertEqual(BluetoothErrorCodes.SPP_DUPLICATE_SESSION);
+
+      expect(ledger.tryReserve(keyB, 'spp-b').success).assertTrue();
+      expect(ledger.tryReserve(keyC, 'spp-c').success).assertTrue();
+      expect(ledger.tryReserve(keyD, 'spp-d').success).assertTrue();
+      expect(ledger.getActiveCount()).assertEqual(BluetoothConstants.SPP_MAX_SESSIONS);
+
+      const limited = ledger.tryReserve(keyE, 'spp-e');
+      expect(limited.success).assertFalse();
+      expect(limited.error?.code).assertEqual(BluetoothErrorCodes.SPP_SESSION_LIMIT);
+
+      ledger.markConnecting(keyA);
+      ledger.promoteConnected(keyA, 42);
+      expect(ledger.findBySessionId('spp-a')?.phase).assertEqual(SppLedgerPhase.CONNECTED);
+      expect(ledger.findBySessionId('spp-a')?.clientSocket).assertEqual(42);
+
+      ledger.markReconnecting(keyA);
+      expect(ledger.hasKey(keyA)).assertTrue();
+      expect(ledger.findBySessionId('spp-a')?.phase).assertEqual(SppLedgerPhase.RECONNECTING);
+      expect(ledger.findBySessionId('spp-a')?.clientSocket).assertEqual(-1);
+
+      ledger.release(keyA, 'test');
+      expect(ledger.hasKey(keyA)).assertFalse();
+      expect(ledger.getActiveCount()).assertEqual(3);
+      expect(ledger.tryReserve(keyA, 'spp-a-again').success).assertTrue();
+      ledger.resetForTests();
+    });
+
+    it('SppSessionLedger_failed_pair_lost_and_exhausted_release_slot', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const key = SppSessionKey.fromParts('66:66:66:66:66:66', BluetoothConstants.DEFAULT_SPP_UUID);
+      expect(ledger.tryReserve(key, 'spp-fail').success).assertTrue();
+      ledger.markConnecting(key);
+      ledger.promoteConnected(key, 7);
+      ledger.markReconnecting(key);
+      expect(ledger.getActiveCount()).assertEqual(1);
+
+      // Simulate pair-lost / reconnect-exhausted / FAILED: must free slot.
+      ledger.release(key, 'pair lost');
+      expect(ledger.hasKey(key)).assertFalse();
+      expect(ledger.getActiveCount()).assertEqual(0);
+      expect(ledger.findBySessionId('spp-fail') === undefined).assertTrue();
+
+      expect(ledger.tryReserve(key, 'spp-retry').success).assertTrue();
+      ledger.markClosing(key);
+      expect(ledger.findBySessionId('spp-retry')?.phase).assertEqual(SppLedgerPhase.CLOSING);
+      ledger.release(key, 'user_disconnect');
+      expect(ledger.hasKey(key)).assertFalse();
+
+      // Idempotent release
+      ledger.release(key, 'again');
+      expect(ledger.getActiveCount()).assertEqual(0);
+      ledger.resetForTests();
+    });
+
+    it('SppSessionLedger_case_insensitive_key_collision', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const upper = SppSessionKey.fromParts('AA:BB:CC:DD:EE:01', '00001101-0000-1000-8000-00805F9B34FB');
+      const lower = SppSessionKey.fromParts('aa:bb:cc:dd:ee:01', '00001101-0000-1000-8000-00805f9b34fb');
+      expect(ledger.tryReserve(upper, 'spp-1').success).assertTrue();
+      const dup = ledger.tryReserve(lower, 'spp-2');
+      expect(dup.success).assertFalse();
+      expect(dup.error?.code).assertEqual(BluetoothErrorCodes.SPP_DUPLICATE_SESSION);
+      ledger.resetForTests();
+    });
+
+    it('SppSessionAdmissionPolicy_mirrors_ledger_eligibility', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const policy = new SppSessionAdmissionPolicy(ledger);
+      const eligibility = new QuerySppConnectEligibilityUseCase(policy);
+      const key = SppSessionKey.fromParts('77:77:77:77:77:77', BluetoothConstants.DEFAULT_SPP_UUID);
+
+      expect(eligibility.execute('77:77:77:77:77:77').success).assertTrue();
+      expect(eligibility.isKeyActive('77:77:77:77:77:77')).assertFalse();
+
+      expect(ledger.tryReserve(key, 'spp-elig').success).assertTrue();
+      const blocked = eligibility.execute('77:77:77:77:77:77');
+      expect(blocked.success).assertFalse();
+      expect(blocked.error?.code).assertEqual(BluetoothErrorCodes.SPP_DUPLICATE_SESSION);
+      expect(eligibility.isKeyActive('aa:bb:cc:dd:ee:ff')).assertFalse();
+      expect(eligibility.isKeyActive('77:77:77:77:77:77')).assertTrue();
+
+      // Same normalization as Connect: mixed-case MAC still blocked.
+      expect(eligibility.execute('77:77:77:77:77:77', '00001101-0000-1000-8000-00805F9B34FB').success)
+        .assertFalse();
+
+      ledger.release(key, 'test');
+      expect(eligibility.execute('77:77:77:77:77:77').success).assertTrue();
+
+      // Fill to limit via admission
+      const keys: SppSessionKey[] = [
+        SppSessionKey.fromParts('01:01:01:01:01:01', BluetoothConstants.DEFAULT_SPP_UUID),
+        SppSessionKey.fromParts('02:02:02:02:02:02', BluetoothConstants.DEFAULT_SPP_UUID),
+        SppSessionKey.fromParts('03:03:03:03:03:03', BluetoothConstants.DEFAULT_SPP_UUID),
+        SppSessionKey.fromParts('04:04:04:04:04:04', BluetoothConstants.DEFAULT_SPP_UUID)
+      ];
+      for (let i = 0; i < keys.length; i++) {
+        expect(ledger.tryReserve(keys[i], `spp-lim-${i}`).success).assertTrue();
+      }
+      const limited = eligibility.execute('05:05:05:05:05:05');
+      expect(limited.success).assertFalse();
+      expect(limited.error?.code).assertEqual(BluetoothErrorCodes.SPP_SESSION_LIMIT);
+      expect(policy.getActiveCount()).assertEqual(BluetoothConstants.SPP_MAX_SESSIONS);
+      ledger.resetForTests();
+    });
+
+    it('SppUuidLabel_formats_standard_spp', 0, () => {
+      expect(SppUuidLabel.formatShort(BluetoothConstants.DEFAULT_SPP_UUID)).assertEqual('SPP');
+      expect(SppUuidLabel.formatShort('6E400001-B5A3-F393-E0A9-E50E24DCCA9E')).assertEqual('6e400001');
+    });
+
+    it('SppSessionCatalog_shouldSurfaceSession_requires_ledger_key', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const key = SppSessionKey.fromParts('88:88:88:88:88:88', BluetoothConstants.DEFAULT_SPP_UUID);
+      expect(SppSessionCatalog.shouldSurfaceSession(key, ledger)).assertFalse();
+      expect(ledger.tryReserve(key, 'spp-obs').success).assertTrue();
+      expect(SppSessionCatalog.shouldSurfaceSession(key, ledger)).assertTrue();
+      ledger.release(key, 'observe_gate');
+      expect(SppSessionCatalog.shouldSurfaceSession(key, ledger)).assertFalse();
+      expect(SppSessionCatalog.shouldSurfaceSession(
+        SppSessionKey.fromParts('', BluetoothConstants.DEFAULT_SPP_UUID),
+        ledger
+      )).assertFalse();
+      ledger.resetForTests();
+    });
+
+    it('asSppTransportFacet_requires_spp_brand', 0, () => {
+      expect(asSppTransportFacet(undefined) === undefined).assertTrue();
+      expect(asSppTransportFacet({}) === undefined).assertTrue();
+      const branded = new FakeSppFacet(
+        SppSessionKey.fromParts('99:99:99:99:99:99', BluetoothConstants.DEFAULT_SPP_UUID)
+      );
+      const facet = asSppTransportFacet(branded);
+      expect(facet !== undefined).assertTrue();
+      expect(facet?.getClientSocketId()).assertEqual(9);
+      expect(facet?.getSessionKey()?.classicDeviceId).assertEqual('99:99:99:99:99:99');
+    });
+
+    it('SppSessionLedger_bindSessionId_and_findBySessionId', 0, () => {
+      const ledger = SppSessionLedger.getInstance();
+      ledger.resetForTests();
+      const key = SppSessionKey.fromParts('AA:00:00:00:00:01', BluetoothConstants.DEFAULT_SPP_UUID);
+      expect(ledger.tryReserve(key, 'pending-id').success).assertTrue();
+      ledger.bindSessionId(key, 'runtime-session-1');
+      expect(ledger.findBySessionId('pending-id') === undefined).assertTrue();
+      expect(ledger.findBySessionId('runtime-session-1')?.sessionKey.compositeKey())
+        .assertEqual(key.compositeKey());
+      ledger.release(key, 'test');
+      expect(ledger.findBySessionId('runtime-session-1') === undefined).assertTrue();
+      ledger.resetForTests();
+    });
   });
+}
+
+class FakeSppFacet {
+  readonly sppFacetBrand: 'spp' = 'spp';
+  private readonly key: SppSessionKey;
+
+  constructor(key: SppSessionKey) {
+    this.key = key;
+  }
+
+  getSessionKey(): SppSessionKey | undefined {
+    return this.key;
+  }
+
+  getClientSocketId(): number {
+    return 9;
+  }
+
+  getReadStrategy(): SppReadStrategy {
+    return SppReadStrategy.ASYNC_LOOP;
+  }
+
+  cancelReconnect(): void {
+  }
+
+  notifyFailed(_reason: string): void {
+  }
 }
 
 function makeClassicDevice(

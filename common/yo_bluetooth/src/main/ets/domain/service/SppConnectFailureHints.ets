@@ -1,7 +1,8 @@
+import { BluetoothConstants } from '../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
 
 /**
- * Structured SPP connect failure hints per architecture bluetooth/00 §9 + 02-§4.3.
+ * Structured SPP connect failure hints per architecture bluetooth/00 §9 + 02-§13.
  */
 export class SppConnectFailureHints {
   static explain(errorCode: string, nativeMessage: string = ''): string[] {
@@ -46,8 +47,25 @@ export class SppConnectFailureHints {
         hints.push('Verify classicDeviceId and UUID');
         hints.push('Pair the device first if bond is required');
         break;
+      case BluetoothErrorCodes.SPP_DUPLICATE_SESSION:
+        // YW-BT-1316 — same (classicDeviceId, serviceUuid) already reserved/connected
+        hints.push('Same device and UUID already has an active SPP session (YW-BT-1316)');
+        hints.push('Disconnect that session, or connect with a different UUID');
+        break;
+      case BluetoothErrorCodes.SPP_SESSION_LIMIT:
+        // YW-BT-1317 — application cap
+        hints.push(
+          `At most ${BluetoothConstants.SPP_MAX_SESSIONS} parallel SPP sessions are allowed (YW-BT-1317)`
+        );
+        hints.push('Disconnect an existing SPP session before opening another');
+        break;
+      case BluetoothErrorCodes.SPP_CONNECT_TIMEOUT:
+        // YW-BT-1318 — sppConnect exceeded timeoutMs
+        hints.push('sppConnect timed out before the remote answered (YW-BT-1318)');
+        hints.push('Stop classic discovery, move closer, then retry with a longer timeout');
+        break;
       case BluetoothErrorCodes.NOT_CONNECTED:
-        hints.push('Session disconnected — reconnect from connect page');
+        hints.push('Session disconnected — reconnect from SPP connect dialog');
         break;
       default:
         hints.push('Check device power and pairing state');

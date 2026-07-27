@@ -1,30 +1,36 @@
-﻿import { IdGenerator, Observable, TimeUtil } from 'common_core';
-import {
-  ModuleType,
-  ProtocolType,
-  TransportState
-} from 'debug_core';
+import { IdGenerator, Observable, TimeUtil } from 'common_core';
 import {
   ITransportSession,
   IncomingPayload,
+  ModuleType,
+  ProtocolType,
   TransportCapabilities,
+  TransportState,
   TransportStateSnapshot,
   WriteOptions,
   WriteResult
 } from 'debug_core';
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
+import { SppRfcommClient } from '../platform/spp/SppRfcommClient';
+import { SppRfcommConnectRequest } from '../platform/spp/SppPlatformGateway';
 import { SppConnectParams } from '../../domain/model/SppConnectParams';
 import { ReconnectPolicy } from '../../domain/model/ReconnectPolicy';
-import { SppConnectOptions, SppSocketDataSource } from '../datasource/platform/SppSocketDataSource';
 import { SppReadStrategy } from '../../domain/model/SppRuntimeState';
-import { PairingState } from '../../domain/model/PairingState';
-import { BluetoothRepository } from '../repository/BluetoothRepository';
+import { SppSessionKey } from '../../domain/model/SppSessionKey';
+import { ISppTransportFacet } from '../../domain/model/spp/ISppTransportFacet';
+import { SppReconnectCoordinator } from '../../domain/service/SppReconnectCoordinator';
+import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
+import { SppSessionTeardown } from '../../domain/service/spp/SppSessionTeardown';
 
 /**
- * SPP RFCOMM transport session. Read loop uses sequential sppReadAsync per WSL FAQ faqs-connectivity-33.
+ * One debug session ↔ one HarmonyOS clientSocket (RFCOMM) — architecture 02 L3.
+ * Uses SppRfcommClient only (SppSocketDataSource removed).
+ * Byte counters owned by LogCaptureService / SendCommand (avoid double applyPatch here).
+ * Reconnect owner = SppReconnectCoordinator (no Transport-only reconnect loop).
  */
-export class SppTransportSession implements ITransportSession {
+export class SppTransportSession implements ITransportSession, ISppTransportFacet {
+  readonly sppFacetBrand: 'spp' = 'spp';
   readonly id: string;
   readonly module: ModuleType = ModuleType.BLUETOOTH;
   readonly protocol: ProtocolType = ProtocolType.SPP;
@@ -32,25 +38,13 @@ export class SppTransportSession implements ITransportSession {
   private currentState: TransportState = TransportState.IDLE;
   private readonly incomingObservable: Observable<IncomingPayload>;
   private readonly stateObservable: Observable<TransportStateSnapshot>;
-  private readonly socketDataSource: SppSocketDataSource;
-  private clientSocket: number = -1;
-  private readLoopActive: boolean = false;
-  private readCancelled: boolean = false;
-  private useEventRead: boolean = false;
+  private readonly rfcommClient: SppRfcommClient;
   private connectParams: SppConnectParams | undefined;
   private userDisconnect: boolean = false;
-  private reconnectAttempts: number = 0;
-  private reconnectScheduled: boolean = false;
-  private consecutiveReadFailures: number = 0;
-  private readStrategy: SppReadStrategy = SppReadStrategy.ASYNC_LOOP;
-  private static readonly MAX_ASYNC_READ_FAILURES: number = 3;
 
-  constructor(
-    sessionId: string,
-    socketDataSource: SppSocketDataSource = SppSocketDataSource.getInstance()
-  ) {
+  constructor(sessionId: string, rfcommClient: SppRfcommClient = new SppRfcommClient()) {
     this.id = sessionId.length > 0 ? sessionId : IdGenerator.next('spp');
-    this.socketDataSource = socketDataSource;
+    this.rfcommClient = rfcommClient;
     this.capabilities = new TransportCapabilities(
       true,
       false,
@@ -68,10 +62,60 @@ export class SppTransportSession implements ITransportSession {
     this.stateObservable = new Observable<TransportStateSnapshot>(
       new TransportStateSnapshot(TransportState.IDLE)
     );
+    this.rfcommClient.setIncomingListener((bytes: Uint8Array) => {
+      this.onIncomingBytes(bytes);
+    });
+    this.rfcommClient.setLinkLostListener((reason: string) => {
+      if (this.currentState === TransportState.CONNECTED && !this.userDisconnect) {
+        void this.handleLinkLoss(reason);
+      }
+    });
   }
 
   get state(): TransportState {
     return this.currentState;
+  }
+
+  getSessionKey(): SppSessionKey | undefined {
+    if (this.connectParams === undefined) {
+      return undefined;
+    }
+    return SppSessionKey.fromParts(this.connectParams.classicDeviceId, this.connectParams.uuid);
+  }
+
+  getClientSocketId(): number {
+    return this.rfcommClient.socketId;
+  }
+
+  getReadStrategy(): SppReadStrategy {
+    return this.rfcommClient.activeReadStrategy;
+  }
+
+  cancelReconnect(): void {
+    this.userDisconnect = true;
+  }
+
+  notifyFailed(reason: string): void {
+    this.userDisconnect = true;
+    this.transition(TransportState.FAILED, reason);
+  }
+
+  /**
+   * Coordinator-bound action: reopen RFCOMM + promote ledger after link loss.
+   */
+  async reopenForReconnect(): Promise<void> {
+    if (this.userDisconnect || this.connectParams === undefined) {
+      throw new Error('SPP reconnect cancelled');
+    }
+    if (this.currentState === TransportState.CONNECTED && this.rfcommClient.isOpen()) {
+      return;
+    }
+    this.transition(TransportState.CONNECTING, 'reconnecting');
+    await this.openRfcomm();
+    const key = this.getSessionKey();
+    if (key !== undefined && this.rfcommClient.isOpen()) {
+      SppSessionLedger.getInstance().promoteConnected(key, this.rfcommClient.socketId);
+    }
   }
 
   async connect(params: Record<string, string | number | boolean>): Promise<void> {
@@ -83,11 +127,16 @@ export class SppTransportSession implements ITransportSession {
     const uuid = `${params['uuid'] ?? BluetoothConstants.DEFAULT_SPP_UUID}`;
     const secure = params['secure'] === true || params['secure'] === 1;
     const autoReconnect = params['autoReconnect'] === true || params['autoReconnect'] === 1;
-    const reconnectPolicy = new ReconnectPolicy(
+    const stopOnPairLost = params['stopOnPairLost'] !== false && params['stopOnPairLost'] !== 0;
+    const stopOnPermissionLost =
+      params['stopOnPermissionLost'] !== false && params['stopOnPermissionLost'] !== 0;
+    const policy = new ReconnectPolicy(
       Number(params['maxReconnectAttempts'] ?? 5),
       Number(params['reconnectInitialDelayMs'] ?? 1000),
       Number(params['reconnectMaxDelayMs'] ?? 15000),
-      Number(params['reconnectBackoffFactor'] ?? 2)
+      Number(params['reconnectBackoffFactor'] ?? 2),
+      stopOnPermissionLost,
+      stopOnPairLost
     );
     this.connectParams = new SppConnectParams(
       classicDeviceId,
@@ -96,54 +145,43 @@ export class SppTransportSession implements ITransportSession {
       secure,
       Number(params['timeoutMs'] ?? BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS),
       autoReconnect,
-      reconnectPolicy
+      policy
     );
     this.userDisconnect = false;
-    this.reconnectAttempts = 0;
-    await this.openSocket();
+    await this.openRfcomm();
   }
 
-  private async openSocket(): Promise<void> {
+  private async openRfcomm(): Promise<void> {
     if (this.connectParams === undefined) {
       throw new Error('SPP connect params missing');
     }
     this.transition(TransportState.CONNECTING);
     const params = this.connectParams;
-    const connected = await this.socketDataSource.connect(
-      new SppConnectOptions(params.classicDeviceId, params.uuid, params.secure)
+    const opened = await this.rfcommClient.open(
+      new SppRfcommConnectRequest(params.classicDeviceId, params.uuid, params.secure),
+      params.timeoutMs
     );
-    if (!connected.success || connected.value === undefined) {
-      this.transition(TransportState.FAILED, connected.error?.message ?? 'connect failed');
-      throw new Error(connected.error?.message ?? 'SPP connect failed');
+    if (!opened.success) {
+      this.transition(TransportState.FAILED, opened.error?.message ?? 'connect failed');
+      throw new Error(opened.error?.message ?? 'SPP connect failed');
     }
-    this.clientSocket = connected.value;
-    this.reconnectAttempts = 0;
     this.transition(TransportState.CONNECTED);
-    this.startReadLoop();
   }
 
   async disconnect(reason: string): Promise<void> {
     this.userDisconnect = true;
-    this.reconnectScheduled = false;
     this.transition(TransportState.DISCONNECTING, reason);
-    this.stopReadLoop();
-    if (this.clientSocket >= 0) {
-      this.socketDataSource.close(this.clientSocket);
-      this.clientSocket = -1;
-    }
+    await this.rfcommClient.close();
     this.transition(TransportState.DISCONNECTED, reason);
   }
 
   async write(payload: Uint8Array, _options?: WriteOptions): Promise<WriteResult> {
-    if (this.currentState !== TransportState.CONNECTED || this.clientSocket < 0) {
+    if (this.currentState !== TransportState.CONNECTED || !this.rfcommClient.isOpen()) {
       return new WriteResult(false, 0, BluetoothErrorCodes.NOT_CONNECTED, 'SPP not connected');
     }
-    const written = await this.socketDataSource.writeAsync(this.clientSocket, payload);
+    const written = await this.rfcommClient.write(payload);
     if (!written.success) {
-      if (this.shouldAutoReconnect()) {
-        await this.scheduleReconnect(written.error?.message ?? 'write failed');
-        return new WriteResult(false, 0, written.error?.code ?? BluetoothErrorCodes.SPP_IO_ERROR, written.error?.message ?? 'write failed');
-      }
+      // Fatal IO triggers link-lost callback → Coordinator reconnect or fail teardown
       return new WriteResult(
         false,
         0,
@@ -164,128 +202,50 @@ export class SppTransportSession implements ITransportSession {
 
   destroy(): void {
     this.userDisconnect = true;
-    this.reconnectScheduled = false;
-    this.stopReadLoop();
-    if (this.clientSocket >= 0) {
-      this.socketDataSource.close(this.clientSocket);
-      this.clientSocket = -1;
-    }
+    // Defensive: tear-down must free ledger even if Disconnect UC skipped (connect-fail path).
+    this.releaseLedgerIfHeld('destroy');
+    void this.rfcommClient.close();
     this.incomingObservable.clearObservers();
     this.stateObservable.clearObservers();
   }
 
-  private startReadLoop(): void {
-    if (this.readLoopActive || this.clientSocket < 0) {
+  private onIncomingBytes(bytes: Uint8Array): void {
+    if (bytes.length === 0) {
       return;
     }
-    if (this.useEventRead) {
-      this.startEventRead();
-      return;
-    }
-    this.readLoopActive = true;
-    this.readCancelled = false;
-    void this.readLoopAsync();
+    this.incomingObservable.next(new IncomingPayload(bytes, TimeUtil.nowMs(), false));
   }
 
-  private startEventRead(): void {
-    this.readStrategy = SppReadStrategy.EVENT_CALLBACK;
-    const subscribed = this.socketDataSource.onSppRead(this.clientSocket, (bytes: Uint8Array) => {
-      if (bytes.length > 0) {
-        this.incomingObservable.next(new IncomingPayload(bytes, TimeUtil.nowMs(), false));
-      }
-    });
-    if (!subscribed.success) {
-      this.transition(TransportState.FAILED, subscribed.error?.message ?? 'SPP event read failed');
-    }
-  }
-
-  private async readLoopAsync(): Promise<void> {
-    while (this.readLoopActive && !this.readCancelled && this.clientSocket >= 0) {
-      const read = await this.socketDataSource.readAsync(this.clientSocket);
-      if (!read.success) {
-        this.consecutiveReadFailures = this.consecutiveReadFailures + 1;
-        if (this.consecutiveReadFailures >= SppTransportSession.MAX_ASYNC_READ_FAILURES && !this.useEventRead) {
-          this.useEventRead = true;
-          this.readLoopActive = false;
-          this.startEventRead();
-          return;
-        }
-        await this.handleReadFailure(read.error?.message ?? 'read failed');
-        break;
-      }
-      this.consecutiveReadFailures = 0;
-      if (read.value !== undefined && read.value.length > 0) {
-        this.incomingObservable.next(new IncomingPayload(read.value, TimeUtil.nowMs(), false));
-      }
-    }
-    this.readLoopActive = false;
-    if (this.currentState === TransportState.CONNECTED && !this.userDisconnect) {
-      await this.handleReadFailure('read loop ended');
-    }
-  }
-
-  private async handleReadFailure(reason: string): Promise<void> {
-    this.stopReadLoop();
-    if (this.clientSocket >= 0) {
-      this.socketDataSource.close(this.clientSocket);
-      this.clientSocket = -1;
-    }
-    if (this.shouldAutoReconnect()) {
-      await this.scheduleReconnect(reason);
-      return;
-    }
-    this.transition(TransportState.FAILED, reason);
-  }
-
-  private shouldAutoReconnect(): boolean {
-    if (this.userDisconnect || this.connectParams === undefined) {
-      return false;
-    }
-    if (!this.connectParams.autoReconnect) {
-      return false;
-    }
-    return this.reconnectAttempts < this.connectParams.reconnectPolicy.maxAttempts;
-  }
-
-  private async scheduleReconnect(reason: string): Promise<void> {
-    if (this.reconnectScheduled || this.connectParams === undefined) {
-      return;
-    }
-    if (this.connectParams.reconnectPolicy.stopOnPairLost) {
-      const pairState = await BluetoothRepository.getInstance().getPairState(this.connectParams.classicDeviceId);
-      if (pairState.success && pairState.value === PairingState.UNPAIRED) {
-        this.transition(TransportState.FAILED, 'pair lost');
-        return;
-      }
-    }
-    await BluetoothRepository.getInstance().ensureClassicDiscoveryStopped();
-    this.reconnectScheduled = true;
-    const attempt = this.reconnectAttempts;
-    this.reconnectAttempts = attempt + 1;
-    const delayMs = this.connectParams.reconnectPolicy.computeDelayMs(attempt);
-    this.transition(TransportState.CONNECTING, `reconnecting:${reason}`);
-    await new Promise<void>((resolve: () => void) => {
-      setTimeout(() => resolve(), delayMs);
-    });
-    this.reconnectScheduled = false;
+  /**
+   * Link loss → Coordinator.requestReconnect when autoReconnect, else full fail teardown.
+   */
+  private async handleLinkLoss(reason: string): Promise<void> {
+    await this.rfcommClient.close();
     if (this.userDisconnect) {
       return;
     }
-    try {
-      await this.openSocket();
-    } catch (_error) {
-      if (this.shouldAutoReconnect()) {
-        await this.scheduleReconnect('reconnect failed');
-      } else {
-        this.transition(TransportState.FAILED, 'reconnect exhausted');
-      }
+    if (this.connectParams === undefined || !this.connectParams.autoReconnect) {
+      SppReconnectCoordinator.getInstance().unbind(this.id);
+      await SppSessionTeardown.failCleanup(this.id, reason);
+      return;
     }
+    const key = this.getSessionKey();
+    if (key !== undefined) {
+      SppSessionLedger.getInstance().markReconnecting(key);
+    }
+    this.transition(TransportState.CONNECTING, `reconnecting:${reason}`);
+    await SppReconnectCoordinator.getInstance().requestReconnect(this.id, reason);
   }
 
-  private stopReadLoop(): void {
-    this.readCancelled = true;
-    this.readLoopActive = false;
-    this.socketDataSource.offSppRead();
+  private releaseLedgerIfHeld(reason: string): void {
+    const key = this.getSessionKey();
+    if (key === undefined) {
+      return;
+    }
+    const ledger = SppSessionLedger.getInstance();
+    if (ledger.hasKey(key)) {
+      ledger.release(key, reason);
+    }
   }
 
   private transition(state: TransportState, reason: string = ''): void {
