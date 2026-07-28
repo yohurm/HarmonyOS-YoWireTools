@@ -3,7 +3,7 @@
 > **状态：修订 · 2026-07-27**  
 > **依据**：项目 `1.2-架构与MVVM规范` · ArkTS MVVM V2 · 本目录 `00`～`05`  
 > **实现根**：
-> - 引擎：`common/yo_bluetooth/src/main/ets/`
+> - 引擎：`common/yobluetooth/src/main/ets/`
 > - UI：`features/bluetooth/src/main/ets/`（ViewModel + View + Dialog + Feature Page）
 > - Page 壳：`product/phone/src/main/ets/pages/bluetooth/`（装配 + 路由入口；SPP Terminal 页在 Feature）
 
@@ -12,7 +12,7 @@
 ## 1. 目标目录树
 
 ```text
-common/yo_bluetooth/src/main/ets/
+common/yobluetooth/src/main/ets/
 ├── constants/
 ├── domain/
 │   ├── model/          # 含 spp/ · session/ · …
@@ -55,8 +55,8 @@ product/phone/src/main/ets/pages/bluetooth/
 | feature `ui/dialog` | `openCustomDialog` 壳 + `@Observed` Content；回调 Controller | 直接 `new XxxUseCase()`；持有 socket；伪造系统配对/开蓝牙 UI |
 | feature `ui/page` | Feature 内页面（如 Terminal）：创建 Terminal VM、绑焦点会话 | 直接 `socket.*` |
 | feature `viewmodel` | `@ObservedV2` / Dialog Controller；唯一 UI→UseCase 出口 | 持有 socket / GattClientDevice |
-| `yo_bluetooth` domain/usecase | 用例编排 | ArkUI |
-| `yo_bluetooth` data/* | Kit 适配、Transport、Mapper | 反向依赖 viewmodel/ui |
+| `yobluetooth` domain/usecase | 用例编排 | ArkUI |
+| `yobluetooth` data/* | Kit 适配、Transport、Mapper | 反向依赖 viewmodel/ui |
 
 ### 2.1 Dialog → Controller → UseCase
 
@@ -85,7 +85,7 @@ SppMainPage / Index
 
 1. product Page 不得 `import` `@kit.ConnectivityKit` 蓝牙子模块或 `*DataSource` / L1–L3 SPP 具体类。
 2. `viewmodel` 不得保存 `clientSocket:number` / `GattClientDevice`。
-3. `yo_bluetooth` domain 不得依赖 `@kit.ArkUI` / 页面组件。
+3. `yobluetooth` domain 不得依赖 `@kit.ArkUI` / 页面组件。
 4. 跨路径状态只经 Session 摘要 + `debug_core`。
 5. SPP 连接参数只含 `classicDeviceId`；GATT/UART 只含 `bleDeviceId`。
 6. Feature/product **不得** import `SppPlatformGateway` / `SppRfcommClient` / `SppTransportSession`（barrel 不导出）。
@@ -94,7 +94,7 @@ SppMainPage / Index
 
 ## 4. ViewModel / Dialog 装配表
 
-| 表面（feature） | Page 壳 / 宿主 | 主 UseCase（yo_bluetooth） |
+| 表面（feature） | Page 壳 / 宿主 | 主 UseCase（yobluetooth） |
 | --- | --- | --- |
 | `BtOverviewViewModel` | BluetoothOverviewPage | LoadOverview |
 | `SppMainViewModel` | SppMainPage | Classic scan / paired / active list |
@@ -109,6 +109,6 @@ SppMainPage / Index
 
 ## 5. Index 导出策略
 
-- `yo_bluetooth`：导出 Repository、UseCases、models、error codes、PairingState、Ledger/Catalog/Admission 等 Domain 面；**不导出** L1–L3 具体实现（`SppPlatformGateway` / `SppRfcommClient` / `SppTransportSession`）及一般 DataSource / Kit bridge。
+- `yobluetooth`：导出 Repository、UseCases、models、error codes、PairingState、Ledger/Catalog/Admission 等 Domain 面；**不导出** L1–L3 具体实现（`SppPlatformGateway` / `SppRfcommClient` / `SppTransportSession`）及一般 DataSource / Kit bridge。
 - `feature_bluetooth`：导出 ViewModel、Dialog Controller、View、`ui/page`、`ui/dialog` 业务表面。
 - product：不对外导出 barrel。

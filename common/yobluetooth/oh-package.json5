@@ -1,5 +1,5 @@
 {
-  "name": "yo_bluetooth",
+  "name": "yobluetooth",
   "version": "1.0.0",
   "description": "YoBluetooth engine: classic SPP, BLE GATT, scan, identity",
   "main": "Index.ets",

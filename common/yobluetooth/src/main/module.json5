@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "yo_bluetooth",
+    "name": "yobluetooth",
     "type": "har",
     "deviceTypes": [
       "default",

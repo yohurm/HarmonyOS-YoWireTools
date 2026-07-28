@@ -1,4 +1,4 @@
-import { EncodingUtil, Subscription } from 'common_core';
+﻿import { EncodingUtil, Subscription } from 'common_core';
 import {
   IncomingPayload,
   LineEndingMode,
@@ -11,7 +11,7 @@ import {
   ObserveSppSessionsUseCase,
   SendSppCommandUseCase,
   SppSessionDescriptor
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 import { SppActiveSessionItem } from './SppMainViewModel';
 
 /**

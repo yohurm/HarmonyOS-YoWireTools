@@ -15,7 +15,7 @@ import {
   BluetoothOverviewSnapshot,
   BluetoothRepository,
   LoadBluetoothOverviewSnapshotUseCase
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 
 @ObservedV2
 export class BtOverviewViewModel {

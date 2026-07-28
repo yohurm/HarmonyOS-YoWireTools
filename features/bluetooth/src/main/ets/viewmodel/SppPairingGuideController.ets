@@ -1,4 +1,4 @@
-import { Subscription } from 'common_core';
+﻿import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator
@@ -10,7 +10,7 @@ import {
   PairBluetoothDeviceUseCase,
   PairingEvent,
   PairingState
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 
 /**
  * Observed dialog state for openCustomDialog + ComponentContent.

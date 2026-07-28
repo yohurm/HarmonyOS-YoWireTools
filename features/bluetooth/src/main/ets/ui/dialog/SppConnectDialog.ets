@@ -1,4 +1,4 @@
-import { ComponentContent, promptAction } from '@kit.ArkUI';
+﻿import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { UIContextRegistry } from 'common_platform';
 import {
@@ -12,7 +12,7 @@ import {
 } from 'youi_kit';
 import {
   BluetoothConstants
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 import { ClassicDeviceListItem } from '../../viewmodel/SppMainViewModel';
 import {
   SppConnectDialogController,

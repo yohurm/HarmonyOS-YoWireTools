@@ -1,4 +1,4 @@
-# YoWire 产品分层与分包架构
+﻿# YoWire 产品分层与分包架构
 
 > 参考：官方《分层架构设计》+「一次开发，多端部署」；吸收 Notes1 的 product 入口思路，不照搬其取消 features / common→UI 反向依赖。
 
@@ -8,7 +8,7 @@
 |----------|-----------------|--------|------|
 | 产品定制层 | `product/phone`、`product/tablet`（预留） | Entry HAP | Ability、根导航、**Page 薄壳**、设备差异布局、产品资源与权限 |
 | 基础特性层 | `features/*` | HAR | **ViewModel** + 业务 View/Component（蓝牙 / WiFi / 星闪 / 首页等） |
-| 公共能力层 | `common/*` | HAR | `youi_kit`、core、platform、storage、`debug_core`、协议引擎（`yo_bluetooth` 等） |
+| 公共能力层 | `common/*` | HAR | `youi_kit`、core、platform、storage、`debug_core`、协议引擎（`yobluetooth` 等） |
 
 依赖方向（硬约束）：
 

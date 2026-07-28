@@ -1,4 +1,4 @@
-import {
+﻿import {
   BluetoothConstants,
   BluetoothTransportType,
   ConnectSppUseCase,
@@ -6,7 +6,7 @@ import {
   ReconnectPolicy,
   SppConnectFailureHints,
   SppConnectParams
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 
 /**
  * Observed dialog form state for openCustomDialog + ComponentContent.

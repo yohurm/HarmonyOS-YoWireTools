@@ -1,10 +1,10 @@
-import {
+﻿import {
   YoColor,
   YoRadius,
   YoSpace,
   YoTypeStyle
 } from 'youi_kit';
-import { ClassicDeviceMajorFilter, ClassicScanFilter } from 'yo_bluetooth';
+import { ClassicDeviceMajorFilter, ClassicScanFilter } from 'yobluetooth';
 import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
 
 /**

@@ -12,7 +12,7 @@
     "common_storage": "file:../../common/storage",
     "youi_kit": "file:../../common/youi_kit",
     "debug_core": "file:../../common/debug_core",
-    "yo_bluetooth": "file:../../common/yo_bluetooth",
+    "yobluetooth": "file:../../common/yobluetooth",
     "feature_bluetooth": "file:../../features/bluetooth",
     "feature_wifi_network": "file:../../features/wifi_network",
     "feature_nearlink": "file:../../features/nearlink",

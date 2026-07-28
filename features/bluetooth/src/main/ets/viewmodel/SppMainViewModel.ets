@@ -1,4 +1,4 @@
-import { Subscription } from 'common_core';
+﻿import { Subscription } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
@@ -24,7 +24,7 @@ import {
   SppSessionLedger,
   StartClassicScanUseCase,
   StopClassicScanUseCase
-} from 'yo_bluetooth';
+} from 'yobluetooth';
 
 export enum SppSegmentTab {
   /** 经典蓝牙 Inquiry 扫描轨（CLASSIC_SCAN），非 SPP 协议扫描。 */

@@ -10,6 +10,6 @@
     "common_platform": "file:../../common/platform",
     "youi_kit": "file:../../common/youi_kit",
     "debug_core": "file:../../common/debug_core",
-    "yo_bluetooth": "file:../../common/yo_bluetooth"
+    "yobluetooth": "file:../../common/yobluetooth"
   }
 }
