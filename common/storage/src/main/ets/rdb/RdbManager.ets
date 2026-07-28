@@ -2,13 +2,13 @@ import { common } from '@kit.AbilityKit';
 import { relationalStore } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
-import { AppLogger, AppLogTag } from 'common_platform';
+import { YoLog, YoLogTag } from 'yolog';
 import { StorageConstants } from '../constants/StorageConstants';
 import { StoreErrorCodes } from '../constants/StoreErrorCodes';
 import { DatabaseSchema } from './DatabaseSchema';
 import { RdbSqlRunner } from './RdbSqlRunner';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /**
  * RDB lifecycle manager: open, migrate, expose store.

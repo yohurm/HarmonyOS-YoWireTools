@@ -1,0 +1,9 @@
+{
+  "name": "yolog",
+  "version": "1.0.0",
+  "description": "YoWire observability logging: HiLog + sandboxed file logs",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

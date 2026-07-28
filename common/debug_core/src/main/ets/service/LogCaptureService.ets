@@ -1,6 +1,6 @@
 import { IdGenerator, Result, TimeUtil } from 'common_core';
 import { LogRepository } from 'common_storage';
-import { AppLogger, AppLogTag, LogParams } from 'common_platform';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { Direction, DisplayHint, LogRecordType, ModuleType, ProtocolType } from '../domain/enums/DomainEnums';
 import { DebugEvent } from '../domain/model/DebugEvent';
 import { DebugLogRecord } from '../domain/model/DebugLogRecord';
@@ -9,7 +9,7 @@ import { SessionStatePatch } from '../runtime/DebugSessionState';
 import { SessionRuntimeStore } from '../runtime/SessionRuntimeStore';
 import { NormalizedPayload, PayloadNormalizer } from './PayloadNormalizer';
 
-const logger = new AppLogger(AppLogTag.SESSION);
+const logger = YoLog.tag(YoLogTag.SESSION);
 
 /**
  * Log capture pipeline: normalize -> persist -> runtime bus per §5.4.

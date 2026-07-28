@@ -1,9 +1,8 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
-import { AppLogger } from '../logging/AppLogger';
-import { AppLogTag } from '../logging/AppLogTag';
+import { YoLog, YoLogTag } from 'yolog';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /** Platform-level error when HarmonyOS Kit event subscribe/unsubscribe fails. */
 export class PlatformErrorCodes {

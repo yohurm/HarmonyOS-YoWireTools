@@ -1,12 +1,10 @@
 import { Observable, Subscription } from 'common_core';
-import { AppLogger } from '../logging/AppLogger';
-import { AppLogTag } from '../logging/AppLogTag';
-import { LogParams } from '../logging/LogParams';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { AppLifecycleState } from './AppLifecycleState';
 import { LifecycleListener, ReconcileCallback } from './LifecycleContracts';
 import { PlatformEvent } from './PlatformEvent';
 import { PlatformEventType } from './PlatformEventType';
-const logger = new AppLogger(AppLogTag.LIFE);
+const logger = YoLog.tag(YoLogTag.LIFE);
 /**
  * Coordinates app lifecycle and platform events per architecture §9.1.
  * EntryAbility wires onForeground/onBackground into this coordinator.
@@ -53,6 +51,7 @@ export class LifecycleCoordinator {
   }
   onAppBackground(detail: string = ''): void {
     this.transition(AppLifecycleState.BACKGROUND, PlatformEventType.APP_BACKGROUND, detail);
+    void YoLog.flush();
   }
   onWindowStageCreate(detail: string = ''): void {
     this.dispatch(new PlatformEvent(PlatformEventType.WINDOW_STAGE_CREATE, detail));

@@ -1,13 +1,11 @@
 import { TimeUtil } from 'common_core';
-import { AppLogger } from '../logging/AppLogger';
-import { AppLogTag } from '../logging/AppLogTag';
-import { LogParams } from '../logging/LogParams';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { CapabilityResult } from './CapabilityResult';
 import { CapabilityStatus } from './CapabilityStatus';
 import { ICapabilityProbe } from './ICapabilityProbe';
 import { PlatformModuleType } from './PlatformModuleType';
 
-const logger = new AppLogger(AppLogTag.CAP);
+const logger = YoLog.tag(YoLogTag.CAP);
 
 /**
  * Generic capability probe registry — catalog IDs are configured by business layer.

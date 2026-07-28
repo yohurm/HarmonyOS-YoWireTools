@@ -1,11 +1,11 @@
 import { common } from '@kit.AbilityKit';
 import { Result } from 'common_core';
-import { AppLogger, AppLogTag } from 'common_platform';
+import { YoLog, YoLogTag } from 'yolog';
 import { LogRepository } from './repository/LogRepository';
 import { PreferencesStore } from './preferences/PreferencesStore';
 import { RdbManager } from './rdb/RdbManager';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /**
  * Initializes storage layer from EntryAbility.onCreate.

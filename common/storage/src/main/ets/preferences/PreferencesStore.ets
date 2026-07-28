@@ -2,13 +2,13 @@ import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
-import { AppLogger, AppLogTag } from 'common_platform';
+import { YoLog, YoLogTag } from 'yolog';
 import { PreferenceKeys } from '../constants/PreferenceKeys';
 import { StorageConstants } from '../constants/StorageConstants';
 import { StoreErrorCodes } from '../constants/StoreErrorCodes';
 import { PreferencesAccess } from './PreferencesAccess';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /**
  * Typed Preferences wrapper per architecture §12.1.

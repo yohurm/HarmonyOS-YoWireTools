@@ -1,7 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { AppLogger } from '../logging/AppLogger';
-import { AppLogTag } from '../logging/AppLogTag';
-import { LogParams } from '../logging/LogParams';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { IPermissionGateway } from './IPermissionGateway';
 import { PermissionDecision } from './PermissionDecision';
 import { PermissionPresentation } from './PermissionPresentation';
@@ -12,7 +10,7 @@ import { PermissionUiState } from './PermissionUiState';
 import { PlatformPermission } from './PlatformPermission';
 import { SystemPermissionGateway } from './SystemPermissionGateway';
 
-const logger = new AppLogger(AppLogTag.PERM);
+const logger = YoLog.tag(YoLogTag.PERM);
 
 /**
  * Platform permission gateway — executes checks/requests; business layer supplies presentation.

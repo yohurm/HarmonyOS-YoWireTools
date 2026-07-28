@@ -1,7 +1,7 @@
 /**
  * Centralized HiLog tags (ASCII, max 31 bytes per HarmonyOS spec).
  */
-export class AppLogTag {
+export class YoLogTag {
   static readonly APP: string = 'YoWire.App';
   static readonly PERM: string = 'YoWire.Perm';
   static readonly CAP: string = 'YoWire.Cap';

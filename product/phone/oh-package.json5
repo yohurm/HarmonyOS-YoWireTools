@@ -7,6 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "common_core": "file:../../common/core",
+    "yolog": "file:../../common/yolog",
     "common_platform": "file:../../common/platform",
     "common_storage": "file:../../common/storage",
     "youi_kit": "file:../../common/youi_kit",

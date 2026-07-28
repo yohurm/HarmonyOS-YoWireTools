@@ -1,21 +1,22 @@
 ﻿import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { LifecycleCoordinator, SystemBarThemeCoordinator, UIContextRegistry, WindowMetricsRegistry } from 'common_platform';
 import { DebugCoreBootstrap } from 'debug_core';
+import { YoLog } from 'yolog';
 
-const DOMAIN = 0x0000;
-const TAG = 'EntryAbility';
+const logger = YoLog.tag('EntryAbility');
 
 export default class EntryAbility extends UIAbility {
   private mainWindow: window.Window | undefined = undefined;
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, TAG, 'Ability onCreate');
+    YoLog.bootstrapFromFilesDir(this.context.filesDir);
+    logger.info('Ability onCreate');
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, TAG, 'Ability onDestroy');
+    logger.info('Ability onDestroy');
+    void YoLog.terminate();
   }
 
   onConfigurationUpdate(newConfig: Configuration): void {
@@ -28,23 +29,23 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    hilog.info(DOMAIN, TAG, 'Ability onWindowStageCreate');
+    logger.info('Ability onWindowStageCreate');
     LifecycleCoordinator.getInstance().onWindowStageCreate('entry');
 
     void DebugCoreBootstrap.initialize(this.context).then((result) => {
       if (!result.success) {
-        hilog.error(DOMAIN, TAG, 'DebugCoreBootstrap failed: %{public}s', result.error?.message ?? 'unknown');
+        logger.error(`DebugCoreBootstrap failed: ${result.error?.message ?? 'unknown'}`);
       } else {
-        hilog.info(DOMAIN, TAG, 'DebugCoreBootstrap initialized');
+        logger.info('DebugCoreBootstrap initialized');
       }
       windowStage.loadContent('pages/Index', (err) => {
         if (err.code) {
-          hilog.error(DOMAIN, TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+          logger.error(`Failed to load the content. Cause: ${JSON.stringify(err)}`);
           return;
         }
         this.configureMainWindow(windowStage);
         this.bindUiContext(windowStage);
-        hilog.info(DOMAIN, TAG, 'Succeeded in loading the content.');
+        logger.info('Succeeded in loading the content.');
       });
     });
   }
@@ -52,17 +53,18 @@ export default class EntryAbility extends UIAbility {
   onWindowStageDestroy(): void {
     this.mainWindow = undefined;
     LifecycleCoordinator.getInstance().onWindowStageDestroy('entry');
-    hilog.info(DOMAIN, TAG, 'Ability onWindowStageDestroy');
+    logger.info('Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
     LifecycleCoordinator.getInstance().onAppForeground('entry');
-    hilog.info(DOMAIN, TAG, 'Ability onForeground');
+    logger.info('Ability onForeground');
   }
 
   onBackground(): void {
     LifecycleCoordinator.getInstance().onAppBackground('entry');
-    hilog.info(DOMAIN, TAG, 'Ability onBackground');
+    logger.info('Ability onBackground');
+    void YoLog.flush();
   }
 
   private configureMainWindow(windowStage: window.WindowStage): void {
@@ -74,7 +76,7 @@ export default class EntryAbility extends UIAbility {
       SystemBarThemeCoordinator.applyToWindow(mainWindow, colorMode);
       WindowMetricsRegistry.updateColorMode(colorMode);
     } catch (err) {
-      hilog.error(DOMAIN, TAG, 'configureMainWindow failed: %{public}s', JSON.stringify(err));
+      logger.error(`configureMainWindow failed: ${JSON.stringify(err)}`);
     }
   }
 
@@ -86,7 +88,7 @@ export default class EntryAbility extends UIAbility {
       UIContextRegistry.getInstance().bind(uiContext);
       WindowMetricsRegistry.bind(mainWindow, uiContext);
     } catch (err) {
-      hilog.error(DOMAIN, TAG, 'bindUiContext failed: %{public}s', JSON.stringify(err));
+      logger.error(`bindUiContext failed: ${JSON.stringify(err)}`);
     }
   }
 }

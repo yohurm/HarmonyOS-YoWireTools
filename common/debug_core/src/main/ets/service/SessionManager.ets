@@ -1,15 +1,13 @@
 import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
 import { SessionRepository } from 'common_storage';
 import {
-  AppLogger,
-  AppLogTag,
   BackgroundPolicyAdvisor,
   LifecycleCoordinator,
-  LogParams,
   PlatformBackgroundSessionKind,
   PlatformEvent,
   PlatformEventType
 } from 'common_platform';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import {
   BackgroundPolicyCatalog,
   BackgroundSessionAction,
@@ -28,7 +26,7 @@ import { SessionRuntimeStore } from '../runtime/SessionRuntimeStore';
 import { SessionStateMachine } from '../runtime/SessionStateMachine';
 import { LogCaptureService } from './LogCaptureService';
 
-const logger = new AppLogger(AppLogTag.SESSION);
+const logger = YoLog.tag(YoLogTag.SESSION);
 
 /**
  * Session lifecycle orchestrator per architecture §3.4.

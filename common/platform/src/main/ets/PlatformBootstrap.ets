@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { MonotonicClockRegistry, TaskExecutorRegistry } from 'common_core';
-import { AppLogger } from './logging/AppLogger';
-import { AppLogTag } from './logging/AppLogTag';
+import { YoLog, YoLogTag } from 'yolog';
 import { CapabilityRegistry } from './capability/CapabilityRegistry';
 import { LifecycleCoordinator } from './lifecycle/LifecycleCoordinator';
 import { PermissionOrchestrator } from './permission/PermissionOrchestrator';
@@ -9,11 +8,11 @@ import { AbilityContextRegistry } from './context/AbilityContextRegistry';
 import { PlatformMonotonicClock } from './time/PlatformMonotonicClock';
 import { TaskPoolTaskExecutor } from './task/TaskPoolTaskExecutor';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /**
- * One-shot platform layer bootstrap invoked from EntryAbility.onCreate.
- * Order: context -> monotonic clock -> task executor -> permission -> lifecycle -> capability.
+ * One-shot platform layer bootstrap invoked from EntryAbility / DebugCoreBootstrap.
+ * Order: yolog ensure -> context -> monotonic clock -> task executor -> permission -> lifecycle -> capability.
  */
 export class PlatformBootstrap {
   private static initialized: boolean = false;
@@ -22,6 +21,7 @@ export class PlatformBootstrap {
     if (PlatformBootstrap.initialized) {
       return;
     }
+    YoLog.ensureBootstrapped(context.filesDir);
     AbilityContextRegistry.getInstance().bind(context);
     MonotonicClockRegistry.register(new PlatformMonotonicClock());
     TaskExecutorRegistry.register(new TaskPoolTaskExecutor());

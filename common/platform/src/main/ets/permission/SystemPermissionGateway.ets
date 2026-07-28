@@ -4,10 +4,9 @@ import { IPermissionGateway } from './IPermissionGateway';
 import { PermissionRequestResult } from './PermissionRequestResult';
 import { PermissionStatus } from './PermissionStatus';
 import { PlatformPermission } from './PlatformPermission';
-import { AppLogger } from '../logging/AppLogger';
-import { AppLogTag } from '../logging/AppLogTag';
+import { YoLog, YoLogTag } from 'yolog';
 
-const logger = new AppLogger(AppLogTag.PERM);
+const logger = YoLog.tag(YoLogTag.PERM);
 
 /**
  * Production permission gateway using HarmonyOS abilityAccessCtrl APIs.

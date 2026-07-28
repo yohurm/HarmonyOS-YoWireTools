@@ -1,7 +1,3 @@
-export { LogDomain } from './src/main/ets/logging/LogDomain';
-export { AppLogTag } from './src/main/ets/logging/AppLogTag';
-export { LogParams } from './src/main/ets/logging/LogParams';
-export { AppLogger } from './src/main/ets/logging/AppLogger';
 export { PlatformPermission } from './src/main/ets/permission/PlatformPermission';
 export { AppPermission } from './src/main/ets/permission/AppPermission';
 export { PermissionStatus } from './src/main/ets/permission/PermissionStatus';

@@ -2,11 +2,11 @@ import { Result, AppThemeMode, AppThemeModeUtil } from 'common_core';
 import { CapabilityRegistry, PlatformBootstrap, ThemeModeCoordinator } from 'common_platform';
 import { AppSettingRepository, PreferenceKeys, StorageBootstrap } from 'common_storage';
 import { common } from '@kit.AbilityKit';
-import { AppLogger, AppLogTag } from 'common_platform';
+import { YoLog, YoLogTag } from 'yolog';
 import { CapabilityId } from './capability/CapabilityId';
 import { SessionManager } from './service/SessionManager';
 
-const logger = new AppLogger(AppLogTag.APP);
+const logger = YoLog.tag(YoLogTag.APP);
 
 /**
  * Initializes debug core layer after platform and storage bootstrap.

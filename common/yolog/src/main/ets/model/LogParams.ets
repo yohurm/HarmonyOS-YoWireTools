@@ -1,5 +1,5 @@
 /**
- * Typed key-value bag for structured HiLog events (ArkTS forbids untyped object literals).
+ * Typed key-value bag for structured log events (ArkTS forbids untyped object literals).
  */
 export class LogParams {
   private readonly keys: string[] = [];
@@ -21,5 +21,16 @@ export class LogParams {
       record[this.keys[i]] = this.values[i];
     }
     return record;
+  }
+
+  format(): string {
+    let body = '';
+    for (let i = 0; i < this.keys.length; i++) {
+      if (i > 0) {
+        body += ', ';
+      }
+      body += `${this.keys[i]}=${this.values[i]}`;
+    }
+    return body;
   }
 }
