@@ -23,7 +23,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
     }
   }
 
@@ -52,7 +52,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
     }
   }
 
@@ -169,7 +169,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
     }
   }
 
@@ -221,7 +221,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
     }
   }
 

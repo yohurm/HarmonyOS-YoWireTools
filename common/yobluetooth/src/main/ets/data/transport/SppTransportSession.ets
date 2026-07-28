@@ -186,7 +186,8 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
         false,
         0,
         written.error?.code ?? BluetoothErrorCodes.SPP_IO_ERROR,
-        written.error?.message ?? 'write failed'
+        written.error?.message ?? 'write failed',
+        written.error?.nativeCode ?? ''
       );
     }
     return new WriteResult(true, written.value ?? payload.length);

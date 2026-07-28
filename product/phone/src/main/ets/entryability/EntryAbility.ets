@@ -1,10 +1,10 @@
-﻿import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { LifecycleCoordinator, SystemBarThemeCoordinator, UIContextRegistry, WindowMetricsRegistry } from 'common_platform';
 import { DebugCoreBootstrap } from 'debug_core';
-import { YoLog } from 'yolog';
+import { YoLog, YoLogTag } from 'yolog';
 
-const logger = YoLog.tag('EntryAbility');
+const logger = YoLog.tag(YoLogTag.APP);
 
 export default class EntryAbility extends UIAbility {
   private mainWindow: window.Window | undefined = undefined;
@@ -62,9 +62,9 @@ export default class EntryAbility extends UIAbility {
   }
 
   onBackground(): void {
+    // LifecycleCoordinator.onAppBackground already flushes YoLog.
     LifecycleCoordinator.getInstance().onAppBackground('entry');
     logger.info('Ability onBackground');
-    void YoLog.flush();
   }
 
   private configureMainWindow(windowStage: window.WindowStage): void {

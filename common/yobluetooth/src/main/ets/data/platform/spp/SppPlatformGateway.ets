@@ -49,7 +49,7 @@ export class SppPlatformGateway {
         });
       } catch (error) {
         const err = error as BusinessError;
-        resolve(Result.fail(ResultError.fromError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err)));
+        resolve(Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err)));
       }
     });
   }
@@ -123,7 +123,7 @@ export class SppPlatformGateway {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.SPP_IO_ERROR, err));
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_IO_ERROR, err));
     }
   }
 

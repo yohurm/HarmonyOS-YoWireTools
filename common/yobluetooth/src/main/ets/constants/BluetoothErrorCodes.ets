@@ -1,9 +1,11 @@
 /**
  * Bluetooth module error codes per architecture bluetooth/00 §9 and 02-§9.
+ * Source of truth is this class; docs under `.projectark/.../05-...§7` may drift.
  */
 export class BluetoothErrorCodes {
   static readonly ADAPTER_OFF: string = 'YW-BT-1001';
   static readonly CLASSIC_UNAVAILABLE: string = 'YW-BT-1002';
+  /** Session / transport not connected (not "SPP connect failed" — that is SPP_CONNECT_FAILED). */
   static readonly NOT_CONNECTED: string = 'YW-BT-1003';
   static readonly OPERATION_BUSY: string = 'YW-BT-1004';
   static readonly DISCONNECTED: string = 'YW-BT-1005';

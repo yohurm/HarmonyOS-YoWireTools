@@ -86,7 +86,7 @@ export class HttpDataSource {
       } else if (err.code !== undefined && err.code >= 2300000) {
         appCode = WifiNetworkErrorCodes.HTTP_SIZE_LIMIT;
       }
-      return Result.fail(ResultError.fromError(appCode, err as Error));
+      return Result.fail(ResultError.fromBusinessError(appCode, err));
     } finally {
       if (headersHandler !== undefined) {
         NetworkKitEventBridge.unsubscribeHttpHeadersReceive(client, headersHandler);

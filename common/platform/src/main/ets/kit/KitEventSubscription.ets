@@ -24,7 +24,7 @@ export class KitEventSubscription {
       if (eventName.length > 0) {
         logger.error(`kit_event_subscribe_failed event=${eventName} code=${err.code} message=${err.message}`);
       }
-      return Result.fail(ResultError.fromError(PlatformErrorCodes.KIT_EVENT_SUBSCRIBE_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(PlatformErrorCodes.KIT_EVENT_SUBSCRIBE_FAILED, err));
     }
   }
 

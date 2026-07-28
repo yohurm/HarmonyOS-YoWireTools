@@ -1,4 +1,4 @@
-﻿import { IdGenerator, Observable, TimeUtil } from 'common_core';
+﻿import { IdGenerator, Observable, ResultError, TimeUtil } from 'common_core';
 import { socket } from '@kit.NetworkKit';
 import {
   ITransportSession,
@@ -73,8 +73,8 @@ export class TcpClientTransportSession implements ITransportSession {
       await this.tcpSocket.send({ data: payload.buffer });
       return new WriteResult(true, payload.length);
     } catch (error) {
-      const err = error as Error;
-      return new WriteResult(false, 0, WifiNetworkErrorCodes.SOCKET_ERRNO, err.message);
+      const mapped = ResultError.fromBusinessError(WifiNetworkErrorCodes.SOCKET_ERRNO, error);
+      return new WriteResult(false, 0, mapped.code, mapped.message, mapped.nativeCode);
     }
   }
 

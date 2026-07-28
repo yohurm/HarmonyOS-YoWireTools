@@ -3,6 +3,7 @@
   YoPageShell
 } from 'youi_kit';
 
+/** Workbench root tab - placeholder until workbench UI is rebuilt. */
 @ComponentV2
 export struct HomeFeaturePage {
   @LocalBuilder

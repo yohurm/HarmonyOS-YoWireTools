@@ -2,6 +2,7 @@
  * Minimal MQTT 3.1.1 wire encoding for CONNECT / SUBSCRIBE / PUBLISH.
  */
 import { Result, ResultError } from 'common_core';
+import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 export class MqttWireCodec {
   static buildConnect(clientId: string, username: string = '', password: string = ''): Uint8Array {
     const protocolName = MqttWireCodec.encodeUtf8('MQTT');
@@ -41,21 +42,27 @@ export class MqttWireCodec {
   }
   static parseConnAck(data: Uint8Array): Result<void> {
     if (data.length < 4 || data[0] !== 0x20) {
-      return Result.fail(new ResultError('YW-MQTT-1001', 'Invalid CONNACK packet'));
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.MQTT_INVALID_CONNACK, 'Invalid CONNACK packet'));
     }
     const returnCode = data[data.length - 1];
     if (returnCode !== 0) {
-      return Result.fail(new ResultError('YW-MQTT-1002', `Broker rejected connection (code ${returnCode})`));
+      return Result.fail(new ResultError(
+        WifiNetworkErrorCodes.MQTT_CONN_REJECTED,
+        `Broker rejected connection (code ${returnCode})`,
+        undefined,
+        {},
+        `${returnCode}`
+      ));
     }
     return Result.ok(undefined);
   }
   static parseSubAck(data: Uint8Array): Result<void> {
     if (data.length < 5 || data[0] !== 0x90) {
-      return Result.fail(new ResultError('YW-MQTT-1003', 'Invalid SUBACK packet'));
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.MQTT_INVALID_SUBACK, 'Invalid SUBACK packet'));
     }
     const qos = data[data.length - 1];
     if (qos === 0x80) {
-      return Result.fail(new ResultError('YW-MQTT-1004', 'Subscribe rejected by broker'));
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.MQTT_SUBSCRIBE_REJECTED, 'Subscribe rejected by broker'));
     }
     return Result.ok(undefined);
   }

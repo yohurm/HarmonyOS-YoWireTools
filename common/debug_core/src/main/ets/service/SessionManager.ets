@@ -18,6 +18,7 @@ import {
   SessionType
 } from '../domain/enums/DomainEnums';
 import { CreateSessionInput, DebugSession } from '../domain/model/DebugSession';
+import { DebugError } from '../domain/model/DebugError';
 import { DebugEvent } from '../domain/model/DebugEvent';
 import { SessionResult } from '../domain/model/SessionResult';
 import { SessionMapper } from '../mapper/SessionMapper';
@@ -108,9 +109,10 @@ export class SessionManager {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as Error;
-      const failed = session.withState(SessionState.FAILED, TimeUtil.nowMs());
+      const resultError = new ResultError('YW-SESSION-1003', err.message, err);
+      const failed = session.withError(DebugError.fromResultError(resultError));
       this.persistAndPublish(failed);
-      return Result.fail(new ResultError('YW-SESSION-1003', err.message));
+      return Result.fail(resultError);
     }
   }
 

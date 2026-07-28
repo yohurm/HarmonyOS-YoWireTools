@@ -1,4 +1,4 @@
-﻿import {
+import {
   BluetoothConstants,
   BluetoothTransportType,
   ConnectSppUseCase,
@@ -7,6 +7,7 @@
   SppConnectFailureHints,
   SppConnectParams
 } from 'yobluetooth';
+import { YoErrorStateModel } from 'youi_kit';
 
 /**
  * Observed dialog form state for openCustomDialog + ComponentContent.
@@ -22,6 +23,8 @@ export class SppConnectDialogParams {
   @Track connecting: boolean = false;
   @Track errorMessage: string = '';
   @Track hintLines: string[] = [];
+  /** Structured three-layer error model (PRD §9 / architecture §10). */
+  errorModel: YoErrorStateModel = new YoErrorStateModel();
   transport: BluetoothTransportType = BluetoothTransportType.BR_EDR;
   onCancel: () => void = () => {
   };
@@ -49,7 +52,7 @@ export class SppConnectDialogController {
 
   /**
    * Eligibility pre-check then ConnectSppUseCase.
-   * Mutates form connecting / errorMessage / hintLines; invokes onConnected on success.
+   * Mutates form connecting / errorMessage / hintLines / errorModel; invokes onConnected on success.
    */
   async connectFromDialog(form: SppConnectDialogParams): Promise<void> {
     if (form.connecting || form.classicDeviceId.length === 0) {
@@ -64,13 +67,13 @@ export class SppConnectDialogController {
     }
     form.errorMessage = '';
     form.hintLines = [];
+    form.errorModel = new YoErrorStateModel();
     // Pre-check DUPLICATE/LIMIT (YW-BT-1316/1317) before starting connect UI/work.
     // ConnectSppUseCase remains the final admission authority.
     const eligibility = this.queryEligibility.execute(form.classicDeviceId, uuid);
     if (!eligibility.success) {
-      const code = eligibility.error?.code ?? '';
-      form.errorMessage = eligibility.error?.message ?? 'not eligible';
-      form.hintLines = SppConnectFailureHints.explain(code, form.errorMessage);
+      SppConnectDialogController.applyFailure(form, eligibility.error?.code ?? '',
+        eligibility.error?.message ?? 'not eligible', eligibility.error?.nativeCode ?? '');
       return;
     }
     form.connecting = true;
@@ -86,11 +89,30 @@ export class SppConnectDialogController {
     ));
     form.connecting = false;
     if (!result.success || result.value === undefined) {
-      const code = result.error?.code ?? '';
-      form.errorMessage = result.error?.message ?? 'connect failed';
-      form.hintLines = SppConnectFailureHints.explain(code, form.errorMessage);
+      SppConnectDialogController.applyFailure(form, result.error?.code ?? '',
+        result.error?.message ?? 'connect failed', result.error?.nativeCode ?? '');
       return;
     }
     form.onConnected(result.value.sessionId);
+  }
+
+  private static applyFailure(
+    form: SppConnectDialogParams,
+    code: string,
+    message: string,
+    nativeCode: string
+  ): void {
+    form.errorMessage = message;
+    form.hintLines = SppConnectFailureHints.explain(code, message);
+    const cause = form.hintLines.length > 0 ? form.hintLines[0] : '';
+    const next = form.hintLines.length > 1 ? form.hintLines[1] : '';
+    form.errorModel = YoErrorStateModel.fromLayers(
+      message,
+      cause,
+      next,
+      true,
+      code,
+      nativeCode
+    );
   }
 }

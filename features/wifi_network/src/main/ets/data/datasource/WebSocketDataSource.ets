@@ -60,7 +60,7 @@ export class WebSocketDataSource {
     } catch (error) {
       const err = error as BusinessError;
       this.setPhase(WebSocketClientPhase.FAILED);
-      return Result.fail(ResultError.fromError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err));
+      return Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err));
     }
   }
 
@@ -74,7 +74,7 @@ export class WebSocketDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err));
+      return Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err));
     }
   }
 

@@ -58,7 +58,17 @@ export class SendCommandUseCase {
       return input.transport.write(bytes, new WriteOptions(false));
     });
     if (!writeResult.success) {
-      return Result.fail(new ResultError(writeResult.appCode || 'YW-CMD-1002', writeResult.message));
+      const appCode = writeResult.appCode.length > 0 ? writeResult.appCode : 'YW-CMD-1002';
+      await this.logCapture.captureBytes(
+        input.sessionId,
+        input.transport.module,
+        input.transport.protocol,
+        Direction.OUTBOUND,
+        bytes,
+        appCode,
+        writeResult.nativeCode
+      );
+      return Result.fail(new ResultError(appCode, writeResult.message, undefined, {}, writeResult.nativeCode));
     }
     return this.logCapture.captureBytes(
       input.sessionId,

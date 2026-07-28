@@ -1,7 +1,7 @@
 import { BackupExtensionAbility, BundleVersion } from '@kit.CoreFileKit';
-import { YoLog } from 'yolog';
+import { YoLog, YoLogTag } from 'yolog';
 
-const logger = YoLog.tag('EntryBackup');
+const logger = YoLog.tag(YoLogTag.APP);
 
 export default class EntryBackupAbility extends BackupExtensionAbility {
   async onBackup() {

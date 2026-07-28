@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { Result, ResultError } from 'common_core';
+import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { ExportFileWriter } from '../file/ExportFileWriter';
 import { LogIndexFilterUtil } from '../query/LogIndexFilterUtil';
 import { LogQuery } from '../query/LogQuery';
@@ -7,6 +8,8 @@ import { LogRepository } from '../repository/LogRepository';
 import { StoreErrorCodes } from '../constants/StoreErrorCodes';
 import { ExportFormat, ExportOptions } from './ExportFormat';
 import { LogExportFormatter } from './LogExportFormatter';
+
+const logger = YoLog.tag(YoLogTag.SESSION);
 
 /**
  * Serial log export service per architecture §5.6 and ExportQueue semantics.
@@ -23,6 +26,10 @@ export class LogExportService {
   }
 
   async exportLogs(options: ExportOptions): Promise<Result<string>> {
+    logger.params('export_start', LogParams.create()
+      .put('sessionId', options.sessionId)
+      .put('format', `${options.format}`)
+      .put('includePayload', options.includePayloadBytes));
     const query = new LogQuery(
       options.sessionId,
       0,
@@ -34,6 +41,7 @@ export class LogExportService {
     );
     const listed = await this.logRepository.list(query);
     if (!listed.success || listed.value === undefined) {
+      logger.error(`export_failed code=${listed.error?.code ?? StoreErrorCodes.EXPORT_FAILED}`);
       return Result.fail(listed.error ?? new ResultError(StoreErrorCodes.EXPORT_FAILED, 'List logs failed'));
     }
     const filteredItems = LogIndexFilterUtil.applyClientFilters(
@@ -56,7 +64,16 @@ export class LogExportService {
     }
     const content = LogExportFormatter.formatRecords(options.format, filteredItems, payloadMap);
     const fileName = LogExportService.fileNameForFormat(options.format);
-    return this.fileWriter.writeText(fileName, content);
+    const written = await this.fileWriter.writeText(fileName, content);
+    if (!written.success) {
+      logger.error(`export_failed code=${written.error?.code ?? StoreErrorCodes.EXPORT_FAILED}`);
+      return written;
+    }
+    logger.params('export_success', LogParams.create()
+      .put('sessionId', options.sessionId)
+      .put('count', filteredItems.length)
+      .put('path', written.value ?? ''));
+    return written;
   }
 
   private static fileNameForFormat(format: ExportFormat): string {

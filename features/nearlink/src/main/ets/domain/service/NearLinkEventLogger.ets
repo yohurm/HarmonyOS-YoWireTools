@@ -1,4 +1,4 @@
-﻿import { IdGenerator, TimeUtil } from 'common_core';
+import { IdGenerator, TimeUtil } from 'common_core';
 import {
   DebugEvent,
   Direction,
@@ -140,8 +140,8 @@ export class NearLinkEventLogger {
       ErrorSeverity.INFO,
       summary,
       undefined,
-      appCode,
       nativeCode,
+      appCode,
       {}
     );
     await NearLinkEventLogger.logCapture.captureEvent(event);

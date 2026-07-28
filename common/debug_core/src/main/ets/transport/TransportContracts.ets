@@ -79,12 +79,20 @@ export class WriteResult {
   readonly bytesWritten: number;
   readonly appCode: string;
   readonly message: string;
+  readonly nativeCode: string;
 
-  constructor(success: boolean, bytesWritten: number, appCode: string = '', message: string = '') {
+  constructor(
+    success: boolean,
+    bytesWritten: number,
+    appCode: string = '',
+    message: string = '',
+    nativeCode: string = ''
+  ) {
     this.success = success;
     this.bytesWritten = bytesWritten;
     this.appCode = appCode;
     this.message = message;
+    this.nativeCode = nativeCode;
   }
 }
 

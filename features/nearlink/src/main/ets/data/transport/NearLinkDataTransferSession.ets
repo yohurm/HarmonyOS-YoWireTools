@@ -134,7 +134,8 @@ export class NearLinkDataTransferSession implements ITransportSession {
           false,
           0,
           result.error?.code ?? NearLinkErrorCodes.DT_GENERIC_FAILED,
-          result.error?.message ?? 'write failed'
+          result.error?.message ?? 'write failed',
+          result.error?.nativeCode ?? ''
         );
       }
       this.transition(TransportState.CONNECTED, 'congested');

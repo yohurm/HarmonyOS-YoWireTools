@@ -1,6 +1,5 @@
 ﻿import { IdGenerator, Observable, Result, ResultError, TimeUtil } from 'common_core';
 import {
-  Direction,
   ModuleType,
   ProtocolType,
   TransportState
@@ -16,7 +15,6 @@ import {
 import { ssap } from '@kit.NearLinkKit';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
 import { SsapOperationQueue } from '../../domain/service/SsapOperationQueue';
 import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';
 
@@ -111,16 +109,11 @@ export class SsapTransportSession implements ITransportSession {
         false,
         0,
         written.error?.code ?? NearLinkErrorCodes.SSAP_WRITE_FAILED,
-        written.error?.message ?? 'SSAP write failed'
+        written.error?.message ?? 'SSAP write failed',
+        written.error?.nativeCode ?? ''
       );
     }
-    void NearLinkEventLogger.logSsapPayload(
-      this.sessionId,
-      Direction.OUTBOUND,
-      this.serviceUuid,
-      this.propertyUuid,
-      payload
-    );
+    // Outbound evidence is owned by SendCommandUseCase — do not capture here.
     return new WriteResult(true, payload.length);
   }
 
@@ -156,13 +149,7 @@ export class SsapTransportSession implements ITransportSession {
       }
       const bytes = new Uint8Array(property.value);
       if (bytes.length > 0) {
-        void NearLinkEventLogger.logSsapPayload(
-          this.sessionId,
-          Direction.INBOUND,
-          property.serviceUuid,
-          property.propertyUuid,
-          bytes
-        );
+        // Inbound evidence is owned by TransportLogBinder — do not capture here.
         this.incomingObservable.next(new IncomingPayload(bytes, TimeUtil.nowMs(), false));
       }
     };

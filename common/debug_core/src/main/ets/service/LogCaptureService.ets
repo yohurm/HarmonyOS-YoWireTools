@@ -60,7 +60,8 @@ export class LogCaptureService {
       normalized,
       payload ?? new Uint8Array(0),
       event.appCode,
-      event.nativeCode
+      event.nativeCode,
+      event.attributes
     );
   }
 
@@ -72,7 +73,8 @@ export class LogCaptureService {
     normalized: NormalizedPayload,
     bytes: Uint8Array,
     appCode: string,
-    nativeCode: string
+    nativeCode: string,
+    attributes: Record<string, string | number | boolean> = {}
   ): Promise<Result<DebugLogRecord>> {
     const record = new DebugLogRecord(
       IdGenerator.next('log'),
@@ -88,7 +90,8 @@ export class LogCaptureService {
       undefined,
       TimeUtil.monotonicMs(),
       appCode,
-      nativeCode
+      nativeCode,
+      attributes
     );
     const indexRecord = LogMapper.toIndexRecord(record);
     const payload = bytes.length > 0 ? bytes : undefined;

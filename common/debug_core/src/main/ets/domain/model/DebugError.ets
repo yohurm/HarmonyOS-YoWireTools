@@ -1,3 +1,4 @@
+import { ResultError } from 'common_core';
 import { ErrorSeverity } from '../enums/DomainEnums';
 
 /**
@@ -31,5 +32,24 @@ export class DebugError {
     this.severity = severity;
     this.retryable = retryable;
     this.attributes = attributes;
+  }
+
+  static fromResultError(
+    err: ResultError,
+    severity: ErrorSeverity = ErrorSeverity.ERROR,
+    retryable: boolean = false,
+    userAction: string = ''
+  ): DebugError {
+    const nativeMessage = err.cause?.message ?? '';
+    return new DebugError(
+      err.code,
+      err.message,
+      userAction,
+      err.nativeCode,
+      nativeMessage,
+      severity,
+      retryable,
+      err.attributes
+    );
   }
 }

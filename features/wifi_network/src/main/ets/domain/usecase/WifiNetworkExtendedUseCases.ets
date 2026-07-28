@@ -1,9 +1,10 @@
-﻿import { Result, ResultError } from 'common_core';
+import { Result, ResultError } from 'common_core';
 import { IdGenerator } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
   CreateSessionUseCase,
+  Direction,
   EnsurePermissionUseCase,
   ModuleType,
   PermissionScenario,
@@ -21,6 +22,7 @@ import { TcpClientTransportSession } from '../../data/transport/TcpClientTranspo
 import { TcpServerSessionCoordinator } from '../../data/transport/TcpServerSessionCoordinator';
 import { MqttConnectConfig } from '../model/MqttModels';
 import { SocketConnectionParams } from '../model/SocketModels';
+import { WifiMessageLogger } from '../service/WifiMessageLogger';
 
 export class OpenTcpServerUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
@@ -46,6 +48,7 @@ export class OpenMqttSessionUseCase {
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   private readonly stopSession: StopSessionUseCase;
+  private activeSessionId: string = '';
 
   constructor(
     mqttDataSource: MqttClientDataSource = MqttClientDataSource.getInstance(),
@@ -83,11 +86,13 @@ export class OpenMqttSessionUseCase {
       await this.stopSession.execute(created.value.id, 'mqtt_connect_failed');
       return Result.fail(connected.error ?? new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'MQTT connect failed'));
     }
+    this.activeSessionId = created.value.id;
     return Result.ok(created.value.id);
   }
 
   async disconnect(sessionId: string): Promise<Result<void>> {
     await this.mqttDataSource.disconnect();
+    this.activeSessionId = '';
     if (sessionId.length > 0) {
       return this.stopSession.execute(sessionId, 'mqtt_disconnected');
     }
@@ -95,11 +100,32 @@ export class OpenMqttSessionUseCase {
   }
 
   onMessage(listener: (payload: string) => void): Result<void> {
-    return this.mqttDataSource.onMessage(listener);
+    return this.mqttDataSource.onMessage((payload: string) => {
+      if (this.activeSessionId.length > 0) {
+        void WifiMessageLogger.logText(
+          this.activeSessionId,
+          ProtocolType.MQTT,
+          Direction.INBOUND,
+          payload,
+          'mqtt_publish'
+        );
+      }
+      listener(payload);
+    });
   }
 
   async publish(topic: string, payload: string): Promise<Result<void>> {
-    return this.mqttDataSource.publish(topic, payload);
+    const result = await this.mqttDataSource.publish(topic, payload);
+    if (result.success && this.activeSessionId.length > 0) {
+      void WifiMessageLogger.logText(
+        this.activeSessionId,
+        ProtocolType.MQTT,
+        Direction.OUTBOUND,
+        payload,
+        `mqtt_publish topic=${topic}`
+      );
+    }
+    return result;
   }
 }
 

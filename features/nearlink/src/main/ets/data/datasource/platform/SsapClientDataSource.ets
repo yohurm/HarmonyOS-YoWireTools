@@ -24,7 +24,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_CREATE_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_CREATE_FAILED, err));
     }
   }
 
@@ -61,7 +61,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
     }
   }
 
@@ -74,7 +74,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
     }
   }
 
@@ -88,7 +88,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, err));
     }
   }
 
@@ -101,7 +101,7 @@ export class SsapClientDataSource {
       return Result.ok(services);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_DISCOVER_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_DISCOVER_FAILED, err));
     }
   }
 
@@ -123,7 +123,7 @@ export class SsapClientDataSource {
       return Result.ok(NearLinkAdvParser.toHex(new Uint8Array(response.value)));
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_READ_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_READ_FAILED, err));
     }
   }
 
@@ -137,7 +137,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_WRITE_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_WRITE_FAILED, err));
     }
   }
 
@@ -151,7 +151,7 @@ export class SsapClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_NOTIFY_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_NOTIFY_FAILED, err));
     }
   }
 
@@ -167,7 +167,7 @@ export class SsapClientDataSource {
       return Result.ok(this.negotiatedMtu);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(NearLinkErrorCodes.SSAP_MTU_FAILED, err));
+      return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_MTU_FAILED, err));
     }
   }
 

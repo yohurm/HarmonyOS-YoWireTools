@@ -1,4 +1,4 @@
-﻿import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { UIContextRegistry } from 'common_platform';
 import {
@@ -6,6 +6,7 @@ import {
   YoActionButtonKind,
   YoColor,
   YoDialogToken,
+  YoErrorStateModel,
   YoRadius,
   YoSpace,
   YoTypeStyle
@@ -138,6 +139,12 @@ struct SppConnectDialogContent {
               .fontSize(YoTypeStyle.BODY_S.size)
               .fontColor(YoColor.ERROR)
               .width('100%')
+            if (this.params.errorModel.appCode.length > 0 || this.params.errorModel.nativeCode.length > 0) {
+              Text(this.buildErrorCodeLine())
+                .fontSize(YoTypeStyle.BODY_S.size)
+                .fontColor(YoColor.TEXT_TERTIARY)
+                .width('100%')
+            }
             ForEach(this.params.hintLines, (hint: string) => {
               Text(hint)
                 .fontSize(YoTypeStyle.BODY_S.size)
@@ -180,6 +187,17 @@ struct SppConnectDialogContent {
     }
     .width('100%')
     .padding({ left: YoSpace.XXL, right: YoSpace.XXL })
+  }
+
+  private buildErrorCodeLine(): string {
+    const parts: string[] = [];
+    if (this.params.errorModel.appCode.length > 0) {
+      parts.push(this.params.errorModel.appCode);
+    }
+    if (this.params.errorModel.nativeCode.length > 0) {
+      parts.push(`native=${this.params.errorModel.nativeCode}`);
+    }
+    return parts.join(' · ');
   }
 }
 
@@ -233,6 +251,7 @@ export class SppConnectDialog {
     dialog.params.connecting = false;
     dialog.params.errorMessage = '';
     dialog.params.hintLines = [];
+    dialog.params.errorModel = new YoErrorStateModel();
     dialog.params.onCancel = () => {
       if (!dialog.params.connecting) {
         dialog.close();

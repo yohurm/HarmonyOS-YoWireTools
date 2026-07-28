@@ -191,7 +191,8 @@ export class GattTransportSession implements ITransportSession {
         false,
         0,
         written.error?.code ?? BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED,
-        written.error?.message ?? 'write failed'
+        written.error?.message ?? 'write failed',
+        written.error?.nativeCode ?? ''
       );
     }
     return new WriteResult(true, payload.length);

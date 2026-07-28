@@ -3,6 +3,7 @@
   YoPageShell
 } from 'youi_kit';
 
+/** More root tab — placeholder until settings UI is rebuilt. */
 @ComponentV2
 export struct MoreFeaturePage {
   @LocalBuilder

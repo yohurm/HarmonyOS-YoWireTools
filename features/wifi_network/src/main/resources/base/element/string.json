@@ -3,42 +3,6 @@
     {
       "name": "wifi_title_overview",
       "value": "网络"
-    },
-    {
-      "name": "wifi_list_title",
-      "value": "Wi-Fi 网络"
-    },
-    {
-      "name": "wifi_detail_title",
-      "value": "网络详情"
-    },
-    {
-      "name": "wifi_filter_subtitle",
-      "value": "SSID / BSSID / 频段 / 安全"
-    },
-    {
-      "name": "wifi_rssi_value",
-      "value": "%d dBm"
-    },
-    {
-      "name": "wifi_demo_ssid_lab",
-      "value": "YoWire-Lab"
-    },
-    {
-      "name": "wifi_demo_ssid_5g",
-      "value": "HarmonyOS-5G"
-    },
-    {
-      "name": "wifi_demo_bssid",
-      "value": "AA:BB:CC:DD:EE:FF"
-    },
-    {
-      "name": "wifi_demo_payload_text",
-      "value": "{\"ssid\":\"YoWire-Lab\",\"security\":\"WPA2\"}"
-    },
-    {
-      "name": "wifi_demo_payload_hex",
-      "value": "7B2273736964223A22596F576972652D4C6162227D"
     }
   ]
 }

@@ -67,14 +67,6 @@
     {
       "name": "more_hub_title",
       "value": "更多"
-    },
-    {
-      "name": "more_settings_detail_title",
-      "value": "更多设置"
-    },
-    {
-      "name": "more_settings_detail_message",
-      "value": "其他设置项将在后续版本提供"
     }
   ]
 }

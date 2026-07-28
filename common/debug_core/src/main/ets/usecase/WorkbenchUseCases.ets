@@ -5,14 +5,30 @@ import { SessionRuntimeStore } from '../runtime/SessionRuntimeStore';
 import { TransportSessionRegistry } from '../service/TransportSessionRegistry';
 
 export class WorkbenchLogLine {
+  readonly id: string;
+  readonly timestampMs: number;
   readonly direction: string;
   readonly summary: string;
   readonly payloadSize: number;
+  readonly appCode: string;
+  readonly nativeCode: string;
 
-  constructor(direction: string, summary: string, payloadSize: number) {
+  constructor(
+    id: string,
+    timestampMs: number,
+    direction: string,
+    summary: string,
+    payloadSize: number,
+    appCode: string = '',
+    nativeCode: string = ''
+  ) {
+    this.id = id;
+    this.timestampMs = timestampMs;
     this.direction = direction;
     this.summary = summary;
     this.payloadSize = payloadSize;
+    this.appCode = appCode;
+    this.nativeCode = nativeCode;
   }
 }
 
@@ -68,7 +84,15 @@ export class LoadSessionLogPreviewUseCase {
     const lines: WorkbenchLogLine[] = [];
     for (let i = 0; i < listed.value.items.length; i++) {
       const record = listed.value.items[i];
-      lines.push(new WorkbenchLogLine(record.direction, record.summary, record.payloadSize));
+      lines.push(new WorkbenchLogLine(
+        record.id,
+        record.timestampMs,
+        record.direction,
+        record.summary,
+        record.payloadSize,
+        record.appCode,
+        record.nativeCode
+      ));
     }
     return Result.ok(lines);
   }

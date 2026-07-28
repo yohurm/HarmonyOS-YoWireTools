@@ -3,6 +3,7 @@
   YoPageShell
 } from 'youi_kit';
 
+/** Network root tab — placeholder until network UI is rebuilt. */
 @ComponentV2
 export struct WifiFeaturePage {
   @LocalBuilder
