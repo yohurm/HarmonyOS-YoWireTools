@@ -1,4 +1,4 @@
-﻿import {
+import {
   YoColor,
   YoRadius,
   YoSpace,
@@ -16,6 +16,7 @@ import { SppMainViewModel } from '../../viewmodel/SppMainViewModel';
  * │ [名称________] [MAC________]      [重置]   │
  * │ 信号  弱──●──强              ≥ -70 dBm    │
  * │ 设备类型                        [全部 ▼]   │
+ * │ 显示已连接                      [开关]     │  ← 已连接已配对 ≠ 仅已配对
  * └────────────────────────────────────────────┘
  */
 @ComponentV2
@@ -149,6 +150,20 @@ export struct ClassicScanFilterPanelView {
             if (index >= 0 && index < this.majorValues.length) {
               this.vm.setFilterMajor(this.majorValues[index]);
             }
+          })
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center)
+
+      Row() {
+        Text($r('app.string.bt_spp_filter_include_connected'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .layoutWeight(1)
+        Toggle({ type: ToggleType.Switch, isOn: this.vm.filterIncludeConnectedPaired })
+          .selectedColor(YoColor.BRAND_PRIMARY)
+          .onChange((isOn: boolean) => {
+            this.vm.setFilterIncludeConnectedPaired(isOn);
           })
       }
       .width('100%')

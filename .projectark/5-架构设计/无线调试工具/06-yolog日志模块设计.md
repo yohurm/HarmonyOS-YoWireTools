@@ -24,8 +24,12 @@ yolog          # 零 common 依赖；仅 Kit
 platform       # 依赖 yolog
 storage        # 依赖 yolog
 debug_core     # 依赖 yolog
+yobluetooth    # 依赖 yolog；业务 tag 自管（BtLogTag）
 product/phone  # bootstrap YoLog
 ```
+
+横切 tag（`YoLogTag`）：`App` / `Perm` / `Cap` / `Life` / `Session`。  
+业务域 tag（如 `YoBt.Scan`）由各 HAR 自建常量，**不得**写入 `yolog`。
 
 ## 3. 架构
 
@@ -81,7 +85,7 @@ YoLog.dumpRing();
 await YoLog.terminate();
 ```
 
-Tag 约定（ASCII ≤31）：`YoWire.App` / `Perm` / `Cap` / `Life` / `Session`。
+Tag 约定（ASCII ≤31）：横切 `YoWire.App` / `Perm` / `Cap` / `Life` / `Session`；业务 tag 见各 HAR（如 yobluetooth `BtLogTag`）。
 
 ## 7. 观测规范（对齐原 §11）
 

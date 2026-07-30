@@ -1,8 +1,9 @@
-import { ModuleType, ProtocolType, SessionState } from 'debug_core';
 import { BluetoothDevice } from '../model/BluetoothDevice';
 import { DiscoverySource } from '../model/DiscoverySource';
+import { SessionState } from 'debug_core';
+import { SppLedgerPhase } from '../model/spp/SppLedgerPhase';
 
-/** 活跃 SPP 会话摘要（供可见性策略使用，避免对象字面量类型）。 */
+/** 活跃 SPP 会话摘要（供 KeepAliveCollector 使用）。 */
 export class ActiveSppSessionRef {
   readonly module: string;
   readonly protocol: string;
@@ -17,17 +18,25 @@ export class ActiveSppSessionRef {
   }
 }
 
+/** Ledger 行摘要。 */
+export class ConnectedSppLedgerRef {
+  readonly classicDeviceId: string;
+  readonly phase: SppLedgerPhase;
+
+  constructor(classicDeviceId: string, phase: SppLedgerPhase) {
+    this.classicDeviceId = classicDeviceId;
+    this.phase = phase;
+  }
+}
+
 /**
- * 经典扫描（CLASSIC_SCAN rail）列表可见性策略。
+ * 经典扫描列表可见性策略（纯函数，不依赖 Kit / yolog）。
  *
- * 本策略属于经典 Inquiry 列表，不是 SPP 协议扫描。
- * 当前 SPP 页是唯一 UI 消费者，故用活跃 SPP 会话地址作「保活行」锚点。
- *
- * 扫描轨只展示：
- * 1. 本轮 Inquiry / discoveryResult 真实回调（含 RSSI 或 deviceFind）
- * 2. 正在连接 / 已连接的 SPP 会话目标（即使暂无广播）
- *
- * 不展示：仅存在于 getPairedDevices、周围无广播且未在连接中的静默配对设备。
+ * 平台 Inquiry 无法配置 includeBonded/includeConnected。
+ * 扫描轨展示：
+ * 1. 本轮 Inquiry / discoveryResult / deviceFind
+ * 2. keepAlive 地址（由 ClassicScanKeepAliveCollector 提供）
+ * 静默仅配对默认不展示。
  */
 export class ClassicScanVisibilityPolicy {
   static hasLiveDiscoverySignal(device: BluetoothDevice): boolean {
@@ -35,12 +44,23 @@ export class ClassicScanVisibilityPolicy {
       device.discoverySource === DiscoverySource.DEVICE_FIND;
   }
 
+  /** @deprecated Prefer ClassicScanKeepAliveCollector.isConnectedSessionState. */
+  static isConnectedKeepAliveSessionState(state: SessionState): boolean {
+    return state === SessionState.RUNNING ||
+      state === SessionState.SUSPENDED ||
+      state === SessionState.STOPPING;
+  }
+
+  /** @deprecated Prefer ClassicScanKeepAliveCollector session helpers. */
   static isActiveSppSessionState(state: SessionState): boolean {
     return state === SessionState.CREATED ||
       state === SessionState.PREPARING ||
-      state === SessionState.RUNNING ||
-      state === SessionState.SUSPENDED ||
-      state === SessionState.STOPPING;
+      ClassicScanVisibilityPolicy.isConnectedKeepAliveSessionState(state);
+  }
+
+  /** @deprecated Prefer ClassicScanKeepAliveCollector.isConnectedLedgerPhase. */
+  static isConnectedLedgerPhase(phase: SppLedgerPhase): boolean {
+    return phase === SppLedgerPhase.CONNECTED;
   }
 
   static matchesDeviceAddress(device: BluetoothDevice, address: string): boolean {
@@ -52,18 +72,23 @@ export class ClassicScanVisibilityPolicy {
       device.bleDeviceId === address;
   }
 
-  static isAddressInActiveSession(address: string, activeClassicAddresses: Set<string>): boolean {
-    return address.length > 0 && activeClassicAddresses.has(address);
+  static isAddressInKeepAlive(address: string, keepAliveAddresses: Set<string>): boolean {
+    return address.length > 0 && keepAliveAddresses.has(address);
   }
 
-  static isVisibleInScanList(device: BluetoothDevice, activeClassicAddresses: Set<string>): boolean {
+  /** @deprecated Prefer isAddressInKeepAlive. */
+  static isAddressInActiveSession(address: string, keepAliveAddresses: Set<string>): boolean {
+    return ClassicScanVisibilityPolicy.isAddressInKeepAlive(address, keepAliveAddresses);
+  }
+
+  static isVisibleInScanList(device: BluetoothDevice, keepAliveAddresses: Set<string>): boolean {
     if (ClassicScanVisibilityPolicy.hasLiveDiscoverySignal(device)) {
       return true;
     }
-    if (ClassicScanVisibilityPolicy.isAddressInActiveSession(device.primaryDeviceId, activeClassicAddresses)) {
+    if (ClassicScanVisibilityPolicy.isAddressInKeepAlive(device.primaryDeviceId, keepAliveAddresses)) {
       return true;
     }
-    if (ClassicScanVisibilityPolicy.isAddressInActiveSession(device.classicDeviceId, activeClassicAddresses)) {
+    if (ClassicScanVisibilityPolicy.isAddressInKeepAlive(device.classicDeviceId, keepAliveAddresses)) {
       return true;
     }
     return false;
@@ -71,11 +96,11 @@ export class ClassicScanVisibilityPolicy {
 
   static filterVisible(
     devices: BluetoothDevice[],
-    activeClassicAddresses: Set<string>
+    keepAliveAddresses: Set<string>
   ): BluetoothDevice[] {
     const visible: BluetoothDevice[] = [];
     for (let i = 0; i < devices.length; i++) {
-      if (ClassicScanVisibilityPolicy.isVisibleInScanList(devices[i], activeClassicAddresses)) {
+      if (ClassicScanVisibilityPolicy.isVisibleInScanList(devices[i], keepAliveAddresses)) {
         visible.push(devices[i]);
       }
     }
@@ -84,7 +109,7 @@ export class ClassicScanVisibilityPolicy {
 
   static augmentMissingActiveSessions(
     visible: BluetoothDevice[],
-    activeClassicAddresses: Set<string>,
+    keepAliveAddresses: Set<string>,
     pairedCache: Map<string, BluetoothDevice>,
     fallbackByAddress: Map<string, BluetoothDevice>
   ): BluetoothDevice[] {
@@ -98,7 +123,7 @@ export class ClassicScanVisibilityPolicy {
     }
 
     const augmented = visible.slice();
-    activeClassicAddresses.forEach((address: string) => {
+    keepAliveAddresses.forEach((address: string) => {
       if (present.has(address)) {
         return;
       }
@@ -111,24 +136,39 @@ export class ClassicScanVisibilityPolicy {
     return augmented;
   }
 
-  static collectActiveSppClassicAddresses(
-    summaries: ActiveSppSessionRef[],
-    resolveAddress: (sessionId: string) => string
-  ): Set<string> {
-    const addresses = new Set<string>();
-    for (let i = 0; i < summaries.length; i++) {
-      const summary = summaries[i];
-      if (summary.module !== ModuleType.BLUETOOTH || summary.protocol !== ProtocolType.SPP) {
-        continue;
+  /**
+   * 扫描列表排序：已连接保活置顶 → 收藏 → 已配对 → RSSI → 名称 → lastSeen。
+   */
+  static sortScanList(
+    devices: BluetoothDevice[],
+    keepAliveAddresses: Set<string>
+  ): BluetoothDevice[] {
+    const items = devices.slice();
+    items.sort((a: BluetoothDevice, b: BluetoothDevice) => {
+      const aKeep = ClassicScanVisibilityPolicy.isDeviceInKeepAlive(a, keepAliveAddresses);
+      const bKeep = ClassicScanVisibilityPolicy.isDeviceInKeepAlive(b, keepAliveAddresses);
+      if (aKeep !== bKeep) {
+        return aKeep ? -1 : 1;
       }
-      if (!ClassicScanVisibilityPolicy.isActiveSppSessionState(summary.state)) {
-        continue;
+      if (a.favorite !== b.favorite) {
+        return a.favorite ? -1 : 1;
       }
-      const address = resolveAddress(summary.id);
-      if (address.length > 0) {
-        addresses.add(address);
+      if (a.paired !== b.paired) {
+        return a.paired ? -1 : 1;
       }
-    }
-    return addresses;
+      if (a.rssi !== b.rssi) {
+        return b.rssi - a.rssi;
+      }
+      if (a.effectiveName !== b.effectiveName) {
+        return a.effectiveName.localeCompare(b.effectiveName);
+      }
+      return b.lastSeenMs - a.lastSeenMs;
+    });
+    return items;
+  }
+
+  static isDeviceInKeepAlive(device: BluetoothDevice, keepAliveAddresses: Set<string>): boolean {
+    return ClassicScanVisibilityPolicy.isAddressInKeepAlive(device.primaryDeviceId, keepAliveAddresses) ||
+      ClassicScanVisibilityPolicy.isAddressInKeepAlive(device.classicDeviceId, keepAliveAddresses);
   }
 }

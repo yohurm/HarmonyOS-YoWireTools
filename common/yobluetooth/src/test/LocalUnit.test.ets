@@ -7,7 +7,9 @@ import { BleAdvertisingPlatformMapper } from '../main/ets/data/mapper/BleAdverti
 import { BleAdStructureParser } from '../main/ets/domain/service/BleAdStructureParser';
 import { DeviceNameSource } from '../main/ets/domain/model/BleAdvertisingPacket';
 import { ScanResultMerger } from '../main/ets/domain/service/ScanResultMerger';
-import { ClassicScanVisibilityPolicy } from '../main/ets/domain/service/ClassicScanVisibilityPolicy';
+import { ClassicScanVisibilityPolicy, ConnectedSppLedgerRef } from '../main/ets/domain/service/ClassicScanVisibilityPolicy';
+import { ClassicScanKeepAliveCollector } from '../main/ets/domain/service/ClassicScanKeepAliveCollector';
+import { ClassicConnectedSnapshot } from '../main/ets/domain/model/ClassicConnectedSnapshot';
 import { ClassicProfileCapability } from '../main/ets/domain/service/ClassicProfileCapability';
 import { ClassicDeviceMajorFilter, ClassicScanFilter } from '../main/ets/domain/model/ClassicScanFilter';
 import { ClassicScanCapability } from '../main/ets/domain/model/ClassicScanCapability';
@@ -167,22 +169,75 @@ export default function localUnitTest() {
         DiscoverySource.DISCOVERY_RESULT,
         false
       );
-      const activeAddresses = new Set<string>();
-      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(pairedOnly, activeAddresses)).assertFalse();
-      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(live, activeAddresses)).assertTrue();
+      const keepAlive = new Set<string>();
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(pairedOnly, keepAlive)).assertFalse();
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(live, keepAlive)).assertTrue();
     });
 
-    it('ClassicScanVisibilityPolicy_keeps_active_session_without_broadcast', 0, () => {
-      const pairedOnly = makeClassicDevice(
-        'Connecting',
+    it('ClassicScanVisibilityPolicy_keeps_connected_paired_without_broadcast', 0, () => {
+      const connectedPaired = makeClassicDevice(
+        'Connected Paired',
         'CC:CC:CC:CC:CC:CC',
         0,
         ClassicDeviceMajorFilter.PHONE as number,
         DiscoverySource.PAIRED,
         true
       );
-      const activeAddresses = new Set<string>(['CC:CC:CC:CC:CC:CC']);
-      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(pairedOnly, activeAddresses)).assertTrue();
+      const keepAlive = new Set<string>(['CC:CC:CC:CC:CC:CC']);
+      expect(ClassicScanVisibilityPolicy.isVisibleInScanList(connectedPaired, keepAlive)).assertTrue();
+    });
+
+    it('ClassicScanFilter_includeConnectedPaired_default_true', 0, () => {
+      expect(ClassicScanFilter.empty().includeConnectedPaired).assertTrue();
+      expect(ClassicScanFilter.empty().withIncludeConnectedPaired(false).includeConnectedPaired).assertFalse();
+    });
+
+    it('ClassicScanKeepAliveCollector_merges_profile_and_respects_switch', 0, () => {
+      const platform = new ClassicConnectedSnapshot(['DD:DD:DD:DD:DD:DD'], 1, false);
+      const on = ClassicScanKeepAliveCollector.collect(true, platform, [], [], (_id: string) => '');
+      expect(on.addresses.has('DD:DD:DD:DD:DD:DD')).assertTrue();
+      expect(on.profileCount).assertEqual(1);
+      const off = ClassicScanKeepAliveCollector.collect(false, platform, [], [], (_id: string) => '');
+      expect(off.addresses.size).assertEqual(0);
+    });
+
+    it('ClassicScanKeepAliveCollector_includes_connecting_ledger', 0, () => {
+      const ledgerRefs = [
+        new ConnectedSppLedgerRef('EE:EE:EE:EE:EE:EE', SppLedgerPhase.CONNECTING)
+      ];
+      const snap = ClassicScanKeepAliveCollector.collect(
+        true,
+        ClassicConnectedSnapshot.empty(),
+        ledgerRefs,
+        [],
+        (_id: string) => ''
+      );
+      expect(snap.addresses.has('EE:EE:EE:EE:EE:EE')).assertTrue();
+      expect(snap.sppConnectingCount).assertEqual(1);
+    });
+
+    it('ClassicScanVisibilityPolicy_sorts_keepalive_first', 0, () => {
+      const live = makeClassicDevice(
+        'Live',
+        '11:11:11:11:11:11',
+        -40,
+        ClassicDeviceMajorFilter.AUDIO_VIDEO as number,
+        DiscoverySource.DISCOVERY_RESULT,
+        false
+      );
+      const connected = makeClassicDevice(
+        'Connected',
+        '22:22:22:22:22:22',
+        0,
+        ClassicDeviceMajorFilter.PHONE as number,
+        DiscoverySource.PAIRED,
+        true
+      );
+      const keepAlive = new Set<string>(['22:22:22:22:22:22']);
+      const sorted = ClassicScanVisibilityPolicy.sortScanList([live, connected], keepAlive);
+      expect(sorted.length).assertEqual(2);
+      expect(sorted[0].primaryDeviceId).assertEqual('22:22:22:22:22:22');
+      expect(sorted[1].primaryDeviceId).assertEqual('11:11:11:11:11:11');
     });
 
     it('ScanResultMerger_excludes_rssi_zero_without_active_session', 0, () => {

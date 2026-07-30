@@ -9,6 +9,7 @@
     "common_core": "file:../core",
     "common_platform": "file:../platform",
     "common_storage": "file:../storage",
-    "debug_core": "file:../debug_core"
+    "debug_core": "file:../debug_core",
+    "yolog": "file:../yolog"
   }
 }

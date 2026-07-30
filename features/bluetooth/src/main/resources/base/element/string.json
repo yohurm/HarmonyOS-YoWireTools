@@ -205,6 +205,10 @@
       "value": "重置"
     },
     {
+      "name": "bt_spp_filter_include_connected",
+      "value": "显示已连接"
+    },
+    {
       "name": "bt_spp_empty_filter_title",
       "value": "无匹配设备"
     },
@@ -223,6 +227,10 @@
     {
       "name": "bt_spp_status_needs_bridge",
       "value": "需桥接"
+    },
+    {
+      "name": "bt_spp_status_connecting",
+      "value": "正在连接"
     },
     {
       "name": "bt_spp_status_connected",

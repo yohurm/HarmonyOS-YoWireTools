@@ -1,5 +1,6 @@
 /**
- * Centralized HiLog tags (ASCII, max 31 bytes per HarmonyOS spec).
+ * Centralized HiLog tags for cross-cutting concerns (ASCII, max 31 bytes).
+ * Domain tags (Bluetooth / Wi-Fi / NearLink) live in consumer HARs, not here.
  */
 export class YoLogTag {
   static readonly APP: string = 'YoWire.App';

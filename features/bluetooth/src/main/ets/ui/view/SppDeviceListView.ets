@@ -80,9 +80,10 @@ export struct SppDeviceListView {
                 rssiText: item.rssiText,
                 statusLabel: item.needsBridge ?
                   $r('app.string.bt_spp_status_needs_bridge') :
-                  (item.alreadyConnected ? $r('app.string.bt_spp_status_connected') : ''),
+                  (item.isConnecting ? $r('app.string.bt_spp_status_connecting') :
+                    (item.alreadyConnected ? $r('app.string.bt_spp_status_connected') : '')),
                 statusWarning: item.needsBridge,
-                isPaired: item.paired && !item.needsBridge,
+                isPaired: item.paired && !item.needsBridge && !item.isConnecting && !item.alreadyConnected,
                 transportLabel: item.transportLabel,
                 profileCapabilitiesText: item.profileCapabilitiesText,
                 majorClass: item.majorClass,

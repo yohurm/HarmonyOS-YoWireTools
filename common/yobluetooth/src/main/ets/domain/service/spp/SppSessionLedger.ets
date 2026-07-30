@@ -77,6 +77,43 @@ export class SppSessionLedger {
   }
 
   /**
+   * Classic addresses with ledger phase CONNECTED（已连接的已配对，非仅配对）.
+   */
+  listConnectedClassicAddresses(): string[] {
+    const addresses: string[] = [];
+    const seen = new Set<string>();
+    const values = Array.from(this.entries.values());
+    for (let i = 0; i < values.length; i++) {
+      const entry = values[i];
+      if (entry.phase !== SppLedgerPhase.CONNECTED) {
+        continue;
+      }
+      const id = entry.sessionKey.classicDeviceId;
+      if (id.length === 0 || seen.has(id)) {
+        continue;
+      }
+      seen.add(id);
+      addresses.push(id);
+    }
+    return addresses;
+  }
+
+  /** First ledger phase for a classicDeviceId, or undefined. */
+  findPhaseByClassicId(classicDeviceId: string): SppLedgerPhase | undefined {
+    const normalized = SppSessionKey.normalizeClassicId(classicDeviceId);
+    if (normalized.length === 0) {
+      return undefined;
+    }
+    const values = Array.from(this.entries.values());
+    for (let i = 0; i < values.length; i++) {
+      if (values[i].sessionKey.classicDeviceId === normalized) {
+        return values[i].phase;
+      }
+    }
+    return undefined;
+  }
+
+  /**
    * After RuntimeStore creates the real session id, rebind the reserved ledger row.
    */
   bindSessionId(key: SppSessionKey, sessionId: string): void {

@@ -130,6 +130,8 @@ export class ConnectSppUseCase {
     }
     this.ledger.bindSessionId(sessionKey, session.value.id);
     this.ledger.markConnecting(sessionKey);
+    // Inject connecting paired target into classic scan list immediately (app-layer keep-alive).
+    this.repository.republishClassicDevices();
     const created = this.repository.createSppTransport(session.value.id, connectParams);
     const transport = created as ITransportSession;
     const facet = asSppTransportFacet(created);

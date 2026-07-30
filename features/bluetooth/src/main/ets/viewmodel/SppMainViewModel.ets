@@ -22,6 +22,7 @@ import {
   SppSessionDescriptor,
   SppSessionKey,
   SppSessionLedger,
+  SppLedgerPhase,
   StartClassicScanUseCase,
   StopClassicScanUseCase
 } from 'yobluetooth';
@@ -50,8 +51,10 @@ export class ClassicDeviceListItem {
   readonly majorClass: number;
   readonly majorMinorClass: number;
   readonly profileCapabilitiesText: string;
-  /** 该 classicDeviceId 是否已有任意活跃 Ledger key（任意 UUID）。 */
+  /** UI 徽章：本应用 SPP 已连，或系统 Profile 已连。 */
   readonly alreadyConnected: boolean;
+  /** Ledger RESERVED / CONNECTING / RECONNECTING（正在连接 SPP）。 */
+  readonly isConnecting: boolean;
 
   constructor(
     primaryDeviceId: string,
@@ -67,7 +70,8 @@ export class ClassicDeviceListItem {
     majorClass: number = 0,
     majorMinorClass: number = 0,
     profileCapabilitiesText: string = '',
-    alreadyConnected: boolean = false
+    alreadyConnected: boolean = false,
+    isConnecting: boolean = false
   ) {
     this.primaryDeviceId = primaryDeviceId;
     this.classicDeviceId = classicDeviceId;
@@ -83,6 +87,7 @@ export class ClassicDeviceListItem {
     this.majorMinorClass = majorMinorClass;
     this.profileCapabilitiesText = profileCapabilitiesText;
     this.alreadyConnected = alreadyConnected;
+    this.isConnecting = isConnecting;
   }
 }
 
@@ -142,6 +147,8 @@ export class SppMainViewModel {
   @Trace filterAddress: string = '';
   @Trace filterMinRssi: number = ClassicScanFilter.RSSI_DEFAULT;
   @Trace filterMajor: ClassicDeviceMajorFilter = ClassicDeviceMajorFilter.ALL;
+  /** Default true: keep connected paired targets in scan list (not silent bonded-only). */
+  @Trace filterIncludeConnectedPaired: boolean = true;
   @Trace filterActive: boolean = false;
 
   private readonly loadOverview: LoadBluetoothOverviewSnapshotUseCase;
@@ -273,11 +280,17 @@ export class SppMainViewModel {
     this.commitScanFilter();
   }
 
+  setFilterIncludeConnectedPaired(include: boolean): void {
+    this.filterIncludeConnectedPaired = include;
+    this.commitScanFilter();
+  }
+
   resetScanFilter(): void {
     this.filterName = '';
     this.filterAddress = '';
     this.filterMinRssi = ClassicScanFilter.RSSI_DEFAULT;
     this.filterMajor = ClassicDeviceMajorFilter.ALL;
+    this.filterIncludeConnectedPaired = true;
     this.commitScanFilter();
   }
 
@@ -372,8 +385,14 @@ export class SppMainViewModel {
       const needsBridge = !resolved.success &&
         device.bleDeviceId.length > 0 &&
         device.classicDeviceId.length === 0;
-      const alreadyConnected = this.hasAnyActiveLedgerKey(classicId);
+      const sppLink = this.resolveSppSessionLink(classicId);
+      const platformConnected = this.repository.isPlatformClassicConnected(classicId);
+      // 徽章：系统 Profile 已连或本应用 SPP 已连均可标「已连接」
+      const alreadyConnected = sppLink === 'connected' || platformConnected;
+      const isConnecting = sppLink === 'connecting';
       const atSessionCap = this.isSessionCapReached();
+      // 仅本应用 SPP 已连/连接中时禁用「连接」；系统 Profile 已连仍可发起 SPP
+      const sppConnectable = resolved.success && sppLink === 'idle' && !atSessionCap;
       items.push(new ClassicDeviceListItem(
         device.primaryDeviceId,
         classicId,
@@ -383,12 +402,13 @@ export class SppMainViewModel {
         device.paired,
         device.transport,
         this.formatTransportLabel(device.transport),
-        resolved.success && !alreadyConnected && !atSessionCap,
+        sppConnectable,
         needsBridge,
         device.majorClass,
         device.majorMinorClass,
         ClassicProfileCapability.formatDisplayText(device.profileUuids),
-        alreadyConnected
+        alreadyConnected,
+        isConnecting
       ));
     }
     this.classicScanDevices = items;
@@ -396,21 +416,27 @@ export class SppMainViewModel {
   }
 
   /**
-   * Scan-row "already connected" considers any Ledger key for the classicDeviceId
-   * (not only DEFAULT_SPP_UUID). Reserved / connecting slots count.
+   * 仅本应用 SPP ledger 会话态（用于能否再点「连接」）。
+   * 系统 Profile 已连不在此列为 connected，避免误禁 SPP。
+   */
+  private resolveSppSessionLink(classicDeviceId: string): 'idle' | 'connecting' | 'connected' {
+    const phase = SppSessionLedger.getInstance().findPhaseByClassicId(classicDeviceId);
+    if (phase === SppLedgerPhase.CONNECTED) {
+      return 'connected';
+    }
+    if (phase === SppLedgerPhase.RESERVED ||
+      phase === SppLedgerPhase.CONNECTING ||
+      phase === SppLedgerPhase.RECONNECTING) {
+      return 'connecting';
+    }
+    return 'idle';
+  }
+
+  /**
+   * Scan-row "busy" for ledger keys (SPP connected/connecting only).
    */
   private hasAnyActiveLedgerKey(classicDeviceId: string): boolean {
-    const normalized = SppSessionKey.normalizeClassicId(classicDeviceId);
-    if (normalized.length === 0) {
-      return false;
-    }
-    const entries = SppSessionLedger.getInstance().listActive();
-    for (let i = 0; i < entries.length; i++) {
-      if (entries[i].sessionKey.classicDeviceId === normalized) {
-        return true;
-      }
-    }
-    return false;
+    return this.resolveSppSessionLink(classicDeviceId) !== 'idle';
   }
 
   /** Cap ≥ SPP_MAX_SESSIONS disables new connects from the scan list. */
@@ -476,7 +502,8 @@ export class SppMainViewModel {
       this.filterMinRssi,
       this.filterMajor,
       false,
-      false
+      false,
+      this.filterIncludeConnectedPaired
     );
     this.filterActive = filter.hasActiveConstraints();
     this.repository.setClassicDeviceFilter(filter);

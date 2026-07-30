@@ -1,9 +1,9 @@
-import { access, ble, connection, socket } from '@kit.ConnectivityKit';
+import { access, baseProfile, ble, connection, socket } from '@kit.ConnectivityKit';
 import { Result } from 'common_core';
 import { KitEventSubscription } from 'common_platform';
 
 /**
- * Connectivity Kit event bridge per WSL ohos.bluetooth.access / connection / ble / socket.
+ * Connectivity Kit event bridge per WSL ohos.bluetooth.access / connection / ble / socket / baseProfile.
  * All kit on()/off() calls live here so DataSources stay throw-safe.
  */
 export class ConnectivityKitEventBridge {
@@ -138,5 +138,27 @@ export class ConnectivityKitEventBridge {
     KitEventSubscription.unsubscribe(() => {
       socket.off('sppRead', clientSocket, handler);
     }, 'socket.sppRead');
+  }
+
+  static subscribeProfileConnectionStateChange(
+    profile: baseProfile.BaseProfile,
+    handler: (param: baseProfile.StateChangeParam) => void
+  ): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      profile.on('connectionStateChange', handler);
+    }, 'profile.connectionStateChange');
+  }
+
+  static unsubscribeProfileConnectionStateChange(
+    profile: baseProfile.BaseProfile,
+    handler?: (param: baseProfile.StateChangeParam) => void
+  ): void {
+    KitEventSubscription.unsubscribe(() => {
+      if (handler !== undefined) {
+        profile.off('connectionStateChange', handler);
+      } else {
+        profile.off('connectionStateChange');
+      }
+    }, 'profile.connectionStateChange');
   }
 }

@@ -2,6 +2,7 @@ import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError } from 'common_core';
 import { ModuleType, ProtocolType, SessionRuntimeStore } from 'debug_core';
 import { ClassicBluetoothDataSource, PlatformDiscoveryPayload } from '../datasource/platform/ClassicBluetoothDataSource';
+import { PlatformConnectedClassicSource } from '../datasource/platform/PlatformConnectedClassicSource';
 import { BleDiscoveryPayload, BleScannerDataSource } from '../datasource/platform/BleScannerDataSource';
 import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
 import { GattClientDataSource } from '../datasource/platform/GattClientDataSource';
@@ -23,7 +24,10 @@ import { BleScanFilter } from '../../domain/model/BleScanFilter';
 import { ClassicScanFilter } from '../../domain/model/ClassicScanFilter';
 import { DiscoverySource } from '../../domain/model/DiscoverySource';
 import { ScanResultMerger } from '../../domain/service/ScanResultMerger';
-import { ClassicScanVisibilityPolicy, ActiveSppSessionRef } from '../../domain/service/ClassicScanVisibilityPolicy';
+import { ClassicScanVisibilityPolicy, ActiveSppSessionRef, ConnectedSppLedgerRef } from '../../domain/service/ClassicScanVisibilityPolicy';
+import { ClassicScanKeepAliveCollector } from '../../domain/service/ClassicScanKeepAliveCollector';
+import { ClassicKeepAliveSnapshot, ClassicConnectedSnapshot } from '../../domain/model/ClassicConnectedSnapshot';
+import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
 import { PairingEvent, PairingState } from '../../domain/model/PairingState';
 import { ClassicScanTimer } from '../../domain/service/ClassicScanTimer';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
@@ -39,7 +43,11 @@ import { SppTransportSession } from '../transport/SppTransportSession';
 import { DeviceIdentity } from '../../domain/model/DeviceIdentity';
 import { DeviceRegistry } from '../../domain/service/registry/DeviceRegistry';
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
-import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
+import { YoLog, YoLogger } from 'yolog';
+import { BtLogTag } from '../../observability/BtLogTag';
+import { SppSessionKey } from '../../domain/model/SppSessionKey';
+
+const scanLogger: YoLogger = YoLog.tag(BtLogTag.SCAN);
 
 /**
  * Bluetooth repository facade per architecture 02-搂6.1.
@@ -49,6 +57,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private readonly classicDataSource: ClassicBluetoothDataSource;
   private readonly bleDataSource: BleScannerDataSource;
   private readonly identityDataSource: BluetoothIdentityDataSource;
+  private readonly platformConnected: PlatformConnectedClassicSource;
   private readonly classicMerger: ScanResultMerger = new ScanResultMerger();
   private readonly bleMerger: ScanResultMerger = new ScanResultMerger();
   /** 已配对经典候选缓存：供 SPP 解析 / 连接态补全，不直接 seed 扫描列表。 */
@@ -75,11 +84,13 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private constructor(
     classicDataSource: ClassicBluetoothDataSource = ClassicBluetoothDataSource.getInstance(),
     bleDataSource: BleScannerDataSource = BleScannerDataSource.getInstance(),
-    identityDataSource: BluetoothIdentityDataSource = BluetoothIdentityDataSource.getInstance()
+    identityDataSource: BluetoothIdentityDataSource = BluetoothIdentityDataSource.getInstance(),
+    platformConnected: PlatformConnectedClassicSource = PlatformConnectedClassicSource.getInstance()
   ) {
     this.classicDataSource = classicDataSource;
     this.bleDataSource = bleDataSource;
     this.identityDataSource = identityDataSource;
+    this.platformConnected = platformConnected;
     this.classicDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.bleDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.scanRemainingObservable = new Observable<number>(0);
@@ -87,6 +98,10 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       new GattServiceTreeSnapshot('', '', 23, [], GattClientState.IDLE)
     );
     void this.identityDataSource.loadRecentFromStore();
+    this.platformConnected.setOnChanged(() => {
+      this.publishClassicDevices();
+    });
+    this.platformConnected.watch();
   }
 
   getAdapterState(): Promise<Result<BluetoothAdapterSnapshot>> {
@@ -149,6 +164,11 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       devices.push(device);
       this.pairedClassicCache.set(device.primaryDeviceId, device);
     }
+    const pairedNames: string[] = [];
+    for (let i = 0; i < devices.length; i++) {
+      pairedNames.push(BluetoothRepository.maskDeviceLabel(devices[i]));
+    }
+    scanLogger.info(`paired_classic_cache size=${devices.length} names=[${pairedNames.join(',')}]`);
     return Result.ok(devices);
   }
 
@@ -626,16 +646,25 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   }
 
   listClassicDevices(): BluetoothDevice[] {
-    const activeAddresses = this.collectActiveSppClassicAddresses();
-    const filtered = this.classicMerger.filter(this.classicFilter, activeAddresses);
-    const visible = ClassicScanVisibilityPolicy.filterVisible(filtered, activeAddresses);
-    const fallbackByAddress = this.buildActiveSessionFallbackDevices(activeAddresses);
-    return ClassicScanVisibilityPolicy.augmentMissingActiveSessions(
+    const keepAlive = this.collectScanKeepAlive();
+    const keepAliveAddresses = keepAlive.addresses;
+    const filtered = this.classicMerger.filter(this.classicFilter, keepAliveAddresses);
+    const visible = ClassicScanVisibilityPolicy.filterVisible(filtered, keepAliveAddresses);
+    const fallbackByAddress = this.buildKeepAliveFallbackDevices(keepAliveAddresses);
+    const listed = ClassicScanVisibilityPolicy.augmentMissingActiveSessions(
       visible,
-      activeAddresses,
+      keepAliveAddresses,
       this.pairedClassicCache,
       fallbackByAddress
     );
+    const sorted = ClassicScanVisibilityPolicy.sortScanList(listed, keepAliveAddresses);
+    this.logClassicScanSnapshot(keepAlive, sorted);
+    return sorted;
+  }
+
+  /** 平台 Profile 已连接（非仅已配对；不含纯 ACL/SPP 系统连接）。 */
+  isPlatformClassicConnected(classicDeviceId: string): boolean {
+    return this.platformConnected.isConnected(classicDeviceId);
   }
 
   listBleDevices(): BluetoothDevice[] {
@@ -713,7 +742,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return undefined;
   }
 
-  private collectActiveSppClassicAddresses(): Set<string> {
+  private collectScanKeepAlive(): ClassicKeepAliveSnapshot {
     const store = SessionRuntimeStore.getInstance();
     const rawSummaries = store.listActiveSummaries();
     const summaries: ActiveSppSessionRef[] = [];
@@ -721,7 +750,19 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       const item = rawSummaries[i];
       summaries.push(new ActiveSppSessionRef(item.module, item.protocol, item.state, item.id));
     }
-    return ClassicScanVisibilityPolicy.collectActiveSppClassicAddresses(
+    const ledgerEntries = SppSessionLedger.getInstance().listActive();
+    const ledgerRefs: ConnectedSppLedgerRef[] = [];
+    for (let i = 0; i < ledgerEntries.length; i++) {
+      const entry = ledgerEntries[i];
+      ledgerRefs.push(new ConnectedSppLedgerRef(entry.sessionKey.classicDeviceId, entry.phase));
+    }
+    const platformSnapshot = this.classicFilter.includeConnectedPaired
+      ? this.platformConnected.listConnectedClassicAddresses()
+      : ClassicConnectedSnapshot.empty();
+    return ClassicScanKeepAliveCollector.collect(
+      this.classicFilter.includeConnectedPaired,
+      platformSnapshot,
+      ledgerRefs,
       summaries,
       (sessionId: string) => {
         const session = store.getSession(sessionId);
@@ -730,7 +771,32 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     );
   }
 
-  private buildActiveSessionFallbackDevices(activeAddresses: Set<string>): Map<string, BluetoothDevice> {
+  private logClassicScanSnapshot(keepAlive: ClassicKeepAliveSnapshot, listed: BluetoothDevice[]): void {
+    const keepAliveNames: string[] = [];
+    keepAlive.addresses.forEach((address: string) => {
+      const cached = this.pairedClassicCache.get(address);
+      if (cached !== undefined) {
+        keepAliveNames.push(BluetoothRepository.maskDeviceLabel(cached));
+      } else {
+        keepAliveNames.push(BluetoothRepository.maskAddress(address));
+      }
+    });
+    const listedNames: string[] = [];
+    for (let i = 0; i < listed.length; i++) {
+      listedNames.push(BluetoothRepository.maskDeviceLabel(listed[i]));
+    }
+    scanLogger.info(
+      `classic_scan_list includeConnected=${this.classicFilter.includeConnectedPaired}` +
+      ` pairedCache=${this.pairedClassicCache.size}` +
+      ` profile=${keepAlive.profileCount}` +
+      ` sppConnected=${keepAlive.sppConnectedCount}` +
+      ` sppConnecting=${keepAlive.sppConnectingCount}` +
+      ` keepAlive=[${keepAliveNames.join(',')}]` +
+      ` listed=[${listedNames.join(',')}]`
+    );
+  }
+
+  private buildKeepAliveFallbackDevices(activeAddresses: Set<string>): Map<string, BluetoothDevice> {
     const fallbacks = new Map<string, BluetoothDevice>();
     if (activeAddresses.size === 0) {
       return fallbacks;
@@ -742,23 +808,48 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       if (summary.module !== ModuleType.BLUETOOTH || summary.protocol !== ProtocolType.SPP) {
         continue;
       }
-      if (!ClassicScanVisibilityPolicy.isActiveSppSessionState(summary.state)) {
+      if (!ClassicScanKeepAliveCollector.isConnectedSessionState(summary.state) &&
+        !ClassicScanKeepAliveCollector.isConnectingSessionState(summary.state)) {
         continue;
       }
       const session = store.getSession(summary.id);
       const address = session?.target?.address ?? '';
-      if (address.length === 0 || !activeAddresses.has(address) || fallbacks.has(address)) {
+      const normalized = SppSessionKey.normalizeClassicId(address);
+      if (normalized.length === 0 || !activeAddresses.has(normalized) || fallbacks.has(normalized)) {
         continue;
       }
-      if (this.pairedClassicCache.has(address)) {
+      if (this.pairedClassicCache.has(normalized)) {
         continue;
       }
-      fallbacks.set(address, this.buildSessionFallbackDevice(
-        address,
+      fallbacks.set(normalized, this.buildSessionFallbackDevice(
+        normalized,
         session?.displayName ?? summary.displayName
       ));
     }
+    activeAddresses.forEach((address: string) => {
+      if (fallbacks.has(address) || this.pairedClassicCache.has(address)) {
+        return;
+      }
+      const name = this.classicDataSource.getRemoteDeviceNameSafe(address);
+      fallbacks.set(address, this.buildSessionFallbackDevice(
+        address,
+        name.length > 0 ? name : address
+      ));
+    });
     return fallbacks;
+  }
+
+  private static maskDeviceLabel(device: BluetoothDevice): string {
+    const name = device.effectiveName.length > 0 ? device.effectiveName : '?';
+    return `${name}@${BluetoothRepository.maskAddress(device.primaryDeviceId)}`;
+  }
+
+  private static maskAddress(address: string): string {
+    const normalized = SppSessionKey.normalizeClassicId(address);
+    if (normalized.length < 5) {
+      return '**';
+    }
+    return `**${normalized.substring(normalized.length - 5)}`;
   }
 
   private buildSessionFallbackDevice(address: string, displayName: string): BluetoothDevice {
