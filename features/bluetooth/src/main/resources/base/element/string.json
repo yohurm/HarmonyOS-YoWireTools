@@ -309,6 +309,10 @@
       "value": "连接 SPP"
     },
     {
+      "name": "bt_spp_connect_dialog_subtitle_fallback",
+      "value": "配置串口连接参数"
+    },
+    {
       "name": "bt_spp_action_cancel",
       "value": "取消"
     },
@@ -325,17 +329,58 @@
       "value": "00001101-0000-1000-8000-00805F9B34FB"
     },
     {
+      "name": "bt_spp_uuid_preset_spp",
+      "value": "标准 SPP"
+    },
+    {
+      "name": "bt_spp_uuid_preset_nus",
+      "value": "Nordic UART"
+    },
+    {
+      "name": "bt_spp_uuid_preset_custom",
+      "value": "自定义"
+    },
+    {
+      "name": "bt_spp_connect_uuid_custom_placeholder",
+      "value": "请输入服务 UUID"
+    },
+    {
+      "name": "bt_spp_connect_timeout_invalid",
+      "value": "请输入有效的超时毫秒数"
+    },
+    {
       "name": "bt_spp_connect_secure_label",
       "value": "安全连接"
     },
     {
+      "name": "bt_spp_connect_secure_desc",
+      "value": "加密 RFCOMM"
+    },
+    {
       "name": "bt_spp_connect_timeout_label",
-      "value": "超时 (ms)"
+      "value": "连接超时"
+    },
+    {
+      "name": "bt_spp_connect_timeout_unit",
+      "value": "毫秒"
     },
     {
       "name": "bt_spp_connect_auto_reconnect_label",
       "value": "自动重连"
     },
+    {
+      "name": "bt_spp_connect_auto_reconnect_desc",
+      "value": "断线后按策略恢复"
+    },
+    {
+      "name": "bt_spp_connect_connecting",
+      "value": "正在连接…"
+    },
+    {
+      "name": "bt_spp_connect_options_section",
+      "value": "连接选项"
+    },
+
     {
       "name": "bt_spp_action_send",
       "value": "发送"

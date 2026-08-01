@@ -52,7 +52,7 @@ product/phone/src/main/ets/pages/bluetooth/
 | --- | --- | --- |
 | product `pages/` | 装配壳：创建 VM、绑生命周期、组合 Feature View、断点布局；打开 Dialog | Kit、DataSource、UseCase 编排（连接编排交给 Dialog Controller） |
 | feature `ui/view` / `component` | 纯展示 + `@Param`/`@Event` | UseCase、Repository |
-| feature `ui/dialog` | `openCustomDialog` 壳 + `@Observed` Content；回调 Controller | 直接 `new XxxUseCase()`；持有 socket；伪造系统配对/开蓝牙 UI |
+| feature `ui/dialog` | `openCustomDialog` + 自绘 AdvancedDialog 结构（标题居中 / ULTRA_THICK 模糊 / 底栏文字按钮）；回调 Controller | 直接 `new XxxUseCase()`；持有 socket；伪造系统配对/开蓝牙 UI；在 ComponentContent 内嵌套 `CustomContentDialogV2`（边距/宽度错乱） |
 | feature `ui/page` | Feature 内页面（如 Terminal）：创建 Terminal VM、绑焦点会话 | 直接 `socket.*` |
 | feature `viewmodel` | `@ObservedV2` / Dialog Controller；唯一 UI→UseCase 出口 | 持有 socket / GattClientDevice |
 | `yobluetooth` domain/usecase | 用例编排 | ArkUI |

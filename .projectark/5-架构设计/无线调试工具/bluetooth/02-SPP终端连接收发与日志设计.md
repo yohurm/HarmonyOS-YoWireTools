@@ -133,8 +133,8 @@ autoReconnect, reconnectPolicy, transport, bleDeviceId?
 | 层级 | 谁弹 | 何时 |
 |------|------|------|
 | 系统 | 开蓝牙 / `pairDevice` 配对 | 适配器关、未配对（系统弹窗，应用不替代） |
-| 应用 | `PairingGuideDialog`（`promptAction.openCustomDialog`） | 未配对点「连接」：说明 + 触发配对/重试/开设置 |
-| 应用 | `SppConnectDialog`（`promptAction.openCustomDialog`） | 已配对（或配对成功后）：填 UUID/secure/timeout/reconnect |
+| 应用 | `PairingGuideDialog`（`openCustomDialog` + 自绘 AdvancedDialog 结构） | 未配对点「连接」：说明 + 触发配对/重试/开设置 |
+| 应用 | `SppConnectDialog`（`openCustomDialog` + 自绘 AdvancedDialog 结构） | 已配对（或配对成功后）：UUID/secure/timeout/reconnect；底栏文字按钮；失败不自动关闭 |
 | 导航 | `SppTerminalPage` | **连接成功后**再 push，不经连接页 |
 
 ```mermaid
@@ -269,8 +269,8 @@ tryReserve → RESERVED → markConnecting → CONNECTING
 | 表面 | 职责 |
 |------|------|
 | `SppMainPage` | 经典扫描轨 + 活动连接列表；活动行 → Terminal；「连接」→（未配对先 `PairingGuideDialog`）`SppConnectDialog` |
-| `PairingGuideDialog` + `SppPairingGuideController` | 说明系统配对弹窗；触发 `pairDevice` / 重试 / 打开蓝牙设置；**配对真相 = `bondStateChange` → `PairingState.PAIRED`（平台 BONDED）**；Promise 成功仅表示系统弹窗已拉起；成功后进入 `SppConnectDialog` |
-| `SppConnectDialog` + `SppConnectDialogController` | UUID/secure/timeout/reconnect；Controller 内 `QuerySppConnectEligibility` 预检 DUPLICATE/LIMIT（`YW-BT-1316/1317`）后调用 Connect UC（最终准入权威）；成功后回调 sessionId |
+| `PairingGuideDialog` + `SppPairingGuideController` | 自绘系统风格弹出框（居中标题 / 模糊 / 底栏文字按钮）；说明系统配对弹窗；触发 `pairDevice` / 重试 / 打开蓝牙设置；**配对真相 = `bondStateChange` → `PairingState.PAIRED`**；成功后进入 `SppConnectDialog` |
+| `SppConnectDialog` + `SppConnectDialogController` | 自绘 AdvancedDialog 结构（不嵌套 `CustomContentDialogV2`，避免 ComponentContent 下边距错乱）；UUID 预设 / secure / timeout / reconnect；Controller 预检后 Connect；成功回调 sessionId |
 | `SppTerminalPage` + `SppTerminalViewModel` | SessionSwitcher（横向 chips）切换 `focusSessionId`；收发/日志仅绑焦点；切路不断开其他会话 |
 
 **已移除**：`SppConnectPage` / `SppConnectViewModel` / 路由 `/bluetooth/spp/connect`。

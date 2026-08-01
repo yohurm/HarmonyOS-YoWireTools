@@ -104,6 +104,7 @@ export {
 export { DeviceIdentity, IdentityStability } from './src/main/ets/domain/model/DeviceIdentity';
 export { PairingState, PairingEvent } from './src/main/ets/domain/model/PairingState';
 export { SppConnectParams } from './src/main/ets/domain/model/SppConnectParams';
+export { SppUuidPreset } from './src/main/ets/domain/model/SppUuidPreset';
 export { SppSessionKey } from './src/main/ets/domain/model/SppSessionKey';
 export { SppSessionDescriptor } from './src/main/ets/domain/model/SppSessionDescriptor';
 export { GattConnectParams } from './src/main/ets/domain/model/GattConnectParams';

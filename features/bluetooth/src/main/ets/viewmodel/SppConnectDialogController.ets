@@ -9,6 +9,13 @@ import {
 } from 'yobluetooth';
 import { YoErrorStateModel } from 'youi_kit';
 
+/** UUID 预设档：标准 SPP 只读；Nordic / 自定义可编辑。 */
+export enum SppUuidPickMode {
+  STANDARD = 0,
+  NORDIC = 1,
+  CUSTOM = 2
+}
+
 /**
  * Observed dialog form state for openCustomDialog + ComponentContent.
  */
@@ -17,6 +24,9 @@ export class SppConnectDialogParams {
   @Track displayName: string = '';
   @Track classicDeviceId: string = '';
   @Track uuid: string = BluetoothConstants.DEFAULT_SPP_UUID;
+  @Track uuidMode: SppUuidPickMode = SppUuidPickMode.STANDARD;
+  /** 自定义档草稿；切回自定义时恢复。 */
+  @Track customUuidDraft: string = '';
   @Track secure: boolean = false;
   @Track timeoutText: string = `${BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS}`;
   @Track autoReconnect: boolean = false;
@@ -63,6 +73,7 @@ export class SppConnectDialogController {
       BluetoothConstants.DEFAULT_SPP_UUID;
     let timeoutMs = Number(form.timeoutText.trim());
     if (Number.isNaN(timeoutMs) || timeoutMs <= 0) {
+      // UI 已对非法超时置灰；此处兜底默认值，避免异常路径传入 NaN。
       timeoutMs = BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS;
     }
     form.errorMessage = '';

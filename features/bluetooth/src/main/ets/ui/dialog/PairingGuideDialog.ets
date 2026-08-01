@@ -2,8 +2,6 @@ import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { UIContextRegistry } from 'common_platform';
 import {
-  YoActionButton,
-  YoActionButtonKind,
   YoColor,
   YoDialogToken,
   YoSpace,
@@ -16,7 +14,7 @@ import {
 } from '../../viewmodel/SppPairingGuideController';
 
 /**
- * Observed form lives on {@link PairingGuideDialogParams} (controller module).
+ * 配对引导内容 — 与 SppConnectDialog 同构的系统风格卡片。
  */
 @Component
 struct PairingGuideDialogContent {
@@ -24,96 +22,128 @@ struct PairingGuideDialogContent {
 
   build() {
     Column() {
-      Column({ space: YoSpace.L }) {
+      Column() {
         Text($r('app.string.bt_pairing_guide_title'))
           .fontSize(YoTypeStyle.TITLE_S.size)
-          .fontWeight(FontWeight.Medium)
+          .fontWeight(FontWeight.Bold)
           .fontColor(YoColor.TEXT_PRIMARY)
+          .textAlign(TextAlign.Center)
           .width('100%')
+          .margin({ top: YoSpace.XXL, bottom: YoSpace.XS })
 
-        Column({ space: YoSpace.XS }) {
-          Text($r('app.string.bt_spp_connect_device_label'))
-            .fontSize(YoTypeStyle.BODY_S.size)
-            .fontColor(YoColor.TEXT_TERTIARY)
-            .width('100%')
-          Text(this.params.displayName)
-            .fontSize(YoTypeStyle.BODY_M.size)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(YoColor.TEXT_PRIMARY)
-            .width('100%')
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(this.params.classicDeviceId)
-            .fontSize(YoTypeStyle.BODY_S.size)
-            .fontColor(YoColor.TEXT_SECONDARY)
-            .fontFamily(YoTypeStyle.MONO_S.family)
-            .width('100%')
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
+        Text(this.params.displayName.length > 0 ? this.params.displayName : this.params.classicDeviceId)
+          .fontSize(YoTypeStyle.BODY_M.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .padding({ left: YoSpace.XXL, right: YoSpace.XXL, bottom: YoSpace.L })
 
-        Column({ space: YoSpace.XS }) {
+        Column({ space: YoSpace.M }) {
           Text($r('app.string.bt_pairing_guide_body'))
-            .fontSize(YoTypeStyle.BODY_S.size)
+            .fontSize(YoTypeStyle.BODY_M.size)
             .fontColor(YoColor.TEXT_SECONDARY)
             .width('100%')
           Text($r('app.string.bt_pairing_hint_pin'))
             .fontSize(YoTypeStyle.BODY_S.size)
             .fontColor(YoColor.TEXT_TERTIARY)
             .width('100%')
+          if (this.params.pairing) {
+            Row({ space: YoSpace.M }) {
+              LoadingProgress()
+                .width(18)
+                .height(18)
+                .color(YoColor.BRAND_PRIMARY)
+              Text($r('app.string.bt_pairing_action_pair'))
+                .fontSize(YoTypeStyle.BODY_S.size)
+                .fontColor(YoColor.TEXT_SECONDARY)
+            }
+            .width('100%')
+          }
+          if (this.params.errorMessage.length > 0) {
+            Text(this.params.errorMessage)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.ERROR)
+              .width('100%')
+          }
+          Button($r('app.string.bt_pairing_action_open_settings'), {
+            type: ButtonType.Normal,
+            buttonStyle: ButtonStyleMode.TEXTUAL,
+            role: ButtonRole.NORMAL
+          })
+            .height(40)
+            .fontSize(YoTypeStyle.BODY_M.size)
+            .enabled(!this.params.pairing)
+            .onClick(() => {
+              this.params.onOpenSettings();
+            })
         }
         .width('100%')
+        .padding({ left: YoSpace.XXL, right: YoSpace.XXL, bottom: YoSpace.L })
         .alignItems(HorizontalAlign.Start)
 
-        if (this.params.errorMessage.length > 0) {
-          Text(this.params.errorMessage)
-            .fontSize(YoTypeStyle.BODY_S.size)
-            .fontColor(YoColor.ERROR)
-            .width('100%')
-        }
+        Divider()
+          .color(YoColor.DIVIDER)
+          .strokeWidth(0.5)
 
-        Row({ space: YoSpace.M }) {
-          YoActionButton({
-            label: $r('app.string.bt_spp_action_cancel'),
-            kind: YoActionButtonKind.SECONDARY,
-            isEnabled: !this.params.pairing,
-            onTap: () => {
+        Row() {
+          Button($r('app.string.bt_spp_action_cancel'), {
+            type: ButtonType.Normal,
+            buttonStyle: ButtonStyleMode.TEXTUAL,
+            role: ButtonRole.NORMAL
+          })
+            .layoutWeight(1)
+            .height(48)
+            .fontSize(YoTypeStyle.SUBTITLE_M.size)
+            .fontWeight(FontWeight.Medium)
+            .enabled(!this.params.pairing)
+            .onClick(() => {
               this.params.onCancel();
-            }
+            })
+
+          Divider()
+            .vertical(true)
+            .height(24)
+            .color(YoColor.DIVIDER)
+            .strokeWidth(0.5)
+
+          Button(this.primaryLabel(), {
+            type: ButtonType.Normal,
+            buttonStyle: ButtonStyleMode.TEXTUAL,
+            role: ButtonRole.NORMAL
           })
             .layoutWeight(1)
-          YoActionButton({
-            label: this.params.hasAttempted || this.params.errorMessage.length > 0 ?
-              $r('app.string.bt_pairing_action_retry') :
-              $r('app.string.bt_pairing_action_pair'),
-            kind: YoActionButtonKind.PRIMARY,
-            loading: this.params.pairing,
-            isEnabled: !this.params.pairing && this.params.classicDeviceId.length > 0,
-            onTap: () => {
+            .height(48)
+            .fontSize(YoTypeStyle.SUBTITLE_M.size)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(!this.params.pairing && this.params.classicDeviceId.length > 0 ?
+              YoColor.BRAND_PRIMARY : YoColor.TEXT_DISABLED)
+            .enabled(!this.params.pairing && this.params.classicDeviceId.length > 0)
+            .onClick(() => {
               this.params.onPair();
-            }
-          })
-            .layoutWeight(1)
+            })
         }
         .width('100%')
-
-        YoActionButton({
-          label: $r('app.string.bt_pairing_action_open_settings'),
-          kind: YoActionButtonKind.TEXT,
-          isEnabled: !this.params.pairing,
-          onTap: () => {
-            this.params.onOpenSettings();
-          }
-        })
+        .height(56)
+        .padding({ bottom: YoSpace.S })
       }
       .width('100%')
       .constraintSize({ maxWidth: YoDialogToken.MAX_WIDTH })
-      .padding(YoDialogToken.CONTENT_PADDING)
       .borderRadius(YoDialogToken.RADIUS)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
       .backgroundColor(YoColor.SURFACE_CARD)
+      .clip(true)
     }
     .width('100%')
-    .padding({ left: YoSpace.XXL, right: YoSpace.XXL })
+    .padding({ left: YoDialogToken.SIDE_MARGIN, right: YoDialogToken.SIDE_MARGIN })
+  }
+
+  private primaryLabel(): ResourceStr {
+    if (this.params.hasAttempted || this.params.errorMessage.length > 0) {
+      return $r('app.string.bt_pairing_action_retry');
+    }
+    return $r('app.string.bt_pairing_action_pair');
   }
 }
 
@@ -123,14 +153,7 @@ function buildPairingGuideDialogContent(params: PairingGuideDialogParams) {
 }
 
 /**
- * App pairing guide (PromptAction.openCustomDialog).
- *
- * Official flow separation:
- * - System dialog: pairDevice / PIN — not customizable, never faked here
- * - App dialog: explain + trigger pair / retry / open Bluetooth settings
- *
- * UseCase orchestration + bond truth live in {@link SppPairingGuideController}.
- * Promise success ≠ paired; close + open Connect only after PairingState.PAIRED.
+ * 配对引导弹窗（openCustomDialog）。不伪造系统 PIN。
  */
 export class PairingGuideDialog {
   private static current: PairingGuideDialog | undefined = undefined;
