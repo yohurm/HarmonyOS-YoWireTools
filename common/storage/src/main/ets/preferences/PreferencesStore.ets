@@ -41,6 +41,13 @@ export class PreferencesStore {
     }
   }
 
+  async hasKey(key: string): Promise<boolean> {
+    if (this.prefs === undefined) {
+      return false;
+    }
+    return PreferencesAccess.hasKey(this.prefs, key);
+  }
+
   async getString(key: string, defaultValue: string = ''): Promise<string> {
     if (this.prefs === undefined) {
       return defaultValue;

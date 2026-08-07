@@ -1,10 +1,14 @@
 import { Result, ResultError } from 'common_core';
+import { YoLog, YoLogger } from 'yolog';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { SppReadStrategy } from '../../../domain/model/SppRuntimeState';
+import { BtLogTag } from '../../../observability/BtLogTag';
 import { SppPlatformGateway, SppRfcommConnectRequest } from './SppPlatformGateway';
 
 type IncomingListener = (bytes: Uint8Array) => void;
 type LinkLostListener = (reason: string) => void;
+
+const logger: YoLogger = YoLog.tag(BtLogTag.SPP);
 
 /**
  * One HarmonyOS RFCOMM clientSocket lifecycle (architecture 02 L2).
@@ -70,8 +74,11 @@ export class SppRfcommClient {
       return Result.fail(new ResultError(BluetoothErrorCodes.SPP_CONNECT_TIMEOUT, 'connect attempt superseded'));
     }
     this.clientSocket = connected.value;
+    // Official: same socket may use EITHER sppReadAsync OR on('sppRead'); prefer async
+    // so disconnect surfaces as 2901054 (ohos.bluetooth.socket + FAQ connectivity-33).
     this.readStrategy = SppReadStrategy.ASYNC_LOOP;
     this.startAsyncReadLoop();
+    logger.i(`open ok socket=${this.clientSocket} strategy=ASYNC_LOOP uuid=${request.serviceUuid}`);
     return Result.ok(undefined);
   }
 
@@ -107,6 +114,7 @@ export class SppRfcommClient {
     }
     this.readLoopActive = true;
     this.readCancelled = false;
+    logger.i(`readLoop start socket=${this.clientSocket}`);
     void this.readLoopAsync();
   }
 
@@ -118,30 +126,41 @@ export class SppRfcommClient {
         break;
       }
       if (!read.success) {
+        const code = read.error?.code ?? 'unknown';
+        const msg = read.error?.message ?? 'read failed';
+        logger.e(`read fail socket=${socketId} code=${code} msg=${msg}`);
         if (SppRfcommClient.isFatalIo(read.error)) {
           this.readLoopActive = false;
-          this.emitLinkLost(read.error?.message ?? 'read failed');
+          this.emitLinkLost(msg);
           return;
         }
         this.consecutiveReadFailures = this.consecutiveReadFailures + 1;
-        if (this.consecutiveReadFailures >= SppRfcommClient.MAX_ASYNC_READ_FAILURES &&
-          this.readStrategy === SppReadStrategy.ASYNC_LOOP) {
+        if (this.consecutiveReadFailures < SppRfcommClient.MAX_ASYNC_READ_FAILURES) {
+          continue;
+        }
+        if (this.readStrategy === SppReadStrategy.ASYNC_LOOP) {
+          logger.w(`read fallback to EVENT_CALLBACK after ${this.consecutiveReadFailures} failures`);
           const fallback = this.activateEventReadFallback();
           if (fallback.success) {
             return;
           }
         }
         this.readLoopActive = false;
-        this.emitLinkLost(read.error?.message ?? 'read failed');
+        this.emitLinkLost(msg);
         return;
       }
       this.consecutiveReadFailures = 0;
-      if (read.value !== undefined && read.value.length > 0 && this.incomingListener !== undefined) {
-        this.incomingListener(read.value);
+      const len = read.value?.length ?? 0;
+      if (len > 0) {
+        logger.i(`read ok socket=${socketId} len=${len} hex=${SppRfcommClient.previewHex(read.value)}`);
+        if (this.incomingListener !== undefined && read.value !== undefined) {
+          this.incomingListener(read.value);
+        }
       }
     }
     this.readLoopActive = false;
     if (!this.readCancelled && this.isOpen()) {
+      logger.w(`readLoop ended unexpectedly socket=${socketId}`);
       this.emitLinkLost('read loop ended');
     }
   }
@@ -162,15 +181,20 @@ export class SppRfcommClient {
     }
     this.readStrategy = SppReadStrategy.EVENT_CALLBACK;
     const subscribed = this.gateway.subscribeRead(this.clientSocket, (bytes: Uint8Array) => {
-      if (bytes.length > 0 && this.incomingListener !== undefined) {
-        this.incomingListener(bytes);
+      if (bytes.length > 0) {
+        logger.i(`eventRead socket=${this.clientSocket} len=${bytes.length} hex=${SppRfcommClient.previewHex(bytes)}`);
+        if (this.incomingListener !== undefined) {
+          this.incomingListener(bytes);
+        }
       }
     });
     if (!subscribed.success || subscribed.value === undefined) {
+      logger.e(`eventRead subscribe fail socket=${this.clientSocket} code=${subscribed.error?.code ?? 'unknown'}`);
       return Result.fail(subscribed.error ?? new ResultError(BluetoothErrorCodes.SPP_IO_ERROR, 'event read failed'));
     }
     this.unsubscribeRead = subscribed.value;
     this.readCancelled = false;
+    logger.i(`eventRead subscribed socket=${this.clientSocket}`);
     return Result.ok(undefined);
   }
 
@@ -181,6 +205,7 @@ export class SppRfcommClient {
     this.linkLostEmitted = true;
     this.readCancelled = true;
     this.readLoopActive = false;
+    logger.w(`linkLost socket=${this.clientSocket} reason=${reason}`);
     this.linkLostListener?.(reason);
   }
 
@@ -245,5 +270,18 @@ export class SppRfcommClient {
     return error.code === BluetoothErrorCodes.SPP_IO_ERROR ||
       error.code === BluetoothErrorCodes.DISCONNECTED ||
       error.code === BluetoothErrorCodes.ADAPTER_OFF;
+  }
+
+  private static previewHex(bytes: Uint8Array | undefined): string {
+    if (bytes === undefined || bytes.length === 0) {
+      return '';
+    }
+    const limit = bytes.length > 24 ? 24 : bytes.length;
+    const parts: string[] = [];
+    for (let i = 0; i < limit; i++) {
+      const hex = bytes[i].toString(16).toUpperCase();
+      parts.push(hex.length === 1 ? `0${hex}` : hex);
+    }
+    return bytes.length > limit ? `${parts.join(' ')}…` : parts.join(' ');
   }
 }

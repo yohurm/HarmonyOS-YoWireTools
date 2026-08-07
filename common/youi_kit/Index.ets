@@ -54,6 +54,7 @@ export { YoSideNavRail } from './src/main/ets/components/shell/YoSideNavRail';
 export type { YoSideNavItem } from './src/main/ets/components/shell/YoSideNavRail';
 export { YoSplitScaffold } from './src/main/ets/components/shell/YoSplitScaffold';
 export { YoPageShell } from './src/main/ets/components/shell/YoPageShell';
+export { YoTitleBarActionRow } from './src/main/ets/components/shell/YoTitleBarActionRow';
 
 // Feedback
 export { YoEmpty } from './src/main/ets/components/feedback/YoEmpty';

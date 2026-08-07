@@ -16,9 +16,12 @@ import {
   YoSize,
   YoSpace,
   YoStroke,
+  YoTitleBarActionRow,
+  YoTitleBarMenuItem,
+  YoToast,
   YoTypeStyle
 } from 'youi_kit';
-import { BluetoothConstants } from 'yobluetooth';
+import { BluetoothConstants, SppUuidFavoriteEntry } from 'yobluetooth';
 import { ClassicDeviceListItem } from '../../viewmodel/SppMainViewModel';
 import {
   SppConnectDialogController,
@@ -26,13 +29,17 @@ import {
   SppUuidPickMode
 } from '../../viewmodel/SppConnectDialogController';
 
+/** Sheet 内容态：列表管理 / 添加编辑表单。 */
+enum FavoriteSheetMode {
+  LIST = 0,
+  FORM = 1
+}
+
 /**
  * SPP 连接弹窗内容（手绘对齐 AdvancedDialog：标题/内容/TEXTUAL 底栏）。
  *
- * - 底栏 ButtonStyleMode.TEXTUAL：系统按压态（文档称按压态，非自定义 ripple）
- * - UUID：单行居中；边框圆角 YoRadius.XLARGE(32vp，弹出框/半模态级)
- * - 分段→输入：控件间较大间隔 16vp（设计指南「有明显边界元素」）
- * - 超时/安全/重连：同列表行（左文案、右控件）
+ * - 自定义档：标题左对齐 + YoTitleBarActionRow（HDS menuStyle 同构）
+ * - 收藏列表：bindSheet 半模态（增删改 + 点选回填）
  */
 @Component
 struct SppConnectDialogContent {
@@ -48,6 +55,12 @@ struct SppConnectDialogContent {
   @State @Watch('onUuidSegmentChange') private uuidSelectedIndexes: number[] = [0];
   /** 递增以强制重建 UUID 输入，解决 Segment 切换后 TextArea/TextInput 不刷新。 */
   @State private uuidFieldEpoch: number = 0;
+  @State private showFavoriteSheet: boolean = false;
+  @State private favoriteSheetMode: FavoriteSheetMode = FavoriteSheetMode.LIST;
+  @State private formOriginalUuid: string = '';
+  @State private formLabelText: string = '';
+  @State private formUuidText: string = '';
+  @State private formSaving: boolean = false;
 
   aboutToAppear(): void {
     this.uuidSelectedIndexes = [this.params.uuidMode as number];
@@ -56,13 +69,7 @@ struct SppConnectDialogContent {
   build() {
     Column() {
       Column() {
-        Text($r('app.string.bt_spp_connect_dialog_title'))
-          .fontSize(YoTypeStyle.TITLE_S.size)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(YoColor.TEXT_PRIMARY)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: YoSpace.XXL, bottom: YoSpace.XS })
+        this.buildTitleRow();
 
         Text(this.deviceLineText())
           .fontSize(YoTypeStyle.BODY_M.size)
@@ -171,6 +178,275 @@ struct SppConnectDialogContent {
   }
 
   @Builder
+  buildTitleRow() {
+    if (this.params.uuidMode === SppUuidPickMode.CUSTOM) {
+      Row({ space: YoSpace.M }) {
+        Text($r('app.string.bt_spp_connect_dialog_title'))
+          .fontSize(YoTypeStyle.TITLE_S.size)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(YoColor.TEXT_PRIMARY)
+          .layoutWeight(1)
+          .textAlign(TextAlign.Start)
+
+        // 一宿主一 sheet：操作图标行作为 bindSheet 宿主
+        Row() {
+          YoTitleBarActionRow({ items: this.buildTitleMenus() })
+        }
+        .bindSheet($$this.showFavoriteSheet, this.FavoriteSheetBuilder(), {
+          height: SheetSize.MEDIUM,
+          dragBar: true,
+          title: { title: $r('app.string.bt_spp_uuid_favorites_title') },
+          onDisappear: () => {
+            this.resetFavoriteSheetState();
+          }
+        })
+      }
+      .width('100%')
+      .padding({
+        left: YoSpace.XXL,
+        right: YoSpace.XXL,
+        top: YoSpace.XXL,
+        bottom: YoSpace.XS
+      })
+      .alignItems(VerticalAlign.Center)
+    } else {
+      Text($r('app.string.bt_spp_connect_dialog_title'))
+        .fontSize(YoTypeStyle.TITLE_S.size)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(YoColor.TEXT_PRIMARY)
+        .textAlign(TextAlign.Center)
+        .width('100%')
+        .margin({ top: YoSpace.XXL, bottom: YoSpace.XS })
+    }
+  }
+
+  @Builder
+  FavoriteSheetBuilder() {
+    Column() {
+      if (this.favoriteSheetMode === FavoriteSheetMode.LIST) {
+        this.buildFavoriteListPane();
+      } else {
+        this.buildFavoriteFormPane();
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding({
+      left: YoSpace.XXL,
+      right: YoSpace.XXL,
+      bottom: YoSpace.XXL
+    })
+  }
+
+  @Builder
+  buildFavoriteListPane() {
+    Column({ space: YoSpace.M }) {
+      Row() {
+        Text($r('app.string.bt_spp_uuid_favorites_hint'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_TERTIARY)
+          .layoutWeight(1)
+          .maxLines(2)
+        Button($r('app.string.bt_spp_uuid_favorite_add'), {
+          type: ButtonType.Normal,
+          buttonStyle: ButtonStyleMode.TEXTUAL,
+          role: ButtonRole.NORMAL
+        })
+          .fontSize(YoTypeStyle.BODY_M.size)
+          .fontColor(YoColor.BRAND_PRIMARY)
+          .enabled(!this.params.connecting)
+          .onClick(() => {
+            this.openFavoriteForm('', '', '');
+          })
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center)
+
+      if (this.params.favorites.length === 0) {
+        Text($r('app.string.bt_spp_uuid_favorites_empty'))
+          .fontSize(YoTypeStyle.BODY_M.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .width('100%')
+          .textAlign(TextAlign.Center)
+          .margin({ top: YoSpace.XXXL })
+      } else {
+        List({ space: 0 }) {
+          ForEach(this.params.favorites, (entry: SppUuidFavoriteEntry, index: number) => {
+            ListItem() {
+              Row({ space: YoSpace.M }) {
+                Column({ space: YoSpace.XXS }) {
+                  Text(entry.displayTitle())
+                    .fontSize(YoTypeStyle.BODY_M.size)
+                    .fontColor(YoColor.TEXT_PRIMARY)
+                    .width('100%')
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Text(entry.uuid)
+                    .fontSize(YoTypeStyle.MONO_S.size)
+                    .fontFamily('HarmonyOS Sans Mono')
+                    .fontColor(YoColor.TEXT_TERTIARY)
+                    .width('100%')
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start)
+
+                SymbolGlyph($r('sys.symbol.pencil_line'))
+                  .fontSize(YoSize.ICON_S)
+                  .fontColor([$r('sys.color.icon_secondary')])
+                  .width(YoSize.TOUCH_TARGET_MIN)
+                  .height(YoSize.TOUCH_TARGET_MIN)
+                  .onClick(() => {
+                    this.openFavoriteForm(entry.uuid, entry.label, entry.uuid);
+                  })
+              }
+              .width('100%')
+              .constraintSize({ minHeight: YoSize.LIST_CARD_HEIGHT })
+              .padding({ top: YoSpace.M, bottom: YoSpace.M })
+              .onClick(() => {
+                this.applyFavoriteIndex(index);
+                this.showFavoriteSheet = false;
+              })
+            }
+            .swipeAction({
+              end: {
+                builder: () => {
+                  this.FavoriteDeleteAction(entry.uuid);
+                }
+              }
+            })
+          }, (entry: SppUuidFavoriteEntry) => entry.uuid)
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .scrollBar(BarState.Auto)
+        .edgeEffect(EdgeEffect.Spring)
+        .nestedScroll({
+          scrollForward: NestedScrollMode.PARENT_FIRST,
+          scrollBackward: NestedScrollMode.PARENT_FIRST
+        })
+      }
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+  @Builder
+  FavoriteDeleteAction(uuid: string) {
+    Button($r('app.string.bt_spp_uuid_favorite_delete'))
+      .type(ButtonType.Normal)
+      .backgroundColor(YoColor.ERROR)
+      .fontColor(Color.White)
+      .fontSize(YoTypeStyle.BODY_M.size)
+      .width(72)
+      .height('100%')
+      .onClick(() => {
+        void this.handleRemoveFavorite(uuid);
+      })
+  }
+
+  @Builder
+  buildFavoriteFormPane() {
+    Column({ space: YoSpace.L }) {
+      Text(this.formOriginalUuid.length > 0 ?
+        $r('app.string.bt_spp_uuid_favorite_form_edit_title') :
+        $r('app.string.bt_spp_uuid_favorite_form_add_title'))
+        .fontSize(YoTypeStyle.SUBTITLE_M.size)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(YoColor.TEXT_PRIMARY)
+        .width('100%')
+
+      Column({ space: YoSpace.XS }) {
+        Text($r('app.string.bt_spp_uuid_favorite_label'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .width('100%')
+        TextInput({
+          text: this.formLabelText,
+          placeholder: $r('app.string.bt_spp_uuid_favorite_label_placeholder')
+        })
+          .width('100%')
+          .height(YoSize.BUTTON_HEIGHT_COMPACT)
+          .showUnderline(false)
+          .backgroundColor(Color.Transparent)
+          .fontSize(YoTypeStyle.BODY_M.size)
+          .padding({ left: YoSpace.M, right: YoSpace.M })
+          .border({
+            width: YoStroke.THIN,
+            color: YoColor.BORDER_PRIMARY,
+            radius: YoRadius.XLARGE
+          })
+          .onChange((text: string) => {
+            this.formLabelText = text;
+          })
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+
+      Column({ space: YoSpace.XS }) {
+        Text($r('app.string.bt_spp_connect_uuid_label'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .width('100%')
+        TextInput({
+          text: this.formUuidText,
+          placeholder: $r('app.string.bt_spp_connect_uuid_custom_placeholder')
+        })
+          .width('100%')
+          .height(YoSize.BUTTON_HEIGHT_COMPACT)
+          .showUnderline(false)
+          .backgroundColor(Color.Transparent)
+          .fontSize(YoTypeStyle.MONO_S.size)
+          .fontFamily('HarmonyOS Sans Mono')
+          .padding({ left: YoSpace.M, right: YoSpace.M })
+          .border({
+            width: YoStroke.THIN,
+            color: YoColor.BORDER_PRIMARY,
+            radius: YoRadius.XLARGE
+          })
+          .onChange((text: string) => {
+            this.formUuidText = text;
+          })
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+
+      Blank()
+
+      Row() {
+        Button($r('app.string.bt_spp_action_cancel'), {
+          type: ButtonType.Normal,
+          buttonStyle: ButtonStyleMode.TEXTUAL,
+          role: ButtonRole.NORMAL
+        })
+          .layoutWeight(1)
+          .height(YoSize.BUTTON_HEIGHT)
+          .enabled(!this.formSaving)
+          .onClick(() => {
+            this.favoriteSheetMode = FavoriteSheetMode.LIST;
+          })
+
+        Button($r('app.string.bt_spp_uuid_favorite_save'), {
+          type: ButtonType.Normal,
+          buttonStyle: ButtonStyleMode.TEXTUAL,
+          role: ButtonRole.NORMAL
+        })
+          .layoutWeight(1)
+          .height(YoSize.BUTTON_HEIGHT)
+          .fontColor(YoColor.BRAND_PRIMARY)
+          .enabled(!this.formSaving && this.formUuidText.trim().length > 0)
+          .onClick(() => {
+            void this.handleSaveFavoriteForm();
+          })
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+  @Builder
   buildUuidSection() {
     Column() {
       Text($r('app.string.bt_spp_connect_uuid_label'))
@@ -178,7 +454,6 @@ struct SppConnectDialogContent {
         .fontColor(YoColor.TEXT_SECONDARY)
         .width('100%')
 
-      // 标签→分段：普通控件间隔 8vp
       SegmentButton({
         options: this.uuidSegmentOptions,
         selectedIndexes: $uuidSelectedIndexes,
@@ -188,8 +463,6 @@ struct SppConnectDialogContent {
       })
         .margin({ top: YoSpace.M })
 
-      // 分段→UUID：有明显边界的控件间较大间隔 16vp（间隔参数）
-      // ForEach key=epoch：切换预设时强制销毁重建，避免 TextInput 单向 text 残留旧值
       ForEach([this.uuidFieldEpoch], (_epoch: number) => {
         this.buildDataField(
           this.params.uuid,
@@ -203,6 +476,7 @@ struct SppConnectDialogContent {
             if (this.params.uuidMode === SppUuidPickMode.CUSTOM) {
               this.params.customUuidDraft = text;
             }
+            this.params.onUuidInputChanged();
             this.clearError();
           }
         );
@@ -212,9 +486,6 @@ struct SppConnectDialogContent {
     .alignItems(HorizontalAlign.Start)
   }
 
-  /**
-   * UUID 数据框：外层边框 + 32vp 圆角（YoRadius.XLARGE），内层透明底；文本居中。
-   */
   @Builder
   buildDataField(
     value: string,
@@ -226,7 +497,6 @@ struct SppConnectDialogContent {
     onChange: (text: string) => void
   ) {
     Row() {
-      // 只读用 Text 居中（禁用 TextInput 的 textAlign 常不生效）；可编辑用 TextInput 居中
       if (!enabled) {
         Text(value.length > 0 ? value : '')
           .width('100%')
@@ -267,9 +537,6 @@ struct SppConnectDialogContent {
     .clip(true)
   }
 
-  /**
-   * 设置区：超时 / 安全连接 / 自动重连 — 左文案、右控件，同列表行排布。
-   */
   @Builder
   buildSettingsSection() {
     Column() {
@@ -305,7 +572,6 @@ struct SppConnectDialogContent {
   @Builder
   buildTimeoutRow() {
     Column({ space: YoSpace.XS }) {
-      // 与安全连接/自动重连同构：左标题+副文案，右窄控件
       Row() {
         Column({ space: YoSpace.XXS }) {
           Text($r('app.string.bt_spp_connect_timeout_label'))
@@ -403,6 +669,113 @@ struct SppConnectDialogContent {
     .alignItems(VerticalAlign.Center)
   }
 
+  private buildTitleMenus(): YoTitleBarMenuItem[] {
+    const bookmarkIcon = this.params.currentUuidFavorited ?
+      $r('sys.symbol.bookmark_fill') :
+      $r('sys.symbol.bookmark');
+    const bookmarkColor: ResourceColor | undefined = this.params.currentUuidFavorited ?
+      YoColor.BRAND_PRIMARY :
+      undefined;
+    return [
+      new YoTitleBarMenuItem(
+        'spp_uuid_favorite_list',
+        $r('sys.symbol.list_bullet'),
+        $r('app.string.bt_spp_uuid_favorites_title'),
+        () => {
+          this.openFavoriteSheet();
+        },
+        !this.params.connecting,
+        'spp_connect_favorite_list'
+      ),
+      new YoTitleBarMenuItem(
+        'spp_uuid_favorite_bookmark',
+        bookmarkIcon,
+        $r('app.string.bt_spp_uuid_favorites_title'),
+        () => {
+          this.params.onToggleFavorite();
+        },
+        !this.params.connecting,
+        'spp_connect_favorite_bookmark',
+        bookmarkColor
+      )
+    ];
+  }
+
+  private openFavoriteSheet(): void {
+    if (this.params.connecting) {
+      return;
+    }
+    this.favoriteSheetMode = FavoriteSheetMode.LIST;
+    this.showFavoriteSheet = true;
+  }
+
+  private openFavoriteForm(originalUuid: string, label: string, uuid: string): void {
+    this.formOriginalUuid = originalUuid;
+    this.formLabelText = label;
+    this.formUuidText = uuid;
+    this.formSaving = false;
+    this.favoriteSheetMode = FavoriteSheetMode.FORM;
+  }
+
+  private resetFavoriteSheetState(): void {
+    this.showFavoriteSheet = false;
+    this.favoriteSheetMode = FavoriteSheetMode.LIST;
+    this.formOriginalUuid = '';
+    this.formLabelText = '';
+    this.formUuidText = '';
+    this.formSaving = false;
+  }
+
+  private async handleSaveFavoriteForm(): Promise<void> {
+    if (this.formSaving) {
+      return;
+    }
+    this.formSaving = true;
+    const outcome = await this.params.saveFavorite(
+      this.formOriginalUuid,
+      this.formUuidText,
+      this.formLabelText
+    );
+    this.formSaving = false;
+    if (outcome === 'ok') {
+      this.favoriteSheetMode = FavoriteSheetMode.LIST;
+      return;
+    }
+    this.toastFavoriteOutcome(outcome);
+  }
+
+  private async handleRemoveFavorite(uuid: string): Promise<void> {
+    const outcome = await this.params.removeFavorite(uuid);
+    if (outcome === 'ok') {
+      YoToast.show($r('app.string.bt_spp_uuid_favorite_deleted'));
+      return;
+    }
+    this.toastFavoriteOutcome(outcome);
+  }
+
+  private toastFavoriteOutcome(outcome: string): void {
+    if (outcome === 'invalid') {
+      YoToast.showWarning($r('app.string.bt_spp_uuid_favorite_invalid'));
+      return;
+    }
+    if (outcome === 'limit') {
+      YoToast.showWarning($r('app.string.bt_spp_uuid_favorite_limit'));
+      return;
+    }
+    if (outcome === 'duplicate') {
+      YoToast.showWarning($r('app.string.bt_spp_uuid_favorite_duplicate'));
+      return;
+    }
+    YoToast.showError($r('app.string.bt_spp_uuid_favorite_failed'));
+  }
+
+  private applyFavoriteIndex(index: number): void {
+    this.params.onSelectFavoriteIndex(index);
+    this.uuidSelectedIndexes = [SppUuidPickMode.CUSTOM as number];
+    this.uuidFieldEpoch = this.uuidFieldEpoch + 1;
+    this.clearError();
+  }
+
   private onUuidSegmentChange(): void {
     if (this.uuidSelectedIndexes.length === 0) {
       return;
@@ -428,6 +801,7 @@ struct SppConnectDialogContent {
     } else {
       this.params.uuid = this.params.customUuidDraft;
     }
+    this.params.onUuidInputChanged();
     this.uuidFieldEpoch = this.uuidFieldEpoch + 1;
     this.clearError();
   }
@@ -533,6 +907,8 @@ export class SppConnectDialog {
     dialog.params.connecting = false;
     dialog.params.errorMessage = '';
     dialog.params.hintLines = [];
+    dialog.params.favorites = [];
+    dialog.params.currentUuidFavorited = false;
     dialog.params.errorModel = new YoErrorStateModel();
     dialog.params.onCancel = () => {
       dialog.close();
@@ -544,8 +920,40 @@ export class SppConnectDialog {
     dialog.params.onConnect = () => {
       void dialog.controller.connectFromDialog(dialog.params);
     };
+    dialog.params.onToggleFavorite = () => {
+      void dialog.handleToggleFavorite();
+    };
+    dialog.params.onSelectFavoriteIndex = (index: number) => {
+      dialog.controller.selectFavoriteIndex(dialog.params, index);
+    };
+    dialog.params.onUuidInputChanged = () => {
+      dialog.controller.refreshFavoriteState(dialog.params);
+    };
+    dialog.params.saveFavorite = (originalUuid: string, uuid: string, label: string): Promise<string> => {
+      return dialog.controller.saveFavorite(dialog.params, originalUuid, uuid, label);
+    };
+    dialog.params.removeFavorite = (uuid: string): Promise<string> => {
+      return dialog.controller.removeFavorite(dialog.params, uuid);
+    };
     SppConnectDialog.current = dialog;
-    dialog.show();
+    void dialog.controller.loadFavorites(dialog.params).then(() => {
+      dialog.show();
+    });
+  }
+
+  private async handleToggleFavorite(): Promise<void> {
+    const outcome = await this.controller.toggleFavorite(this.params);
+    if (outcome === 'invalid') {
+      YoToast.showWarning($r('app.string.bt_spp_uuid_favorite_invalid'), this.uiContext);
+      return;
+    }
+    if (outcome === 'limit') {
+      YoToast.showWarning($r('app.string.bt_spp_uuid_favorite_limit'), this.uiContext);
+      return;
+    }
+    if (outcome === 'failed' || outcome === 'duplicate' || outcome === 'not_found') {
+      YoToast.showError($r('app.string.bt_spp_uuid_favorite_failed'), this.uiContext);
+    }
   }
 
   private show(): void {

@@ -44,15 +44,11 @@ export class SendCommandUseCase {
   }
 
   async execute(input: SendCommandInput): Promise<Result<DebugLogRecord>> {
-    const encoded = PayloadTextCodec.encodeText(input.payloadText, input.encoding);
-    if (!encoded.success) {
-      return Result.fail(new ResultError('YW-CMD-1001', 'Command encoding failed'));
+    const bytesResult = SendCommandUseCase.toWriteBytes(input.payloadText, input.encoding, input.lineEnding);
+    if (!bytesResult.success) {
+      return Result.fail(bytesResult.error ?? new ResultError('YW-CMD-1001', 'Command encoding failed'));
     }
-    let bytes = EncodingUtil.stringToUtf8Bytes(encoded.getOrThrow());
-    if (input.lineEnding !== LineEndingMode.LF && input.lineEnding !== LineEndingMode.NONE) {
-      const withEnding = PayloadTextCodec.appendLineEnding(encoded.getOrThrow(), input.lineEnding);
-      bytes = EncodingUtil.stringToUtf8Bytes(withEnding);
-    }
+    const bytes = bytesResult.getOrThrow();
     const queue = this.queueRegistry.getQueue(input.transport.id);
     const writeResult = await queue.enqueue(async () => {
       return input.transport.write(bytes, new WriteOptions(false));
@@ -77,6 +73,61 @@ export class SendCommandUseCase {
       Direction.OUTBOUND,
       bytes
     );
+  }
+
+  /**
+   * TEXT：按 Latin-1/ASCII 单字节落盘（产测 AT^ 命令必须是 ASCII，勿走 UTF-8 多字节）。
+   * HEX：按字面量解析（如 "0A FF" → bytes）。
+   * BASE64：经 PayloadTextCodec 再 UTF-8。
+   */
+  static toWriteBytes(
+    payloadText: string,
+    encoding: PayloadEncoding,
+    lineEnding: LineEndingMode
+  ): Result<Uint8Array> {
+    let bytes: Uint8Array;
+    if (encoding === PayloadEncoding.HEX) {
+      const normalized = payloadText.replace(/\s+/g, '');
+      if (normalized.length === 0) {
+        return Result.fail(new ResultError('YW-CMD-1001', 'Empty hex payload'));
+      }
+      if (normalized.length % 2 !== 0) {
+        return Result.fail(new ResultError('YW-CMD-1001', 'Invalid hex payload'));
+      }
+      for (let i = 0; i < normalized.length; i++) {
+        const c = normalized.charCodeAt(i);
+        const isHex = (c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x46) || (c >= 0x61 && c <= 0x66);
+        if (!isHex) {
+          return Result.fail(new ResultError('YW-CMD-1001', 'Invalid hex payload'));
+        }
+      }
+      bytes = EncodingUtil.hexToBytes(normalized);
+    } else if (encoding === PayloadEncoding.TEXT) {
+      bytes = SendCommandUseCase.textToAsciiBytes(payloadText);
+    } else {
+      const encoded = PayloadTextCodec.encodeText(payloadText, encoding);
+      if (!encoded.success) {
+        return Result.fail(encoded.error ?? new ResultError('YW-CMD-1001', 'Command encoding failed'));
+      }
+      bytes = EncodingUtil.stringToUtf8Bytes(encoded.getOrThrow());
+    }
+    if (lineEnding === LineEndingMode.NONE) {
+      return Result.ok(bytes);
+    }
+    const ending = SendCommandUseCase.textToAsciiBytes(PayloadTextCodec.toLineSequence(lineEnding));
+    const merged = new Uint8Array(bytes.length + ending.length);
+    merged.set(bytes, 0);
+    merged.set(ending, bytes.length);
+    return Result.ok(merged);
+  }
+
+  /** AT/产测文本 → 单字节 ASCII/Latin-1（与 GATT TEXT 写一致）。 */
+  static textToAsciiBytes(text: string): Uint8Array {
+    const bytes = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) {
+      bytes[i] = text.charCodeAt(i) & 0xFF;
+    }
+    return bytes;
   }
 }
 

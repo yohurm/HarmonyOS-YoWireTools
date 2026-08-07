@@ -270,8 +270,8 @@ tryReserve → RESERVED → markConnecting → CONNECTING
 |------|------|
 | `SppMainPage` | 经典扫描轨 + 活动连接列表；活动行 → Terminal；「连接」→（未配对先 `PairingGuideDialog`）`SppConnectDialog` |
 | `PairingGuideDialog` + `SppPairingGuideController` | 自绘系统风格弹出框（居中标题 / 模糊 / 底栏文字按钮）；说明系统配对弹窗；触发 `pairDevice` / 重试 / 打开蓝牙设置；**配对真相 = `bondStateChange` → `PairingState.PAIRED`**；成功后进入 `SppConnectDialog` |
-| `SppConnectDialog` + `SppConnectDialogController` | 自绘 AdvancedDialog 结构（不嵌套 `CustomContentDialogV2`，避免 ComponentContent 下边距错乱）；UUID 预设 / secure / timeout / reconnect；Controller 预检后 Connect；成功回调 sessionId |
-| `SppTerminalPage` + `SppTerminalViewModel` | SessionSwitcher（横向 chips）切换 `focusSessionId`；收发/日志仅绑焦点；切路不断开其他会话 |
+| `SppConnectDialog` + `SppConnectDialogController` | 自绘 AdvancedDialog；分段 **标准 SPP \| Nordic UART \| 自定义**；自定义档标题左对齐 + `YoTitleBarActionRow`（`YoTitleBarMenuItem` / HDS menuStyle 同构：列表 + 收藏）；收藏经 Preferences `bluetooth.spp.uuidFavorites`（首缺 key 时种子 HS01 AT）；列表用 `bindSheet` 半模态管理（点选回填 / 增删改）；secure / timeout / reconnect；Controller 预检后 Connect；成功回调 sessionId |
+| `SppTerminalPage` + `SppTerminalViewModel` | 业界终端排布（对齐 Serial Bluetooth Terminal / nRF Serial Terminal）：紧凑状态条（StatusPill + 设备/MAC/UUID + RX·TX）→ SessionSwitcher chips → 全高日志视口（文本/HEX/混合 + RX/TX 分色 + 清屏）→ 底栏 Composer（TEXT/HEX + None/CR/LF/CRLF + 输入 + 发送）；断开/清屏进标题栏 More；收发仅绑 `focusSessionId`，切路不断开其他会话 |
 
 **已移除**：`SppConnectPage` / `SppConnectViewModel` / 路由 `/bluetooth/spp/connect`。
 

@@ -5,11 +5,13 @@ import {
   QuerySppConnectEligibilityUseCase,
   ReconnectPolicy,
   SppConnectFailureHints,
-  SppConnectParams
+  SppConnectParams,
+  SppUuidFavoriteEntry,
+  SppUuidFavoriteUseCases
 } from 'yobluetooth';
 import { YoErrorStateModel } from 'youi_kit';
 
-/** UUID 预设档：标准 SPP 只读；Nordic / 自定义可编辑。 */
+/** UUID 预设档：标准 SPP / Nordic UART 只读档位；自定义可编辑。HS01 AT 仅作收藏种子。 */
 export enum SppUuidPickMode {
   STANDARD = 0,
   NORDIC = 1,
@@ -33,6 +35,10 @@ export class SppConnectDialogParams {
   @Track connecting: boolean = false;
   @Track errorMessage: string = '';
   @Track hintLines: string[] = [];
+  /** 自定义 UUID 收藏列表（Preferences）。 */
+  @Track favorites: SppUuidFavoriteEntry[] = [];
+  /** 当前输入 UUID 是否已收藏（自定义档标题收藏图标点亮）。 */
+  @Track currentUuidFavorited: boolean = false;
   /** Structured three-layer error model (PRD §9 / architecture §10). */
   errorModel: YoErrorStateModel = new YoErrorStateModel();
   transport: BluetoothTransportType = BluetoothTransportType.BR_EDR;
@@ -42,6 +48,25 @@ export class SppConnectDialogParams {
   };
   onConnect: () => void = () => {
   };
+  onToggleFavorite: () => void = () => {
+  };
+  onSelectFavoriteIndex: (index: number) => void = (_index: number) => {
+  };
+  onUuidInputChanged: () => void = () => {
+  };
+  /**
+   * Persist favorite from sheet form.
+   * @param originalUuid empty = add; non-empty = update that entry
+   * @returns 'ok' | 'invalid' | 'limit' | 'duplicate' | 'not_found' | 'failed'
+   */
+  saveFavorite: (originalUuid: string, uuid: string, label: string) => Promise<string> =
+    async (_originalUuid: string, _uuid: string, _label: string): Promise<string> => 'failed';
+  /**
+   * Remove favorite by uuid.
+   * @returns 'ok' | 'not_found' | 'failed'
+   */
+  removeFavorite: (uuid: string) => Promise<string> =
+    async (_uuid: string): Promise<string> => 'failed';
 }
 
 /**
@@ -51,13 +76,87 @@ export class SppConnectDialogParams {
 export class SppConnectDialogController {
   private readonly connectSpp: ConnectSppUseCase;
   private readonly queryEligibility: QuerySppConnectEligibilityUseCase;
+  private readonly uuidFavorites: SppUuidFavoriteUseCases;
 
   constructor(
     connectSpp: ConnectSppUseCase = new ConnectSppUseCase(),
-    queryEligibility: QuerySppConnectEligibilityUseCase = new QuerySppConnectEligibilityUseCase()
+    queryEligibility: QuerySppConnectEligibilityUseCase = new QuerySppConnectEligibilityUseCase(),
+    uuidFavorites: SppUuidFavoriteUseCases = new SppUuidFavoriteUseCases()
   ) {
     this.connectSpp = connectSpp;
     this.queryEligibility = queryEligibility;
+    this.uuidFavorites = uuidFavorites;
+  }
+
+  async loadFavorites(form: SppConnectDialogParams): Promise<void> {
+    form.favorites = await this.uuidFavorites.listFavorites();
+    this.refreshFavoriteState(form);
+  }
+
+  refreshFavoriteState(form: SppConnectDialogParams): void {
+    form.currentUuidFavorited = this.uuidFavorites.isFavorite(form.uuid);
+  }
+
+  /**
+   * Toggle favorite for current UUID input.
+   * @returns 'added' | 'removed' | 'invalid' | 'limit' | 'failed'
+   */
+  async toggleFavorite(form: SppConnectDialogParams): Promise<string> {
+    const uuid = form.uuid.trim();
+    if (uuid.length === 0) {
+      return 'invalid';
+    }
+    const result = await this.uuidFavorites.toggleFavorite(uuid, '');
+    if (!result.success) {
+      return SppConnectDialogController.mapFavoriteError(result.error?.message ?? '');
+    }
+    form.favorites = await this.uuidFavorites.listFavorites();
+    this.refreshFavoriteState(form);
+    return result.value === true ? 'added' : 'removed';
+  }
+
+  /**
+   * @returns 'ok' | 'invalid' | 'limit' | 'duplicate' | 'not_found' | 'failed'
+   */
+  async saveFavorite(
+    form: SppConnectDialogParams,
+    originalUuid: string,
+    uuid: string,
+    label: string
+  ): Promise<string> {
+    const result = originalUuid.trim().length === 0 ?
+      await this.uuidFavorites.addFavorite(uuid, label) :
+      await this.uuidFavorites.updateFavorite(originalUuid, uuid, label);
+    if (!result.success) {
+      return SppConnectDialogController.mapFavoriteError(result.error?.message ?? '');
+    }
+    form.favorites = await this.uuidFavorites.listFavorites();
+    this.refreshFavoriteState(form);
+    return 'ok';
+  }
+
+  /**
+   * @returns 'ok' | 'not_found' | 'failed'
+   */
+  async removeFavorite(form: SppConnectDialogParams, uuid: string): Promise<string> {
+    const result = await this.uuidFavorites.removeFavorite(uuid);
+    if (!result.success) {
+      return SppConnectDialogController.mapFavoriteError(result.error?.message ?? '');
+    }
+    form.favorites = await this.uuidFavorites.listFavorites();
+    this.refreshFavoriteState(form);
+    return 'ok';
+  }
+
+  selectFavoriteIndex(form: SppConnectDialogParams, index: number): void {
+    if (index < 0 || index >= form.favorites.length) {
+      return;
+    }
+    const entry = form.favorites[index];
+    form.uuidMode = SppUuidPickMode.CUSTOM;
+    form.uuid = entry.uuid;
+    form.customUuidDraft = entry.uuid;
+    this.refreshFavoriteState(form);
   }
 
   /**
@@ -105,6 +204,22 @@ export class SppConnectDialogController {
       return;
     }
     form.onConnected(result.value.sessionId);
+  }
+
+  private static mapFavoriteError(message: string): string {
+    if (message.indexOf('limit') >= 0) {
+      return 'limit';
+    }
+    if (message.indexOf('Invalid') >= 0) {
+      return 'invalid';
+    }
+    if (message.indexOf('Duplicate') >= 0) {
+      return 'duplicate';
+    }
+    if (message.indexOf('not found') >= 0) {
+      return 'not_found';
+    }
+    return 'failed';
   }
 
   private static applyFailure(

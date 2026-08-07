@@ -294,7 +294,7 @@
     },
     {
       "name": "bt_command_placeholder",
-      "value": "输入命令或数据"
+      "value": "ASCII 命令，如 AT^FACTORY=1"
     },
     {
       "name": "bt_terminal_tx_line",
@@ -345,6 +345,34 @@
       "value": "请输入服务 UUID"
     },
     {
+      "name": "bt_spp_uuid_favorites_title",
+      "value": "收藏的 UUID"
+    },
+    {
+      "name": "bt_spp_uuid_favorites_message",
+      "value": "选择一项填入自定义服务 UUID"
+    },
+    {
+      "name": "bt_spp_uuid_favorites_empty",
+      "value": "暂无收藏的 UUID"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_invalid",
+      "value": "请输入有效的服务 UUID"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_limit",
+      "value": "收藏已达上限（20）"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_failed",
+      "value": "收藏失败，请重试"
+    },
+    {
+      "name": "bt_spp_uuid_preset_hs01_at",
+      "value": "HS01 AT"
+    },
+    {
       "name": "bt_spp_connect_timeout_invalid",
       "value": "请输入有效的超时毫秒数"
     },
@@ -380,7 +408,6 @@
       "name": "bt_spp_connect_options_section",
       "value": "连接选项"
     },
-
     {
       "name": "bt_spp_action_send",
       "value": "发送"
@@ -396,6 +423,70 @@
     {
       "name": "bt_spp_terminal_clear",
       "value": "清屏"
+    },
+    {
+      "name": "bt_spp_terminal_encoding_text",
+      "value": "文本"
+    },
+    {
+      "name": "bt_spp_terminal_encoding_hex",
+      "value": "HEX"
+    },
+    {
+      "name": "bt_spp_terminal_display_text",
+      "value": "文本"
+    },
+    {
+      "name": "bt_spp_terminal_display_hex",
+      "value": "HEX"
+    },
+    {
+      "name": "bt_spp_terminal_display_mixed",
+      "value": "混合"
+    },
+    {
+      "name": "bt_spp_terminal_line_none",
+      "value": "无"
+    },
+    {
+      "name": "bt_spp_terminal_line_cr",
+      "value": "CR"
+    },
+    {
+      "name": "bt_spp_terminal_line_lf",
+      "value": "LF"
+    },
+    {
+      "name": "bt_spp_terminal_line_crlf",
+      "value": "CRLF"
+    },
+    {
+      "name": "bt_spp_terminal_hex_placeholder",
+      "value": "HEX，如 48 65 6C 6C 6F"
+    },
+    {
+      "name": "bt_spp_terminal_hex_invalid",
+      "value": "HEX 格式无效，请输入偶数位十六进制（可含空格）"
+    },
+    {
+      "name": "bt_spp_terminal_status_connected",
+      "value": "已连接"
+    },
+    {
+      "name": "bt_spp_terminal_status_connecting",
+      "value": "连接中"
+    },
+    {
+      "name": "bt_spp_terminal_status_reconnecting",
+      "value": "重连中"
+    },
+    {
+      "name": "bt_spp_terminal_status_disconnected",
+      "value": "已断开"
+    },
+    {
+      "name": "bt_spp_terminal_empty_hint",
+      "value": "连接已就绪，发送数据后将显示收发日志"
     },
     {
       "name": "bt_spp_connect_device_label",
@@ -432,6 +523,50 @@
     {
       "name": "bt_pairing_error_failed",
       "value": "配对失败，请重试"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_add",
+      "value": "添加"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_edit",
+      "value": "编辑"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_delete",
+      "value": "删除"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_save",
+      "value": "保存"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_form_add_title",
+      "value": "添加收藏"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_form_edit_title",
+      "value": "编辑收藏"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_label",
+      "value": "名称"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_label_placeholder",
+      "value": "可选，默认取 UUID 前缀"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_duplicate",
+      "value": "该 UUID 已在收藏中"
+    },
+    {
+      "name": "bt_spp_uuid_favorite_deleted",
+      "value": "已删除收藏"
+    },
+    {
+      "name": "bt_spp_uuid_favorites_hint",
+      "value": "点选填入；侧滑删除；点铅笔编辑"
     }
   ]
 }

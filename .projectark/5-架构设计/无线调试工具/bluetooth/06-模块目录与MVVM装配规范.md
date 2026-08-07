@@ -69,12 +69,15 @@ SppMainPage / Index
             → PairBluetoothDeviceUseCase + ObservePairingEventsUseCase
             → 仅 PairingState.PAIRED（bond）后 onPaired
   → SppConnectDialog.open
+       → SppConnectDialogController.loadFavorites / toggleFavorite / saveFavorite / removeFavorite / selectFavoriteIndex
+            → SppUuidFavoriteUseCases（list/toggle/add/update/remove）→ SppUuidFavoriteDataSource → PreferencesStore
        → SppConnectDialogController.connectFromDialog
             → QuerySppConnectEligibilityUseCase → ConnectSppUseCase
   → 成功回调 sessionId → push SppTerminalPage
 ```
 
 - Dialog **Content** 只改表单态并调用 hooks；UseCase 编排在 `viewmodel/*Controller`。
+- Dialog Content **禁止**直访 `PreferencesStore` / DataSource；收藏经 Controller → UseCases。
 - 最终准入权威仍是 `ConnectSppUseCase`（预检可失败，UC 再校验）。
 - 系统配对/开蓝牙弹窗与应用 RFCOMM Dialog **严格分离**（见 `01` / `02`）。
 - `pairDevice` Promise 成功 ≠ 已配对；配对真相为 `bondStateChange` → `PAIRED`（平台 BONDED）。
@@ -99,7 +102,7 @@ SppMainPage / Index
 | `BtOverviewViewModel` | BluetoothOverviewPage | LoadOverview |
 | `SppMainViewModel` | SppMainPage | Classic scan / paired / active list |
 | `SppPairingGuideController` | `PairingGuideDialog`（Dialog 生命周期） | Pair + ObservePairing（bond 真相） |
-| `SppConnectDialogController` | `SppConnectDialog`（Dialog 生命周期） | QueryEligibility + ConnectSpp |
+| `SppConnectDialogController` | `SppConnectDialog`（Dialog 生命周期） | QueryEligibility + ConnectSpp + SppUuidFavorite |
 | `SppTerminalViewModel` | `ui/page/SppTerminalPage` | Send / Observe / Disconnect（焦点会话） |
 | `BleMainViewModel` | BleMainPage | BLE scan entry |
 

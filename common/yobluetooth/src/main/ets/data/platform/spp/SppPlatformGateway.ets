@@ -1,8 +1,12 @@
 import { socket } from '@kit.ConnectivityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
+import { YoLog, YoLogger } from 'yolog';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
+import { BtLogTag } from '../../../observability/BtLogTag';
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
+
+const logger: YoLogger = YoLog.tag(BtLogTag.SPP);
 
 /**
  * RFCOMM connect request — maps 1:1 to HarmonyOS socket.SppOptions (SPP_RFCOMM).
@@ -40,15 +44,19 @@ export class SppPlatformGateway {
           secure: request.secure,
           type: socket.SppType.SPP_RFCOMM
         };
+        logger.i(`sppConnect begin device=${request.classicDeviceId} uuid=${request.serviceUuid} secure=${request.secure}`);
         socket.sppConnect(request.classicDeviceId, options, (err: BusinessError, clientSocket: number) => {
           if (err) {
+            logger.e(`sppConnect fail code=${err.code} msg=${err.message}`);
             resolve(Result.fail(SppPlatformGateway.mapConnectError(err)));
             return;
           }
+          logger.i(`sppConnect ok socket=${clientSocket}`);
           resolve(Result.ok(clientSocket));
         });
       } catch (error) {
         const err = error as BusinessError;
+        logger.e(`sppConnect throw code=${err.code} msg=${err.message}`);
         resolve(Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err)));
       }
     });
@@ -61,9 +69,11 @@ export class SppPlatformGateway {
     try {
       const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
       await socket.sppWriteAsync(clientSocket, buffer);
+      logger.i(`sppWriteAsync ok socket=${clientSocket} len=${bytes.length} hex=${SppPlatformGateway.previewHex(bytes)}`);
       return Result.ok(bytes.length);
     } catch (error) {
       const err = error as BusinessError;
+      logger.e(`sppWriteAsync fail socket=${clientSocket} code=${err.code} msg=${err.message}`);
       return Result.fail(SppPlatformGateway.mapIoError(err));
     }
   }
@@ -78,11 +88,13 @@ export class SppPlatformGateway {
     try {
       const buffer = await socket.sppReadAsync(clientSocket);
       if (buffer === undefined || buffer.byteLength === 0) {
+        logger.w(`sppReadAsync empty socket=${clientSocket}`);
         return Result.ok(new Uint8Array(0));
       }
       return Result.ok(new Uint8Array(buffer));
     } catch (error) {
       const err = error as BusinessError;
+      logger.e(`sppReadAsync fail socket=${clientSocket} code=${err.code} msg=${err.message}`);
       return Result.fail(SppPlatformGateway.mapIoError(err));
     }
   }
@@ -155,5 +167,15 @@ export class SppPlatformGateway {
       return new ResultError(BluetoothErrorCodes.ADAPTER_OFF, err.message, err);
     }
     return new ResultError(BluetoothErrorCodes.DISCONNECTED, err.message, err);
+  }
+
+  private static previewHex(bytes: Uint8Array): string {
+    const limit = bytes.length > 24 ? 24 : bytes.length;
+    const parts: string[] = [];
+    for (let i = 0; i < limit; i++) {
+      const hex = bytes[i].toString(16).toUpperCase();
+      parts.push(hex.length === 1 ? `0${hex}` : hex);
+    }
+    return bytes.length > limit ? `${parts.join(' ')}…` : parts.join(' ');
   }
 }

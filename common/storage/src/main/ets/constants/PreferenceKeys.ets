@@ -15,5 +15,7 @@ export class PreferenceKeys {
   static readonly WIFI_SCAN_COOLDOWN_MS: string = 'wifi.scanCooldownMs';
   static readonly BLUETOOTH_AUTO_STOP_DISCOVERY: string = 'bluetooth.autoStopDiscoveryBeforeConnect';
   static readonly BLUETOOTH_RECENT_CONNECTIONS: string = 'bluetooth.recentConnections';
+  /** SPP 自定义 UUID 收藏列表（行协议，见 SppUuidFavoriteEntry）。 */
+  static readonly BLUETOOTH_SPP_UUID_FAVORITES: string = 'bluetooth.spp.uuidFavorites';
   static readonly NEARLINK_REQUIRE_FILTER: string = 'nearlink.requireFilterForScan';
 }

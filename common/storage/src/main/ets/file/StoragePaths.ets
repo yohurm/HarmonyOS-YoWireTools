@@ -2,7 +2,13 @@ import { common } from '@kit.AbilityKit';
 import { TimeUtil } from 'common_core';
 
 /**
- * Canonical file paths per architecture 05-§6.3.
+ * Canonical file paths per architecture 05-§6.3 / APP filesystem plan.
+ *
+ * Sandbox roles (official Core File Kit):
+ * - filesDir: long-lived private data (payload / export / import / yolog)
+ * - preferencesDir: via Preferences API only (settings + SPP UUID favorites) — do not hand-build path
+ * - cacheDir / tempDir: rebuildable / ephemeral — never store favorites or settings
+ * - databaseDir: RDB only
  */
 export class StoragePaths {
   static payloadRoot(context: common.Context): string {

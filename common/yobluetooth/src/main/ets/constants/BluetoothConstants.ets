@@ -3,6 +3,12 @@
  */
 export class BluetoothConstants {
   static readonly DEFAULT_SPP_UUID: string = '00001101-0000-1000-8000-00805F9B34FB';
+  /**
+   * HS01 AT 产测通道（RFCOMM Channel 15 / GREEN）的 SDP 唯一 UUID。
+   * 固件里 00001101 同时挂在 GSound / OnlineLog / AT 多条 SDP 上，sppConnect(标准SPP)
+   * 会落到 OnlineLog；该 UUID 仅映射 Channel 15，可稳定进 AT^ 产测。
+   */
+  static readonly HS01_AT_SPP_UUID: string = '40000000-0000-1000-8000-00805F587E61';
   static readonly CLASSIC_DISCOVERY_TIMEOUT_MS: number = 12000;
   static readonly DEFAULT_SPP_CONNECT_TIMEOUT_MS: number = 15000;
   static readonly SPP_MAX_WRITE_BYTES: number = 1024;
