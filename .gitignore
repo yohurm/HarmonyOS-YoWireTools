@@ -13,3 +13,4 @@
 .agent/
 .codex
 .research/
+/build-profile.json5
