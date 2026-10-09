@@ -8,6 +8,7 @@ import { PermissionRequestResult } from './PermissionRequestResult';
 import { PermissionStatus } from './PermissionStatus';
 import { PermissionUiState } from './PermissionUiState';
 import { PlatformPermission } from './PlatformPermission';
+import { SystemGrantCatalog } from './SystemGrantCatalog';
 import { SystemPermissionGateway } from './SystemPermissionGateway';
 
 const logger = YoLog.tag(YoLogTag.PERM);
@@ -60,12 +61,18 @@ export class PermissionOrchestrator {
       logger.params('permission_granted', LogParams.create().put('scenario', presentation.scenarioId));
       return new PermissionDecision(true, presentation.scenarioId, [], uiState);
     }
-    const blocked = this.shouldBlockAutoRequest(missing);
+    const runtimeMissing = PermissionOrchestrator.userGrantMissing(missing);
+    if (runtimeMissing.length === 0) {
+      const uiState = this.buildUiState(permissions, statuses, presentation, false, false);
+      logger.params('system_grant_missing', LogParams.create().put('scenario', presentation.scenarioId));
+      return new PermissionDecision(false, presentation.scenarioId, missing, uiState);
+    }
+    const blocked = this.shouldBlockAutoRequest(runtimeMissing);
     if (blocked) {
       const uiState = this.buildUiState(permissions, statuses, presentation, false, true);
       return new PermissionDecision(false, presentation.scenarioId, missing, uiState);
     }
-    const requestResult = await this.requestFromUser(missing, reason);
+    const requestResult = await this.requestFromUser(runtimeMissing, reason);
     const finalStatuses = await this.checkPermissions(permissions);
     const stillMissing = PermissionOrchestrator.collectMissing(permissions, finalStatuses);
     const granted = stillMissing.length === 0;
@@ -148,6 +155,16 @@ export class PermissionOrchestrator {
       statuses.push(await this.gateway.checkPermission(permissions[i]));
     }
     return statuses;
+  }
+
+  private static userGrantMissing(missing: PlatformPermission[]): PlatformPermission[] {
+    const runtime: PlatformPermission[] = [];
+    for (let i = 0; i < missing.length; i++) {
+      if (!SystemGrantCatalog.isSystemGrant(missing[i])) {
+        runtime.push(missing[i]);
+      }
+    }
+    return runtime;
   }
 
   private static collectMissing(

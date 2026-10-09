@@ -10,6 +10,7 @@
     "common_platform": "file:../../common/platform",
     "common_storage": "file:../../common/storage",
     "youi_kit": "file:../../common/youi_kit",
-    "debug_core": "file:../../common/debug_core"
+    "debug_core": "file:../../common/debug_core",
+    "yolog": "file:../../common/yolog"
   }
 }

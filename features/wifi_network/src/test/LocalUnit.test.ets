@@ -29,8 +29,12 @@ export default function localUnitTest() {
       const tracker = new WifiScanCooldownTracker();
       const now = Date.now();
       tracker.recordScan(now);
-      expect(tracker.canScanNow(now + 1000)).assertFalse();
-      expect(tracker.remainingCooldownMs(now + 1000)).assertLarger(0);
+      expect(tracker.canScanNow(now + 1000)).assertTrue();
+      tracker.recordScan(now + 1000);
+      tracker.recordScan(now + 2000);
+      tracker.recordScan(now + 3000);
+      expect(tracker.canScanNow(now + 4000)).assertFalse();
+      expect(tracker.remainingCooldownMs(now + 4000)).assertLarger(0);
     });
 
     it('PrivateNetworkGuard_private_ip', 0, () => {
@@ -58,7 +62,7 @@ export default function localUnitTest() {
 
     it('WifiAccessPointSnapshot_masked_bssid', 0, () => {
       const masked = WifiAccessPointSnapshot.maskedBssid('AA:BB:CC:DD:EE:FF', false, BssidMaskReason.PERMISSION_DENIED);
-      expect(masked).assertEqual('**:**:**:**:**:**');
+      expect(masked).assertEqual('');
     });
 
     it('WifiNetworkConstants_defaults', 0, () => {

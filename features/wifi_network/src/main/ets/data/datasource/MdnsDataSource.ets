@@ -64,6 +64,58 @@ export class MdnsDataSource {
   getServices(): DiscoveredNetworkService[] {
     return this.services.slice();
   }
+
+  publishLocal(
+    context: common.UIAbilityContext,
+    serviceName: string,
+    serviceType: string,
+    port: number
+  ): Promise<Result<void>> {
+    return new Promise<Result<void>>((resolve) => {
+      const info: mdns.LocalServiceInfo = {
+        serviceName: serviceName,
+        serviceType: serviceType,
+        port: port
+      };
+      try {
+        mdns.addLocalService(context, info, (error: BusinessError) => {
+          if (error !== undefined && error.code !== undefined && error.code !== 0) {
+            resolve(Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.SCAN_LIMITED, error)));
+            return;
+          }
+          resolve(Result.ok(undefined));
+        });
+      } catch (error) {
+        const err = error as BusinessError;
+        resolve(Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.SCAN_LIMITED, err)));
+      }
+    });
+  }
+
+  removeLocal(
+    context: common.UIAbilityContext,
+    serviceName: string,
+    serviceType: string
+  ): Promise<Result<void>> {
+    return new Promise<Result<void>>((resolve) => {
+      const info: mdns.LocalServiceInfo = {
+        serviceName: serviceName,
+        serviceType: serviceType
+      };
+      try {
+        mdns.removeLocalService(context, info, (error: BusinessError) => {
+          if (error !== undefined && error.code !== undefined && error.code !== 0) {
+            resolve(Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.SCAN_LIMITED, error)));
+            return;
+          }
+          resolve(Result.ok(undefined));
+        });
+      } catch (error) {
+        const err = error as BusinessError;
+        resolve(Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.SCAN_LIMITED, err)));
+      }
+    });
+  }
   private registerHandlers(context: common.UIAbilityContext): void {
     if (this.discoveryService === undefined) {
       return;

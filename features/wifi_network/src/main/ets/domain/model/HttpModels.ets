@@ -53,6 +53,11 @@ export class HttpResponseRecord {
   readonly latencyMs: number;
   readonly nativeCode: number;
   readonly appCode: string;
+  readonly dnsMs: string;
+  readonly tcpMs: string;
+  readonly tlsMs: string;
+  readonly firstByteMs: string;
+  readonly totalFinishMs: string;
 
   constructor(
     requestId: string,
@@ -62,7 +67,12 @@ export class HttpResponseRecord {
     bodySize: number,
     latencyMs: number,
     nativeCode: number = 0,
-    appCode: string = ''
+    appCode: string = '',
+    dnsMs: string = '未返回',
+    tcpMs: string = '未返回',
+    tlsMs: string = '未返回',
+    firstByteMs: string = '未返回',
+    totalFinishMs: string = '未返回'
   ) {
     this.requestId = requestId;
     this.responseCode = responseCode;
@@ -72,5 +82,10 @@ export class HttpResponseRecord {
     this.latencyMs = latencyMs;
     this.nativeCode = nativeCode;
     this.appCode = appCode;
+    this.dnsMs = dnsMs;
+    this.tcpMs = tcpMs;
+    this.tlsMs = tlsMs;
+    this.firstByteMs = firstByteMs;
+    this.totalFinishMs = totalFinishMs;
   }
 }

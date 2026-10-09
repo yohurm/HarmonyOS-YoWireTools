@@ -9,6 +9,7 @@ export { PermissionRecordStore } from './src/main/ets/permission/PermissionRecor
 export { IPermissionGateway } from './src/main/ets/permission/IPermissionGateway';
 export { SystemPermissionGateway } from './src/main/ets/permission/SystemPermissionGateway';
 export { PermissionOrchestrator } from './src/main/ets/permission/PermissionOrchestrator';
+export { SystemGrantCatalog } from './src/main/ets/permission/SystemGrantCatalog';
 export { PlatformModuleType } from './src/main/ets/capability/PlatformModuleType';
 export { CapabilityStatus } from './src/main/ets/capability/CapabilityStatus';
 export { CapabilityResult } from './src/main/ets/capability/CapabilityResult';

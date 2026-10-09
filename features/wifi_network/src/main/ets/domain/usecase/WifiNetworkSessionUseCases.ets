@@ -183,6 +183,9 @@ export class StartMdnsDiscoveryUseCase {
     this.ensurePermission = ensurePermission;
   }
   async execute(serviceType: string): Promise<Result<void>> {
+    if (serviceType.trim().length === 0) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, '类型为空'));
+    }
     const perm = await this.ensurePermission.execute(PermissionScenario.NETWORK_ACCESS);
     if (!perm.granted) {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
@@ -195,6 +198,22 @@ export class StartMdnsDiscoveryUseCase {
   }
   getDataSource(): MdnsDataSource {
     return this.mdnsDataSource;
+  }
+
+  async publish(serviceName: string, serviceType: string, port: number): Promise<Result<void>> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound'));
+    }
+    return this.mdnsDataSource.publishLocal(context, serviceName, serviceType, port);
+  }
+
+  async unpublish(serviceName: string, serviceType: string): Promise<Result<void>> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound'));
+    }
+    return this.mdnsDataSource.removeLocal(context, serviceName, serviceType);
   }
 }
 

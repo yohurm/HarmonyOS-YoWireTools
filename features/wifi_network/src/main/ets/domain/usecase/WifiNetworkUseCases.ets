@@ -116,17 +116,28 @@ export class StartWifiScanUseCase {
       sid = created.value.id;
       await this.startSession.execute(sid);
     }
-    let fromCache = true;
     if (activeScan) {
-      const scan = await this.repository.startWifiScan();
-      if (scan.success) {
-        fromCache = false;
-        await WifiScanLogger.log(sid, 'WiFi active scan started');
-      } else {
-        await WifiScanLogger.log(sid, 'Active scan unavailable, reading cache');
+      const control = await this.ensurePermission.execute(PermissionScenario.WIFI_CONTROL);
+      if (!control.granted) {
+        return Result.fail(new ResultError(
+          WifiNetworkErrorCodes.NO_WIFI_INFO,
+          '权限被拒绝',
+          undefined,
+          {},
+          '201'
+        ));
       }
+      const scan = await this.repository.runForegroundScan(macPerm.granted, true);
+      await WifiScanLogger.log(sid, scan.success ? 'action=startScan result=success' : 'action=startScan result=failed');
+      if (sid.length > 0) {
+        await this.stopSession.execute(sid, 'scan_complete');
+      }
+      if (!scan.success || scan.value === undefined) {
+        return Result.fail(scan.error ?? new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, '扫描失败'));
+      }
+      return Result.ok(scan.value.rows);
     }
-    const results = await this.repository.getScanResults(macPerm.granted, fromCache);
+    const results = await this.repository.getScanResults(macPerm.granted, true);
     if (sid.length > 0) {
       await this.stopSession.execute(sid, 'scan_complete');
     }

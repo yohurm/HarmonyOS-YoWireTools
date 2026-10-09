@@ -7,8 +7,14 @@ import { UdpSocketDataSource } from '../datasource/UdpSocketDataSource';
 import { MqttClientDataSource } from '../datasource/MqttClientDataSource';
 import { HttpDataSource } from '../datasource/HttpDataSource';
 import { WebSocketDataSource } from '../datasource/WebSocketDataSource';
-import { socket } from '@kit.NetworkKit';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
+import {
+  WifiCandidateDraft,
+  WifiFeatureFact,
+  WifiIpv4Facts,
+  WifiIpv6Facts,
+  WifiScanBatch
+} from '../../domain/model/WifiDebugFacts';
 import { WifiLinkedInfoSnapshot } from '../../domain/model/WifiLinkedInfoSnapshot';
 import { WifiOverviewSnapshot } from '../../domain/model/WifiOverviewSnapshot';
 import { WifiScanSource } from '../../domain/model/WifiScanState';
@@ -30,11 +36,13 @@ import {
   PortProbeState,
   PortScanConfig
 } from '../../domain/model/LanDiscoveryModels';
+import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts } from '../../domain/model/NetworkInspectFacts';
 import { WifiNetworkRepositoryContract } from '../../domain/repository/WifiNetworkRepositoryContract';
 import { WifiScanCooldownTracker } from '../../domain/service/WifiScanCooldownTracker';
 import { CidrAddressGenerator } from '../../domain/service/CidrAddressGenerator';
 import { PortScanQueue } from '../../domain/service/PortScanQueue';
 import { PrivateNetworkGuard } from '../../domain/service/PrivateNetworkGuard';
+import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 
 /**
@@ -373,5 +381,186 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
 
   async createMqttSession(config: MqttConnectConfig): Promise<Result<void>> {
     return this.mqttDataSource.connect(config);
+  }
+
+  foregroundSlotsLeft(): number {
+    return this.scanCooldown.foregroundSlotsLeft();
+  }
+
+  getLastScanAtMs(): number {
+    return this.lastScanAtMs;
+  }
+
+  isEmulatorRuntime(): boolean {
+    return WifiInfoDataSource.isEmulatorRuntime();
+  }
+
+  sdkApiVersion(): number {
+    return this.wifiDataSource.sdkApiVersion();
+  }
+
+  readFeatureSupport(): Promise<Result<WifiFeatureFact[]>> {
+    return this.wifiDataSource.readFeatureSupport();
+  }
+
+  isStaConnected(): Promise<Result<boolean>> {
+    return this.wifiDataSource.isStaConnected();
+  }
+
+  isHotspotActive(): Promise<Result<boolean>> {
+    return this.wifiDataSource.isHotspotActive();
+  }
+
+  readIpv4(): Promise<Result<WifiIpv4Facts>> {
+    return this.wifiDataSource.readIpv4();
+  }
+
+  readIpv6(): Promise<Result<WifiIpv6Facts>> {
+    return this.wifiDataSource.readIpv6();
+  }
+
+  onWifiPowerState(listener: (state: number) => void): Result<void> {
+    return this.wifiDataSource.onWifiPowerState(listener);
+  }
+
+  offWifiPowerState(): void {
+    this.wifiDataSource.offWifiPowerState();
+  }
+
+  onWifiConnectionState(listener: (state: number) => void): Result<void> {
+    return this.wifiDataSource.onWifiConnectionState(listener);
+  }
+
+  offWifiConnectionState(): void {
+    this.wifiDataSource.offWifiConnectionState();
+  }
+
+  onWifiRssi(listener: (rssi: number) => void): Result<void> {
+    return this.wifiDataSource.onWifiRssiChange(listener);
+  }
+
+  offWifiRssi(): void {
+    this.wifiDataSource.offWifiRssiChange();
+  }
+
+  async runForegroundScan(bssidVisible: boolean, foreground: boolean): Promise<Result<WifiScanBatch>> {
+    if (!foreground && !this.scanCooldown.canScanInBackground()) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_COOLDOWN, '该次未执行'));
+    }
+    if (foreground && !this.scanCooldown.canScanNow()) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_COOLDOWN, '剩余冷却'));
+    }
+    const active = await this.wifiDataSource.isWifiActive();
+    if (!active.success) {
+      return Result.fail(active.error ?? new ResultError(WifiNetworkErrorCodes.NO_WIFI_INFO, '权限被拒绝'));
+    }
+    if (active.value !== true) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, '先打开 WLAN'));
+    }
+    const linked = await this.wifiDataSource.getLinkedInfo(bssidVisible);
+    if (linked.success && linked.value !== undefined) {
+      const state = linked.value.connStateLabel;
+      if (state === 'CONNECTING' || state === 'AUTHENTICATING' || state === 'OBTAINING_IPADDR') {
+        return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, '连接过程中不允许扫描'));
+      }
+    }
+    const batch = await this.wifiDataSource.runActiveScan(bssidVisible);
+    const message = batch.error !== undefined ? batch.error.message : '';
+    if (message !== '当前系统版本没有该接口') {
+      if (foreground) {
+        this.scanCooldown.recordScan();
+      } else {
+        this.scanCooldown.recordBackgroundScan();
+      }
+    }
+    if (batch.success && batch.value !== undefined) {
+      this.lastScanResults = batch.value.rows;
+      this.lastScanAtMs = batch.value.readAtMs;
+      this.lastScanFromCache = false;
+    }
+    return batch;
+  }
+
+  async refreshScanCache(bssidVisible: boolean): Promise<Result<WifiScanBatch>> {
+    const batch = await this.wifiDataSource.readScanCache(bssidVisible);
+    if (!batch.success || batch.value === undefined) {
+      return batch;
+    }
+    const withinCache = this.lastScanAtMs > 0 &&
+      (Date.now() - this.lastScanAtMs) < WifiNetworkConstants.SCAN_CACHE_WINDOW_MS;
+    if (!withinCache) {
+      this.lastScanResults = batch.value.rows;
+      this.lastScanAtMs = batch.value.readAtMs;
+    }
+    this.lastScanFromCache = true;
+    return Result.ok(new WifiScanBatch(
+      withinCache ? this.lastScanResults : batch.value.rows,
+      withinCache ? this.lastScanAtMs : batch.value.readAtMs,
+      WifiScanSource.CACHE,
+      -1
+    ));
+  }
+
+  addCandidate(draft: WifiCandidateDraft): Promise<Result<number>> {
+    return this.wifiDataSource.addCandidate(draft);
+  }
+
+  connectCandidate(networkId: number): Result<void> {
+    return this.wifiDataSource.connectCandidate(networkId);
+  }
+
+  connectCandidateWithUserAction(networkId: number): Promise<Result<void>> {
+    return this.wifiDataSource.connectCandidateWithUserAction(networkId);
+  }
+
+  removeCandidate(networkId: number): Promise<Result<void>> {
+    return this.wifiDataSource.removeCandidate(networkId);
+  }
+
+  listCandidateSsids(): Promise<Result<string[]>> {
+    return this.wifiDataSource.listCandidateSsids();
+  }
+
+  readDefaultNet(): Promise<Result<NetworkStateSnapshot>> {
+    return this.networkDataSource.getDefaultNet();
+  }
+
+  readOnlineStatus(): Promise<Result<string>> {
+    return this.networkDataSource.readOnlineStatus();
+  }
+
+  readConnectionProperties(): Promise<Result<NetworkPropertyFacts>> {
+    return this.networkDataSource.readConnectionProperties();
+  }
+
+  readHttpProxy(): Result<HttpProxyFacts> {
+    return this.networkDataSource.readHttpProxy();
+  }
+
+  resolveHost(host: string, family: number): Promise<Result<DnsLookupFacts>> {
+    return this.networkDataSource.getAddressesByNameWithOptions(host, family);
+  }
+
+  queryProbe(destination: string): Promise<Result<ProbeFacts>> {
+    return this.networkDataSource.queryProbeResult(destination);
+  }
+
+  readSelfWifiTraffic(startMs: number, endMs: number): Promise<Result<string>> {
+    return this.networkDataSource.readSelfWifiTraffic(startMs, endMs);
+  }
+
+  abortHttp(): void {
+    this.httpDataSource.abort();
+  }
+
+  startNetObservation(
+    listener: (snapshot: NetworkStateSnapshot) => void,
+    events: (name: string, detail: string) => void
+  ): void {
+    this.networkDataSource.startListening(listener, events);
+  }
+
+  stopNetObservation(): void {
+    this.networkDataSource.stopListening();
   }
 }

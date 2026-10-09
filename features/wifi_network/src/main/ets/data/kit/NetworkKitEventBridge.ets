@@ -33,6 +33,42 @@ export class NetworkKitEventBridge {
     }, 'wifiManager.wifiConnectionChange');
   }
 
+  static subscribeWifiScanStateChange(handler: (state: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiScanStateChange', handler);
+    }, 'wifiManager.wifiScanStateChange');
+  }
+
+  static unsubscribeWifiScanStateChange(handler: (state: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiScanStateChange', handler);
+    }, 'wifiManager.wifiScanStateChange');
+  }
+
+  static subscribeWifiRssiChange(handler: (rssi: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiRssiChange', handler);
+    }, 'wifiManager.wifiRssiChange');
+  }
+
+  static unsubscribeWifiRssiChange(handler: (rssi: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiRssiChange', handler);
+    }, 'wifiManager.wifiRssiChange');
+  }
+
+  static subscribeWifiConnectionState(handler: (state: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiConnectionChange', handler);
+    }, 'wifiManager.wifiConnectionState');
+  }
+
+  static unsubscribeWifiConnectionState(handler: (state: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiConnectionChange', handler);
+    }, 'wifiManager.wifiConnectionState');
+  }
+
   static subscribeMdnsServiceFound(
     service: mdns.DiscoveryService,
     handler: (info: mdns.LocalServiceInfo) => void
