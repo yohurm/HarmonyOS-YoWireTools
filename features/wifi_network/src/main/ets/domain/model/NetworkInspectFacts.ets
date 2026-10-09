@@ -52,6 +52,18 @@ export class DnsLookupFacts {
   }
 }
 
+export class TraceHopFact {
+  readonly jumpNo: number;
+  readonly address: string;
+  readonly rttText: string;
+
+  constructor(jumpNo: number, address: string, rttText: string) {
+    this.jumpNo = jumpNo;
+    this.address = address;
+    this.rttText = rttText;
+  }
+}
+
 export class ProbeFacts {
   readonly lossRate: string;
   readonly rttText: string;

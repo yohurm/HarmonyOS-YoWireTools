@@ -12,6 +12,7 @@ export class WifiNetworkConstants {
   static readonly DNS_OPTIONS_MIN_API: number = 23;
   static readonly ADDRESS_FAMILY_MIN_API: number = 24;
   static readonly PROBE_MIN_API: number = 26;
+  static readonly TRACE_ROUTE_MAX_HOPS: number = 5;
   static readonly TRAFFIC_STATS_MIN_API: number = 22;
   static readonly WEB_SOCKET_SERVER_MIN_API: number = 19;
   static readonly FEATURE_INFRA: number = 0x0001;

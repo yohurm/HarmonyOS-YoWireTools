@@ -454,7 +454,9 @@ export struct WifiAddressPage {
       YoActionButton({
         label: '路由跟踪',
         kind: YoActionButtonKind.SECONDARY,
-        onTap: () => this.vm.refuseTrace()
+        onTap: () => {
+          void this.vm.runTrace();
+        }
       })
       YoActionButton({
         label: '整机监听表',
@@ -598,6 +600,129 @@ export struct WifiInspectPage {
         kind: YoActionButtonKind.SECONDARY,
         onTap: () => this.vm.refuseOtherUidTraffic()
       })
+      WifiFieldInput({
+        label: '主机',
+        text: this.vm.hostInput,
+        onValue: (value: string) => {
+          this.vm.hostInput = value;
+        }
+      })
+      WifiFieldInput({
+        label: '端口',
+        text: this.vm.portInput,
+        onValue: (value: string) => {
+          this.vm.portInput = value;
+        }
+      })
+      WifiFieldInput({
+        label: '文本',
+        text: this.vm.payloadInput,
+        onValue: (value: string) => {
+          this.vm.payloadInput = value;
+        }
+      })
+      YoActionButton({
+        label: 'TCP 连接',
+        onTap: () => {
+          void this.vm.connectInspectTcp();
+        }
+      })
+      YoActionButton({
+        label: 'TCP 发送',
+        isEnabled: this.vm.tcpSendEnabled,
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.sendInspectTcp();
+        }
+      })
+      YoActionButton({
+        label: 'TCP 断开',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          void this.vm.disconnectInspectTcp();
+        }
+      })
+      YoActionButton({
+        label: '发送数据报',
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.sendInspectUdp();
+        }
+      })
+      YoActionButton({
+        label: '监听',
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.startInspectTcpServer();
+        }
+      })
+      YoActionButton({
+        label: '停止监听',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          void this.vm.stopInspectTcpServer();
+        }
+      })
+      if (this.vm.tlsMark === 'TLS') {
+        YoStatusPill({ label: 'TLS', tone: 'success' })
+      } else if (this.vm.tlsMark === 'failed') {
+        WifiFactText({ text: '未标为已加密成功' })
+      } else {
+        WifiFactText({ text: '未建立' })
+      }
+      YoActionButton({
+        label: '建立 TLS',
+        onTap: () => {
+          void this.vm.connectInspectTls();
+        }
+      })
+      YoActionButton({
+        label: 'WebSocket 连接',
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.connectInspectWs();
+        }
+      })
+      YoActionButton({
+        label: 'WebSocket 发送',
+        isEnabled: this.vm.wsSendEnabled,
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.sendInspectWs();
+        }
+      })
+      YoActionButton({
+        label: 'WebSocket 断开',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          void this.vm.disconnectInspectWs();
+        }
+      })
+      WifiFactText({ text: this.vm.wsServerLine })
+      YoActionButton({
+        label: '启动服务',
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.startInspectWsServer();
+        }
+      })
+      YoActionButton({
+        label: '停止服务',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          void this.vm.stopInspectWsServer();
+        }
+      })
+      YoActionButton({
+        label: '加入',
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.joinMulticast();
+        }
+      })
+      ForEach(this.vm.inspectLines, (line: string) => {
+        WifiFactText({ text: line })
+      }, (line: string, index: number) => `n${index}-${line}`)
       ForEach(this.vm.httpLines, (line: string) => {
         WifiFactText({ text: line })
       }, (line: string, index: number) => `i${index}`)

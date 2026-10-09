@@ -36,7 +36,7 @@ import {
   PortProbeState,
   PortScanConfig
 } from '../../domain/model/LanDiscoveryModels';
-import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts } from '../../domain/model/NetworkInspectFacts';
+import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts, TraceHopFact } from '../../domain/model/NetworkInspectFacts';
 import { WifiNetworkRepositoryContract } from '../../domain/repository/WifiNetworkRepositoryContract';
 import { WifiScanCooldownTracker } from '../../domain/service/WifiScanCooldownTracker';
 import { CidrAddressGenerator } from '../../domain/service/CidrAddressGenerator';
@@ -543,6 +543,10 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
 
   queryProbe(destination: string): Promise<Result<ProbeFacts>> {
     return this.networkDataSource.queryProbeResult(destination);
+  }
+
+  queryTraceRoute(destination: string): Promise<Result<TraceHopFact[]>> {
+    return this.networkDataSource.queryTraceRoute(destination);
   }
 
   readSelfWifiTraffic(startMs: number, endMs: number): Promise<Result<string>> {

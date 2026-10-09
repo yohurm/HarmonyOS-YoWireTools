@@ -1,4 +1,4 @@
-import { Result, ResultError } from 'common_core';
+import { Observable, Result, ResultError } from 'common_core';
 import { IdGenerator } from 'common_core';
 import {
   AppMode,
@@ -12,7 +12,10 @@ import {
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase,
-  TransportSessionRegistry
+  TransportSessionRegistry,
+  TransportState,
+  TransportStateSnapshot,
+  WriteResult
 } from 'debug_core';
 import { DeviceFavoriteRecord, TargetRepository } from 'common_storage';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
@@ -21,16 +24,40 @@ import { TcpClientSessionCoordinator } from '../../data/transport/TcpClientSessi
 import { TcpClientTransportSession } from '../../data/transport/TcpClientTransportSession';
 import { TcpServerSessionCoordinator } from '../../data/transport/TcpServerSessionCoordinator';
 import { MqttConnectConfig } from '../model/MqttModels';
-import { SocketConnectionParams } from '../model/SocketModels';
+import { SocketConnectionParams, TcpServerClientRecord } from '../model/SocketModels';
 import { WifiMessageLogger } from '../service/WifiMessageLogger';
 
 export class OpenTcpServerUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
+  private knownClientIds: string[] = [];
 
   constructor(
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.ensurePermission = ensurePermission;
+  }
+
+  watchClients(
+    onConnect: (address: string, port: number) => void,
+    onBytes: (address: string, port: number, byteCount: number) => void
+  ): void {
+    this.knownClientIds = [];
+    const coordinator = TcpServerSessionCoordinator.getInstance();
+    coordinator.setCallbacks((clientId: string, text: string) => {
+      const record = this.findClient(clientId);
+      if (record !== undefined) {
+        onBytes(record.remoteAddress, record.remotePort, text.length);
+      }
+    }, () => {
+      const clients = coordinator.listClients();
+      for (let i = 0; i < clients.length; i++) {
+        const client = clients[i];
+        if (!this.clientKnown(client.id)) {
+          this.knownClientIds.push(client.id);
+          onConnect(client.remoteAddress, client.remotePort);
+        }
+      }
+    });
   }
 
   async execute(port: number): Promise<Result<void>> {
@@ -39,6 +66,25 @@ export class OpenTcpServerUseCase {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
     }
     return TcpServerSessionCoordinator.getInstance().start(port);
+  }
+
+  private findClient(clientId: string): TcpServerClientRecord | undefined {
+    const clients = TcpServerSessionCoordinator.getInstance().listClients();
+    for (let i = 0; i < clients.length; i++) {
+      if (clients[i].id === clientId) {
+        return clients[i];
+      }
+    }
+    return undefined;
+  }
+
+  private clientKnown(clientId: string): boolean {
+    for (let i = 0; i < this.knownClientIds.length; i++) {
+      if (this.knownClientIds[i] === clientId) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -208,15 +254,34 @@ export class ConnectTcpClientUseCase {
   private readonly openTcpSession: OpenTcpClientSessionUseCase;
   private readonly tcpCoordinator: TcpClientSessionCoordinator;
   private readonly stopSession: StopSessionUseCase;
+  private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
     openTcpSession: OpenTcpClientSessionUseCase = new OpenTcpClientSessionUseCase(),
     tcpCoordinator: TcpClientSessionCoordinator = TcpClientSessionCoordinator.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase()
+    stopSession: StopSessionUseCase = new StopSessionUseCase(),
+    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
     this.openTcpSession = openTcpSession;
     this.tcpCoordinator = tcpCoordinator;
     this.stopSession = stopSession;
+    this.transportRegistry = transportRegistry;
+  }
+
+  observeState(sessionId: string): Observable<TransportStateSnapshot> | undefined {
+    const transport = this.transportRegistry.get(sessionId);
+    if (transport === undefined) {
+      return undefined;
+    }
+    return transport.observeState();
+  }
+
+  async sendText(sessionId: string, text: string): Promise<WriteResult> {
+    const transport = this.transportRegistry.get(sessionId);
+    if (transport === undefined || transport.state !== TransportState.CONNECTED) {
+      return new WriteResult(false, 0, WifiNetworkErrorCodes.NOT_CONNECTED, '发送不可用');
+    }
+    return transport.write(ConnectTcpClientUseCase.toBytes(text));
   }
 
   async execute(params: SocketConnectionParams): Promise<Result<string>> {
@@ -230,6 +295,14 @@ export class ConnectTcpClientUseCase {
       return Result.fail(connected.error ?? new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'Connect failed'));
     }
     return Result.ok(session.value);
+  }
+
+  private static toBytes(text: string): Uint8Array {
+    const bytes = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) {
+      bytes[i] = text.charCodeAt(i) & 0xff;
+    }
+    return bytes;
   }
 }
 
@@ -246,7 +319,9 @@ export class DisconnectTcpClientSessionUseCase {
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    if (this.transportRegistry.get(sessionId) !== undefined) {
+    const transport = this.transportRegistry.get(sessionId);
+    if (transport !== undefined) {
+      await transport.disconnect('tcp_disconnected');
       this.transportRegistry.remove(sessionId);
     }
     return this.stopSession.execute(sessionId, 'tcp_disconnected');

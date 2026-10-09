@@ -1,10 +1,18 @@
+import { abilityAccessCtrl, bundleManager } from '@kit.AbilityKit';
 import { connection, statistics } from '@kit.NetworkKit';
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { Observable, Result, ResultError } from 'common_core';
 import { YoLog } from 'yolog';
 import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
-import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, NetworkRouteFact, ProbeFacts } from '../../domain/model/NetworkInspectFacts';
+import {
+  DnsLookupFacts,
+  HttpProxyFacts,
+  NetworkPropertyFacts,
+  NetworkRouteFact,
+  ProbeFacts,
+  TraceHopFact
+} from '../../domain/model/NetworkInspectFacts';
 import { NetworkStateSnapshot } from '../../domain/model/NetworkStateSnapshot';
 
 export { NetworkStateSnapshot };
@@ -20,12 +28,27 @@ interface DnsQueryOptions {
 }
 
 interface AddressFamilyCarrier {
-  addrFamilyFlags?: number;
+  isIPv4LinkValid?: boolean;
+  isIPv6LinkValid?: boolean;
+}
+
+interface TraceRouteCallOption {
+  maxJumpNumber: number;
+}
+
+interface TraceRouteHopRaw {
+  jumpNo: number;
+  address: string;
+  rtt?: number[];
+}
+
+interface TraceRouteCall {
+  queryTraceRoute(destination: string, option: TraceRouteCallOption): Promise<TraceRouteHopRaw[]>;
 }
 
 /**
- * Call site for connection, DNS, probe, proxy, and self traffic.
- * queryTraceRoute is not called from this file.
+ * Call site for connection, DNS, probe, proxy, self traffic, and gated trace route.
+ * queryTraceRoute runs only when API 26 and the restricted permission both allow it.
  */
 export class NetworkConnectionDataSource {
   private static instance: NetworkConnectionDataSource | undefined;
@@ -117,8 +140,10 @@ export class NetworkConnectionDataSource {
         WifiNetworkConstants.SYSTEM_NOT_RETURNED : `${props.dnses.length}`;
       let familyLine = '当前系统无此字段';
       if (deviceInfo.sdkApiVersion >= WifiNetworkConstants.ADDRESS_FAMILY_MIN_API) {
-        const flags = (props as AddressFamilyCarrier).addrFamilyFlags;
-        familyLine = flags === undefined ? WifiNetworkConstants.SYSTEM_NOT_RETURNED : `${flags}`;
+        const family = props as AddressFamilyCarrier;
+        const ipv4 = NetworkConnectionDataSource.familyWord(family.isIPv4LinkValid);
+        const ipv6 = NetworkConnectionDataSource.familyWord(family.isIPv6LinkValid);
+        familyLine = `IPv4 ${ipv4}；IPv6 ${ipv6}`;
       }
       const interfaceName = props.interfaceName.length > 0 ? props.interfaceName : WifiNetworkConstants.SYSTEM_NOT_RETURNED;
       const mtu = props.mtu > 0 ? `${props.mtu}` : WifiNetworkConstants.SYSTEM_NOT_RETURNED;
@@ -202,6 +227,43 @@ export class NetworkConnectionDataSource {
       const native = `${err.code}`;
       const message = native === WifiNetworkConstants.NATIVE_PERMISSION_DENIED ? '权限被拒绝' : err.message;
       return Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.DNS_FAILED, err, message));
+    }
+  }
+
+  async queryTraceRoute(destination: string): Promise<Result<TraceHopFact[]>> {
+    const trimmed = destination.trim();
+    if (trimmed.length === 0) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, '参数无效'));
+    }
+    const refusal = this.traceRefusal();
+    if (refusal !== undefined) {
+      return Result.fail(refusal);
+    }
+    try {
+      const option: TraceRouteCallOption = { maxJumpNumber: WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS };
+      const kit = connection as TraceRouteCall;
+      const hops = await kit.queryTraceRoute(trimmed, option);
+      const facts: TraceHopFact[] = [];
+      const limit = hops.length > WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS ?
+        WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS : hops.length;
+      for (let i = 0; i < limit; i++) {
+        const hop = hops[i];
+        facts.push(new TraceHopFact(hop.jumpNo, hop.address, NetworkConnectionDataSource.formatRtt(hop.rtt)));
+      }
+      return Result.ok(facts);
+    } catch (error) {
+      const err = error as BusinessError;
+      const native = `${err.code}`;
+      if (native === WifiNetworkConstants.NATIVE_PERMISSION_DENIED) {
+        return Result.fail(new ResultError(
+          WifiNetworkErrorCodes.NO_INTERNET,
+          '失败码 201。未授予 ACCESS_NET_TRACE_INFO，不显示跳数表。',
+          err,
+          {},
+          native
+        ));
+      }
+      return Result.fail(ResultError.fromBusinessError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err, err.message));
     }
   }
 
@@ -339,6 +401,60 @@ export class NetworkConnectionDataSource {
       return '已验证';
     }
     return '能力变化';
+  }
+
+  private traceRefusal(): ResultError | undefined {
+    if (deviceInfo.sdkApiVersion < WifiNetworkConstants.PROBE_MIN_API) {
+      return new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, '当前系统版本没有该接口');
+    }
+    if (!this.permissionGranted('ohos.permission.ACCESS_NET_TRACE_INFO')) {
+      return new ResultError(
+        WifiNetworkErrorCodes.NO_INTERNET,
+        '失败码 201。未授予 ACCESS_NET_TRACE_INFO，不显示跳数表。',
+        undefined,
+        {},
+        WifiNetworkConstants.NATIVE_PERMISSION_DENIED
+      );
+    }
+    const location = this.permissionGranted('ohos.permission.LOCATION') &&
+      this.permissionGranted('ohos.permission.APPROXIMATELY_LOCATION');
+    if (!location) {
+      return new ResultError(
+        WifiNetworkErrorCodes.NO_INTERNET,
+        '位置未授权。不显示跳数表。',
+        undefined,
+        {},
+        WifiNetworkConstants.NATIVE_PERMISSION_DENIED
+      );
+    }
+    return undefined;
+  }
+
+  private permissionGranted(permission: string): boolean {
+    try {
+      const bundleInfo = bundleManager.getBundleInfoForSelfSync(
+        bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION
+      );
+      const tokenId = bundleInfo.appInfo.accessTokenId;
+      const grant = abilityAccessCtrl.createAtManager().checkAccessTokenSync(tokenId, permission);
+      return grant === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
+    } catch (_error) {
+      return false;
+    }
+  }
+
+  private static familyWord(flag: boolean | undefined): string {
+    if (flag === undefined) {
+      return WifiNetworkConstants.SYSTEM_NOT_RETURNED;
+    }
+    return flag ? '可用' : '不可用';
+  }
+
+  private static formatRtt(rtt: number[] | undefined): string {
+    if (rtt === undefined || rtt.length < 4) {
+      return WifiNetworkConstants.SYSTEM_NOT_RETURNED;
+    }
+    return `${rtt[0]}, ${rtt[1]}, ${rtt[2]}, ${rtt[3]}`;
   }
 
   private hasNonAscii(host: string): boolean {

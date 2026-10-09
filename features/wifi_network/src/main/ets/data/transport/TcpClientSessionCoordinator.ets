@@ -29,12 +29,22 @@ export class TcpClientSessionCoordinator {
   }
 
   async connectSession(sessionId: string, params: SocketConnectionParams): Promise<Result<void>> {
+    const transport = new TcpClientTransportSession(sessionId);
+    if (params.mode === 'tls') {
+      const secured = await this.tcpDataSource.connectTls(params.host, params.port, params.timeoutMs);
+      if (!secured.success || secured.value === undefined) {
+        return Result.fail(secured.error ??
+          new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'TLS connect failed'));
+      }
+      transport.bindTls(secured.value);
+      this.transportRegistry.register(sessionId, transport);
+      return Result.ok(undefined);
+    }
     const connected = await this.tcpDataSource.connectWithTimeout(params.host, params.port, params.timeoutMs);
     if (!connected.success || connected.value === undefined) {
       return Result.fail(connected.error ??
         new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'Connect failed'));
     }
-    const transport = new TcpClientTransportSession(sessionId);
     transport.bindSocket(connected.value);
     this.transportRegistry.register(sessionId, transport);
     return Result.ok(undefined);

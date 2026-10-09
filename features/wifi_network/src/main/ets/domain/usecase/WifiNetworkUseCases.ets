@@ -1,4 +1,4 @@
-import { Result, ResultError, Subscription } from 'common_core';
+import { Observable, Result, ResultError, Subscription } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
@@ -21,7 +21,7 @@ import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
 import { WifiScanPhase } from '../model/WifiScanState';
 import { NetworkDiagnosticPlan, DiagnosticStepResult } from '../model/NetworkDiagnosticModels';
 import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';
-import { WebSocketConfig, WebSocketMessageRecord } from '../model/WebSocketModels';
+import { WebSocketClientPhase, WebSocketConfig, WebSocketMessageRecord } from '../model/WebSocketModels';
 import { LanDiscoveryConfig, LanHostResult, PortScanConfig, PortProbeResult } from '../model/LanDiscoveryModels';
 import { SocketConnectionParams } from '../model/SocketModels';
 
@@ -241,6 +241,14 @@ export class OpenWebSocketUseCase {
 
   async sendText(text: string): Promise<Result<void>> {
     return this.repository.getWebSocketDataSource().sendText(text);
+  }
+
+  observePhase(): Observable<WebSocketClientPhase> {
+    return this.repository.getWebSocketDataSource().observePhase();
+  }
+
+  observeMessages(): Observable<WebSocketMessageRecord[]> {
+    return this.repository.getWebSocketDataSource().observeMessages();
   }
 
   async disconnect(sessionId: string = ''): Promise<Result<void>> {

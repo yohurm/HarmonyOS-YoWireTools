@@ -153,6 +153,11 @@ export class OpenMulticastSessionUseCase {
     MulticastSessionCoordinator.getInstance().attach(created.value.id, joined.value);
     return Result.ok(new MulticastSessionOpenResult(created.value.id));
   }
+
+  setMessageListener(listener: (text: string) => void): void {
+    MulticastSessionCoordinator.getInstance().setMessageListener(listener);
+  }
+
   getDataSource(): MulticastSocketDataSource {
     return this.multicastDataSource;
   }

@@ -1,4 +1,5 @@
-import { ResultError, TimeUtil } from 'common_core';
+import { ResultError, Subscription, TimeUtil } from 'common_core';
+import { TransportState, TransportStateSnapshot } from 'debug_core';
 import {
   AbilityContextRegistry,
   AppLifecycleState,
@@ -14,10 +15,33 @@ import { WifiCandidateDraft, WifiFeatureFact, WifiIpv4Facts, WifiIpv6Facts } fro
 import { WifiLinkedInfoSnapshot } from '../../domain/model/WifiLinkedInfoSnapshot';
 import { NetworkStateSnapshot } from '../../domain/model/NetworkStateSnapshot';
 import { WifiChannelOccupancyRow } from '../../domain/model/WifiDebugFacts';
+import { DiscoveredNetworkService } from '../../domain/model/MqttModels';
+import { MulticastSessionConfig, SocketConnectionParams, UdpSessionConfig } from '../../domain/model/SocketModels';
+import {
+  WebSocketClientPhase,
+  WebSocketConfig,
+  WebSocketMessageRecord,
+  WebSocketServerClientRecord,
+  WebSocketServerConfigModel
+} from '../../domain/model/WebSocketModels';
 import { WifiDebugUseCases } from '../../domain/usecase/WifiDebugUseCases';
-import { ExecuteHttpRequestUseCase } from '../../domain/usecase/WifiNetworkUseCases';
-import { StartMdnsDiscoveryUseCase, StopMdnsDiscoveryUseCase } from '../../domain/usecase/WifiNetworkSessionUseCases';
-import { StartPortScanUseCase } from '../../domain/usecase/WifiNetworkUseCases';
+import {
+  ConnectTcpClientUseCase,
+  DisconnectTcpClientSessionUseCase,
+  OpenTcpServerUseCase,
+  StopTcpServerSessionUseCase
+} from '../../domain/usecase/WifiNetworkExtendedUseCases';
+import { ExecuteHttpRequestUseCase, OpenWebSocketUseCase, StartPortScanUseCase } from '../../domain/usecase/WifiNetworkUseCases';
+import {
+  CloseUdpSessionUseCase,
+  LeaveMulticastSessionUseCase,
+  OpenMulticastSessionUseCase,
+  OpenUdpSessionUseCase,
+  OpenWebSocketServerUseCase,
+  StartMdnsDiscoveryUseCase,
+  StopMdnsDiscoveryUseCase,
+  StopWebSocketServerUseCase
+} from '../../domain/usecase/WifiNetworkSessionUseCases';
 import { HttpRequestDraft } from '../../domain/model/HttpModels';
 import { PortProbeResult, PortScanConfig } from '../../domain/model/LanDiscoveryModels';
 import { WifiChannelOccupancy } from '../../domain/service/WifiChannelOccupancy';
@@ -132,6 +156,11 @@ export class WifiDebugViewModel {
   @Trace openGroups: string[] = [];
   @Trace httpCancelled: boolean = false;
   @Trace selectedTitle: string = '';
+  @Trace payloadInput: string = '';
+  @Trace tcpSendEnabled: boolean = false;
+  @Trace tlsMark: string = '';
+  @Trace wsSendEnabled: boolean = false;
+  @Trace wsServerLine: string = '未启动';
 
   private readonly repository: WifiNetworkRepository = WifiNetworkRepository.getInstance();
   private readonly debugCases: WifiDebugUseCases = new WifiDebugUseCases(this.repository);
@@ -139,7 +168,30 @@ export class WifiDebugViewModel {
   private readonly portCase: StartPortScanUseCase = new StartPortScanUseCase();
   private readonly mdnsCase: StartMdnsDiscoveryUseCase = new StartMdnsDiscoveryUseCase();
   private readonly stopMdnsCase: StopMdnsDiscoveryUseCase = new StopMdnsDiscoveryUseCase();
+  private readonly tcpCase: ConnectTcpClientUseCase = new ConnectTcpClientUseCase();
+  private readonly disconnectTcpCase: DisconnectTcpClientSessionUseCase = new DisconnectTcpClientSessionUseCase();
+  private readonly udpCase: OpenUdpSessionUseCase = new OpenUdpSessionUseCase();
+  private readonly closeUdpCase: CloseUdpSessionUseCase = new CloseUdpSessionUseCase();
+  private readonly tcpServerCase: OpenTcpServerUseCase = new OpenTcpServerUseCase();
+  private readonly stopTcpServerCase: StopTcpServerSessionUseCase = new StopTcpServerSessionUseCase();
+  private readonly wsCase: OpenWebSocketUseCase = new OpenWebSocketUseCase();
+  private readonly wsServerCase: OpenWebSocketServerUseCase = new OpenWebSocketServerUseCase();
+  private readonly stopWsServerCase: StopWebSocketServerUseCase = new StopWebSocketServerUseCase();
+  private readonly multicastCase: OpenMulticastSessionUseCase = new OpenMulticastSessionUseCase();
+  private readonly leaveMulticastCase: LeaveMulticastSessionUseCase = new LeaveMulticastSessionUseCase();
   private subscribed: boolean = false;
+  private tcpSessionId: string = '';
+  private tcpStateSub: Subscription | undefined;
+  private lanSub: Subscription | undefined;
+  private lanOnlineNames: string[] = [];
+  private lanLeftLines: string[] = [];
+  private wsPhaseSub: Subscription | undefined;
+  private wsMessageSub: Subscription | undefined;
+  private wsLogged: number = 0;
+  private wsPrime: boolean = false;
+  private wsServerSub: Subscription | undefined;
+  private wsSeen: string[] = [];
+  private multicastSessionId: string = '';
   private peersMacGranted: boolean = false;
   private cacheReadAtMs: number = 0;
   private backgroundBlocked: boolean = false;
@@ -158,6 +210,7 @@ export class WifiDebugViewModel {
     this.appendLog('openWifiDebug', 'noRuntimeDialog', '');
     this.pageState = YoPageState.CONTENT;
     this.wifiActiveLabel = '未读取';
+    this.refreshWsServerGate();
     this.subscribe();
     this.repository.startNetObservation((snapshot: NetworkStateSnapshot) => {
       this.netIdLabel = snapshot.hasDefaultNet ? snapshot.netType : '无';
@@ -172,7 +225,9 @@ export class WifiDebugViewModel {
   leave(): void {
     this.unsubscribe();
     this.repository.stopNetObservation();
+    this.unbindLan();
     void this.stopMdnsCase.execute();
+    this.releaseInspect();
   }
 
   subscribe(): void {
@@ -553,9 +608,27 @@ export class WifiDebugViewModel {
     this.appendLog('portScan', 'cancelled', '');
   }
 
-  refuseTrace(): void {
-    this.addressLines = ['失败码 201。未授予 ACCESS_NET_TRACE_INFO，不显示跳数表。'];
-    this.appendLog('traceRoute', 'denied', '201');
+  async runTrace(): Promise<void> {
+    const result = await this.repository.queryTraceRoute(this.hostInput);
+    if (!result.success || result.value === undefined) {
+      const message = result.error !== undefined ?
+        result.error.message : '失败码 201。未授予 ACCESS_NET_TRACE_INFO，不显示跳数表。';
+      this.addressLines = [message];
+      this.appendLog('traceRoute', 'denied', result.error !== undefined ? result.error.nativeCode : '201');
+      return;
+    }
+    const lines: string[] = [];
+    const hops = result.value;
+    const limit = hops.length > WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS ?
+      WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS : hops.length;
+    for (let i = 0; i < limit; i++) {
+      lines.push(`跳数 ${hops[i].jumpNo} 地址 ${hops[i].address} RTT ${hops[i].rttText}`);
+    }
+    if (lines.length === 0) {
+      lines.push(WifiNetworkConstants.SYSTEM_NOT_RETURNED);
+    }
+    this.addressLines = lines;
+    this.appendLog('traceRoute', 'shown', '');
   }
 
   refuseSystemPorts(): void {
@@ -673,17 +746,15 @@ export class WifiDebugViewModel {
       return;
     }
     this.lanError = '';
-    const services = this.mdnsCase.getDataSource().getServices();
-    const lines: string[] = [];
-    for (let i = 0; i < services.length; i++) {
-      lines.push(`${services[i].name} ${services[i].type} ${services[i].port}`);
-    }
-    this.lanLines = lines;
+    this.lanLeftLines = [];
+    this.lanOnlineNames = [];
+    this.bindLan();
     this.appendLog('mdnsDiscover', 'found', '');
   }
 
   async stopLan(): Promise<void> {
     await this.stopMdnsCase.execute();
+    this.unbindLan();
     this.appendLog('mdnsStop', 'stopped', '');
   }
 
@@ -877,9 +948,12 @@ export class WifiDebugViewModel {
       `MTU ${value.mtu}`,
       `地址 ${value.linkAddressState}`,
       `DNS ${value.dnsState}`,
-      `路由 ${value.routeState}`,
-      `地址族 ${value.familyLine}`
+      `路由 ${value.routeState}`
     ];
+    const familyLines = this.familyDisplay(value.familyLine);
+    for (let i = 0; i < familyLines.length; i++) {
+      lines.push(familyLines[i]);
+    }
     for (let i = 0; i < value.routes.length; i++) {
       const route = value.routes[i];
       lines.push(`${route.destination} 网关 ${route.gateway} 默认 ${route.isDefault ? '是' : '否'}`);
@@ -952,6 +1026,231 @@ export class WifiDebugViewModel {
     this.appendLog('uidTraffic', 'denied', '201');
   }
 
+  async connectInspectTcp(): Promise<void> {
+    await this.disconnectInspectTcp();
+    const port = Number(this.portInput);
+    if (this.hostInput.length === 0 || isNaN(port)) {
+      this.tcpSendEnabled = false;
+      this.pushInspect('失败可见，没有成功字样');
+      this.appendLog('tcpSend', 'failed', '');
+      return;
+    }
+    const connected = await this.tcpCase.execute(new SocketConnectionParams('tcp', port, this.hostInput));
+    if (!connected.success || connected.value === undefined) {
+      this.tcpSendEnabled = false;
+      this.tlsMark = '';
+      const message = connected.error !== undefined ? connected.error.message : '失败';
+      this.pushInspect(message);
+      this.appendLog('tcpSend', 'failed', connected.error !== undefined ? connected.error.nativeCode : '');
+      return;
+    }
+    this.tcpSessionId = connected.value;
+    this.tcpSendEnabled = true;
+    this.tlsMark = '';
+    this.bindTcpState(connected.value);
+    this.pushInspect(`去向 ${this.hostInput} 端口 ${port} 已连接`);
+    this.appendLog('tcpConnect', 'connected', '');
+  }
+
+  async sendInspectTcp(): Promise<void> {
+    if (!this.tcpSendEnabled || this.tcpSessionId.length === 0) {
+      this.pushInspect('发送不可用');
+      return;
+    }
+    const written = await this.tcpCase.sendText(this.tcpSessionId, this.payloadInput);
+    if (!written.success) {
+      this.pushInspect(written.message.length > 0 ? written.message : '失败');
+      this.appendLog('tcpSend', 'failed', written.nativeCode);
+      return;
+    }
+    const line = `去向 ${this.hostInput} 端口 ${this.portInput} 字节数 ${written.bytesWritten} 成功`;
+    this.pushInspect(line);
+    this.appendLog('tcpSend', 'success', '');
+  }
+
+  async disconnectInspectTcp(): Promise<void> {
+    this.tcpSendEnabled = false;
+    this.unbindTcpState();
+    if (this.tcpSessionId.length > 0) {
+      await this.disconnectTcpCase.execute(this.tcpSessionId);
+      this.tcpSessionId = '';
+    }
+  }
+
+  async sendInspectUdp(): Promise<void> {
+    const port = Number(this.portInput);
+    if (this.hostInput.length === 0 || isNaN(port)) {
+      this.pushInspect('UDP 发送失败');
+      this.appendLog('udpSend', 'failed', '');
+      return;
+    }
+    const opened = await this.udpCase.execute(new UdpSessionConfig(0, this.hostInput, port, false));
+    if (!opened.success || opened.value === undefined) {
+      const message = opened.error !== undefined ? opened.error.message : '发送失败';
+      this.pushInspect(`UDP ${this.hostInput} ${message}`);
+      this.appendLog('udpSend', 'failed', opened.error !== undefined ? opened.error.nativeCode : '');
+      return;
+    }
+    const written = await opened.value.transport.write(this.textBytes(this.payloadInput));
+    await this.closeUdpCase.execute(opened.value.sessionId);
+    if (!written.success) {
+      this.pushInspect(`UDP ${this.hostInput} ${written.message} ${written.nativeCode}`);
+      this.appendLog('udpSend', 'failed', written.nativeCode);
+      return;
+    }
+    const line = `UDP ${this.hostInput} 字节数 ${written.bytesWritten}`;
+    this.pushInspect(line);
+    this.appendLog('udpSend', line, '');
+  }
+
+  async startInspectTcpServer(): Promise<void> {
+    const port = Number(this.portInput);
+    if (isNaN(port)) {
+      this.pushInspect('监听端口无效');
+      return;
+    }
+    this.tcpServerCase.watchClients((address: string, remotePort: number) => {
+      this.pushInspect(`对端 ${address}:${remotePort} 已连入`);
+    }, (address: string, remotePort: number, byteCount: number) => {
+      this.pushInspect(`对端 ${address}:${remotePort} 字节数 ${byteCount}`);
+      this.appendLog('tcpAccept', `${address} ${byteCount}`, '');
+    });
+    const started = await this.tcpServerCase.execute(port);
+    if (!started.success) {
+      this.pushInspect(started.error !== undefined ? started.error.message : '监听失败');
+      this.appendLog('tcpAccept', 'failed', '');
+      return;
+    }
+    this.pushInspect(`监听 ${port}`);
+    this.appendLog('tcpAccept', 'listening', '');
+  }
+
+  async stopInspectTcpServer(): Promise<void> {
+    await this.stopTcpServerCase.execute();
+    this.pushInspect('停止监听');
+  }
+
+  async connectInspectTls(): Promise<void> {
+    await this.disconnectInspectTcp();
+    this.tlsMark = '';
+    const port = Number(this.portInput);
+    if (this.hostInput.length === 0 || isNaN(port)) {
+      this.tlsMark = 'failed';
+      this.pushInspect('失败可见，未标为已加密成功');
+      this.appendLog('tlsConnect', 'failed', '');
+      return;
+    }
+    const connected = await this.tcpCase.execute(new SocketConnectionParams('tls', port, this.hostInput));
+    if (!connected.success || connected.value === undefined) {
+      this.tcpSendEnabled = false;
+      this.tlsMark = 'failed';
+      const message = connected.error !== undefined ? connected.error.message : '失败';
+      this.pushInspect(`${message}。未标为已加密成功`);
+      this.appendLog('tlsConnect', 'failed', connected.error !== undefined ? connected.error.nativeCode : '');
+      return;
+    }
+    this.tcpSessionId = connected.value;
+    this.tcpSendEnabled = true;
+    this.tlsMark = 'TLS';
+    this.bindTcpState(connected.value);
+    this.pushInspect(`TLS ${this.hostInput}:${port}`);
+    this.appendLog('tlsConnect', 'TLS', '');
+  }
+
+  async connectInspectWs(): Promise<void> {
+    this.wsSendEnabled = false;
+    const connected = await this.wsCase.execute(new WebSocketConfig(this.urlInput));
+    if (!connected.success) {
+      this.pushInspect(connected.error !== undefined ? connected.error.message : '失败');
+      this.appendLog('wsClient', 'failed', '');
+      return;
+    }
+    this.bindWs();
+    this.appendLog('wsClient', 'connecting', '');
+  }
+
+  async sendInspectWs(): Promise<void> {
+    if (!this.wsSendEnabled) {
+      this.pushInspect('发送不可用');
+      return;
+    }
+    const sent = await this.wsCase.sendText(this.payloadInput);
+    if (!sent.success) {
+      this.wsSendEnabled = false;
+      this.pushInspect(sent.error !== undefined ? sent.error.message : '发送不可用');
+      this.appendLog('wsClient', 'sendFailed', '');
+      return;
+    }
+    this.appendLog('wsClient', 'sent', '');
+  }
+
+  async disconnectInspectWs(): Promise<void> {
+    this.wsSendEnabled = false;
+    await this.wsCase.disconnect();
+    this.pushInspect('断开');
+    this.appendLog('wsClient', 'closed', '');
+  }
+
+  async startInspectWsServer(): Promise<void> {
+    const port = Number(this.portInput);
+    if (isNaN(port)) {
+      this.wsServerLine = '端口无效';
+      return;
+    }
+    this.wsSeen = [];
+    this.bindWsServer();
+    const started = await this.wsServerCase.execute(new WebSocketServerConfigModel(port));
+    if (!started.success) {
+      const message = started.error !== undefined ? started.error.message : '失败';
+      if (message === '当前系统版本没有该接口') {
+        this.wsServerLine = '当前系统不可用';
+      } else {
+        this.wsServerLine = message;
+      }
+      this.appendLog('wsServer', this.wsServerLine, '');
+      return;
+    }
+    this.wsServerLine = '监听中';
+    this.appendLog('wsServer', 'listening', '');
+  }
+
+  async stopInspectWsServer(): Promise<void> {
+    await this.stopWsServerCase.execute();
+    if (this.repository.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
+      this.wsServerLine = '当前系统不可用';
+    } else {
+      this.wsServerLine = '未启动';
+    }
+  }
+
+  async joinMulticast(): Promise<void> {
+    const port = Number(this.portInput);
+    const group = this.hostInput.length > 0 ? this.hostInput : WifiNetworkConstants.DEFAULT_MULTICAST_GROUP;
+    if (isNaN(port)) {
+      this.pushInspect('组播端口无效');
+      return;
+    }
+    if (this.multicastSessionId.length > 0) {
+      await this.leaveMulticastCase.execute(this.multicastSessionId);
+      this.multicastSessionId = '';
+    }
+    this.multicastCase.setMessageListener((text: string) => {
+      this.pushInspect(`组地址 ${group} ${text}`);
+      this.appendLog('multicast', group, '');
+    });
+    const joined = await this.multicastCase.execute(new MulticastSessionConfig(port, group, 1));
+    if (!joined.success || joined.value === undefined) {
+      const code = joined.error !== undefined ? joined.error.nativeCode : '';
+      const message = joined.error !== undefined ? joined.error.message : '加入失败';
+      this.pushInspect(`Socket ${code} ${message}`);
+      this.appendLog('multicast', message, code);
+      return;
+    }
+    this.multicastSessionId = joined.value.sessionId;
+    this.pushInspect(`组地址 ${group}`);
+    this.appendLog('multicast', group, '');
+  }
+
   refuseStaDisconnect(): void {
     this.connectMessage = '需要系统应用或企业权限。系统连接保持到用户在系统设置中断开。';
     this.appendLog('disconnectSta', 'refused', '');
@@ -960,6 +1259,204 @@ export class WifiDebugViewModel {
   refuseSavedPsk(): void {
     this.connectMessage = '企业权限。不显示 PSK。';
     this.appendLog('readSavedPsk', 'denied', '');
+  }
+
+  private refreshWsServerGate(): void {
+    if (this.repository.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
+      this.wsServerLine = '当前系统不可用';
+    }
+  }
+
+  private familyDisplay(familyLine: string): string[] {
+    if (familyLine === '当前系统无此字段') {
+      this.appendLog('readFamily', 'absent', '');
+      return ['IPv4 当前系统无此字段', 'IPv6 当前系统无此字段'];
+    }
+    this.appendLog('readFamily', 'shown', '');
+    const parts = familyLine.split('；');
+    const lines: string[] = [];
+    for (let i = 0; i < parts.length; i++) {
+      lines.push(parts[i]);
+    }
+    return lines;
+  }
+
+  private bindLan(): void {
+    this.unbindLan();
+    this.lanSub = this.mdnsCase.getDataSource().observeServices().subscribe((services: DiscoveredNetworkService[]) => {
+      this.applyLan(services);
+    }, true);
+  }
+
+  private unbindLan(): void {
+    if (this.lanSub !== undefined) {
+      this.lanSub.dispose();
+      this.lanSub = undefined;
+    }
+  }
+
+  private applyLan(services: DiscoveredNetworkService[]): void {
+    const online: string[] = [];
+    const lines: string[] = [];
+    for (let i = 0; i < services.length; i++) {
+      const item = services[i];
+      online.push(item.name);
+      lines.push(`${item.name} ${item.type} ${item.port}`);
+    }
+    const left: string[] = [];
+    for (let i = 0; i < this.lanLeftLines.length; i++) {
+      left.push(this.lanLeftLines[i]);
+    }
+    for (let i = 0; i < this.lanOnlineNames.length; i++) {
+      const name = this.lanOnlineNames[i];
+      let still = false;
+      for (let j = 0; j < online.length; j++) {
+        if (online[j] === name) {
+          still = true;
+        }
+      }
+      if (!still) {
+        const marked = `${name} 离开`;
+        left.push(marked);
+        this.appendLog('serviceLost', marked, '');
+      }
+    }
+    this.lanOnlineNames = online;
+    this.lanLeftLines = left;
+    for (let i = 0; i < left.length; i++) {
+      lines.push(left[i]);
+    }
+    this.lanLines = lines;
+  }
+
+  private bindTcpState(sessionId: string): void {
+    this.unbindTcpState();
+    const stream = this.tcpCase.observeState(sessionId);
+    if (stream === undefined) {
+      return;
+    }
+    this.tcpStateSub = stream.subscribe((snapshot: TransportStateSnapshot) => {
+      if (snapshot.state === TransportState.DISCONNECTED && snapshot.reason === '关闭') {
+        this.tcpSendEnabled = false;
+        this.pushInspect('关闭');
+        this.appendLog('tcpClose', '关闭', '');
+      }
+    }, true);
+  }
+
+  private unbindTcpState(): void {
+    if (this.tcpStateSub !== undefined) {
+      this.tcpStateSub.dispose();
+      this.tcpStateSub = undefined;
+    }
+  }
+
+  private bindWs(): void {
+    this.unbindWs();
+    this.wsPrime = true;
+    this.wsPhaseSub = this.wsCase.observePhase().subscribe((phase: WebSocketClientPhase) => {
+      this.wsSendEnabled = phase === WebSocketClientPhase.OPEN;
+    }, true);
+    this.wsMessageSub = this.wsCase.observeMessages().subscribe((messages: WebSocketMessageRecord[]) => {
+      if (this.wsPrime) {
+        this.wsPrime = false;
+        this.wsLogged = messages.length;
+        return;
+      }
+      for (let i = this.wsLogged; i < messages.length; i++) {
+        const item = messages[i];
+        const direction = item.direction === 'outbound' ? '发出' : '收到';
+        this.pushInspect(`${direction} ${item.payload}`);
+      }
+      this.wsLogged = messages.length;
+    }, true);
+  }
+
+  private unbindWs(): void {
+    if (this.wsPhaseSub !== undefined) {
+      this.wsPhaseSub.dispose();
+      this.wsPhaseSub = undefined;
+    }
+    if (this.wsMessageSub !== undefined) {
+      this.wsMessageSub.dispose();
+      this.wsMessageSub = undefined;
+    }
+  }
+
+  private bindWsServer(): void {
+    if (this.wsServerSub !== undefined) {
+      this.wsServerSub.dispose();
+    }
+    this.wsServerSub = this.wsServerCase.getDataSource().observeClients()
+      .subscribe((clients: WebSocketServerClientRecord[]) => {
+        this.applyWsServerClients(clients);
+      }, false);
+  }
+
+  private applyWsServerClients(clients: WebSocketServerClientRecord[]): void {
+    for (let i = 0; i < clients.length; i++) {
+      const client = clients[i];
+      const connectKey = `c:${client.id}`;
+      if (!this.wsSeenHas(connectKey)) {
+        this.wsSeen.push(connectKey);
+        this.pushInspect(`客户端 ${client.remoteHost}:${client.remotePort} 已连接`);
+      }
+      if (client.lastMessage.length > 0) {
+        const messageKey = `m:${client.id}:${client.lastSeenAtMs}`;
+        if (!this.wsSeenHas(messageKey)) {
+          this.wsSeen.push(messageKey);
+          this.pushInspect(`客户端 ${client.remoteHost} 消息 ${client.lastMessage}`);
+        }
+      }
+    }
+  }
+
+  private wsSeenHas(key: string): boolean {
+    for (let i = 0; i < this.wsSeen.length; i++) {
+      if (this.wsSeen[i] === key) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private releaseInspect(): void {
+    this.unbindTcpState();
+    this.tcpSendEnabled = false;
+    if (this.tcpSessionId.length > 0) {
+      void this.disconnectTcpCase.execute(this.tcpSessionId);
+      this.tcpSessionId = '';
+    }
+    this.unbindWs();
+    this.wsSendEnabled = false;
+    void this.wsCase.disconnect();
+    if (this.wsServerSub !== undefined) {
+      this.wsServerSub.dispose();
+      this.wsServerSub = undefined;
+    }
+    void this.stopWsServerCase.execute();
+    void this.stopTcpServerCase.execute();
+    if (this.multicastSessionId.length > 0) {
+      void this.leaveMulticastCase.execute(this.multicastSessionId);
+      this.multicastSessionId = '';
+    }
+  }
+
+  private pushInspect(line: string): void {
+    const next: string[] = [];
+    for (let i = 0; i < this.inspectLines.length; i++) {
+      next.push(this.inspectLines[i]);
+    }
+    next.push(line);
+    this.inspectLines = next;
+  }
+
+  private textBytes(text: string): Uint8Array {
+    const bytes = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) {
+      bytes[i] = text.charCodeAt(i) & 0xff;
+    }
+    return bytes;
   }
 
   private noteNetEvent(name: string, detail: string): void {

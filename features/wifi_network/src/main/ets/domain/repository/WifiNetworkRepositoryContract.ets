@@ -8,7 +8,7 @@ import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';
 import { WebSocketConfig } from '../model/WebSocketModels';
 import { MqttConnectConfig } from '../model/MqttModels';
 import { LanDiscoveryConfig, LanHostResult, PortScanConfig, PortProbeResult } from '../model/LanDiscoveryModels';
-import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts } from '../model/NetworkInspectFacts';
+import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts, TraceHopFact } from '../model/NetworkInspectFacts';
 import { NetworkStateSnapshot } from '../model/NetworkStateSnapshot';
 import {
   WifiCandidateDraft,
@@ -70,6 +70,7 @@ export interface WifiNetworkRepositoryContract {
   readHttpProxy(): Result<HttpProxyFacts>;
   resolveHost(host: string, family: number): Promise<Result<DnsLookupFacts>>;
   queryProbe(destination: string): Promise<Result<ProbeFacts>>;
+  queryTraceRoute(destination: string): Promise<Result<TraceHopFact[]>>;
   readSelfWifiTraffic(startMs: number, endMs: number): Promise<Result<string>>;
   abortHttp(): void;
   startNetObservation(

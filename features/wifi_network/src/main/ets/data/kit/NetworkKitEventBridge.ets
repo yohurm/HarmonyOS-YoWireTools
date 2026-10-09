@@ -141,6 +141,48 @@ export class NetworkKitEventBridge {
     }, 'tcp.message');
   }
 
+  static subscribeTcpClose(tcp: socket.TCPSocket, handler: () => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tcp.on('close', handler);
+    }, 'tcp.close');
+  }
+
+  static unsubscribeTcpClose(tcp: socket.TCPSocket, handler: () => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      tcp.off('close', handler);
+    }, 'tcp.close');
+  }
+
+  static subscribeTlsMessage(
+    tls: socket.TLSSocket,
+    handler: (value: socket.SocketMessageInfo) => void
+  ): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tls.on('message', handler);
+    }, 'tls.message');
+  }
+
+  static unsubscribeTlsMessage(
+    tls: socket.TLSSocket,
+    handler: (value: socket.SocketMessageInfo) => void
+  ): void {
+    KitEventSubscription.unsubscribe(() => {
+      tls.off('message', handler);
+    }, 'tls.message');
+  }
+
+  static subscribeTlsClose(tls: socket.TLSSocket, handler: () => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tls.on('close', handler);
+    }, 'tls.close');
+  }
+
+  static unsubscribeTlsClose(tls: socket.TLSSocket, handler: () => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      tls.off('close', handler);
+    }, 'tls.close');
+  }
+
   static subscribeMulticastMessage(
     multicast: socket.MulticastSocket,
     handler: (value: socket.SocketMessageInfo) => void
