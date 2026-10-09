@@ -12,6 +12,7 @@ export {
   OpenTcpClientUseCase
 } from './src/main/ets/domain/usecase/WifiNetworkUseCases';
 export { LanDiscoveryFacade } from './src/main/ets/domain/usecase/LanDiscoveryFacade';
+export { LoadWifiOverviewUseCase, WifiOverviewLoaded } from './src/main/ets/domain/usecase/LoadWifiOverviewUseCase';
 export {
   OpenTcpServerUseCase,
   OpenMqttSessionUseCase,

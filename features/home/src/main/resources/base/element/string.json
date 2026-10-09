@@ -3,6 +3,110 @@
     {
       "name": "home_title",
       "value": "工作台"
+    },
+    {
+      "name": "home_section_modules",
+      "value": "调试入口"
+    },
+    {
+      "name": "home_section_sessions",
+      "value": "进行中的会话"
+    },
+    {
+      "name": "home_entry_bluetooth_title",
+      "value": "蓝牙"
+    },
+    {
+      "name": "home_entry_bluetooth_desc",
+      "value": "经典蓝牙与 BLE"
+    },
+    {
+      "name": "home_entry_wifi_title",
+      "value": "网络"
+    },
+    {
+      "name": "home_entry_wifi_desc",
+      "value": "Wi-Fi 连接与周围网络"
+    },
+    {
+      "name": "home_entry_nearlink_title",
+      "value": "星闪"
+    },
+    {
+      "name": "home_entry_nearlink_desc",
+      "value": "扫描星闪设备"
+    },
+    {
+      "name": "home_permission_granted",
+      "value": "已授权"
+    },
+    {
+      "name": "home_permission_missing",
+      "value": "未授权"
+    },
+    {
+      "name": "home_session_empty_title",
+      "value": "没有进行中的会话"
+    },
+    {
+      "name": "home_session_empty_message",
+      "value": "从蓝牙、网络或星闪开始调试后，会话会显示在这里。"
+    },
+    {
+      "name": "home_error_title",
+      "value": "工作台没有加载出来"
+    },
+    {
+      "name": "home_error_cause",
+      "value": "会话列表读取失败。"
+    },
+    {
+      "name": "home_error_next",
+      "value": "重试加载。若仍然失败，重新打开应用。"
+    },
+    {
+      "name": "home_protocol_spp",
+      "value": "经典蓝牙串口"
+    },
+    {
+      "name": "home_protocol_classic_scan",
+      "value": "经典蓝牙扫描"
+    },
+    {
+      "name": "home_protocol_ble_scan",
+      "value": "BLE 扫描"
+    },
+    {
+      "name": "home_protocol_ble_gatt",
+      "value": "BLE GATT"
+    },
+    {
+      "name": "home_protocol_ble_uart",
+      "value": "BLE 串口"
+    },
+    {
+      "name": "home_protocol_wifi_scan",
+      "value": "Wi-Fi 扫描"
+    },
+    {
+      "name": "home_protocol_network",
+      "value": "网络调试"
+    },
+    {
+      "name": "home_protocol_nearlink_scan",
+      "value": "星闪扫描"
+    },
+    {
+      "name": "home_protocol_ssap",
+      "value": "星闪 SSAP"
+    },
+    {
+      "name": "home_protocol_data_transfer",
+      "value": "星闪数传"
+    },
+    {
+      "name": "home_protocol_other",
+      "value": "调试会话"
     }
   ]
 }

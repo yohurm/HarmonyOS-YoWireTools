@@ -67,6 +67,30 @@
     {
       "name": "more_hub_title",
       "value": "更多"
+    },
+    {
+      "name": "more_section_system",
+      "value": "系统开关"
+    },
+    {
+      "name": "more_entry_bluetooth_settings_title",
+      "value": "蓝牙设置"
+    },
+    {
+      "name": "more_entry_bluetooth_settings_desc",
+      "value": "打开系统蓝牙页面"
+    },
+    {
+      "name": "more_entry_wifi_settings_title",
+      "value": "Wi-Fi 设置"
+    },
+    {
+      "name": "more_entry_wifi_settings_desc",
+      "value": "打开系统 Wi-Fi 页面"
+    },
+    {
+      "name": "more_settings_unavailable",
+      "value": "应用还不能打开系统设置"
     }
   ]
 }

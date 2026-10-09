@@ -16,8 +16,9 @@ import {
 import { PermissionDecision } from 'common_platform';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
-import { NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
+import { NearLinkAdapterSnapshot, NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
+import { NearLinkScanPhase } from '../model/NearLinkScanPhase';
 import { CapabilityResult } from 'common_platform';
 import { NearLinkCapabilityService } from '../service/NearLinkCapabilityService';
 import { NearLinkScanLogger } from '../service/NearLinkScanLogger';
@@ -167,5 +168,41 @@ export class ResolveNearLinkCapabilityUseCase {
       readyForScan,
       readyForConnect
     ));
+  }
+}
+
+export class ObserveNearLinkScanPhaseUseCase {
+  private readonly repository: NearLinkRepository;
+
+  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(listener: (phase: NearLinkScanPhase) => void): Subscription {
+    return this.repository.observeScanPhase().subscribe(listener);
+  }
+}
+
+export class ReadNearLinkScanFailureUseCase {
+  private readonly repository: NearLinkRepository;
+
+  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(): string {
+    return this.repository.getLastScanFailureCode();
+  }
+}
+
+export class ObserveNearLinkAdapterUseCase {
+  private readonly repository: NearLinkRepository;
+
+  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(listener: (snapshot: NearLinkAdapterSnapshot) => void): Subscription {
+    return this.repository.observeAdapterState().subscribe(listener, false);
   }
 }

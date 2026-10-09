@@ -3,6 +3,170 @@
     {
       "name": "nl_title_overview",
       "value": "星闪"
+    },
+    {
+      "name": "nl_status_support",
+      "value": "能力"
+    },
+    {
+      "name": "nl_status_supported",
+      "value": "支持"
+    },
+    {
+      "name": "nl_status_unsupported",
+      "value": "不支持"
+    },
+    {
+      "name": "nl_status_switch",
+      "value": "开关"
+    },
+    {
+      "name": "nl_status_on",
+      "value": "已开启"
+    },
+    {
+      "name": "nl_status_off",
+      "value": "已关闭"
+    },
+    {
+      "name": "nl_status_permission",
+      "value": "权限"
+    },
+    {
+      "name": "nl_status_granted",
+      "value": "已授权"
+    },
+    {
+      "name": "nl_status_denied",
+      "value": "未授权"
+    },
+    {
+      "name": "nl_unsupported_message",
+      "value": "这台设备没有星闪，扫描不可用。"
+    },
+    {
+      "name": "nl_filter_placeholder",
+      "value": "设备名，可留空"
+    },
+    {
+      "name": "nl_action_scan",
+      "value": "开始扫描"
+    },
+    {
+      "name": "nl_action_stop",
+      "value": "停止扫描"
+    },
+    {
+      "name": "nl_scan_disabled_unsupported",
+      "value": "当前设备不支持星闪"
+    },
+    {
+      "name": "nl_scan_disabled_switch",
+      "value": "先打开星闪"
+    },
+    {
+      "name": "nl_scan_disabled_capability",
+      "value": "扫描能力不可用"
+    },
+    {
+      "name": "nl_section_devices",
+      "value": "扫描到的设备"
+    },
+    {
+      "name": "nl_device_unnamed",
+      "value": "未命名设备"
+    },
+    {
+      "name": "nl_label_rssi",
+      "value": "信号"
+    },
+    {
+      "name": "nl_device_rssi_unknown",
+      "value": "未知"
+    },
+    {
+      "name": "nl_device_connectable",
+      "value": "可连接"
+    },
+    {
+      "name": "nl_device_not_connectable",
+      "value": "不可连接"
+    },
+    {
+      "name": "nl_device_favorite",
+      "value": "已收藏"
+    },
+    {
+      "name": "nl_empty_title",
+      "value": "没有星闪设备"
+    },
+    {
+      "name": "nl_empty_message",
+      "value": "开始扫描后，附近设备会列在这里。旧系统可能要求填写设备名。"
+    },
+    {
+      "name": "nl_empty_scanning",
+      "value": "正在扫描，设备出现后会列在这里。"
+    },
+    {
+      "name": "nl_error_filter_title",
+      "value": "需要扫描条件"
+    },
+    {
+      "name": "nl_error_filter_cause",
+      "value": "当前系统不允许空过滤扫描。"
+    },
+    {
+      "name": "nl_error_filter_next",
+      "value": "填写设备名后再扫描。"
+    },
+    {
+      "name": "nl_error_busy_title",
+      "value": "扫描仍在进行"
+    },
+    {
+      "name": "nl_error_busy_cause",
+      "value": "上一次扫描还没有结束。"
+    },
+    {
+      "name": "nl_error_busy_next",
+      "value": "先停止，再重新开始。"
+    },
+    {
+      "name": "nl_error_switch_title",
+      "value": "星闪已关闭"
+    },
+    {
+      "name": "nl_error_switch_cause",
+      "value": "关闭状态下不能扫描。"
+    },
+    {
+      "name": "nl_error_switch_next",
+      "value": "在系统设置中打开星闪。"
+    },
+    {
+      "name": "nl_error_unsupported_title",
+      "value": "设备不支持星闪"
+    },
+    {
+      "name": "nl_error_unsupported_cause",
+      "value": "这台设备没有星闪硬件或系统能力。"
+    },
+    {
+      "name": "nl_error_unsupported_next",
+      "value": "换一台支持星闪的真机。"
+    },
+    {
+      "name": "nl_error_scan_title",
+      "value": "扫描失败"
+    },
+    {
+      "name": "nl_error_scan_cause",
+      "value": "系统没有开始星闪扫描。"
+    },
+    {
+      "name": "nl_error_scan_next",
+      "value": "确认星闪已开启后重试。模拟器不支持星闪。"
     }
   ]
 }

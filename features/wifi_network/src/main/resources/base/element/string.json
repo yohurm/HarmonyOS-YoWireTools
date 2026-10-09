@@ -3,6 +3,134 @@
     {
       "name": "wifi_title_overview",
       "value": "网络"
+    },
+    {
+      "name": "wifi_status_radio",
+      "value": "Wi-Fi"
+    },
+    {
+      "name": "wifi_status_on",
+      "value": "已开启"
+    },
+    {
+      "name": "wifi_status_off",
+      "value": "已关闭"
+    },
+    {
+      "name": "wifi_status_permission",
+      "value": "权限"
+    },
+    {
+      "name": "wifi_status_granted",
+      "value": "已授权"
+    },
+    {
+      "name": "wifi_status_denied",
+      "value": "未授权"
+    },
+    {
+      "name": "wifi_status_bssid",
+      "value": "物理地址"
+    },
+    {
+      "name": "wifi_status_bssid_visible",
+      "value": "可见"
+    },
+    {
+      "name": "wifi_status_bssid_hidden",
+      "value": "已隐藏"
+    },
+    {
+      "name": "wifi_status_disconnected",
+      "value": "未连接 Wi-Fi"
+    },
+    {
+      "name": "wifi_section_link",
+      "value": "当前连接"
+    },
+    {
+      "name": "wifi_section_aps",
+      "value": "周围网络"
+    },
+    {
+      "name": "wifi_label_ssid",
+      "value": "名称"
+    },
+    {
+      "name": "wifi_label_bssid",
+      "value": "地址"
+    },
+    {
+      "name": "wifi_label_rssi",
+      "value": "信号"
+    },
+    {
+      "name": "wifi_label_channel",
+      "value": "信道"
+    },
+    {
+      "name": "wifi_label_frequency",
+      "value": "频率"
+    },
+    {
+      "name": "wifi_label_link_speed",
+      "value": "速率"
+    },
+    {
+      "name": "wifi_ap_hidden",
+      "value": "隐藏网络"
+    },
+    {
+      "name": "wifi_ap_empty_title",
+      "value": "还没有扫描结果"
+    },
+    {
+      "name": "wifi_ap_empty_message",
+      "value": "打开 Wi-Fi 后扫描，列表会显示周围网络。系统可能只返回缓存结果。"
+    },
+    {
+      "name": "wifi_action_scan",
+      "value": "扫描"
+    },
+    {
+      "name": "wifi_action_scan_disabled_off",
+      "value": "先打开 Wi-Fi"
+    },
+    {
+      "name": "wifi_error_scan_cooldown_title",
+      "value": "扫描太频繁"
+    },
+    {
+      "name": "wifi_error_scan_cooldown_cause",
+      "value": "系统限制了 Wi-Fi 扫描间隔。"
+    },
+    {
+      "name": "wifi_error_scan_cooldown_next",
+      "value": "稍后再扫描。"
+    },
+    {
+      "name": "wifi_error_scan_limited_title",
+      "value": "暂时不能扫描"
+    },
+    {
+      "name": "wifi_error_scan_limited_cause",
+      "value": "系统拒绝了这次 Wi-Fi 扫描。"
+    },
+    {
+      "name": "wifi_error_scan_limited_next",
+      "value": "确认 Wi-Fi 已开启后重试。"
+    },
+    {
+      "name": "wifi_error_scan_failed_title",
+      "value": "扫描失败"
+    },
+    {
+      "name": "wifi_error_scan_failed_cause",
+      "value": "没有拿到周围网络列表。"
+    },
+    {
+      "name": "wifi_error_scan_failed_next",
+      "value": "重试扫描。若仍失败，检查系统 Wi-Fi 开关。"
     }
   ]
 }
