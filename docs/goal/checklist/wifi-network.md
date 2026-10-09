@@ -26,7 +26,7 @@ related: [research.wifi-network, rule.common.acceptance]
 
 ## 权限与能力
 
-- [ ] **WN-001** [普通应用] Given 安装包已声明 `ohos.permission.GET_WIFI_INFO`、`SET_WIFI_INFO`、`GET_NETWORK_INFO`、`INTERNET`，When 打开 Wi-Fi 调试页，Then 不出现运行时授权弹窗，且调用失败时日志含错误码 201 或成功结果二者之一。
+- [ ] **WN-001** [普通应用] Given 安装包已声明 `ohos.permission.GET_WIFI_INFO`、`SET_WIFI_INFO`、`GET_NETWORK_INFO`、`INTERNET`，When 打开 Wi-Fi 调试页，Then 不出现运行时授权弹窗。
 - [ ] **WN-002** [普通应用] Given 未声明 `GET_WIFI_INFO`，When 读取 WLAN 开关或连接信息，Then 界面显示权限被拒绝及错误码 201，列表不为成功空态。
 - [ ] **WN-003** [普通应用] Given 未声明 `SET_WIFI_INFO`，When 点击刷新扫描，Then 扫描不启动，界面显示错误码 201。
 - [ ] **WN-004** [普通应用] Given 未声明 `INTERNET`，When 发起 DNS 或 HTTP，Then 请求失败且可见错误码 201。
