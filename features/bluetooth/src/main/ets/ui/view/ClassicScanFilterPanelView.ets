@@ -47,6 +47,10 @@ export struct ClassicScanFilterPanelView {
 
   build() {
     Column({ space: YoSpace.M }) {
+      Text($r('app.string.bt_classic_filter_limitation'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
+        .width('100%')
       Row({ space: YoSpace.M }) {
         TextInput({
           text: this.vm.filterName,

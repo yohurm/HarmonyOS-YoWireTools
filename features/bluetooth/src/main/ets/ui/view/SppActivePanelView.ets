@@ -15,6 +15,38 @@ export struct SppActivePanelView {
   };
 
   build() {
+    Column() {
+      Row({ space: 8 }) {
+        Button($r('app.string.bt_spp_action_listen'))
+          .onClick(() => {
+            void this.vm.startListen();
+          })
+        Button($r('app.string.bt_spp_action_listen_stop'))
+          .onClick(() => {
+            void this.vm.stopListen();
+          })
+      }
+      .width('100%')
+      .padding({ left: this.horizontalPadding, right: this.horizontalPadding })
+      if (this.vm.listenPhase === 1) {
+        Text($r('app.string.bt_spp_listen_waiting'))
+          .fontSize(14)
+          .width('100%')
+          .padding({ left: this.horizontalPadding, right: this.horizontalPadding })
+      }
+      if (this.vm.listenPhase === 2) {
+        Text($r('app.string.bt_spp_listen_accepted'))
+          .fontSize(14)
+          .width('100%')
+          .padding({ left: this.horizontalPadding, right: this.horizontalPadding })
+      }
+      if (this.vm.listenError.length > 0) {
+        Text(this.vm.listenError)
+          .fontSize(14)
+          .fontColor(Color.Red)
+          .width('100%')
+          .padding({ left: this.horizontalPadding, right: this.horizontalPadding })
+      }
     SppDeviceListView({
       mode: 'active',
       sessions: this.vm.activeSessions,
@@ -34,6 +66,9 @@ export struct SppActivePanelView {
       }
     })
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
+    }
+    .width('100%')
+    .height('100%')
   }
 }

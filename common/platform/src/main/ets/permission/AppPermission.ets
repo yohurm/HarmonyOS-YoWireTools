@@ -13,4 +13,5 @@ export class AppPermission {
   static readonly INTERNET: PlatformPermission = 'ohos.permission.INTERNET';
   static readonly GET_NETWORK_INFO: PlatformPermission = 'ohos.permission.GET_NETWORK_INFO';
   static readonly ACCESS_NEARLINK: PlatformPermission = 'ohos.permission.ACCESS_NEARLINK';
+  static readonly KEEP_BACKGROUND_RUNNING: PlatformPermission = 'ohos.permission.KEEP_BACKGROUND_RUNNING';
 }

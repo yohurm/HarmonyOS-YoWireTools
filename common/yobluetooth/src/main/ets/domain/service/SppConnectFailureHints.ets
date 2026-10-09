@@ -67,6 +67,10 @@ export class SppConnectFailureHints {
       case BluetoothErrorCodes.NOT_CONNECTED:
         hints.push('Session disconnected — reconnect from SPP connect dialog');
         break;
+      case BluetoothErrorCodes.NOT_PAIRED:
+        hints.push('Device is not paired (2900016)');
+        hints.push('Start pairing. This is not a connection timeout');
+        break;
       default:
         hints.push('Check device power and pairing state');
         break;

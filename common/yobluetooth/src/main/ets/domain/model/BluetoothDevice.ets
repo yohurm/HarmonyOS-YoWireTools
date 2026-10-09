@@ -30,6 +30,7 @@ export class BluetoothDeviceDraft {
   majorMinorClass: number = 0;
   listRail: BluetoothListRail = BluetoothListRail.CLASSIC_SCAN;
   rssi: number = 0;
+  rssiKnown: boolean = false;
   paired: boolean = false;
   pairState: PairingState = PairingState.UNKNOWN;
   connectable: boolean = true;
@@ -58,6 +59,7 @@ export class BluetoothDevice {
   readonly majorMinorClass: number;
   readonly listRail: BluetoothListRail;
   readonly rssi: number;
+  readonly rssiKnown: boolean;
   readonly paired: boolean;
   readonly pairState: PairingState;
   readonly connectable: boolean;
@@ -87,6 +89,7 @@ export class BluetoothDevice {
     this.majorMinorClass = draft.majorMinorClass;
     this.listRail = draft.listRail;
     this.rssi = draft.rssi;
+    this.rssiKnown = draft.rssiKnown;
     this.paired = draft.paired;
     this.pairState = draft.pairState;
     this.connectable = draft.connectable;
@@ -129,6 +132,7 @@ export class BluetoothDevice {
     draft.majorMinorClass = this.majorMinorClass;
     draft.listRail = this.listRail;
     draft.rssi = this.rssi;
+    draft.rssiKnown = this.rssiKnown;
     draft.paired = this.paired;
     draft.pairState = this.pairState;
     draft.connectable = this.connectable;
@@ -147,6 +151,7 @@ export class BluetoothDevice {
     const draft = this.toDraft();
     if (rssi !== 0) {
       draft.rssi = rssi;
+      draft.rssiKnown = true;
     }
     draft.lastSeenMs = lastSeenMs;
     return new BluetoothDevice(draft);
@@ -199,7 +204,10 @@ export class BluetoothDevice {
     if (other.displayName.length > 0) {
       draft.displayName = other.displayName;
     }
-    draft.rssi = other.rssi !== 0 ? other.rssi : draft.rssi;
+    if (other.rssiKnown) {
+      draft.rssi = other.rssi;
+      draft.rssiKnown = true;
+    }
     draft.paired = draft.paired || other.paired;
     draft.connectable = other.connectable;
     draft.lastSeenMs = other.lastSeenMs > 0 ? other.lastSeenMs : draft.lastSeenMs;

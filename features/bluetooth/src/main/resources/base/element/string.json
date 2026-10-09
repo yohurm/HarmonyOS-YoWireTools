@@ -567,6 +567,422 @@
     {
       "name": "bt_spp_uuid_favorites_hint",
       "value": "点选填入；侧滑删除；点铅笔编辑"
+    },
+    {
+      "name": "bt_status_emulator",
+      "value": "模拟器不可用"
+    },
+    {
+      "name": "bt_status_switching",
+      "value": "切换中"
+    },
+    {
+      "name": "bt_status_turning_on",
+      "value": "正在打开"
+    },
+    {
+      "name": "bt_status_turning_off",
+      "value": "正在关闭"
+    },
+    {
+      "name": "bt_status_ble_turning_on",
+      "value": "BLE 正在打开"
+    },
+    {
+      "name": "bt_status_ble_on",
+      "value": "仅 BLE 已开"
+    },
+    {
+      "name": "bt_status_ble_turning_off",
+      "value": "BLE 正在关闭"
+    },
+    {
+      "name": "bt_action_enable",
+      "value": "打开"
+    },
+    {
+      "name": "bt_action_disable",
+      "value": "关闭"
+    },
+    {
+      "name": "bt_emulator_limitation",
+      "value": "蓝牙模块暂不支持模拟器。这里不会开始扫描，也不会列出伪造设备。"
+    },
+    {
+      "name": "bt_error_service_stopped",
+      "value": "蓝牙服务已停止。扫描和连接都已结束。"
+    },
+    {
+      "name": "bt_error_too_frequent",
+      "value": "操作过于频繁（2900011）。请稍后再试。"
+    },
+    {
+      "name": "bt_error_adapter_off",
+      "value": "蓝牙未打开（2900003）。这不是附近没有设备。"
+    },
+    {
+      "name": "bt_error_scan_resource",
+      "value": "扫描因硬件资源或扫描失败而结束。"
+    },
+    {
+      "name": "bt_classic_filter_limitation",
+      "value": "名称和信号只过滤已经上报的结果。开始发现本身没有过滤参数。"
+    },
+    {
+      "name": "bt_pairing_no_system_confirm",
+      "value": "普通应用不会调用系统配对确认。"
+    },
+    {
+      "name": "bt_pairing_cannot_unpair",
+      "value": "应用不能取消配对。请到系统蓝牙设置中操作。"
+    },
+    {
+      "name": "bt_spp_action_listen",
+      "value": "监听"
+    },
+    {
+      "name": "bt_spp_action_listen_stop",
+      "value": "停止监听"
+    },
+    {
+      "name": "bt_spp_listen_waiting",
+      "value": "正在等待对端接入"
+    },
+    {
+      "name": "bt_spp_listen_accepted",
+      "value": "已接入客户端套接字"
+    },
+    {
+      "name": "bt_entry_diagnostics",
+      "value": "回连与诊断"
+    },
+    {
+      "name": "bt_entry_identity",
+      "value": "地址"
+    },
+    {
+      "name": "bt_entry_peripheral",
+      "value": "广播与服务端"
+    },
+    {
+      "name": "bt_entry_session_log",
+      "value": "会话日志"
+    },
+    {
+      "name": "bt_address_virtual",
+      "value": "虚拟地址"
+    },
+    {
+      "name": "bt_identity_title",
+      "value": "设备地址"
+    },
+    {
+      "name": "bt_identity_favorite_bookmark",
+      "value": "收藏只是本机书签，不是免配对固化，也不会显示为已固化。"
+    },
+    {
+      "name": "bt_identity_no_spp_from_ble",
+      "value": "BLE 扫描地址不能传给 sppConnect。需要经典地址，或先用该 BLE 地址配对。"
+    },
+    {
+      "name": "bt_identity_no_classic_to_gatt",
+      "value": "没有从经典连接自动转到 GATT 的路径。GATT 需要 BLE 扫描地址。"
+    },
+    {
+      "name": "bt_identity_stale_address",
+      "value": "未配对地址在蓝牙重启后可能失效。连接失败后需要重新发现，不会把旧地址当成已固化。"
+    },
+    {
+      "name": "bt_identity_save_bookmark",
+      "value": "保存书签"
+    },
+    {
+      "name": "bt_identity_pair_from_ble",
+      "value": "用该 BLE 地址配对"
+    },
+    {
+      "name": "bt_ble_filter_hint",
+      "value": "服务 UUID、精确名称、厂商 ID 和掩码会进入扫描过滤。名称子串在回调里匹配。清空后以空过滤开始。"
+    },
+    {
+      "name": "bt_ble_exact_name",
+      "value": "精确名称"
+    },
+    {
+      "name": "bt_ble_service_uuid",
+      "value": "服务 UUID"
+    },
+    {
+      "name": "bt_ble_service_mask",
+      "value": "服务 UUID 掩码"
+    },
+    {
+      "name": "bt_ble_name_prefix",
+      "value": "名称子串"
+    },
+    {
+      "name": "bt_ble_manufacturer",
+      "value": "厂商 ID"
+    },
+    {
+      "name": "bt_ble_rssi_threshold",
+      "value": "RSSI 门限"
+    },
+    {
+      "name": "bt_ble_rssi_threshold_unavailable",
+      "value": "当前 API 没有 RSSI 门限字段。超出 -128 到 127 的输入会被拒绝。"
+    },
+    {
+      "name": "bt_ble_duty_low",
+      "value": "低功耗"
+    },
+    {
+      "name": "bt_ble_duty_balanced",
+      "value": "均衡"
+    },
+    {
+      "name": "bt_ble_duty_low_latency",
+      "value": "低延迟"
+    },
+    {
+      "name": "bt_ble_start_scan",
+      "value": "开始扫描"
+    },
+    {
+      "name": "bt_ble_stop_scan",
+      "value": "停止扫描"
+    },
+    {
+      "name": "bt_ble_start_extra",
+      "value": "再开一路扫描"
+    },
+    {
+      "name": "bt_ble_stop_extra",
+      "value": "停止这一路"
+    },
+    {
+      "name": "bt_ble_parallel_unavailable",
+      "value": "当前 API 不能并行两路扫描。需要先停止当前扫描。"
+    },
+    {
+      "name": "bt_ble_not_connectable",
+      "value": "这条广播不可连接，不会发起 GATT。"
+    },
+    {
+      "name": "bt_ble_empty",
+      "value": "还没有扫描结果"
+    },
+    {
+      "name": "bt_ble_unnamed",
+      "value": "未上报名称"
+    },
+    {
+      "name": "bt_ble_connect",
+      "value": "连接"
+    },
+    {
+      "name": "bt_ble_scan_error_title",
+      "value": "扫描没有开始"
+    },
+    {
+      "name": "bt_ble_scan_error_next",
+      "value": "查看错误码后再试。不要把失败当成空列表。"
+    },
+    {
+      "name": "bt_peripheral_title",
+      "value": "广播"
+    },
+    {
+      "name": "bt_peripheral_no_custom_ad_type",
+      "value": "没有自定义 AD Type。可用字段只对应服务 UUID、服务数据 0x16、厂商数据 0xFF 和设备名 0x09。"
+    },
+    {
+      "name": "bt_peripheral_service_data_uuid",
+      "value": "服务数据 UUID"
+    },
+    {
+      "name": "bt_peripheral_service_data",
+      "value": "服务数据 HEX"
+    },
+    {
+      "name": "bt_peripheral_manufacturer_data",
+      "value": "厂商数据 HEX"
+    },
+    {
+      "name": "bt_peripheral_scan_response",
+      "value": "扫描响应 HEX"
+    },
+    {
+      "name": "bt_peripheral_toggle_name",
+      "value": "设备名"
+    },
+    {
+      "name": "bt_peripheral_toggle_extended",
+      "value": "扩展广播"
+    },
+    {
+      "name": "bt_peripheral_toggle_connectable",
+      "value": "可连接"
+    },
+    {
+      "name": "bt_peripheral_extended_mutex",
+      "value": "扩展广播不能同时可连接又带非空扫描响应。传统广播超过 31 字节会失败，不会显示正在广播。"
+    },
+    {
+      "name": "bt_peripheral_server_responds",
+      "value": "GATT 服务端收到读写请求时会 sendResponse。离开本页会停止持续广播。"
+    },
+    {
+      "name": "bt_peripheral_start",
+      "value": "开始广播"
+    },
+    {
+      "name": "bt_peripheral_stop",
+      "value": "停止广播"
+    },
+    {
+      "name": "bt_gatt_client_title",
+      "value": "GATT 客户端"
+    },
+    {
+      "name": "bt_mtu_negotiating",
+      "value": "MTU 协商中"
+    },
+    {
+      "name": "bt_mtu_request",
+      "value": "请求 MTU（23–517）"
+    },
+    {
+      "name": "bt_mtu_apply",
+      "value": "协商 MTU"
+    },
+    {
+      "name": "bt_phy_unverified",
+      "value": "PHY 未证实，不发起切换。"
+    },
+    {
+      "name": "bt_connection_param_presets_only",
+      "value": "连接参数只有低功耗、均衡、高速率三档。没有连接间隔、从机延迟或监督超时的数字输入。"
+    },
+    {
+      "name": "bt_gatt_characteristic",
+      "value": "特征 UUID"
+    },
+    {
+      "name": "bt_gatt_payload_hex",
+      "value": "HEX 载荷"
+    },
+    {
+      "name": "bt_gatt_connect",
+      "value": "连接 GATT"
+    },
+    {
+      "name": "bt_gatt_read",
+      "value": "读"
+    },
+    {
+      "name": "bt_gatt_write",
+      "value": "写"
+    },
+    {
+      "name": "bt_gatt_write_no_response",
+      "value": "无响应写"
+    },
+    {
+      "name": "bt_gatt_notify",
+      "value": "通知"
+    },
+    {
+      "name": "bt_gatt_indicate",
+      "value": "指示"
+    },
+    {
+      "name": "bt_gatt_rssi",
+      "value": "RSSI"
+    },
+    {
+      "name": "bt_gatt_security_encryption",
+      "value": "未加密（2901005）。可以先配对。"
+    },
+    {
+      "name": "bt_gatt_security_authentication",
+      "value": "未认证（2901006）。可以先配对。"
+    },
+    {
+      "name": "bt_gatt_security_authorization",
+      "value": "未授权（2901007）。可以先配对。"
+    },
+    {
+      "name": "bt_conn_low_power",
+      "value": "低功耗"
+    },
+    {
+      "name": "bt_conn_balanced",
+      "value": "均衡"
+    },
+    {
+      "name": "bt_conn_high",
+      "value": "高速率"
+    },
+    {
+      "name": "bt_throughput_start",
+      "value": "开始吞吐"
+    },
+    {
+      "name": "bt_throughput_stop",
+      "value": "停止吞吐"
+    },
+    {
+      "name": "bt_session_log_title",
+      "value": "会话日志"
+    },
+    {
+      "name": "bt_session_log_no_hci",
+      "value": "应用内不生成 HCI 抓包文件。"
+    },
+    {
+      "name": "bt_session_log_clear_hint",
+      "value": "清屏只清空这里的显示，不删除已经导出的文件。"
+    },
+    {
+      "name": "bt_session_log_empty",
+      "value": "当前屏幕没有行"
+    },
+    {
+      "name": "bt_session_log_export",
+      "value": "导出"
+    },
+    {
+      "name": "bt_session_log_clear",
+      "value": "清屏"
+    },
+    {
+      "name": "bt_diagnostics_title",
+      "value": "诊断"
+    },
+    {
+      "name": "bt_diagnostics_no_hci",
+      "value": "普通应用不能在应用内抓空口 HCI。需要开发者模式采集，再用电脑上的工具打开。"
+    },
+    {
+      "name": "bt_diagnostics_release_hci",
+      "value": "Release 版本的开发者 HCI 采集预期只有 Header，载荷会被去掉。"
+    },
+    {
+      "name": "bt_diagnostics_background_suspend",
+      "value": "没有申请蓝牙交互长时任务时，退到后台后会话可能断开。这不是对端主动断开。"
+    },
+    {
+      "name": "bt_diagnostics_stop_reconnect",
+      "value": "停止自动回连"
+    },
+    {
+      "name": "bt_diagnostics_background_on",
+      "value": "后台保持"
+    },
+    {
+      "name": "bt_diagnostics_background_off",
+      "value": "取消后台保持"
     }
   ]
 }

@@ -27,6 +27,8 @@ export struct SppMainPage {
   };
   @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
   };
+  @Event onOpenIdentity: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
@@ -62,6 +64,9 @@ export struct SppMainPage {
       },
       onOpenTerminal: (sessionId: string) => {
         this.onOpenTerminal(sessionId);
+      },
+      onOpenIdentity: (item: ClassicDeviceListItem) => {
+        this.onOpenIdentity(item);
       }
     })
   }

@@ -46,6 +46,16 @@ export class ConnectGattUseCase {
         'bleDeviceId required for GATT'
       ));
     }
+    const scanned = this.repository.listBleDevices();
+    for (let i = 0; i < scanned.length; i++) {
+      const device = scanned[i];
+      if (device.bleDeviceId === params.bleDeviceId && !device.connectable) {
+        return Result.fail(new ResultError(
+          BluetoothErrorCodes.NOT_CONNECTABLE,
+          'Advertisement is not connectable'
+        ));
+      }
+    }
     if (!this.repository.tryReserveBleConnection()) {
       return Result.fail(new ResultError(
         BluetoothErrorCodes.BLE_GATT_SESSION_LIMIT,

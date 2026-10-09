@@ -183,8 +183,12 @@ export class SppSessionLedger {
     return Array.from(this.entries.values());
   }
 
+  closeAll(): void {
+    this.entries.clear();
+  }
+
   /** Test-only reset. */
   resetForTests(): void {
-    this.entries.clear();
+    this.closeAll();
   }
 }

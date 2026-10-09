@@ -1,5 +1,5 @@
 import { Result, AppThemeMode, AppThemeModeUtil } from 'common_core';
-import { CapabilityRegistry, PlatformBootstrap, ThemeModeCoordinator } from 'common_platform';
+import { BluetoothRuntimeProbe, CapabilityRegistry, PlatformBootstrap, ThemeModeCoordinator } from 'common_platform';
 import { AppSettingRepository, PreferenceKeys, StorageBootstrap } from 'common_storage';
 import { common } from '@kit.AbilityKit';
 import { YoLog, YoLogTag } from 'yolog';
@@ -15,6 +15,9 @@ export class DebugCoreBootstrap {
   static async initialize(context: common.UIAbilityContext): Promise<Result<void>> {
     PlatformBootstrap.initialize(context);
     CapabilityRegistry.getInstance().configureCatalog(CapabilityId.all());
+    CapabilityRegistry.getInstance().registerProbe(
+      new BluetoothRuntimeProbe(CapabilityId.BLUETOOTH_ADAPTER_STATE)
+    );
     const storageResult = await StorageBootstrap.initialize(context);
     if (!storageResult.success) {
       return storageResult;

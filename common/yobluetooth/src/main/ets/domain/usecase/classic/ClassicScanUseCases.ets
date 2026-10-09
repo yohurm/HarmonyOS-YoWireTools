@@ -104,6 +104,7 @@ export class PairBluetoothDeviceUseCase {
     if (!permission.success) {
       return permission;
     }
+    await this.repository.ensureClassicDiscoveryStopped();
     return this.repository.pairDevice(deviceId);
   }
 }

@@ -35,6 +35,10 @@ export struct MainTabContainer {
   };
   @Event onOpenBluetoothBle: () => void = () => {
   };
+  @Event onOpenBluetoothDiagnostics: () => void = () => {
+  };
+  @Event onOpenBluetoothIdentity: () => void = () => {
+  };
   private readonly tabItems: YoSideNavItem[] = [
     { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
     { index: 1, label: $r('app.string.tab_bluetooth'), symbol: $r('sys.symbol.trunk') },
@@ -47,7 +51,9 @@ export struct MainTabContainer {
   bluetoothTab() {
     BluetoothOverviewPage({
       onOpenSpp: this.onOpenBluetoothSpp,
-      onOpenBle: this.onOpenBluetoothBle
+      onOpenBle: this.onOpenBluetoothBle,
+      onOpenDiagnostics: this.onOpenBluetoothDiagnostics,
+      onOpenIdentity: this.onOpenBluetoothIdentity
     })
   }
 

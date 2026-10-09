@@ -1,4 +1,4 @@
-﻿import { Subscription } from 'common_core';
+﻿import { Subscription, TimeUtil } from 'common_core';
 import {
   AbilityContextRegistry,
   BluetoothSettingsNavigator,
@@ -7,6 +7,7 @@ import {
 import {
   BluetoothConstants,
   BluetoothDevice,
+  BluetoothErrorCodes,
   BluetoothRepository,
   BluetoothTransportType,
   ClassicDeviceMajorFilter,
@@ -19,6 +20,7 @@ import {
   LoadPairedClassicDevicesUseCase,
   ObserveClassicDevicesUseCase,
   ObserveSppSessionsUseCase,
+  SppListenUseCase,
   SppSessionDescriptor,
   SppSessionKey,
   SppSessionLedger,
@@ -150,6 +152,12 @@ export class SppMainViewModel {
   /** Default true: keep connected paired targets in scan list (not silent bonded-only). */
   @Trace filterIncludeConnectedPaired: boolean = true;
   @Trace filterActive: boolean = false;
+  @Trace scanNotice: string = '';
+  @Trace listenPhase: number = 0;
+  @Trace listenError: string = '';
+  private rateLimitedUntilMs: number = 0;
+  private serverSocket: number = -1;
+  private readonly listenUseCase: SppListenUseCase = new SppListenUseCase();
 
   private readonly loadOverview: LoadBluetoothOverviewSnapshotUseCase;
   private readonly loadPaired: LoadPairedClassicDevicesUseCase;
@@ -190,6 +198,7 @@ export class SppMainViewModel {
   }
 
   async onPageAppear(): Promise<void> {
+    this.onPageDisappearSubscriptions();
     this.classicSubscription = this.observeClassic.execute((devices: BluetoothDevice[]) => {
       this.applyScanDevices(devices);
     });
@@ -205,7 +214,7 @@ export class SppMainViewModel {
     await this.refresh(true);
   }
 
-  async onPageDisappear(): Promise<void> {
+  private onPageDisappearSubscriptions(): void {
     if (this.lifecycleUnsubscribe !== undefined) {
       this.lifecycleUnsubscribe();
       this.lifecycleUnsubscribe = undefined;
@@ -222,6 +231,10 @@ export class SppMainViewModel {
       this.scanRemainingSubscription.dispose();
       this.scanRemainingSubscription = undefined;
     }
+  }
+
+  async onPageDisappear(): Promise<void> {
+    this.onPageDisappearSubscriptions();
     this.filterPanelExpanded = false;
     this.repository.setClassicDeviceFilter(ClassicScanFilter.empty());
     await this.stopScanIfNeeded();
@@ -334,6 +347,11 @@ export class SppMainViewModel {
       this.classicScanDevices = [];
       return;
     }
+    if (TimeUtil.monotonicMs() < this.rateLimitedUntilMs) {
+      this.scanNotice = 'too_frequent';
+      this.isScanning = false;
+      return;
+    }
     await this.stopScanIfNeeded();
     // Arch 01: preload paired classic candidates before Inquiry so list is not empty-only-scan.
     await this.loadPaired.execute();
@@ -342,10 +360,61 @@ export class SppMainViewModel {
     if (started.success && started.value !== undefined) {
       this.scanSessionId = started.value;
       this.isScanning = true;
+      this.scanNotice = '';
     } else {
       this.scanSessionId = '';
       this.isScanning = false;
+      this.applyScanFailure(started.error?.code ?? '');
     }
+  }
+
+  async startListen(): Promise<void> {
+    const listened = await this.listenUseCase.execute('YoWire');
+    if (!listened.success || listened.value === undefined) {
+      this.listenPhase = 0;
+      this.listenError = listened.error?.message ?? '';
+      return;
+    }
+    this.serverSocket = listened.value;
+    this.listenPhase = 1;
+    this.listenError = '';
+    const accepted = await this.listenUseCase.accept(this.serverSocket);
+    if (!accepted.success) {
+      this.listenPhase = 0;
+      this.listenError = accepted.error?.message ?? '';
+      return;
+    }
+    this.listenPhase = 2;
+  }
+
+  async stopListen(): Promise<void> {
+    if (this.serverSocket >= 0) {
+      this.listenUseCase.closeServer(this.serverSocket);
+      this.serverSocket = -1;
+    }
+    this.listenPhase = 0;
+    this.listenError = '';
+  }
+
+  private applyScanFailure(code: string): void {
+    if (code === BluetoothErrorCodes.TOO_FREQUENT) {
+      this.rateLimitedUntilMs = TimeUtil.monotonicMs() + BluetoothConstants.RATE_LIMIT_COOLDOWN_MS;
+      this.scanNotice = 'too_frequent';
+      return;
+    }
+    if (code === BluetoothErrorCodes.ADAPTER_OFF) {
+      this.scanNotice = 'adapter_off';
+      return;
+    }
+    if (code === BluetoothErrorCodes.SERVICE_STOPPED) {
+      this.scanNotice = 'service_stopped';
+      return;
+    }
+    if (code === BluetoothErrorCodes.SCAN_RESOURCE_FAILED) {
+      this.scanNotice = 'scan_resource';
+      return;
+    }
+    this.scanNotice = code;
   }
 
   private refreshActiveSessions(): void {
@@ -398,7 +467,7 @@ export class SppMainViewModel {
         classicId,
         device.effectiveName.length > 0 ? device.effectiveName : '',
         classicId,
-        this.formatRssi(device.rssi),
+        this.formatRssi(device),
         device.paired,
         device.transport,
         this.formatTransportLabel(device.transport),
@@ -450,11 +519,11 @@ export class SppMainViewModel {
     this.updateEmptyState();
   }
 
-  private formatRssi(rssi: number): string {
-    if (rssi === 0) {
-      return '--';
+  private formatRssi(device: BluetoothDevice): string {
+    if (!device.rssiKnown) {
+      return '';
     }
-    return `${rssi} dBm`;
+    return `${device.rssi} dBm`;
   }
 
   private formatTransportLabel(transport: BluetoothTransportType): ResourceStr {

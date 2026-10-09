@@ -15,6 +15,9 @@ export class BleGattReconnectCoordinator {
   private bleDeviceId: string = '';
   private identityStability: IdentityStability = IdentityStability.UNKNOWN;
   private userDisconnect: boolean = false;
+  private failCountValue: number = 0;
+  private lastFailure: string = '';
+  private autoReconnectStopped: boolean = false;
 
   static getInstance(): BleGattReconnectCoordinator {
     if (BleGattReconnectCoordinator.instance === undefined) {
@@ -32,6 +35,7 @@ export class BleGattReconnectCoordinator {
     this.identityStability = identityStability;
     this.pendingAction = action;
     this.userDisconnect = false;
+    this.autoReconnectStopped = false;
     this.lifecycleUnsub?.();
     this.lifecycleUnsub = LifecycleCoordinator.getInstance().addListener((event: PlatformEvent) => {
       if (event.type === PlatformEventType.APP_FOREGROUND || event.type === PlatformEventType.BLUETOOTH_SWITCH) {
@@ -43,6 +47,20 @@ export class BleGattReconnectCoordinator {
   markUserDisconnect(): void {
     this.userDisconnect = true;
     this.unbind();
+  }
+
+  failCount(): number {
+    return this.failCountValue;
+  }
+
+  lastFailureReason(): string {
+    return this.lastFailure;
+  }
+
+  stopAutoReconnect(): void {
+    this.autoReconnectStopped = true;
+    this.userDisconnect = true;
+    this.pendingAction = undefined;
   }
 
   unbind(): void {
@@ -60,10 +78,14 @@ export class BleGattReconnectCoordinator {
   }
 
   async tryReconnect(): Promise<void> {
-    if (this.userDisconnect || this.pendingAction === undefined || this.bleDeviceId.length === 0) {
+    if (this.userDisconnect || this.autoReconnectStopped ||
+      this.pendingAction === undefined || this.bleDeviceId.length === 0) {
       return;
     }
-    if (this.identityStability === IdentityStability.EPHEMERAL_RANDOM) {
+    if (this.identityStability === IdentityStability.EPHEMERAL_RANDOM ||
+      this.identityStability === IdentityStability.PERSISTENT_MAC ||
+      this.identityStability === IdentityStability.UNKNOWN) {
+      this.lastFailure = 'identity not reusable';
       return;
     }
     const repository = BluetoothRepository.getInstance();
@@ -72,12 +94,16 @@ export class BleGattReconnectCoordinator {
       return;
     }
     repository.stopBleScan();
-    await this.pendingAction();
+    try {
+      await this.pendingAction();
+    } catch (error) {
+      this.failCountValue = this.failCountValue + 1;
+      this.lastFailure = error instanceof Error ? error.message : 'reconnect failed';
+    }
   }
 
   static canFastReconnect(stability: IdentityStability): boolean {
     return stability === IdentityStability.PAIRED_STABLE ||
-      stability === IdentityStability.PERSISTENT_MAC ||
       stability === IdentityStability.CURRENT_SESSION;
   }
 }

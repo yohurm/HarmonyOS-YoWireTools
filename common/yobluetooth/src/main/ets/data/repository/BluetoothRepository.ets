@@ -31,6 +31,7 @@ import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
 import { PairingEvent, PairingState } from '../../domain/model/PairingState';
 import { ClassicScanTimer } from '../../domain/service/ClassicScanTimer';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
+import { ClassicDiscoveryAdmission } from '../../domain/service/ClassicDiscoveryAdmission';
 import { GattServiceTreeSnapshot, GattClientState } from '../../domain/model/GattServiceTree';
 import { GattPlatformMapper } from '../mapper/GattPlatformMapper';
 import { GattCharacteristicChangeEvent, GattCharacteristicRef, GattDescriptorRef } from '../../domain/model/GattCharacteristicRef';
@@ -80,6 +81,8 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private scanTimeoutHandler: (() => void) | undefined;
   private classicFilter: ClassicScanFilter = ClassicScanFilter.empty();
   private activeBleScanFilter: BleScanFilter = new BleScanFilter();
+  private serviceStopped: boolean = false;
+  private readonly serviceStoppedObservable: Observable<boolean>;
 
   private constructor(
     classicDataSource: ClassicBluetoothDataSource = ClassicBluetoothDataSource.getInstance(),
@@ -94,6 +97,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     this.classicDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.bleDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.scanRemainingObservable = new Observable<number>(0);
+    this.serviceStoppedObservable = new Observable<boolean>(false);
     this.gattTreeObservable = new Observable<GattServiceTreeSnapshot>(
       new GattServiceTreeSnapshot('', '', 23, [], GattClientState.IDLE)
     );
@@ -376,13 +380,24 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return this.classicFilter;
   }
 
+  async enableBluetooth(): Promise<Result<void>> {
+    const result = await this.classicDataSource.enableBluetooth();
+    this.absorbPlatformFailure(result);
+    return result;
+  }
+
+  async disableBluetooth(): Promise<Result<void>> {
+    const result = await this.classicDataSource.disableBluetooth();
+    this.absorbPlatformFailure(result);
+    return result;
+  }
+
   async startClassicDiscovery(sessionId: string, onTimeout?: () => void): Promise<Result<void>> {
-    if (this.classicScanPhase === ClassicScanPhase.SCANNING) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.SCAN_ALREADY_RUNNING, 'Scan already running'));
-    }
     const discovering = await this.classicDataSource.isBluetoothDiscovering();
-    if (discovering.success && discovering.value === true) {
-      await this.classicDataSource.stopBluetoothDiscovery();
+    const platformDiscovering = discovering.success && discovering.value === true;
+    const admission = ClassicDiscoveryAdmission.admit(this.classicScanPhase, platformDiscovering);
+    if (!admission.success) {
+      return admission;
     }
     await this.refreshPairedClassicCache();
     this.prepareClassicScanList();
@@ -395,6 +410,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     if (!started.success) {
       this.classicScanPhase = ClassicScanPhase.FAILED;
       this.classicDataSource.offDiscoveryResult();
+      this.absorbPlatformFailure(started);
       return Result.fail(started.error ?? new ResultError(BluetoothErrorCodes.SCAN_RESOURCE_FAILED, 'start failed'));
     }
     this.scanTimeoutHandler = onTimeout;
@@ -501,6 +517,35 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       return started;
     }
     return Result.ok(undefined);
+  }
+
+  bleRssiThresholdAvailable(): boolean {
+    return this.bleDataSource.rssiThresholdAvailable();
+  }
+
+  bleParallelScanAvailable(): boolean {
+    return this.bleDataSource.parallelScanAvailable();
+  }
+
+  startExtraBleScan(filter: BleScanFilter): Result<void> {
+    return this.bleDataSource.startExtraScan(filter);
+  }
+
+  stopExtraBleScan(): Result<void> {
+    return this.bleDataSource.stopExtraScan();
+  }
+
+  gattCurrentMtu(sessionId: string): number {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return BluetoothConstants.BLE_DEFAULT_MTU;
+    }
+    return client.currentMtu();
+  }
+
+  gattMtuPending(sessionId: string): boolean {
+    const client = this.gattClients.get(sessionId);
+    return client !== undefined && client.isMtuPending();
   }
 
   stopBleScan(): Result<void> {
@@ -677,6 +722,35 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   resetClassicScanPhase(): void {
     this.classicScanPhase = ClassicScanPhase.IDLE;
+  }
+
+  isServiceStopped(): boolean {
+    return this.serviceStopped;
+  }
+
+  observeServiceStopped(): Observable<boolean> {
+    return this.serviceStoppedObservable;
+  }
+
+  haltForServiceStop(): void {
+    this.serviceStopped = true;
+    this.serviceStoppedObservable.next(true);
+    void this.stopClassicDiscovery();
+    this.stopBleScan();
+    const clients = Array.from(this.gattClients.values());
+    for (let i = 0; i < clients.length; i++) {
+      clients[i].release();
+    }
+    this.gattClients.clear();
+    SppSessionLedger.getInstance().closeAll();
+  }
+
+  private absorbPlatformFailure(result: Result<void>): void {
+    const code = result.error?.code ?? '';
+    const nativeCode = result.error?.nativeCode ?? '';
+    if (code === BluetoothErrorCodes.SERVICE_STOPPED || nativeCode === '2900001') {
+      this.haltForServiceStop();
+    }
   }
 
   /** 会话态变化后刷新扫描列表可见性（注入正在连接的 SPP 目标）。 */

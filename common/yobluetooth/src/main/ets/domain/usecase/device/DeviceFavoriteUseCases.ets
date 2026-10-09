@@ -10,6 +10,9 @@ export class SaveBluetoothFavoriteUseCase {
     this.repository = repository;
   }
 
+  /**
+   * Local bookmark only. Does not call addPersistentDeviceId and must not be shown as 已固化.
+   */
   async execute(device: BluetoothDevice, alias: string, protocol: string, uuid: string = ''): Promise<Result<void>> {
     return this.repository.saveFavorite(device, alias, protocol, uuid);
   }

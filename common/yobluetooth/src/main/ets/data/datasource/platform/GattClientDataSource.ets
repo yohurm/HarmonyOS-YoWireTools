@@ -1,7 +1,10 @@
 import { ble, constant } from '@kit.ConnectivityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
+import { BluetoothPlatformCodes } from '../../../constants/BluetoothPlatformCodes';
+import { ConnectionParamPreset } from '../../../domain/model/ConnectionParamPreset';
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
 
 type ConnectionStateListener = (state: ble.BLEConnectionChangeState) => void;
@@ -15,6 +18,10 @@ export class GattClientDataSource {
   private connectionHandler: ConnectionStateListener | undefined;
   private characteristicHandler: CharacteristicChangeListener | undefined;
   private cachedServices: Array<ble.GattService> = [];
+  private negotiatedMtu: number = BluetoothConstants.BLE_DEFAULT_MTU;
+  private mtuPending: boolean = false;
+  private mtuHandler: ((mtuSize: number) => void) | undefined;
+  private servicesReady: boolean = false;
 
   createClient(bleDeviceId: string): Result<void> {
     try {
@@ -101,11 +108,25 @@ export class GattClientDataSource {
       }
       const services = await this.client.getServices();
       this.cachedServices = services;
+      this.servicesReady = true;
       return Result.ok(services);
     } catch (error) {
+      this.servicesReady = false;
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, err));
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED));
     }
+  }
+
+  hasServiceTree(): boolean {
+    return this.servicesReady;
+  }
+
+  currentMtu(): number {
+    return this.negotiatedMtu;
+  }
+
+  isMtuPending(): boolean {
+    return this.mtuPending;
   }
 
   onCharacteristicChange(listener: CharacteristicChangeListener): Result<void> {
@@ -133,7 +154,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_NOTIFY_FAILED, err));
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_NOTIFY_FAILED));
     }
   }
 
@@ -152,7 +173,8 @@ export class GattClientDataSource {
 
   async writeCharacteristic(
     characteristic: ble.BLECharacteristic,
-    bytes: Uint8Array
+    bytes: Uint8Array,
+    noResponse: boolean = false
   ): Promise<Result<void>> {
     try {
       if (this.client === undefined) {
@@ -165,11 +187,12 @@ export class GattClientDataSource {
         characteristicValue: buffer,
         descriptors: characteristic.descriptors ?? []
       };
-      await this.client.writeCharacteristicValue(payload, ble.GattWriteType.WRITE);
+      const writeType = noResponse ? ble.GattWriteType.WRITE_NO_RESPONSE : ble.GattWriteType.WRITE;
+      await this.client.writeCharacteristicValue(payload, writeType);
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err));
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED));
     }
   }
 
@@ -178,11 +201,53 @@ export class GattClientDataSource {
       if (this.client === undefined) {
         return Result.fail(new ResultError(BluetoothErrorCodes.BLE_MTU_FAILED, 'GATT client not created'));
       }
+      this.mtuPending = true;
+      if (this.mtuHandler !== undefined) {
+        this.client.off('BLEMtuChange', this.mtuHandler);
+      }
+      this.mtuHandler = (mtuSize: number): void => {
+        this.negotiatedMtu = mtuSize;
+        this.mtuPending = false;
+      };
+      this.client.on('BLEMtuChange', this.mtuHandler);
       await this.client.setBLEMtuSize(mtu);
-      return Result.ok(mtu);
+      return Result.ok(this.negotiatedMtu);
+    } catch (error) {
+      this.mtuPending = false;
+      const err = error as BusinessError;
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_MTU_FAILED));
+    }
+  }
+
+  async readRssi(): Promise<Result<number>> {
+    try {
+      if (this.client === undefined) {
+        return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT client not created'));
+      }
+      const rssi = await this.client.getRssiValue();
+      return Result.ok(rssi);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_MTU_FAILED, err));
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED));
+    }
+  }
+
+  async updateConnectionParam(preset: ConnectionParamPreset): Promise<Result<void>> {
+    if (deviceInfo.sdkApiVersion < BluetoothConstants.SPP_SOCKET_QUERY_API) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.CAPABILITY_UNSUPPORTED,
+        'updateConnectionParam requires API 22'
+      ));
+    }
+    try {
+      if (this.client === undefined) {
+        return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT client not created'));
+      }
+      await this.client.updateConnectionParam(GattClientDataSource.toConnectionParam(preset));
+      return Result.ok(undefined);
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED));
     }
   }
 
@@ -254,7 +319,7 @@ export class GattClientDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.BLE_NOTIFY_FAILED, err));
+      return Result.fail(GattClientDataSource.mapError(err, BluetoothErrorCodes.BLE_NOTIFY_FAILED));
     }
   }
 
@@ -336,9 +401,29 @@ export class GattClientDataSource {
 
   release(): void {
     this.cachedServices = [];
+    this.servicesReady = false;
+    this.negotiatedMtu = BluetoothConstants.BLE_DEFAULT_MTU;
+    this.mtuPending = false;
+    this.mtuHandler = undefined;
     this.offCharacteristicChange();
     this.offConnectionStateChange();
     this.disconnect();
     this.close();
+  }
+
+  private static toConnectionParam(preset: ConnectionParamPreset): ble.ConnectionParam {
+    if (preset === ConnectionParamPreset.LOW_POWER) {
+      return ble.ConnectionParam.LOW_POWER;
+    }
+    if (preset === ConnectionParamPreset.HIGH) {
+      return ble.ConnectionParam.HIGH;
+    }
+    return ble.ConnectionParam.BALANCED;
+  }
+
+  private static mapError(err: BusinessError, fallback: string): ResultError {
+    const mapped = BluetoothPlatformCodes.domainCode(err.code);
+    const code = mapped.length > 0 ? mapped : fallback;
+    return ResultError.fromBusinessError(code, err);
   }
 }

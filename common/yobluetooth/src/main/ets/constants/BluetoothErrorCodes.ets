@@ -49,4 +49,26 @@ export class BluetoothErrorCodes {
   static readonly BLE_SCAN_UNFILTERED: string = 'YW-BLE-2101';
   static readonly BLE_SCAN_FAILED: string = 'YW-BLE-2102';
   static readonly PERMISSION_DENIED: string = 'YW-PERM-1001';
+  static readonly SERVICE_STOPPED: string = 'YW-BT-1006';
+  static readonly TOO_FREQUENT: string = 'YW-BT-1007';
+  static readonly SCAN_STOP_PENDING: string = 'YW-BT-1103';
+  static readonly NOT_PAIRED: string = 'YW-BT-1203';
+  static readonly L2CAP_PSM_REQUIRED: string = 'YW-BT-1320';
+  static readonly L2CAP_TOO_LARGE: string = 'YW-BT-1321';
+  static readonly SPP_WRITE_TOO_LARGE: string = 'YW-BT-1402';
+  static readonly GATT_NOT_CONNECTED: string = 'YW-BLE-2007';
+  static readonly MTU_OUT_OF_RANGE: string = 'YW-BLE-2008';
+  static readonly GATT_TIMEOUT: string = 'YW-BLE-2009';
+  static readonly GATT_INSUFFICIENT_ENCRYPTION: string = 'YW-BLE-2010';
+  static readonly GATT_INSUFFICIENT_AUTHENTICATION: string = 'YW-BLE-2011';
+  static readonly GATT_INSUFFICIENT_AUTHORIZATION: string = 'YW-BLE-2012';
+  static readonly GATT_PROPERTY: string = 'YW-BLE-2013';
+  static readonly GATT_SERVICE_MISSING: string = 'YW-BLE-2014';
+  static readonly GATT_SEQUENCE: string = 'YW-BLE-2015';
+  static readonly NOT_CONNECTABLE: string = 'YW-BLE-2103';
+  static readonly RSSI_OUT_OF_RANGE: string = 'YW-BLE-2104';
+  static readonly PARALLEL_SCAN_BLOCKED: string = 'YW-BLE-2105';
+  static readonly ADV_TOO_LONG: string = 'YW-BLE-2201';
+  static readonly ADV_REJECTED: string = 'YW-BLE-2202';
+  static readonly CAPABILITY_UNSUPPORTED: string = 'YW-BT-1801';
 }

@@ -15,6 +15,8 @@ import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
 import { SppRfcommClient } from '../platform/spp/SppRfcommClient';
 import { SppRfcommConnectRequest } from '../platform/spp/SppPlatformGateway';
 import { SppConnectParams } from '../../domain/model/SppConnectParams';
+import { SppSocketKind } from '../../domain/model/SppSocketKind';
+import { BluetoothTransportType } from '../../domain/model/BluetoothTransportType';
 import { ReconnectPolicy } from '../../domain/model/ReconnectPolicy';
 import { SppReadStrategy } from '../../domain/model/SppRuntimeState';
 import { SppSessionKey } from '../../domain/model/SppSessionKey';
@@ -138,6 +140,10 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
       stopOnPermissionLost,
       stopOnPairLost
     );
+    const kindRaw = `${params['socketKind'] ?? SppSocketKind.RFCOMM}`;
+    const socketKind = kindRaw === SppSocketKind.L2CAP ?
+      SppSocketKind.L2CAP :
+      (kindRaw === SppSocketKind.L2CAP_BLE ? SppSocketKind.L2CAP_BLE : SppSocketKind.RFCOMM);
     this.connectParams = new SppConnectParams(
       classicDeviceId,
       displayName,
@@ -145,7 +151,11 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
       secure,
       Number(params['timeoutMs'] ?? BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS),
       autoReconnect,
-      policy
+      policy,
+      BluetoothTransportType.BR_EDR,
+      `${params['bleDeviceId'] ?? ''}`,
+      socketKind,
+      Number(params['psm'] ?? 0)
     );
     this.userDisconnect = false;
     await this.openRfcomm();
@@ -158,7 +168,13 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
     this.transition(TransportState.CONNECTING);
     const params = this.connectParams;
     const opened = await this.rfcommClient.open(
-      new SppRfcommConnectRequest(params.classicDeviceId, params.uuid, params.secure),
+      new SppRfcommConnectRequest(
+        params.classicDeviceId,
+        params.uuid,
+        params.secure,
+        params.socketKind,
+        params.psm
+      ),
       params.timeoutMs
     );
     if (!opened.success) {
@@ -179,18 +195,42 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
     if (this.currentState !== TransportState.CONNECTED || !this.rfcommClient.isOpen()) {
       return new WriteResult(false, 0, BluetoothErrorCodes.NOT_CONNECTED, 'SPP not connected');
     }
-    const written = await this.rfcommClient.write(payload);
-    if (!written.success) {
-      // Fatal IO triggers link-lost callback → Coordinator reconnect or fail teardown
-      return new WriteResult(
-        false,
-        0,
-        written.error?.code ?? BluetoothErrorCodes.SPP_IO_ERROR,
-        written.error?.message ?? 'write failed',
-        written.error?.nativeCode ?? ''
-      );
+    let chunkSize = BluetoothConstants.SPP_RECOMMENDED_WRITE_BYTES;
+    const kind = this.connectParams === undefined ? SppSocketKind.RFCOMM : this.connectParams.socketKind;
+    if (kind !== SppSocketKind.RFCOMM) {
+      const limit = this.rfcommClient.maxTransmitLimit();
+      if (limit.success && limit.value !== undefined && payload.length > limit.value) {
+        return new WriteResult(
+          false,
+          0,
+          BluetoothErrorCodes.L2CAP_TOO_LARGE,
+          `L2CAP write exceeds ${limit.value}`
+        );
+      }
+      if (limit.success && limit.value !== undefined && limit.value > 0 && limit.value < chunkSize) {
+        chunkSize = limit.value;
+      }
     }
-    return new WriteResult(true, written.value ?? payload.length);
+    let offset = 0;
+    while (offset < payload.length) {
+      const end = Math.min(offset + chunkSize, payload.length);
+      const chunk = payload.subarray(offset, end);
+      if (chunk.length > BluetoothConstants.SPP_MAX_WRITE_BYTES) {
+        return new WriteResult(false, offset, BluetoothErrorCodes.SPP_WRITE_TOO_LARGE, 'SPP chunk exceeds 1024');
+      }
+      const written = await this.rfcommClient.write(chunk);
+      if (!written.success) {
+        return new WriteResult(
+          false,
+          offset,
+          written.error?.code ?? BluetoothErrorCodes.SPP_IO_ERROR,
+          written.error?.message ?? 'write failed',
+          written.error?.nativeCode ?? ''
+        );
+      }
+      offset = end;
+    }
+    return new WriteResult(true, payload.length);
   }
 
   observeIncoming(): Observable<IncomingPayload> {

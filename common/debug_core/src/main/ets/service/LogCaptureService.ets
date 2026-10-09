@@ -18,6 +18,7 @@ export class LogCaptureService {
   private static instance: LogCaptureService | undefined;
   private readonly logRepository: LogRepository;
   private readonly runtimeStore: SessionRuntimeStore;
+  private readonly pausedPacketSessions: Set<string> = new Set();
 
   private constructor(
     logRepository: LogRepository = LogRepository.getInstance(),
@@ -34,6 +35,14 @@ export class LogCaptureService {
     return LogCaptureService.instance;
   }
 
+  setPacketCapturePaused(sessionId: string, paused: boolean): void {
+    if (paused) {
+      this.pausedPacketSessions.add(sessionId);
+      return;
+    }
+    this.pausedPacketSessions.delete(sessionId);
+  }
+
   async captureBytes(
     sessionId: string,
     module: ModuleType,
@@ -43,6 +52,19 @@ export class LogCaptureService {
     appCode: string = '',
     nativeCode: string = ''
   ): Promise<Result<DebugLogRecord>> {
+    if (this.pausedPacketSessions.has(sessionId)) {
+      const summary = new NormalizedPayload(`${bytes.length}`, DisplayHint.NONE, LogRecordType.DATA);
+      return this.captureRecord(
+        sessionId,
+        module,
+        protocol,
+        direction,
+        summary,
+        new Uint8Array(0),
+        appCode,
+        nativeCode
+      );
+    }
     const normalized = PayloadNormalizer.normalize(bytes, direction, module, protocol);
     return this.captureRecord(sessionId, module, protocol, direction, normalized, bytes, appCode, nativeCode);
   }

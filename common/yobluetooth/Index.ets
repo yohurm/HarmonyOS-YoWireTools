@@ -132,3 +132,20 @@ export {
   BleScanStatusKind
 } from './src/main/ets/domain/model/BluetoothStatusKind';
 export { SppConnectFailureHints } from './src/main/ets/domain/service/SppConnectFailureHints';
+export { EnableBluetoothUseCase, DisableBluetoothUseCase } from './src/main/ets/domain/usecase/classic/AdapterSwitchUseCases';
+export { SppListenUseCase } from './src/main/ets/domain/usecase/classic/SppServerUseCases';
+export { StartBleAdvertiseUseCase, StopBleAdvertiseUseCase } from './src/main/ets/domain/usecase/ble/BleAdvertiseUseCases';
+export { OpenGattServerUseCase, CloseGattServerUseCase, NotifyGattServerUseCase } from './src/main/ets/domain/usecase/ble/GattServerUseCases';
+export {
+  ReadGattRssiUseCase,
+  UpdateGattConnectionParamUseCase
+} from './src/main/ets/domain/usecase/ble/GattOperationUseCases';
+export { AdvertisingRequest } from './src/main/ets/domain/model/AdvertisingRequest';
+export { ConnectionParamPreset } from './src/main/ets/domain/model/ConnectionParamPreset';
+export { SppSocketKind } from './src/main/ets/domain/model/SppSocketKind';
+export { MtuBounds } from './src/main/ets/domain/model/MtuBounds';
+export { ThroughputSession, ThroughputSnapshot } from './src/main/ets/domain/service/ThroughputSession';
+export { ExportBluetoothSessionLogUseCase } from './src/main/ets/domain/usecase/log/ExportBluetoothSessionLogUseCase';
+export { BleScanDutyPreset } from './src/main/ets/domain/model/BleScanFilter';
+export { BleGattReconnectCoordinator } from './src/main/ets/domain/service/BleGattReconnectCoordinator';
+export { SppReconnectCoordinator } from './src/main/ets/domain/service/SppReconnectCoordinator';

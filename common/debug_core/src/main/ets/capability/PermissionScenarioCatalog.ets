@@ -13,6 +13,8 @@ export class PermissionScenarioCatalog {
         return [AppPermission.ACCESS_BLUETOOTH];
       case PermissionScenario.BLUETOOTH_PERSISTENT_MAC:
         return [AppPermission.ACCESS_BLUETOOTH, AppPermission.PERSISTENT_BLUETOOTH_PEERS_MAC];
+      case PermissionScenario.BLUETOOTH_BACKGROUND:
+        return [AppPermission.KEEP_BACKGROUND_RUNNING];
       case PermissionScenario.WIFI_INFO:
         return [AppPermission.GET_WIFI_INFO];
       case PermissionScenario.WIFI_PEERS_MAC:
@@ -36,6 +38,8 @@ export class PermissionScenarioCatalog {
         return 'Bluetooth scan and connection require ACCESS_BLUETOOTH';
       case PermissionScenario.BLUETOOTH_PERSISTENT_MAC:
         return 'Persistent Bluetooth address requires additional permission';
+      case PermissionScenario.BLUETOOTH_BACKGROUND:
+        return 'Background Bluetooth keep-alive requires KEEP_BACKGROUND_RUNNING';
       case PermissionScenario.WIFI_INFO:
         return 'WiFi overview requires GET_WIFI_INFO';
       case PermissionScenario.WIFI_PEERS_MAC:

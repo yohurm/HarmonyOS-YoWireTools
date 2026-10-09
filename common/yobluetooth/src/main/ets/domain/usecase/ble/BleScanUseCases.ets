@@ -7,6 +7,7 @@ import {
   SessionType,
   StopSessionUseCase
 } from 'debug_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
 import { BleScanFilter } from '../../model/BleScanFilter';
@@ -48,6 +49,14 @@ export class StartBleScanUseCase {
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     const scanFilter: BleScanFilter = filter !== undefined ? filter : new BleScanFilter('', '', serviceUuid);
+    if (scanFilter.rssiThreshold !== BluetoothConstants.RSSI_THRESHOLD_UNSET &&
+      (scanFilter.rssiThreshold < BluetoothConstants.RSSI_PROTOCOL_MIN ||
+        scanFilter.rssiThreshold > BluetoothConstants.RSSI_PROTOCOL_MAX)) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.RSSI_OUT_OF_RANGE,
+        'RSSI threshold is outside -128 to 127'
+      ));
+    }
     const scan = this.repository.startBleScan(session.value.id, scanFilter);
     if (!scan.success) {
       return Result.fail(scan.error ?? new ResultError(BluetoothErrorCodes.BLE_SCAN_FAILED, 'BLE scan failed'));

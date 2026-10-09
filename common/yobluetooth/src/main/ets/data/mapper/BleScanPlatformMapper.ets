@@ -14,8 +14,11 @@ export class BleScanPlatformMapper {
     if (filter.serviceUuid.length > 0) {
       platformFilter.serviceUuid = filter.serviceUuid;
     }
-    if (filter.namePrefix.length > 0) {
-      platformFilter.name = filter.namePrefix;
+    if (filter.serviceUuidMask.length > 0) {
+      platformFilter.serviceUuidMask = filter.serviceUuidMask;
+    }
+    if (filter.exactName.length > 0) {
+      platformFilter.name = filter.exactName;
     }
     if (filter.manufacturerId >= 0) {
       platformFilter.manufactureId = filter.manufacturerId;

@@ -1,8 +1,15 @@
 ﻿import { UIContextRegistry } from 'common_platform';
 import { YoColor } from 'youi_kit';
 import {
+  BleDeviceRow,
+  BluetoothDiagnosticsPage,
+  BluetoothObjectNavParams,
+  BlePeripheralPage,
   ClassicDeviceListItem,
+  DeviceIdentityPage,
+  GattClientPage,
   PairingGuideDialog,
+  SessionLogPage,
   SppConnectDialog,
   SppTerminalNavParams,
   SppTerminalPage
@@ -82,6 +89,18 @@ struct Index {
           },
           onOpenTerminal: (sessionId: string) => {
             this.openSppTerminal(sessionId);
+          },
+          onOpenIdentity: (item: ClassicDeviceListItem) => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.BLUETOOTH_DEVICE,
+              param: new BluetoothObjectNavParams(
+                item.classicDeviceId,
+                item.displayName,
+                item.address,
+                true,
+                ''
+              )
+            });
           }
         })
       }
@@ -93,11 +112,101 @@ struct Index {
         BleMainPage({
           onBack: () => {
             this.rootNavStack.pop();
+          },
+          onOpenIdentity: (row: BleDeviceRow) => {
+            this.openBleIdentity(row);
+          },
+          onOpenClient: (row: BleDeviceRow) => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.BLUETOOTH_BLE_CLIENT,
+              param: new BluetoothObjectNavParams(row.deviceId, row.name, row.address, row.connectable, '')
+            });
+          },
+          onOpenPeripheral: () => {
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE_PERIPHERAL });
+          },
+          onOpenLog: () => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.BLUETOOTH_SESSION_LOG,
+              param: new BluetoothObjectNavParams()
+            });
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_DEVICE) {
+      NavDestination() {
+        DeviceIdentityPage({
+          params: this.readObjectParams(param),
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_BLE_PERIPHERAL) {
+      NavDestination() {
+        BlePeripheralPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_BLE_CLIENT) {
+      NavDestination() {
+        GattClientPage({
+          params: this.readObjectParams(param),
+          onBack: () => {
+            this.rootNavStack.pop();
+          },
+          onOpenLog: (sessionId: string) => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.BLUETOOTH_SESSION_LOG,
+              param: new BluetoothObjectNavParams('', '', '', true, sessionId)
+            });
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_SESSION_LOG) {
+      NavDestination() {
+        SessionLogPage({
+          params: this.readObjectParams(param),
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_DIAGNOSTICS) {
+      NavDestination() {
+        BluetoothDiagnosticsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
           }
         })
       }
       .hideTitleBar(true, false)
     }
+  }
+
+  private openBleIdentity(row: BleDeviceRow): void {
+    this.rootNavStack.pushPath({
+      name: AppRoutes.BLUETOOTH_DEVICE,
+      param: new BluetoothObjectNavParams(row.deviceId, row.name, row.address, row.connectable, '')
+    });
+  }
+
+  private readObjectParams(param: Object): BluetoothObjectNavParams {
+    const raw = param as BluetoothObjectNavParams;
+    return new BluetoothObjectNavParams(
+      raw.deviceId !== undefined ? raw.deviceId : '',
+      raw.displayName !== undefined ? raw.displayName : '',
+      raw.addressText !== undefined ? raw.addressText : '',
+      raw.connectable !== undefined ? raw.connectable : true,
+      raw.sessionId !== undefined ? raw.sessionId : ''
+    );
   }
 
   build() {
@@ -115,6 +224,17 @@ struct Index {
           onOpenBluetoothBle: () => {
             this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
             this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
+          },
+          onOpenBluetoothDiagnostics: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_DIAGNOSTICS });
+          },
+          onOpenBluetoothIdentity: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({
+              name: AppRoutes.BLUETOOTH_DEVICE,
+              param: new BluetoothObjectNavParams()
+            });
           }
         })
       }

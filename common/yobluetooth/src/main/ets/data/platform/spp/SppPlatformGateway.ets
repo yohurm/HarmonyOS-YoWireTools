@@ -1,8 +1,11 @@
 import { socket } from '@kit.ConnectivityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
 import { YoLog, YoLogger } from 'yolog';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
+import { BluetoothPlatformCodes } from '../../../constants/BluetoothPlatformCodes';
+import { SppSocketKind } from '../../../domain/model/SppSocketKind';
 import { BtLogTag } from '../../../observability/BtLogTag';
 import { ConnectivityKitEventBridge } from '../../kit/ConnectivityKitEventBridge';
 
@@ -16,11 +19,21 @@ export class SppRfcommConnectRequest {
   readonly classicDeviceId: string;
   readonly serviceUuid: string;
   readonly secure: boolean;
+  readonly socketKind: SppSocketKind;
+  readonly psm: number;
 
-  constructor(classicDeviceId: string, serviceUuid: string, secure: boolean = false) {
+  constructor(
+    classicDeviceId: string,
+    serviceUuid: string,
+    secure: boolean = false,
+    socketKind: SppSocketKind = SppSocketKind.RFCOMM,
+    psm: number = 0
+  ) {
     this.classicDeviceId = classicDeviceId;
     this.serviceUuid = serviceUuid;
     this.secure = secure;
+    this.socketKind = socketKind;
+    this.psm = psm;
   }
 }
 
@@ -39,11 +52,21 @@ export class SppPlatformGateway {
   connect(request: SppRfcommConnectRequest): Promise<Result<number>> {
     return new Promise((resolve: (value: Result<number>) => void) => {
       try {
+        if (request.socketKind !== SppSocketKind.RFCOMM && request.psm <= 0) {
+          resolve(Result.fail(new ResultError(
+            BluetoothErrorCodes.L2CAP_PSM_REQUIRED,
+            'L2CAP connect requires a PSM'
+          )));
+          return;
+        }
         const options: socket.SppOptions = {
           uuid: request.serviceUuid,
           secure: request.secure,
-          type: socket.SppType.SPP_RFCOMM
+          type: SppPlatformGateway.toSppType(request.socketKind)
         };
+        if (request.socketKind !== SppSocketKind.RFCOMM) {
+          options.psm = request.psm;
+        }
         logger.i(`sppConnect begin device=${request.classicDeviceId} uuid=${request.serviceUuid} secure=${request.secure}`);
         socket.sppConnect(request.classicDeviceId, options, (err: BusinessError, clientSocket: number) => {
           if (err) {
@@ -65,6 +88,16 @@ export class SppPlatformGateway {
   async writeAsync(clientSocket: number, bytes: Uint8Array): Promise<Result<number>> {
     if (clientSocket < 0) {
       return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'invalid clientSocket'));
+    }
+    if (deviceInfo.sdkApiVersion >= BluetoothConstants.SPP_SOCKET_QUERY_API &&
+      !socket.isConnected(clientSocket)) {
+      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'socket is not connected'));
+    }
+    if (bytes.length > BluetoothConstants.SPP_MAX_WRITE_BYTES) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.SPP_WRITE_TOO_LARGE,
+        'Single SPP write exceeds 1024 bytes'
+      ));
     }
     try {
       const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
@@ -149,13 +182,14 @@ export class SppPlatformGateway {
     if (err.code === 801) {
       return new ResultError(BluetoothErrorCodes.SPP_UNSUPPORTED, err.message, err);
     }
-    if (err.code === 2900003) {
-      return new ResultError(BluetoothErrorCodes.ADAPTER_OFF, err.message, err);
+    const mapped = BluetoothPlatformCodes.domainCode(err.code);
+    if (mapped.length > 0) {
+      return new ResultError(mapped, err.message, err, {}, `${err.code}`);
     }
-    if (err.code === 2900004) {
-      return new ResultError(BluetoothErrorCodes.SPP_PROFILE_UNSUPPORTED, err.message, err);
+    if (err.code === BluetoothPlatformCodes.PROFILE_BUSY) {
+      return new ResultError(BluetoothErrorCodes.SPP_PROFILE_UNSUPPORTED, err.message, err, {}, `${err.code}`);
     }
-    return new ResultError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err.message, err);
+    return new ResultError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err.message, err, {}, `${err.code}`);
   }
 
   /** Maps 2901054 → YW-BT-1315 (link IO / disconnect). */
@@ -167,6 +201,91 @@ export class SppPlatformGateway {
       return new ResultError(BluetoothErrorCodes.ADAPTER_OFF, err.message, err);
     }
     return new ResultError(BluetoothErrorCodes.DISCONNECTED, err.message, err);
+  }
+
+  listen(
+    name: string,
+    uuid: string,
+    secure: boolean,
+    kind: SppSocketKind,
+    psm: number
+  ): Promise<Result<number>> {
+    return new Promise((resolve: (value: Result<number>) => void) => {
+      try {
+        const options: socket.SppOptions = {
+          uuid: uuid,
+          secure: secure,
+          type: SppPlatformGateway.toSppType(kind)
+        };
+        if (kind !== SppSocketKind.RFCOMM) {
+          options.psm = psm;
+        }
+        socket.sppListen(name, options, (err: BusinessError, serverSocket: number) => {
+          if (err) {
+            resolve(Result.fail(SppPlatformGateway.mapConnectError(err)));
+            return;
+          }
+          resolve(Result.ok(serverSocket));
+        });
+      } catch (error) {
+        const err = error as BusinessError;
+        resolve(Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err)));
+      }
+    });
+  }
+
+  accept(serverSocket: number): Promise<Result<number>> {
+    return new Promise((resolve: (value: Result<number>) => void) => {
+      try {
+        socket.sppAccept(serverSocket, (err: BusinessError, clientSocket: number) => {
+          if (err) {
+            resolve(Result.fail(SppPlatformGateway.mapConnectError(err)));
+            return;
+          }
+          resolve(Result.ok(clientSocket));
+        });
+      } catch (error) {
+        const err = error as BusinessError;
+        resolve(Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_CONNECT_FAILED, err)));
+      }
+    });
+  }
+
+  closeServer(serverSocket: number): Result<void> {
+    try {
+      if (serverSocket >= 0) {
+        socket.sppCloseServerSocket(serverSocket);
+      }
+      return Result.ok(undefined);
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_IO_ERROR, err));
+    }
+  }
+
+  maxTransmitBytes(clientSocket: number): Result<number> {
+    if (deviceInfo.sdkApiVersion < BluetoothConstants.SPP_SOCKET_QUERY_API) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.CAPABILITY_UNSUPPORTED,
+        'getMaxTransmitDataSize requires API 22'
+      ));
+    }
+    try {
+      return Result.ok(socket.getMaxTransmitDataSize(clientSocket));
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ResultError.fromBusinessError(BluetoothErrorCodes.SPP_IO_ERROR, err));
+    }
+  }
+
+  private static toSppType(kind: SppSocketKind): socket.SppType {
+    if (kind === SppSocketKind.L2CAP) {
+      return socket.SppType.SPP_L2CAP;
+    }
+    if (kind === SppSocketKind.L2CAP_BLE) {
+      return socket.SppType.SPP_L2CAP_BLE;
+    }
+    return socket.SppType.SPP_RFCOMM;
   }
 
   private static previewHex(bytes: Uint8Array): string {

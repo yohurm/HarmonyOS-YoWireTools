@@ -90,10 +90,7 @@ export class BluetoothIdentityDataSource {
     return this.dualLinks.get(deviceId.toUpperCase());
   }
 
-  resolvePersistentMac(address: string): string {
-    if (BluetoothIdentityDataSource.looksLikeMac(address)) {
-      return address;
-    }
+  resolvePersistentMac(_address: string): string {
     return '';
   }
 
@@ -202,21 +199,18 @@ export class BluetoothIdentityDataSource {
     );
   }
 
+  /**
+   * Unpaired scan addresses stay ephemeral. addPersistentDeviceId is not called,
+   * so a MAC-shaped virtual address is not a persisted-address success.
+   */
   private static resolveStability(address: string, paired: boolean): IdentityStability {
     if (paired) {
       return IdentityStability.PAIRED_STABLE;
-    }
-    if (BluetoothIdentityDataSource.looksLikeMac(address)) {
-      return IdentityStability.PERSISTENT_MAC;
     }
     if (address.length > 0) {
       return IdentityStability.EPHEMERAL_RANDOM;
     }
     return IdentityStability.UNKNOWN;
-  }
-
-  private static looksLikeMac(value: string): boolean {
-    return /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(value);
   }
 
   private static simpleHash(value: string): string {

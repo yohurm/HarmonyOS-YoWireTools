@@ -57,6 +57,21 @@ export class SppReconnectCoordinator {
     this.ensureGlobalListeners();
   }
 
+  failureCount(): number {
+    let total = 0;
+    this.bindings.forEach((binding: SppReconnectBinding) => {
+      total = total + binding.attempt;
+    });
+    return total;
+  }
+
+  stopAutoReconnect(): void {
+    const sessionIds = Array.from(this.bindings.keys());
+    for (let i = 0; i < sessionIds.length; i++) {
+      this.unbind(sessionIds[i]);
+    }
+  }
+
   unbind(sessionId: string): void {
     const binding = this.bindings.get(sessionId);
     if (binding !== undefined) {
