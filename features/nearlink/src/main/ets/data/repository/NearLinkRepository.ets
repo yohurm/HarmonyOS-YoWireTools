@@ -22,12 +22,14 @@ import { NearLinkRecentConnection } from '../../domain/model/NearLinkRecentConne
 import { NearLinkRepositoryContract } from '../../domain/repository/NearLinkRepositoryContract';
 import {
   SsapClientState,
+  SsapNotifyState,
   SsapPropertyNode,
   SsapServiceNode,
   SsapServiceTreeSnapshot
 } from '../../domain/model/SsapServiceTree';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkAdvParser } from '../../domain/service/NearLinkAdvParser';
+import { NearLinkScanPolicy } from '../../domain/service/NearLinkScanPolicy';
 import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
 import { SsapPropertyChangeDispatcher } from '../service/SsapPropertyChangeDispatcher';
 import { SsapPlatformMapper } from '../mapper/SsapPlatformMapper';
@@ -47,11 +49,15 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   private readonly dataTransferSources: Map<string, DataTransferDataSource> = new Map();
   private readonly ssapDispatchers: Map<string, SsapPropertyChangeDispatcher> = new Map();
   private readonly advertisingMap: Map<string, NearLinkAdvertisingPacket> = new Map();
+  private activeFilter: NearLinkScanFilter | undefined;
   private readonly devicesObservable: Observable<NearLinkDevice[]>;
   private readonly ssapTreeObservable: Observable<SsapServiceTreeSnapshot>;
   private readonly dataTransferPacketObservable: Observable<DataTransferPacket>;
   private readonly dataTransferIncomingSubscriptions: Map<string, Subscription> = new Map();
   private scanPhase: NearLinkScanPhase = NearLinkScanPhase.IDLE;
+  private scanStarting: boolean = false;
+  private readonly ssapClientAddress: Map<string, string> = new Map();
+  private readonly ssapByAddress: Map<string, SsapClientDataSource> = new Map();
   private activeScanSessionId: string = '';
   private favoritesCache: DeviceFavoriteRecord[] = [];
 
@@ -182,39 +188,45 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     );
   }
 
-  startScan(sessionId: string, filter: NearLinkScanFilter): Result<void> {
-    if (this.scanPhase === NearLinkScanPhase.SCANNING) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.OPERATION_BUSY, 'Scan already running'));
+  hasSsapClient(address: string): boolean {
+    return this.findSsapClient(address) !== undefined;
+  }
+
+  async startScan(sessionId: string, filter: NearLinkScanFilter): Promise<Result<void>> {
+    if (this.managerDataSource.isEmulator()) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.EMULATOR_UNAVAILABLE, 'api=startScan'));
+    }
+    if (this.scanPhase === NearLinkScanPhase.SCANNING || this.scanStarting) {
+      return Result.ok(undefined);
+    }
+    this.scanStarting = true;
+    this.activeFilter = filter;
+    const started = await this.scanDataSource.startScan(filter);
+    if (!started.success) {
+      this.scanStarting = false;
+      this.scanPhase = NearLinkScanPhase.FAILED;
+      return Result.fail(started.error ?? new ResultError(NearLinkErrorCodes.SCAN_FAILED, 'api=startScan'));
     }
     const subscribed = this.scanDataSource.onDeviceFound((payload: NearLinkDiscoveryPayload) => {
       this.handleDiscovery(payload);
     });
     if (!subscribed.success) {
+      await this.scanDataSource.stopScan();
+      this.scanStarting = false;
+      this.scanPhase = NearLinkScanPhase.FAILED;
       return subscribed;
     }
     this.scanPhase = NearLinkScanPhase.SCANNING;
     this.activeScanSessionId = sessionId;
-    void this.runScan(filter);
+    this.scanStarting = false;
     return Result.ok(undefined);
   }
 
-  private async runScan(filter: NearLinkScanFilter): Promise<void> {
-    const started = await this.scanDataSource.startScan(filter);
-    if (!started.success) {
-      this.scanDataSource.offDeviceFound();
-      this.scanPhase = NearLinkScanPhase.FAILED;
-    }
-  }
-
-  stopScan(): Result<void> {
-    void this.stopScanAsync();
-    return Result.ok(undefined);
-  }
-
-  private async stopScanAsync(): Promise<void> {
+  async stopScan(): Promise<Result<void>> {
     const stopped = await this.scanDataSource.stopScan();
-    this.scanDataSource.offDeviceFound();
+    this.scanStarting = false;
     this.scanPhase = stopped.success ? NearLinkScanPhase.COMPLETED : NearLinkScanPhase.FAILED;
+    return stopped;
   }
 
   listDevices(): NearLinkDevice[] {
@@ -297,6 +309,13 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   getOrCreateSsapClient(sessionId: string, address: string): Result<SsapClientDataSource> {
+    const bound = this.findSsapClient(address);
+    if (bound !== undefined) {
+      this.ssapClients.set(sessionId, bound);
+      this.ssapClientAddress.set(sessionId, address);
+      this.ssapByAddress.set(address, bound);
+      return Result.ok(bound);
+    }
     let client = this.ssapClients.get(sessionId);
     if (client === undefined) {
       client = new SsapClientDataSource();
@@ -306,7 +325,13 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
       }
       this.ssapClients.set(sessionId, client);
     }
+    this.ssapClientAddress.set(sessionId, address);
+    this.ssapByAddress.set(address, client);
     return Result.ok(client);
+  }
+
+  private findSsapClient(address: string): SsapClientDataSource | undefined {
+    return this.ssapByAddress.get(address);
   }
 
   async discoverSsapServices(sessionId: string, address: string, mtu: number): Promise<Result<SsapServiceTreeSnapshot>> {
@@ -380,6 +405,11 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
       client.release();
       this.ssapClients.delete(sessionId);
     }
+    const boundAddress = this.ssapClientAddress.get(sessionId);
+    if (boundAddress !== undefined) {
+      this.ssapByAddress.delete(boundAddress);
+    }
+    this.ssapClientAddress.delete(sessionId);
     this.ssapDispatchers.delete(sessionId);
   }
 
@@ -393,13 +423,33 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   private handleDiscovery(payload: NearLinkDiscoveryPayload): void {
+    const filter = this.activeFilter;
+    let belowGate = false;
+    if (filter !== undefined) {
+      const systemRssi = this.scanDataSource.getRssiFilterMode() === 'system';
+      const decision = NearLinkScanPolicy.applyLocal(
+        payload.advertising.serviceUuids,
+        payload.rssi,
+        payload.rssiValid,
+        filter.localServiceUuid,
+        filter.localUuidFilterEnabled,
+        filter.localRssiGate,
+        filter.hasLocalRssiGate,
+        systemRssi
+      );
+      if (!decision.visible) {
+        return;
+      }
+      belowGate = decision.belowLocalRssiGate;
+    }
     this.advertisingMap.set(payload.randomAddress, payload.advertising);
     const favorite = this.favoritesCache.some((f: DeviceFavoriteRecord) => f.address === payload.randomAddress);
     const aliasRecord = this.favoritesCache.find((f: DeviceFavoriteRecord) => f.address === payload.randomAddress);
     const device = NearLinkDeviceMapper.fromDiscovery(
       payload,
       favorite,
-      aliasRecord?.alias ?? ''
+      aliasRecord?.alias ?? '',
+      belowGate
     );
     this.merger.merge(device);
     this.devicesObservable.next(this.merger.listSorted());
@@ -436,7 +486,23 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
       const properties: SsapPropertyNode[] = [];
       const props = service.properties ?? [];
       for (let j = 0; j < props.length; j++) {
-        properties.push(new SsapPropertyNode(service.serviceUuid, props[j].propertyUuid));
+        const operation = props[j].operation ?? 0;
+        let hasClientConfig = false;
+        const descriptors = props[j].descriptors ?? [];
+        for (let k = 0; k < descriptors.length; k++) {
+          if (descriptors[k].descriptorType === ssap.PropertyDescriptorType.CLIENT_PROPERTY_CONFIG) {
+            hasClientConfig = true;
+          }
+        }
+        const valueBytes = props[j].value === undefined ? new Uint8Array(0) : new Uint8Array(props[j].value);
+        properties.push(new SsapPropertyNode(
+          service.serviceUuid,
+          props[j].propertyUuid,
+          SsapNotifyState.DISABLED,
+          NearLinkAdvParser.toHex(valueBytes),
+          operation,
+          hasClientConfig
+        ));
       }
       nodes.push(new SsapServiceNode(service.serviceUuid, properties));
     }

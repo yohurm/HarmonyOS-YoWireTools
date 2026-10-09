@@ -26,4 +26,17 @@ export class NearLinkErrorCodes {
   static readonly NOT_CONNECTED: string = 'YW-NL-1006';
   static readonly ENCRYPTION_UNVERIFIED: string = 'YW-NL-4001';
   static readonly OPERATION_BUSY: string = 'YW-NL-1010';
+  static readonly VERSION_UNAVAILABLE: string = 'version_unavailable';
+  static readonly CAPABILITY_UNSUPPORTED: string = 'capability_unsupported';
+  static readonly EMULATOR_UNAVAILABLE: string = 'emulator_unavailable';
+  static readonly VALIDATION: string = 'validation';
+  static readonly DURATION_RANGE: string = 'YW-NL-1007';
+  static readonly MANUFACTURER_ID_RANGE: string = 'YW-NL-1008';
+  static readonly NAME_LENGTH: string = 'YW-NL-1009';
+  static readonly HEX_INVALID: string = 'YW-NL-1011';
+  static readonly WRITE_TYPE_UNSUPPORTED: string = 'YW-NL-2203';
+  static readonly NOTIFY_UNSUPPORTED: string = 'YW-NL-2302';
+  static readonly ALREADY_PAIRED: string = 'already_paired';
+  static readonly BLOCKED_UNENCRYPTED: string = 'blocked_unencrypted';
+  static readonly GAP: string = 'gap';
 }

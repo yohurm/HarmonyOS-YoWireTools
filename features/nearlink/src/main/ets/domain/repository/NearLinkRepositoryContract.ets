@@ -15,8 +15,8 @@ export interface NearLinkRepositoryContract {
   getScanPhase(): NearLinkScanPhase;
   loadAdapterState(): Promise<Result<NearLinkAdapterSnapshot>>;
   loadOverview(permissionGranted: boolean): Promise<NearLinkOverviewSnapshot>;
-  startScan(sessionId: string, filter: NearLinkScanFilter): Result<void>;
-  stopScan(): Result<void>;
+  startScan(sessionId: string, filter: NearLinkScanFilter): Promise<Result<void>>;
+  stopScan(): Promise<Result<void>>;
   listDevices(): NearLinkDevice[];
   getAdvertising(address: string): NearLinkAdvertisingPacket | undefined;
   listRecentConnections(): NearLinkRecentConnection[];

@@ -23,17 +23,23 @@ export class SsapPropertyNode {
   readonly propertyUuid: string;
   notifyState: SsapNotifyState;
   lastValueHex: string;
+  readonly operation: number;
+  readonly hasClientConfig: boolean;
 
   constructor(
     serviceUuid: string,
     propertyUuid: string,
     notifyState: SsapNotifyState = SsapNotifyState.DISABLED,
-    lastValueHex: string = ''
+    lastValueHex: string = '',
+    operation: number = 0,
+    hasClientConfig: boolean = false
   ) {
     this.serviceUuid = serviceUuid;
     this.propertyUuid = propertyUuid;
     this.notifyState = notifyState;
     this.lastValueHex = lastValueHex;
+    this.operation = operation;
+    this.hasClientConfig = hasClientConfig;
   }
 }
 

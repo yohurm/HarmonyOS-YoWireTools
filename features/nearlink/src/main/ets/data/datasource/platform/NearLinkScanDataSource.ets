@@ -2,12 +2,13 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { scan } from '@kit.NearLinkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Result, ResultError } from 'common_core';
+import { KitEventSubscription } from 'common_platform';
 import { NearLinkScanFilter } from '../../../domain/model/NearLinkScanFilter';
 import { NearLinkScanPlatformMapper } from '../../mapper/NearLinkScanPlatformMapper';
 import { NearLinkAdvertisingPacket } from '../../../domain/model/NearLinkAdvertisingPacket';
 import { NearLinkAdvParser } from '../../../domain/service/NearLinkAdvParser';
+import { NearLinkConstants } from '../../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../../constants/NearLinkErrorCodes';
-import { NearLinkKitEventBridge } from '../../kit/NearLinkKitEventBridge';
 
 export class NearLinkDiscoveryPayload {
   readonly randomAddress: string;
@@ -16,6 +17,7 @@ export class NearLinkDiscoveryPayload {
   readonly rssiValid: boolean;
   readonly connectable: boolean;
   readonly advertising: NearLinkAdvertisingPacket;
+  readonly deviceClass: string;
 
   constructor(
     randomAddress: string,
@@ -23,7 +25,8 @@ export class NearLinkDiscoveryPayload {
     rssi: number,
     rssiValid: boolean,
     connectable: boolean,
-    advertising: NearLinkAdvertisingPacket
+    advertising: NearLinkAdvertisingPacket,
+    deviceClass: string = ''
   ) {
     this.randomAddress = randomAddress;
     this.deviceName = deviceName;
@@ -31,6 +34,15 @@ export class NearLinkDiscoveryPayload {
     this.rssiValid = rssiValid;
     this.connectable = connectable;
     this.advertising = advertising;
+    this.deviceClass = deviceClass;
+  }
+}
+
+export class NearLinkScanStartInfo {
+  readonly rssiFilter: string;
+
+  constructor(rssiFilter: string) {
+    this.rssiFilter = rssiFilter;
   }
 }
 
@@ -38,11 +50,11 @@ type DeviceFoundListener = (payload: NearLinkDiscoveryPayload) => void;
 
 export class NearLinkScanDataSource {
   private static instance: NearLinkScanDataSource | undefined;
-  private static readonly NULL_FILTER_MIN_API: number = 26;
   private findListener: DeviceFoundListener | undefined;
   private findHandler: ((results: scan.ScanResults[]) => void) | undefined;
   private scanning: boolean = false;
-  private activeFilter: NearLinkScanFilter | undefined;
+  private rssiFilterMode: string = 'none';
+  private seenApi: number = 0;
 
   private constructor() {
   }
@@ -54,41 +66,49 @@ export class NearLinkScanDataSource {
     return NearLinkScanDataSource.instance;
   }
 
-  static supportsNullFilterScan(): boolean {
-    try {
-      return deviceInfo.sdkApiVersion >= NearLinkScanDataSource.NULL_FILTER_MIN_API;
-    } catch (_error) {
-      return false;
-    }
-  }
-
   isScanning(): boolean {
     return this.scanning;
   }
 
-  async startScan(filter: NearLinkScanFilter): Promise<Result<void>> {
+  getRssiFilterMode(): string {
+    return this.rssiFilterMode;
+  }
+
+  async startScan(filter: NearLinkScanFilter): Promise<Result<NearLinkScanStartInfo>> {
+    const api = deviceInfo.sdkApiVersion;
+    this.seenApi = api;
     const validated = filter.validate();
     if (!validated.success) {
-      return validated;
+      return Result.fail(validated.error ?? new ResultError(NearLinkErrorCodes.EMPTY_FILTER, 'api=startScan'));
     }
+    if (filter.scanAll) {
+      if (api < NearLinkConstants.API_NULL_FILTER) {
+        return Result.fail(new ResultError(
+          NearLinkErrorCodes.VERSION_UNAVAILABLE,
+          `api=startScan;since=${NearLinkConstants.SINCE_NULL_FILTER}`,
+          undefined,
+          { 'since': NearLinkConstants.SINCE_NULL_FILTER },
+          ''
+        ));
+      }
+    }
+    const includeRssi = api >= NearLinkConstants.API_RSSI_FILTER;
+    this.rssiFilterMode = includeRssi && this.requestHasRssi(filter) ? 'system' :
+      (filter.hasLocalRssiGate ? 'local' : 'none');
     try {
       this.offDeviceFound();
-      this.activeFilter = filter;
-      const filters = NearLinkScanPlatformMapper.toPlatformFilters(filter);
       const options = NearLinkScanPlatformMapper.toScanOptions(filter);
-      if (filters.length === 0 && filter.allowNullFilter) {
-        if (!NearLinkScanDataSource.supportsNullFilterScan()) {
-          return Result.fail(new ResultError(
-            NearLinkErrorCodes.EMPTY_FILTER,
-            `Null filter requires API ${NearLinkScanDataSource.NULL_FILTER_MIN_API}+`
-          ));
-        }
+      if (filter.scanAll) {
+        await scan.startScan(null, options);
+      } else {
+        const filters = NearLinkScanPlatformMapper.toPlatformFilters(filter, includeRssi);
+        await scan.startScan(filters, options);
       }
-      await scan.startScan(filters, options);
       this.scanning = true;
-      return Result.ok(undefined);
+      return Result.ok(new NearLinkScanStartInfo(this.rssiFilterMode));
     } catch (error) {
       const err = error as BusinessError;
+      this.scanning = false;
       return Result.fail(ResultError.fromError(NearLinkErrorCodes.SCAN_FAILED, err));
     }
   }
@@ -101,6 +121,8 @@ export class NearLinkScanDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
+      this.scanning = false;
+      this.offDeviceFound();
       return Result.fail(ResultError.fromError(NearLinkErrorCodes.SCAN_FAILED, err));
     }
   }
@@ -108,18 +130,33 @@ export class NearLinkScanDataSource {
   onDeviceFound(listener: DeviceFoundListener): Result<void> {
     this.offDeviceFound();
     this.findListener = listener;
-    this.findHandler = (results: scan.ScanResults[]) => {
+    const handler = (results: scan.ScanResults[]) => {
       this.dispatchResults(results);
     };
-    return NearLinkKitEventBridge.subscribeDeviceFound(this.findHandler);
+    this.findHandler = handler;
+    return KitEventSubscription.subscribe(() => {
+      scan.on('deviceFound', handler);
+    }, 'scan.deviceFound');
   }
 
   offDeviceFound(): void {
     if (this.findHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribeDeviceFound(this.findHandler);
+      const handler = this.findHandler;
+      KitEventSubscription.unsubscribe(() => {
+        scan.off('deviceFound', handler);
+      }, 'scan.deviceFound');
       this.findHandler = undefined;
     }
     this.findListener = undefined;
+  }
+
+  private requestHasRssi(filter: NearLinkScanFilter): boolean {
+    for (let i = 0; i < filter.groups.length; i++) {
+      if (filter.groups[i].hasRssi) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private dispatchResults(results: scan.ScanResults[]): void {
@@ -131,21 +168,20 @@ export class NearLinkScanDataSource {
       const rssi = item.rssi;
       const rssiValid = NearLinkAdvParser.isRssiValid(rssi);
       const advertising = NearLinkAdvParser.parseRawData(item.data, item.deviceName ?? '');
-      const deviceName = item.deviceName.length > 0 ? item.deviceName :
-        (advertising.localName.length > 0 ? advertising.localName : item.address);
-      const payload = new NearLinkDiscoveryPayload(
+      const deviceName = item.deviceName.length > 0 ? item.deviceName : item.address;
+      let deviceClass = '';
+      if (this.seenApi >= NearLinkConstants.API_DEVICE_CLASS && item.deviceClass !== undefined) {
+        deviceClass = `${item.deviceClass}`;
+      }
+      this.findListener(new NearLinkDiscoveryPayload(
         item.address,
         deviceName,
         rssi,
         rssiValid,
         item.isConnectable,
-        advertising
-      );
-      if (this.activeFilter !== undefined &&
-        !this.activeFilter.matchesPostFilter(payload.deviceName, payload.rssi, payload.rssiValid)) {
-        continue;
-      }
-      this.findListener(payload);
+        advertising,
+        deviceClass
+      ));
     }
   }
 }

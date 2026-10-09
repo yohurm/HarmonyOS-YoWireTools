@@ -25,7 +25,9 @@ export class ScanResultMerger {
       device.serviceUuids.length > 0 ? device.serviceUuids : merged.serviceUuids,
       merged.alias.length > 0 ? merged.alias : device.alias,
       device.rawHex.length > 0 ? device.rawHex : merged.rawHex,
-      merged.seenCount
+      merged.seenCount,
+      device.deviceClass.length > 0 ? device.deviceClass : merged.deviceClass,
+      device.belowLocalRssiGate
     );
     this.devices.set(device.randomAddress, withMeta);
     return withMeta;
@@ -43,8 +45,10 @@ export class ScanResultMerger {
       if (a.rssiValid !== b.rssiValid) {
         return a.rssiValid ? -1 : 1;
       }
-      if (a.rssi !== b.rssi) {
-        return b.rssi - a.rssi;
+      const left = a.rssiValid ? a.rssi : -1000;
+      const right = b.rssiValid ? b.rssi : -1000;
+      if (left !== right) {
+        return right - left;
       }
       return b.lastSeenMs - a.lastSeenMs;
     });

@@ -67,7 +67,7 @@ export class StartNearLinkScanUseCase {
     if (!started.success) {
       return Result.fail(started.error ?? new ResultError('YW-SESSION-1003', 'Session start failed'));
     }
-    const scan = this.repository.startScan(created.value.id, filter);
+    const scan = await this.repository.startScan(created.value.id, filter);
     if (!scan.success) {
       return Result.fail(scan.error ?? new ResultError(NearLinkErrorCodes.SCAN_FAILED, 'Scan failed'));
     }
@@ -89,7 +89,7 @@ export class StopNearLinkScanUseCase {
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    const stopped = this.repository.stopScan();
+    const stopped = await this.repository.stopScan();
     if (!stopped.success) {
       return stopped;
     }

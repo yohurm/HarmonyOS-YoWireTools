@@ -18,7 +18,7 @@ export class CongestionPolicy {
   readonly maxBackoffMs: number;
   readonly maxRetryCount: number;
 
-  constructor(initialBackoffMs: number = 50, maxBackoffMs: number = 500, maxRetryCount: number = 5) {
+  constructor(initialBackoffMs: number = 10, maxBackoffMs: number = 500, maxRetryCount: number = 5) {
     this.initialBackoffMs = initialBackoffMs;
     this.maxBackoffMs = maxBackoffMs;
     this.maxRetryCount = maxRetryCount;
@@ -33,7 +33,7 @@ export class DataTransferPortConfig {
 
   constructor(
     uuid: string = '',
-    mtu: number = 256,
+    mtu: number = 512,
     secureRequired: boolean = false,
     congestionPolicy: CongestionPolicy = new CongestionPolicy()
   ) {

@@ -3,7 +3,12 @@ import { NearLinkDiscoveryPayload } from '../datasource/platform/NearLinkScanDat
 import { NearLinkDevice } from '../../domain/model/NearLinkDevice';
 
 export class NearLinkDeviceMapper {
-  static fromDiscovery(payload: NearLinkDiscoveryPayload, favorite: boolean = false, alias: string = ''): NearLinkDevice {
+  static fromDiscovery(
+    payload: NearLinkDiscoveryPayload,
+    favorite: boolean = false,
+    alias: string = '',
+    belowLocalRssiGate: boolean = false
+  ): NearLinkDevice {
     return new NearLinkDevice(
       payload.randomAddress,
       payload.deviceName,
@@ -15,7 +20,10 @@ export class NearLinkDeviceMapper {
       TimeUtil.nowMs(),
       payload.advertising.serviceUuids,
       alias,
-      payload.advertising.rawHex
+      payload.advertising.rawHex,
+      1,
+      payload.deviceClass,
+      belowLocalRssiGate
     );
   }
 }

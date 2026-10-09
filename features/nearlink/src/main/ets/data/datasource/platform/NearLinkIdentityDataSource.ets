@@ -49,7 +49,7 @@ export class NearLinkIdentityDataSource {
       '',
       0,
       uuid,
-      '{}',
+      `{"name":"${device.displayName}","deviceClass":"${device.deviceClass}","address":"${device.randomAddress}"}`,
       Date.now()
     );
     return this.targetRepository.saveFavorite(record);

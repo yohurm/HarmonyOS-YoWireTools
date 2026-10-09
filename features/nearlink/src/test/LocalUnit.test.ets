@@ -1,45 +1,101 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { NearLinkScanFilter, NearLinkScanMode } from '../main/ets/domain/model/NearLinkScanFilter';
+import { NearLinkConstants } from '../main/ets/constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../main/ets/constants/NearLinkErrorCodes';
-import { NearLinkAdvParser } from '../main/ets/domain/service/NearLinkAdvParser';
-import { NearLinkExtendedUseCases } from '../main/ets/domain/usecase/NearLinkExtendedUseCases';
-import { DeviceNameSource } from '../main/ets/domain/model/NearLinkAdvertisingPacket';
+import { NearLinkScanFilter, NearLinkScanMode, NearLinkSystemFilter } from '../main/ets/domain/model/NearLinkScanFilter';
+import { NearLinkGap } from '../main/ets/domain/model/NearLinkScreenCategory';
+import { NearLinkLogEntry } from '../main/ets/domain/model/NearLinkLogEntry';
+import {
+  NearLinkGapFacts,
+  NearLinkLogBook,
+  NearLinkPairedPresentation,
+  NearLinkReasonPolicy,
+  NearLinkSlicePlan
+} from '../main/ets/domain/service/NearLinkDebugRules';
+import { NearLinkScanForm } from '../main/ets/domain/service/NearLinkScanForm';
+import { NearLinkPayloadRules, NearLinkScanPolicy } from '../main/ets/domain/service/NearLinkScanPolicy';
 
 export default function localUnitTest() {
   describe('NearLinkLocalUnitTest', () => {
-    it('NearLinkScanFilter_rejects_empty_without_null_flag', 0, () => {
+    it('rejects_empty_filter_with_401', 0, () => {
       const filter = new NearLinkScanFilter();
       const validated = filter.validate();
       expect(validated.success).assertFalse();
       expect(validated.error?.code).assertEqual(NearLinkErrorCodes.EMPTY_FILTER);
+      expect(validated.error?.nativeCode).assertEqual(`${NearLinkConstants.NATIVE_INVALID}`);
     });
 
-    it('NearLinkScanFilter_rejects_mask_length_mismatch', 0, () => {
-      const filter = new NearLinkScanFilter('', '', 1, 'aabb', 'aa');
-      const validated = filter.validate();
-      expect(validated.success).assertFalse();
-      expect(validated.error?.code).assertEqual(NearLinkErrorCodes.MASK_LENGTH_MISMATCH);
+    it('accepts_named_filter', 0, () => {
+      const filter = NearLinkScanFilter.named('YoWire');
+      expect(filter.validate().success).assertTrue();
+      expect(filter.scanMode).assertEqual(NearLinkScanMode.LOW_POWER);
     });
 
-    it('NearLinkScanFilter_matches_post_filter_rssi_and_name', 0, () => {
-      const filter = new NearLinkScanFilter('', 'Yo', -1, '', '', false, NearLinkScanMode.BALANCED, 0, -50);
-      expect(filter.matchesPostFilter('YoWire Device', -40, true)).assertTrue();
-      expect(filter.matchesPostFilter('Other', -40, true)).assertFalse();
-      expect(filter.matchesPostFilter('YoWire', -80, true)).assertFalse();
+    it('rejects_duration_and_name_and_manufacturer', 0, () => {
+      const duration = new NearLinkScanFilter([new NearLinkSystemFilter('', 'Yo')], NearLinkScanMode.LOW_POWER, 9);
+      expect(duration.validate().error?.code).assertEqual(NearLinkErrorCodes.DURATION_RANGE);
+      const named = new NearLinkScanFilter([new NearLinkSystemFilter('', '1234567890123456789012345678901')]);
+      expect(named.validate().error?.code).assertEqual(NearLinkErrorCodes.NAME_LENGTH);
+      const maker = new NearLinkScanFilter([new NearLinkSystemFilter('', '', 0, 'aa')]);
+      expect(maker.validate().error?.code).assertEqual(NearLinkErrorCodes.MANUFACTURER_ID_RANGE);
+      const mask = new NearLinkScanFilter([new NearLinkSystemFilter('', '', 1, 'aabb', 'aa')]);
+      expect(mask.validate().error?.code).assertEqual(NearLinkErrorCodes.MASK_LENGTH_MISMATCH);
     });
 
-    it('NearLinkAdvParser_hex_roundtrip_via_usecase', 0, () => {
-      const bytes = NearLinkExtendedUseCases.hexToBytes('59 6F');
-      expect(bytes.length).assertEqual(2);
-      expect(bytes[0]).assertEqual(0x59);
-      expect(NearLinkAdvParser.toHex(bytes)).assertEqual('596F');
+    it('keeps_local_rssi_off_the_system_filter_below_26', 0, () => {
+      const filter = NearLinkScanForm.toFilter('11:22', 'Yo', '', '', '', '-70', false,
+        NearLinkScanMode.BALANCED, '', false, '', false);
+      expect(filter.groups[0].hasRssi).assertFalse();
+      expect(filter.hasLocalRssiGate).assertTrue();
+      expect(NearLinkScanForm.modeFromIndex(99)).assertEqual(NearLinkScanMode.LOW_POWER);
     });
 
-    it('NearLinkAdvParser_parses_complete_name', 0, () => {
-      const bytes = new Uint8Array([0x06, 0x09, 0x59, 0x6F, 0x57, 0x69, 0x72, 0x65]);
-      const parsed = NearLinkAdvParser.parseBytes(bytes);
-      expect(parsed.localName).assertEqual('YoWire');
-      expect(parsed.nameSource).assertEqual(DeviceNameSource.ADV_LOCAL_NAME);
+    it('local_uuid_filter_off_keeps_the_row', 0, () => {
+      const open = NearLinkScanPolicy.matchesLocalUuid(['37BEA880'], '0609', false);
+      const closed = NearLinkScanPolicy.matchesLocalUuid(['AAAA'], '0609', true);
+      expect(open).assertTrue();
+      expect(closed).assertFalse();
+      expect(NearLinkScanPolicy.rssiSortKey(127, false)).assertEqual(-1000);
+    });
+
+    it('payload_rules_reject_bad_hex_mtu_and_write_type', 0, () => {
+      expect(NearLinkPayloadRules.isEvenHex('abc')).assertFalse();
+      expect(NearLinkPayloadRules.isEvenHex('0a')).assertTrue();
+      expect(NearLinkPayloadRules.validateSsapMtu(21).success).assertFalse();
+      expect(NearLinkPayloadRules.validateSsapMtu(256).success).assertTrue();
+      expect(NearLinkPayloadRules.validatePortMtu(1, false).value).assertEqual(NearLinkConstants.PORT_MTU_DEFAULT);
+      expect(NearLinkPayloadRules.writeAllowed(NearLinkConstants.OP_WRITE_NO_RESPONSE, true)).assertFalse();
+      expect(NearLinkPayloadRules.canNotify(NearLinkConstants.OP_NOTIFY, false)).assertFalse();
+      expect(NearLinkPayloadRules.validateAdvertisingInterval(10).success).assertFalse();
+      expect(NearLinkPayloadRules.shouldRespondToWrite(1)).assertTrue();
+      expect(NearLinkPayloadRules.shouldRespondToWrite(2)).assertFalse();
+    });
+
+    it('slice_waits_for_confirmation', 0, () => {
+      const bytes = new Uint8Array(30);
+      const blocked = NearLinkSlicePlan.plan(bytes, 22, false);
+      expect(blocked.success).assertFalse();
+      const allowed = NearLinkSlicePlan.plan(bytes, 22, true);
+      expect(allowed.success).assertTrue();
+      expect(allowed.value?.length).assertEqual(2);
+    });
+
+    it('gaps_have_no_success_path_and_reason_msg_does_not_branch', 0, () => {
+      expect(NearLinkGapFacts.successPathCount()).assertEqual(0);
+      expect(NearLinkGap.hasSuccessPath(NearLinkGap.UNPAIR)).assertFalse();
+      expect(NearLinkReasonPolicy.affectsUiBranch('detail')).assertFalse();
+      expect(NearLinkReasonPolicy.pairingCategory('remote_canceled', 'ignore-me')).assertEqual('remote_canceled');
+      expect(NearLinkPairedPresentation.showEmptyAsNone(true, 0)).assertFalse();
+      expect(NearLinkPairedPresentation.showEmptyAsNone(false, 0)).assertTrue();
+    });
+
+    it('export_keeps_entries_when_format_is_reused', 0, () => {
+      const entry = new NearLinkLogEntry('1', 1, 'out', 'writeData', '', '', 'hidden', '0A0B', false);
+      const text = NearLinkLogBook.format([entry]);
+      expect(text.indexOf('writeData') >= 0).assertTrue();
+      expect(text.indexOf('0A0B') >= 0).assertTrue();
+      expect(text.indexOf('reasonMsg=hidden') >= 0).assertTrue();
+      const kept = NearLinkLogBook.retainOnFailure([entry]);
+      expect(kept.length).assertEqual(1);
     });
   });
 }

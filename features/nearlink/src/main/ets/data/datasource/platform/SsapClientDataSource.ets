@@ -4,7 +4,8 @@ import { Result, ResultError } from 'common_core';
 import { NearLinkConstants } from '../../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../../constants/NearLinkErrorCodes';
 import { NearLinkAdvParser } from '../../../domain/service/NearLinkAdvParser';
-import { NearLinkKitEventBridge } from '../../kit/NearLinkKitEventBridge';
+import { NearLinkPayloadRules } from '../../../domain/service/NearLinkScanPolicy';
+import { KitEventSubscription } from 'common_platform';
 
 type ConnectionStateListener = (state: ssap.ConnectionChangeState) => void;
 type PropertyChangeListener = (property: ssap.Property) => void;
@@ -41,13 +42,21 @@ export class SsapClientDataSource {
     if (this.client === undefined) {
       return Result.fail(new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'SSAP client not created'));
     }
-    this.connectionHandler = listener;
-    return NearLinkKitEventBridge.subscribeConnectionStateChange(this.client, this.connectionHandler);
+    const handler = listener;
+    this.connectionHandler = handler;
+    const client = this.client;
+    return KitEventSubscription.subscribe(() => {
+      client.on('connectionStateChange', handler);
+    }, 'ssap.connectionStateChange');
   }
 
   offConnectionStateChange(): void {
     if (this.client !== undefined && this.connectionHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribeConnectionStateChange(this.client, this.connectionHandler);
+      const client = this.client;
+      const handler = this.connectionHandler;
+      KitEventSubscription.unsubscribe(() => {
+        client.off('connectionStateChange', handler);
+      }, 'ssap.connectionStateChange');
     }
     this.connectionHandler = undefined;
   }
@@ -127,18 +136,58 @@ export class SsapClientDataSource {
     }
   }
 
-  async writeProperty(serviceUuid: string, propertyUuid: string, data: ArrayBuffer): Promise<Result<void>> {
+  async writeByOperation(
+    serviceUuid: string,
+    propertyUuid: string,
+    data: ArrayBuffer,
+    operation: number,
+    withResponse: boolean
+  ): Promise<Result<void>> {
+    if (!NearLinkPayloadRules.writeAllowed(operation, withResponse)) {
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.WRITE_TYPE_UNSUPPORTED,
+        'api=writeProperty'
+      ));
+    }
+    const writeType = withResponse ?
+      ssap.PropertyWriteType.WRITE :
+      ssap.PropertyWriteType.WRITE_NO_RESPONSE;
+    return this.writeProperty(serviceUuid, propertyUuid, data, writeType);
+  }
+
+  async writeProperty(
+    serviceUuid: string,
+    propertyUuid: string,
+    data: ArrayBuffer,
+    writeType: ssap.PropertyWriteType = ssap.PropertyWriteType.WRITE
+  ): Promise<Result<void>> {
     try {
       if (this.client === undefined) {
-        return Result.fail(new ResultError(NearLinkErrorCodes.SSAP_WRITE_FAILED, 'SSAP client not created'));
+        return Result.fail(new ResultError(NearLinkErrorCodes.SSAP_WRITE_FAILED, 'api=writeProperty'));
       }
       const request = this.buildProperty(serviceUuid, propertyUuid, data);
-      await this.client.writeProperty(request, ssap.PropertyWriteType.WRITE);
+      await this.client.writeProperty(request, writeType);
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
       return Result.fail(ResultError.fromBusinessError(NearLinkErrorCodes.SSAP_WRITE_FAILED, err));
     }
+  }
+
+  async notifyByOperation(
+    serviceUuid: string,
+    propertyUuid: string,
+    enable: boolean,
+    operation: number,
+    hasClientConfig: boolean
+  ): Promise<Result<void>> {
+    if (enable && !NearLinkPayloadRules.canNotify(operation, hasClientConfig)) {
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.NOTIFY_UNSUPPORTED,
+        'api=setPropertyNotification'
+      ));
+    }
+    return this.setPropertyNotification(serviceUuid, propertyUuid, enable);
   }
 
   async setPropertyNotification(serviceUuid: string, propertyUuid: string, enable: boolean): Promise<Result<void>> {
@@ -176,13 +225,21 @@ export class SsapClientDataSource {
     if (this.client === undefined) {
       return Result.fail(new ResultError(NearLinkErrorCodes.SSAP_NOTIFY_FAILED, 'SSAP client not created'));
     }
-    this.propertyHandler = listener;
-    return NearLinkKitEventBridge.subscribePropertyChange(this.client, this.propertyHandler);
+    const handler = listener;
+    this.propertyHandler = handler;
+    const client = this.client;
+    return KitEventSubscription.subscribe(() => {
+      client.on('propertyChange', handler);
+    }, 'ssap.propertyChange');
   }
 
   offPropertyChange(): void {
     if (this.client !== undefined && this.propertyHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribePropertyChange(this.client, this.propertyHandler);
+      const client = this.client;
+      const handler = this.propertyHandler;
+      KitEventSubscription.unsubscribe(() => {
+        client.off('propertyChange', handler);
+      }, 'ssap.propertyChange');
     }
     this.propertyHandler = undefined;
   }
@@ -196,12 +253,20 @@ export class SsapClientDataSource {
       this.negotiatedMtu = mtu;
       listener(mtu);
     };
-    return NearLinkKitEventBridge.subscribeMtuChange(this.client, this.mtuHandler);
+    const handler = this.mtuHandler;
+    const client = this.client;
+    return KitEventSubscription.subscribe(() => {
+      client.on('mtuChange', handler);
+    }, 'ssap.mtuChange');
   }
 
   offMtuChange(): void {
     if (this.client !== undefined && this.mtuHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribeMtuChange(this.client, this.mtuHandler);
+      const client = this.client;
+      const handler = this.mtuHandler;
+      KitEventSubscription.unsubscribe(() => {
+        client.off('mtuChange', handler);
+      }, 'ssap.mtuChange');
     }
     this.mtuHandler = undefined;
   }
