@@ -1,0 +1,73 @@
+---
+id: ui.bluetooth.spp-terminal
+type: ui-design
+status: draft
+when: design
+phase: C
+checklist: [BT-037, BT-038, BT-039, BT-040, BT-041, BT-042, BT-043, BT-044, BT-045, BT-046]
+related:
+  - docs/goal/ui/bluetooth/index.md
+  - docs/goal/ui/bluetooth/l2cap.md
+  - docs/goal/architecture/bluetooth/BT-037.md
+  - features/bluetooth/src/main/ets/ui/page/SppTerminalPage.ets
+---
+
+# SPP 终端
+
+路由 `/bluetooth/spp/terminal`，参数是会话 id。页面 `SppTerminalPage`，状态 `SppTerminalViewModel`。读写只经 `common/yobluetooth` 的 SPP 用例。L2CAP 与本页共用终端壳，类型分段见 [L2CAP](l2cap.md)。本页默认类型是 `SPP_RFCOMM`。
+
+## 结构
+
+`YoPageShell`，`TERMINAL`，显示返回，`scrollable` 为假，`contentEdgeToEdge` 为真。标题是设备名，副标题是 UUID 的短标签。
+
+纵向三区，中间区吃掉剩余高度（`layoutWeight`）：
+
+1. 顶栏：连接胶囊、角色胶囊（客户端 / 服务端）、`YoSegmentButton` 三项「RFCOMM / L2CAP / L2CAP BLE」。分段按钮的宽度由外层 `Column` 给，不链式写在分段组件上。
+2. 报文 `List`：每行时间、方向、长度、一段 HEX。一次回调一行（BT-040）。字号 `YoTypeStyle.MONO_S`。
+3. 底栏：`TextInput`、HEX / 文本分段、`YoActionButton`「发送」。大数据发送时同一位置变成「停止发送」。
+
+服务端模式在顶栏下多一行：监听胶囊和「等待接入 / 已接入」。`sppListen` 与 `sppAccept` 的结果分开显示（BT-044）。
+
+`≥600vp` 时左栏是会话与 UUID，右栏是报文加发送。发送栏贴在右栏底部。
+
+## 信息密度
+
+默认 UUID 显示标准串口 `00001101-0000-1000-8000-00805F9B34FB`，允许改成自定义 UUID（BT-037、BT-039）。UUID 用等宽，完整值在一行内可横向滚动，不折成多行解释。
+
+报文行不把一次读取合并成「一条业务消息」。长度用十进制字节数。超过两行 HEX 在行内省略，点行才展开全文。展开仍在本页，不新开路由。
+
+未连接时底栏留着，发送按钮禁用，避免用户找不到入口（BT-043）。
+
+## 控件
+
+| 区域 | 符号 |
+| --- | --- |
+| 类型 | `YoSegmentButton` |
+| 连接 / 监听 | `YoStatusPill` |
+| 发送、停止、断开、开始监听 | `YoActionButton` |
+| 非法 HEX | 输入框下 `YoColor.ERROR` 的 `BODY_S` 说明 |
+| 无报文 | `YoEmpty` 放在 List 区域 |
+| 连接失败 | `YoError` 放在顶栏下，List 仍保留已有行 |
+| 复制短反馈 | `YoToast` |
+
+标题栏更多菜单沿用特性里的 `SppTerminalMoreMenu`，项用 `YoTitleBarMenuItem`，由 `YoPageShell` 呈现。
+
+## 状态
+
+| 状态 | 本屏 |
+| --- | --- |
+| 默认 | 已连接。胶囊 `success`「已连接」。输入为空。List 有历史则显示历史。标准或两端一致的自定义 UUID 都可以是这个默认 |
+| 按下 | 「发送」按下松手后提交。「停止发送」按下松手后停止后续分段。行按下展开 HEX |
+| 禁用 | 未连接或 API 22+ `isConnected` 为假时发送禁用，原因「未连接」（BT-043）。HEX 非法时发送禁用，原因「HEX 无效」（BT-046）。写操作进行中「发送」改为「停止发送」，避免再入队 |
+| 空 | 已连接但还没有字节：List 区 `YoEmpty`，标题「还没有数据」，没有主操作。未连接不是空，是禁用加说明 |
+| 错误 | UUID 不一致：不进入已连接，顶栏 `YoError` 说明原因（BT-038）。未配对：文案「尚未配对」，下一步「发起配对」，码 2900016（BT-022）。单次写入超过建议上限：该段不标已发送；默认分段长度 600 字节，超过 1024 字节失败可见（BT-041）。服务端关闭后本机胶囊变为未连接，对端方向不再追加成功行（BT-045） |
+| 加载 | 连接或 `sppAccept` 未返回时胶囊「连接中」，发送禁用。大缓冲写出时界面保持可点「停止发送」，不用整页 `YoLoading` 盖住终端（BT-042） |
+
+## 导航
+
+返回发现页，会话按 ViewModel 决定保持或关闭；关闭动作在菜单里显式叫「断开」，不靠返回键偷偷断开。未配对错误打开配对半模态。本终端不从星闪或 Wi‑Fi 进入。
+
+## 非目标
+
+- 不把 A2DP / HFP 已连接画进这页的「已连接」。
+- 不在 Kit 里新增终端、日志行或 HEX 输入组件。
