@@ -4,7 +4,7 @@ type: checklist
 status: active
 when: research
 when_to_use: 蓝牙专业调试能力逐条做架构设计之前
-related: [research.synthesis.client-runtime]
+related: [docs/goal/research/bluetooth.md]
 ---
 
 # 蓝牙专业调试特性清单
@@ -15,7 +15,7 @@ related: [research.synthesis.client-runtime]
 - **缺口**：文档写明没有，或只属于系统应用、开发者模式、PC 侧工具。设计时不得做成「应用里点一下就有」。
 - **待证**：API 在文档里，但是否在目标设备、API 等级或 ACL 上可用，必须真机单独判。文档阶段不能标通过。
 
-证据路径相对 `yohurm/HarmonyOS-Developer-docs`。行业行为见 `docs/goal/research/by-stack/client-runtime/_synthesis.md`。
+证据路径相对 `yohurm/HarmonyOS-Developer-docs`。行业行为见 `docs/goal/research/bluetooth.md`。
 
 ## 1. 权限与适配器
 
