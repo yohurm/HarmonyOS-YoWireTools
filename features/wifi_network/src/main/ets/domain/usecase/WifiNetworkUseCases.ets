@@ -7,7 +7,9 @@ import {
   EnsurePermissionUseCase,
   ModuleType,
   PermissionScenario,
+  PermissionScenarioCoordinator,
   ProtocolType,
+  RadioSwitchReading,
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase
@@ -15,6 +17,7 @@ import {
 import { WifiScanLogger } from '../service/WifiScanLogger';
 import { WifiMessageLogger } from '../service/WifiMessageLogger';
 import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
+import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 import { WifiOverviewSnapshot } from '../model/WifiOverviewSnapshot';
 import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
@@ -229,7 +232,7 @@ export class OpenWebSocketUseCase {
   }
 
   async sendText(text: string): Promise<Result<void>> {
-    return this.repository.getWebSocketDataSource().sendText(text);
+    return this.repository.sendWebSocketText(text);
   }
 
   async disconnect(sessionId: string = ''): Promise<Result<void>> {
@@ -246,7 +249,7 @@ export class OpenWebSocketUseCase {
   private bindMessageEvidence(): void {
     this.unbindMessageEvidence();
     this.loggedMessageCount = 0;
-    this.messageSubscription = this.repository.getWebSocketDataSource().observeMessages()
+    this.messageSubscription = this.repository.observeWebSocketMessages()
       .subscribe((messages: WebSocketMessageRecord[]) => {
         if (this.activeSessionId.length === 0 || messages.length <= this.loggedMessageCount) {
           this.loggedMessageCount = messages.length;
@@ -330,6 +333,26 @@ export class OpenTcpClientUseCase {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
     }
     return Result.ok(params);
+  }
+}
+
+export class ReadWifiSwitchUseCase {
+  private readonly repository: WifiNetworkRepositoryContract;
+
+  constructor(repository: WifiNetworkRepositoryContract = WifiNetworkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  async execute(): Promise<Result<string>> {
+    const granted = await PermissionScenarioCoordinator.getInstance().checkGranted(PermissionScenario.WIFI_INFO);
+    if (!granted) {
+      return Result.ok(RadioSwitchReading.DENIED);
+    }
+    const active = await this.repository.getWifiState();
+    if (!active.success || active.value === undefined) {
+      return Result.fail(active.error ?? new ResultError(WifiNetworkErrorCodes.NO_WIFI_INFO, 'wifi unread'));
+    }
+    return Result.ok(active.value ? RadioSwitchReading.ON : RadioSwitchReading.OFF);
   }
 }
 

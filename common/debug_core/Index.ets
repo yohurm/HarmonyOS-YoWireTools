@@ -67,10 +67,61 @@ export {
   StopRepeatCommandUseCase,
   RepeatCommandCoordinator
 } from './src/main/ets/service/RepeatCommandCoordinator';
+export { FeatureModuleId } from './src/main/ets/domain/model/FeatureModuleId';
+export { RadioSwitchReading } from './src/main/ets/domain/model/RadioSwitchReading';
+export { SessionLogQuery } from './src/main/ets/domain/model/SessionLogQuery';
+export { SettingsSnapshot } from './src/main/ets/domain/model/SettingsSnapshot';
 export {
   LoadWorkbenchOverviewUseCase,
+  CountSessionLogRowsUseCase,
   LoadSessionLogPreviewUseCase,
+  ExportSessionLogUseCase,
+  ClearSessionLogUseCase,
   WorkbenchLogLine
 } from './src/main/ets/usecase/WorkbenchUseCases';
+export {
+  LoadSettingsUseCase,
+  UpdateSettingUseCase,
+  ClearLocalDataUseCase
+} from './src/main/ets/usecase/SettingsUseCases';
+export {
+  ListModuleCommandTemplatesUseCase,
+  SaveModuleCommandTemplateUseCase,
+  ExecuteModuleCommandUseCase,
+  RepeatModuleCommandUseCase,
+  ReadCommandRepeatPolicyUseCase,
+  SaveCommandRepeatPolicyUseCase,
+  ShellCommandCodes
+} from './src/main/ets/usecase/CommandPanelUseCases';
+export {
+  ListBluetoothCommandTemplatesUseCase,
+  SaveBluetoothCommandTemplateUseCase,
+  ExecuteBluetoothCommandUseCase,
+  RepeatBluetoothCommandUseCase
+} from './src/main/ets/usecase/BluetoothCommandUseCases';
+export {
+  ListNearLinkCommandTemplatesUseCase,
+  SaveNearLinkCommandTemplateUseCase,
+  ExecuteNearLinkCommandUseCase,
+  RepeatNearLinkCommandUseCase
+} from './src/main/ets/usecase/NearLinkCommandUseCases';
+export {
+  ListWifiCommandTemplatesUseCase,
+  SaveWifiCommandTemplateUseCase,
+  ExecuteWifiCommandUseCase,
+  RepeatWifiCommandUseCase
+} from './src/main/ets/usecase/WifiCommandUseCases';
+export {
+  LoadBluetoothModuleSettingsUseCase,
+  SaveBluetoothAutoStopUseCase
+} from './src/main/ets/usecase/BluetoothModuleSettingsUseCases';
+export {
+  LoadNearLinkModuleSettingsUseCase,
+  SaveNearLinkRequireFilterUseCase
+} from './src/main/ets/usecase/NearLinkModuleSettingsUseCases';
+export {
+  LoadWifiModuleSettingsUseCase,
+  SaveWifiScanCooldownUseCase
+} from './src/main/ets/usecase/WifiModuleSettingsUseCases';
 export { DebugCoreBootstrap } from './src/main/ets/DebugCoreBootstrap';
 export { SessionUiFormat } from './src/main/ets/ui/SessionUiFormat';

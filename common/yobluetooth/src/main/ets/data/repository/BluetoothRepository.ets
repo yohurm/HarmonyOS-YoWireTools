@@ -1,6 +1,6 @@
 import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError } from 'common_core';
-import { ModuleType, ProtocolType, SessionRuntimeStore } from 'debug_core';
+import { ModuleType, ProtocolType, SessionRuntimeStore, TransportSessionRegistry } from 'debug_core';
 import { ClassicBluetoothDataSource, PlatformDiscoveryPayload } from '../datasource/platform/ClassicBluetoothDataSource';
 import { PlatformConnectedClassicSource } from '../datasource/platform/PlatformConnectedClassicSource';
 import { BleDiscoveryPayload, BleScannerDataSource } from '../datasource/platform/BleScannerDataSource';
@@ -40,8 +40,11 @@ import { BleManufacturerMaskMatcher } from '../../domain/service/BleManufacturer
 import { BluetoothRepositoryContract } from '../../domain/repository/BluetoothRepositoryContract';
 import { SppConnectParams } from '../../domain/model/SppConnectParams';
 import { SppTransportSession } from '../transport/SppTransportSession';
+import { GattTransportSession } from '../transport/GattTransportSession';
+import { SppUuidFavoriteDataSource } from '../datasource/local/SppUuidFavoriteDataSource';
+import { SppUuidFavoriteEntry } from '../../domain/model/SppUuidFavoriteEntry';
 import { DeviceIdentity } from '../../domain/model/DeviceIdentity';
-import { DeviceRegistry } from '../../domain/service/registry/DeviceRegistry';
+import { DeviceRegistry } from '../registry/DeviceRegistry';
 import { BluetoothConstants } from '../../constants/BluetoothConstants';
 import { YoLog, YoLogger } from 'yolog';
 import { BtLogTag } from '../../observability/BtLogTag';
@@ -1020,6 +1023,46 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       packet.discoveredAtMs,
       packet.discoveryCount
     );
+  }
+
+  async connectGattTransport(
+    sessionId: string,
+    connectRecord: Record<string, string | number | boolean>
+  ): Promise<Result<string>> {
+    const transport = new GattTransportSession(sessionId);
+    try {
+      await transport.connect(connectRecord);
+    } catch (error) {
+      const err = error as Error;
+      transport.destroy();
+      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err.message, err));
+    }
+    TransportSessionRegistry.getInstance().register(sessionId, transport);
+    return Result.ok(transport.id);
+  }
+
+  listSppUuidFavorites(): Promise<SppUuidFavoriteEntry[]> {
+    return SppUuidFavoriteDataSource.getInstance().ensureLoaded();
+  }
+
+  sppUuidIsFavorite(uuid: string): boolean {
+    return SppUuidFavoriteDataSource.getInstance().contains(uuid);
+  }
+
+  toggleSppUuidFavorite(uuid: string, label: string = ''): Promise<Result<boolean>> {
+    return SppUuidFavoriteDataSource.getInstance().toggle(uuid, label);
+  }
+
+  addSppUuidFavorite(uuid: string, label: string = ''): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().add(uuid, label);
+  }
+
+  updateSppUuidFavorite(uuid: string, nextUuid: string, label: string = ''): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().update(uuid, nextUuid, label);
+  }
+
+  removeSppUuidFavorite(uuid: string): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().remove(uuid);
   }
 }
 

@@ -1,6 +1,7 @@
 import { Result, AppThemeMode, AppThemeModeUtil } from 'common_core';
 import { CapabilityRegistry, PlatformBootstrap, ThemeModeCoordinator } from 'common_platform';
-import { AppSettingRepository, PreferenceKeys, StorageBootstrap } from 'common_storage';
+import { StorageBootstrap } from 'common_storage';
+import { LoadSettingsUseCase } from './usecase/SettingsUseCases';
 import { common } from '@kit.AbilityKit';
 import { YoLog, YoLogTag } from 'yolog';
 import { CapabilityId } from './capability/CapabilityId';
@@ -26,8 +27,9 @@ export class DebugCoreBootstrap {
   }
 
   private static async applyPersistedTheme(context: common.UIAbilityContext): Promise<void> {
-    const themeResult = await AppSettingRepository.getInstance().get(PreferenceKeys.THEME_MODE);
-    const themeMode = AppThemeModeUtil.parse(themeResult.success ? themeResult.value : undefined);
+    const themeResult = await new LoadSettingsUseCase().execute();
+    const raw = themeResult.success && themeResult.value !== undefined ? themeResult.value.themeMode : undefined;
+    const themeMode = AppThemeModeUtil.parse(raw);
     ThemeModeCoordinator.apply(context, themeMode);
   }
 }

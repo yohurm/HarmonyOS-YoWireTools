@@ -8,7 +8,9 @@ import {
   EnsurePermissionUseCase,
   ModuleType,
   PermissionScenario,
+  PermissionScenarioCoordinator,
   ProtocolType,
+  RadioSwitchReading,
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase
@@ -16,7 +18,9 @@ import {
 import { PermissionDecision } from 'common_platform';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
+import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
 import { NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
+import { NearLinkGapNotice } from '../model/NearLinkGapNotice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
 import { CapabilityResult } from 'common_platform';
 import { NearLinkCapabilityService } from '../service/NearLinkCapabilityService';
@@ -167,5 +171,52 @@ export class ResolveNearLinkCapabilityUseCase {
       readyForScan,
       readyForConnect
     ));
+  }
+}
+
+export class ReadNearLinkSwitchUseCase {
+  private readonly repository: NearLinkRepositoryContract;
+
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  async execute(): Promise<Result<string>> {
+    const granted = await PermissionScenarioCoordinator.getInstance().checkGranted(PermissionScenario.NEARLINK_ACCESS);
+    if (!granted) {
+      return Result.ok(RadioSwitchReading.DENIED);
+    }
+    const adapter = await this.repository.loadAdapterState();
+    if (!adapter.success || adapter.value === undefined) {
+      return Result.fail(adapter.error ?? new ResultError(NearLinkErrorCodes.UNSUPPORTED, 'nearlink unread'));
+    }
+    if (!adapter.value.supported) {
+      return Result.ok(RadioSwitchReading.UNSUPPORTED);
+    }
+    return Result.ok(adapter.value.enabled ? RadioSwitchReading.ON : RadioSwitchReading.OFF);
+  }
+}
+
+export class ReadNearLinkUnpairBoundaryUseCase {
+  private readonly repository: NearLinkRepositoryContract;
+
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(): NearLinkGapNotice {
+    return this.repository.describeUnpairBoundary();
+  }
+}
+
+export class ReadCdsmBoundaryUseCase {
+  private readonly repository: NearLinkRepositoryContract;
+
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(): NearLinkGapNotice {
+    return this.repository.describeCdsmBoundary();
   }
 }

@@ -80,6 +80,7 @@ export {
   LoadBluetoothOverviewUseCase,
   LoadBluetoothOverviewSnapshotUseCase,
   ResolveBluetoothCapabilityUseCase,
+  ReadBluetoothSwitchUseCase,
   ObserveBluetoothDevicesUseCase
 } from './src/main/ets/domain/usecase/overview/OverviewUseCases';
 export {

@@ -72,16 +72,30 @@ export class CommandRepository {
   }
 
   async listTemplates(offset: number, limit: number): Promise<Result<PageResult<CommandTemplateRecord>>> {
+    return this.listTemplatesFiltered('', offset, limit);
+  }
+
+  async listTemplatesByModule(module: string, offset: number, limit: number): Promise<Result<PageResult<CommandTemplateRecord>>> {
+    return this.listTemplatesFiltered(module, offset, limit);
+  }
+
+  private async listTemplatesFiltered(module: string, offset: number, limit: number): Promise<Result<PageResult<CommandTemplateRecord>>> {
     const store = RdbManager.getInstance().getStore();
     if (store === undefined) {
       return Result.fail(new ResultError(StoreErrorCodes.RDB_OPEN_FAILED, 'Database not ready'));
     }
     const countPredicates = new relationalStore.RdbPredicates(DatabaseSchema.TABLE_COMMAND_TEMPLATE);
+    if (module.length > 0) {
+      countPredicates.equalTo('module', module);
+    }
     const counted = RdbCountRunner.countSync(store, countPredicates);
     if (!counted.success) {
       return Result.fail(counted.error ?? new ResultError(StoreErrorCodes.RDB_READ_FAILED, 'Count failed'));
     }
     const predicates = new relationalStore.RdbPredicates(DatabaseSchema.TABLE_COMMAND_TEMPLATE);
+    if (module.length > 0) {
+      predicates.equalTo('module', module);
+    }
     predicates.orderByDesc('updated_at_ms');
     predicates.limitAs(limit);
     predicates.offsetAs(offset);

@@ -2,18 +2,7 @@ import { connection } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Observable, Result, ResultError } from 'common_core';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
-
-export class NetworkStateSnapshot {
-  readonly hasDefaultNet: boolean;
-  readonly netType: string;
-  readonly bearerTypes: string;
-
-  constructor(hasDefaultNet: boolean, netType: string, bearerTypes: string) {
-    this.hasDefaultNet = hasDefaultNet;
-    this.netType = netType;
-    this.bearerTypes = bearerTypes;
-  }
-}
+import { NetworkStateSnapshot } from '../../domain/model/NetworkStateSnapshot';
 
 type NetworkStateListener = (snapshot: NetworkStateSnapshot) => void;
 

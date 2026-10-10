@@ -22,6 +22,10 @@ export struct BluetoothOverviewPage {
   };
   @Event onOpenBle: () => void = () => {
   };
+  @Event onOpenModuleSettings: () => void = () => {
+  };
+  @Event onOpenCommand: () => void = () => {
+  };
   @Local private vm: BtOverviewViewModel = new BtOverviewViewModel();
 
   aboutToAppear(): void {
@@ -140,6 +144,22 @@ export struct BluetoothOverviewPage {
       }
       .width('100%')
       .alignItems(VerticalAlign.Top)
+      Button($r('app.string.bt_open_module_settings'), {
+        type: ButtonType.Normal,
+        buttonStyle: ButtonStyleMode.TEXTUAL,
+        role: ButtonRole.NORMAL
+      })
+        .onClick(() => {
+          this.onOpenModuleSettings();
+        })
+      Button($r('app.string.bt_open_command'), {
+        type: ButtonType.Normal,
+        buttonStyle: ButtonStyleMode.TEXTUAL,
+        role: ButtonRole.NORMAL
+      })
+        .onClick(() => {
+          this.onOpenCommand();
+        })
     }
     .width('100%')
   }

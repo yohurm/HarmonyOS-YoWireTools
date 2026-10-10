@@ -1,5 +1,6 @@
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { PlatformColorToken } from './PlatformColorToken';
 
 /**
@@ -41,15 +42,18 @@ export class SystemBarThemeCoordinator {
   }
 
   static applyToWindow(mainWindow: window.Window, colorMode: number): void {
-    try {
-      void mainWindow.setWindowSystemBarProperties(SystemBarThemeCoordinator.buildProperties(colorMode));
-    } catch (_error) {
-      // Window may not be ready during lifecycle transitions.
+    const deviceType = deviceInfo.deviceType;
+    // Phone and tablet keep setWindowSystemBarProperties. It is unavailable on 2in1.
+    if (deviceType === 'phone' || deviceType === 'tablet') {
+      try {
+        void mainWindow.setWindowSystemBarProperties(SystemBarThemeCoordinator.buildProperties(colorMode));
+      } catch (_error) {
+        // Window may not be ready during lifecycle transitions.
+      }
     }
-    try {
-      mainWindow.setWindowBackgroundColor(SystemBarThemeCoordinator.resolveWindowBackgroundColor(colorMode));
-    } catch (_error) {
-      // Window background can only be changed after content is attached.
-    }
+    // setWindowBackgroundColor is unavailable on phone, tablet, and 2in1.
+    // This product covers those devices, so it is not called.
+    // Phone system-bar colors stay on setWindowSystemBarProperties.
+    // setWindowLayoutFullScreen is already applied by EntryAbility.
   }
 }

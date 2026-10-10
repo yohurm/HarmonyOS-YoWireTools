@@ -18,7 +18,6 @@ export { StoragePaths } from './src/main/ets/file/StoragePaths';
 export { PayloadChunkWriter } from './src/main/ets/file/PayloadChunkWriter';
 export { PayloadFileReader } from './src/main/ets/file/PayloadFileReader';
 export { ExportFileWriter } from './src/main/ets/file/ExportFileWriter';
-export { LogIndexFilterUtil } from './src/main/ets/query/LogIndexFilterUtil';
 export { LogQuery } from './src/main/ets/query/LogQuery';
 export { SessionQuery } from './src/main/ets/query/SessionQuery';
 export { LogCleanupPolicy } from './src/main/ets/cleanup/LogCleanupPolicy';

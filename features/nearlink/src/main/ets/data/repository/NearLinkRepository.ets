@@ -1,7 +1,8 @@
-﻿import { ssap } from '@kit.NearLinkKit';
-import { DeviceFavoriteRecord } from 'common_storage';
+﻿import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError, Subscription, TimeUtil } from 'common_core';
-import { ITransportSession, IncomingPayload, ModuleType, SessionRuntimeStore } from 'debug_core';
+import { ITransportSession, IncomingPayload, ModuleType, ProtocolType, SessionRuntimeStore, TransportSessionRegistry } from 'debug_core';
+import { RemoteDeviceDataSource } from '../datasource/platform/RemoteDeviceDataSource';
+import { NearLinkSecurityState } from '../../domain/model/NearLinkSecurityState';
 import { NearLinkManagerDataSource } from '../datasource/platform/NearLinkManagerDataSource';
 import { NearLinkScanDataSource, NearLinkDiscoveryPayload } from '../datasource/platform/NearLinkScanDataSource';
 import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';
@@ -22,11 +23,10 @@ import { NearLinkRecentConnection } from '../../domain/model/NearLinkRecentConne
 import { NearLinkRepositoryContract } from '../../domain/repository/NearLinkRepositoryContract';
 import {
   SsapClientState,
-  SsapPropertyNode,
-  SsapServiceNode,
   SsapServiceTreeSnapshot
 } from '../../domain/model/SsapServiceTree';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
+import { NearLinkGapNotice } from '../../domain/model/NearLinkGapNotice';
 import { NearLinkAdvParser } from '../../domain/service/NearLinkAdvParser';
 import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
 import { SsapPropertyChangeDispatcher } from '../service/SsapPropertyChangeDispatcher';
@@ -319,7 +319,7 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     if (!servicesResult.success || servicesResult.value === undefined) {
       return Result.fail(servicesResult.error ?? new ResultError(NearLinkErrorCodes.SSAP_DISCOVER_FAILED, 'discover failed'));
     }
-    const tree = NearLinkRepository.buildTree(sessionId, address, servicesResult.value, mtu, SsapClientState.READY);
+    const tree = SsapPlatformMapper.buildTree(sessionId, address, servicesResult.value, mtu, SsapClientState.READY);
     this.ssapTreeObservable.next(tree);
     return Result.ok(tree);
   }
@@ -423,24 +423,124 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     return `${parts[0]}:${parts[1]}:**:**:**:**`;
   }
 
-  private static buildTree(
+  async getAdapterState(): Promise<Result<NearLinkAdapterSnapshot>> {
+    return NearLinkManagerDataSource.getInstance().getAdapterState();
+  }
+
+  async connectPreparedSsap(sessionId: string, deviceId: string): Promise<Result<void>> {
+    const clientResult = this.getOrCreateSsapClient(sessionId, deviceId);
+    if (!clientResult.success || clientResult.value === undefined) {
+      return Result.fail(clientResult.error ?? new ResultError(NearLinkErrorCodes.SSAP_CREATE_FAILED, 'create failed'));
+    }
+    const wired = this.wireSsapClientSession(sessionId, deviceId);
+    if (!wired.success) {
+      return Result.fail(wired.error ?? new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'wire failed'));
+    }
+    const connected = await clientResult.value.connect();
+    if (!connected.success) {
+      return Result.fail(connected.error ?? new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'connect failed'));
+    }
+    await NearLinkEventLogger.logSsapState(sessionId, 'SSAP connected, discovering services');
+    await this.discoverSsapServices(sessionId, deviceId, NearLinkConstants.DEFAULT_MTU);
+    const transport = this.createSsapTransport(sessionId);
+    if (transport !== undefined) {
+      const attachParams: Record<string, string | number | boolean> = {};
+      await transport.connect(attachParams);
+      TransportSessionRegistry.getInstance().register(sessionId, transport);
+    }
+    return Result.ok(undefined);
+  }
+
+  bindSsapEndpoints(sessionId: string, serviceUuid: string, propertyUuid: string): Result<void> {
+    const transport = TransportSessionRegistry.getInstance().get(sessionId);
+    if (transport === undefined || transport.protocol !== ProtocolType.SSAP) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP transport not registered'));
+    }
+    const ssapTransport = transport as SsapTransportSession;
+    return ssapTransport.bindEndpoints(serviceUuid, propertyUuid);
+  }
+
+  async readSsapProperty(sessionId: string, serviceUuid: string, propertyUuid: string): Promise<Result<string>> {
+    const client = this.getSsapClient(sessionId);
+    if (client === undefined) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
+    }
+    return client.readProperty(serviceUuid, propertyUuid);
+  }
+
+  async writeSsapProperty(
+    sessionId: string,
+    serviceUuid: string,
+    propertyUuid: string,
+    data: ArrayBuffer
+  ): Promise<Result<void>> {
+    const client = this.getSsapClient(sessionId);
+    if (client === undefined) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
+    }
+    return client.writeProperty(serviceUuid, propertyUuid, data);
+  }
+
+  async setSsapNotification(
+    sessionId: string,
+    serviceUuid: string,
+    propertyUuid: string,
+    enable: boolean
+  ): Promise<Result<void>> {
+    const client = this.getSsapClient(sessionId);
+    if (client === undefined) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
+    }
+    return client.setPropertyNotification(serviceUuid, propertyUuid, enable);
+  }
+
+  async requestSsapMtu(sessionId: string, mtu: number): Promise<Result<number>> {
+    const client = this.getSsapClient(sessionId);
+    if (client === undefined) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
+    }
+    return client.requestMtuSize(mtu);
+  }
+
+  async openDataTransferSession(
     sessionId: string,
     address: string,
-    services: ssap.Service[],
+    uuid: string,
     mtu: number,
-    state: SsapClientState
-  ): SsapServiceTreeSnapshot {
-    const nodes: SsapServiceNode[] = [];
-    for (let i = 0; i < services.length; i++) {
-      const service = services[i];
-      const properties: SsapPropertyNode[] = [];
-      const props = service.properties ?? [];
-      for (let j = 0; j < props.length; j++) {
-        properties.push(new SsapPropertyNode(service.serviceUuid, props[j].propertyUuid));
-      }
-      nodes.push(new SsapServiceNode(service.serviceUuid, properties));
+    congestionPolicy: CongestionPolicy
+  ): Promise<Result<void>> {
+    const transport = this.createDataTransferTransport(sessionId, congestionPolicy);
+    const connectParams: Record<string, string | number | boolean> = {};
+    connectParams['address'] = address;
+    connectParams['uuid'] = uuid;
+    connectParams['mtu'] = mtu;
+    try {
+      await transport.connect(connectParams);
+    } catch (error) {
+      const err = error as Error;
+      transport.destroy();
+      return Result.fail(new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, err.message));
     }
-    return new SsapServiceTreeSnapshot(sessionId, address, mtu, nodes, state);
+    this.attachDataTransferIncoming(sessionId, transport);
+    TransportSessionRegistry.getInstance().register(sessionId, transport);
+    return Result.ok(undefined);
+  }
+
+  async pairRemoteDevice(address: string): Promise<Result<NearLinkSecurityState>> {
+    const remoteDeviceSource = new RemoteDeviceDataSource();
+    const created = remoteDeviceSource.createRemoteDevice(address);
+    if (!created.success) {
+      return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'remote device failed'));
+    }
+    const pairing = await remoteDeviceSource.startPairing();
+    if (!pairing.success) {
+      return Result.fail(pairing.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'pairing failed'));
+    }
+    const acb = remoteDeviceSource.getAcbState();
+    if (!acb.success || acb.value === undefined) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.ENCRYPTION_UNVERIFIED, 'encryption unverified'));
+    }
+    return Result.ok(remoteDeviceSource.resolveSecurityState(acb.value));
   }
 
   markInvalidRssiWarning(rssi: number): string {
@@ -448,5 +548,17 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
       return NearLinkErrorCodes.RSSI_INVALID;
     }
     return '';
+  }
+
+  describeUnpairBoundary(): NearLinkGapNotice {
+    return new NearLinkGapNotice(NearLinkConstants.GAP_UNPAIR, true);
+  }
+
+  describeCdsmBoundary(): NearLinkGapNotice {
+    return new NearLinkGapNotice(
+      NearLinkConstants.GAP_CDSM_UNSUPPORTED,
+      false,
+      NearLinkConstants.CDSM_UNSUPPORTED_CODE
+    );
   }
 }

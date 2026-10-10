@@ -1,13 +1,18 @@
 import { CancellationTokenSource, ResultError } from 'common_core';
-import { Observable, Result } from 'common_core';
+import { Observable, Result, Subscription } from 'common_core';
 import { WifiInfoDataSource } from '../datasource/WifiInfoDataSource';
-import { NetworkConnectionDataSource, NetworkStateSnapshot } from '../datasource/NetworkConnectionDataSource';
+import { NetworkConnectionDataSource } from '../datasource/NetworkConnectionDataSource';
+import { NetworkStateSnapshot } from '../../domain/model/NetworkStateSnapshot';
+import { WifiSessionGateway } from '../gateway/WifiSessionGateway';
 import { TcpSocketDataSource } from '../datasource/TcpSocketDataSource';
 import { UdpSocketDataSource } from '../datasource/UdpSocketDataSource';
 import { MqttClientDataSource } from '../datasource/MqttClientDataSource';
+import { MdnsDataSource } from '../datasource/MdnsDataSource';
+import { MulticastSocketDataSource } from '../datasource/MulticastSocketDataSource';
+import { SsdpDiscoveryDataSource } from '../datasource/SsdpDiscoveryDataSource';
+import { WebSocketServerDataSource } from '../datasource/WebSocketServerDataSource';
 import { HttpDataSource } from '../datasource/HttpDataSource';
 import { WebSocketDataSource } from '../datasource/WebSocketDataSource';
-import { socket } from '@kit.NetworkKit';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
 import { WifiLinkedInfoSnapshot } from '../../domain/model/WifiLinkedInfoSnapshot';
 import { WifiOverviewSnapshot } from '../../domain/model/WifiOverviewSnapshot';
@@ -18,10 +23,10 @@ import {
   DiagnosticStepState,
   NetworkDiagnosticPlan
 } from '../../domain/model/NetworkDiagnosticModels';
-import { SocketConnectionParams, UdpSessionConfig } from '../../domain/model/SocketModels';
+import { MulticastSessionConfig, SocketConnectionParams, UdpSessionConfig } from '../../domain/model/SocketModels';
 import { HttpRequestDraft, HttpResponseRecord } from '../../domain/model/HttpModels';
-import { WebSocketConfig } from '../../domain/model/WebSocketModels';
-import { MqttConnectConfig } from '../../domain/model/MqttModels';
+import { WebSocketConfig, WebSocketMessageRecord, WebSocketServerConfigModel } from '../../domain/model/WebSocketModels';
+import { DiscoveredNetworkService, MqttConnectConfig } from '../../domain/model/MqttModels';
 import {
   LanDiscoveryConfig,
   LanHostAliveState,
@@ -45,8 +50,6 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
   private readonly wifiDataSource: WifiInfoDataSource;
   private readonly networkDataSource: NetworkConnectionDataSource;
   private readonly tcpDataSource: TcpSocketDataSource;
-  private readonly udpDataSource: UdpSocketDataSource;
-  private readonly mqttDataSource: MqttClientDataSource;
   private readonly httpDataSource: HttpDataSource;
   private readonly webSocketDataSource: WebSocketDataSource;
   private readonly scanCooldown: WifiScanCooldownTracker = new WifiScanCooldownTracker();
@@ -57,6 +60,7 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
   private portScanQueue: PortScanQueue | undefined;
   private lanCancelSource: CancellationTokenSource | undefined;
   private portScanCancelSource: CancellationTokenSource | undefined;
+  private readonly sessionGateway: WifiSessionGateway;
 
   private constructor(
     wifiDataSource: WifiInfoDataSource = WifiInfoDataSource.getInstance(),
@@ -70,10 +74,17 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     this.wifiDataSource = wifiDataSource;
     this.networkDataSource = networkDataSource;
     this.tcpDataSource = tcpDataSource;
-    this.udpDataSource = udpDataSource;
-    this.mqttDataSource = mqttDataSource;
     this.httpDataSource = httpDataSource;
     this.webSocketDataSource = webSocketDataSource;
+    this.sessionGateway = new WifiSessionGateway(
+      udpDataSource,
+      MulticastSocketDataSource.getInstance(),
+      MdnsDataSource.getInstance(),
+      SsdpDiscoveryDataSource.getInstance(),
+      WebSocketServerDataSource.getInstance(),
+      mqttDataSource,
+      webSocketDataSource
+    );
   }
 
   static getInstance(): WifiNetworkRepository {
@@ -270,8 +281,12 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     return this.webSocketDataSource.disconnect();
   }
 
-  getWebSocketDataSource(): WebSocketDataSource {
-    return this.webSocketDataSource;
+  sendWebSocketText(text: string): Promise<Result<void>> {
+    return this.sessionGateway.sendWebSocketText(text);
+  }
+
+  observeWebSocketMessages(): Observable<WebSocketMessageRecord[]> {
+    return this.sessionGateway.observeWebSocketMessages();
   }
 
   async startLanDiscovery(
@@ -372,6 +387,78 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
   }
 
   async createMqttSession(config: MqttConnectConfig): Promise<Result<void>> {
-    return this.mqttDataSource.connect(config);
+    return this.sessionGateway.connectMqtt(config);
+  }
+
+  openUdpSocket(sessionId: string, config: UdpSessionConfig): Promise<Result<void>> {
+    return this.sessionGateway.openUdpSocket(sessionId, config);
+  }
+
+  joinMulticast(sessionId: string, config: MulticastSessionConfig): Promise<Result<void>> {
+    return this.sessionGateway.joinMulticast(sessionId, config);
+  }
+
+  leaveMulticast(): Promise<void> {
+    return this.sessionGateway.leaveMulticast();
+  }
+
+  startMdnsDiscovery(serviceType: string): Promise<Result<void>> {
+    return this.sessionGateway.startMdnsDiscovery(serviceType);
+  }
+
+  stopMdnsDiscovery(): Promise<void> {
+    return this.sessionGateway.stopMdnsDiscovery();
+  }
+
+  startSsdpDiscovery(): Promise<Result<void>> {
+    return this.sessionGateway.startSsdpDiscovery();
+  }
+
+  stopSsdpDiscovery(): Promise<void> {
+    return this.sessionGateway.stopSsdpDiscovery();
+  }
+
+  startWebSocketServer(config: WebSocketServerConfigModel): Promise<Result<void>> {
+    return this.sessionGateway.startWebSocketServer(config);
+  }
+
+  stopWebSocketServer(): Promise<void> {
+    return this.sessionGateway.stopWebSocketServer();
+  }
+
+  listDiscoveredServices(): DiscoveredNetworkService[] {
+    return this.sessionGateway.listDiscoveredServices();
+  }
+
+  observeMdnsServices(onChange: (services: DiscoveredNetworkService[]) => void): Subscription {
+    return this.sessionGateway.observeMdnsServices(onChange);
+  }
+
+  observeSsdpServices(onChange: () => void): Subscription {
+    return this.sessionGateway.observeSsdpServices(onChange);
+  }
+
+  disconnectMqtt(): Promise<void> {
+    return this.sessionGateway.disconnectMqtt();
+  }
+
+  onMqttMessage(listener: (payload: string) => void): Result<void> {
+    return this.sessionGateway.onMqttMessage(listener);
+  }
+
+  publishMqtt(topic: string, payload: string): Promise<Result<void>> {
+    return this.sessionGateway.publishMqtt(topic, payload);
+  }
+
+  startTcpServer(port: number): Promise<Result<void>> {
+    return this.sessionGateway.startTcpServer(port);
+  }
+
+  stopTcpServer(): Promise<void> {
+    return this.sessionGateway.stopTcpServer();
+  }
+
+  connectTcpClient(sessionId: string, params: SocketConnectionParams): Promise<Result<void>> {
+    return this.sessionGateway.connectTcpClient(sessionId, params);
   }
 }

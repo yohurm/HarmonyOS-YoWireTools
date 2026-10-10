@@ -46,7 +46,7 @@
     },
     {
       "name": "tab_workbench",
-      "value": "工作台"
+      "value": "首页看板"
     },
     {
       "name": "tab_bluetooth",
@@ -54,19 +54,19 @@
     },
     {
       "name": "tab_network",
-      "value": "网络"
+      "value": "WiFi"
     },
     {
       "name": "tab_nearlink",
       "value": "星闪"
     },
     {
-      "name": "tab_more",
-      "value": "更多"
+      "name": "tab_settings",
+      "value": "设置"
     },
     {
-      "name": "more_hub_title",
-      "value": "更多"
+      "name": "settings_app_title",
+      "value": "设置"
     }
   ]
 }

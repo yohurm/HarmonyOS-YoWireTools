@@ -1,6 +1,7 @@
 import { Result } from 'common_core';
 import { DeviceFavoriteRecord } from 'common_storage';
 import { NearLinkDevice, NearLinkAdapterSnapshot, NearLinkOverviewSnapshot } from '../model/NearLinkDevice';
+import { NearLinkGapNotice } from '../model/NearLinkGapNotice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
 import { NearLinkScanPhase } from '../model/NearLinkScanPhase';
 import { NearLinkAdvertisingPacket } from '../model/NearLinkAdvertisingPacket';
@@ -22,4 +23,6 @@ export interface NearLinkRepositoryContract {
   listRecentConnections(): NearLinkRecentConnection[];
   listFavorites(): DeviceFavoriteRecord[];
   saveFavorite(device: NearLinkDevice, alias: string, protocol: string, uuid?: string): Promise<Result<void>>;
+  describeUnpairBoundary(): NearLinkGapNotice;
+  describeCdsmBoundary(): NearLinkGapNotice;
 }

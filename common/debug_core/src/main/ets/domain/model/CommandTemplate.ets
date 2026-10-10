@@ -58,6 +58,7 @@ export class CommandTemplate {
   readonly variables: CommandVariable[];
   readonly createdAtMs: number;
   readonly updatedAtMs: number;
+  readonly favorite: boolean;
 
   constructor(
     id: string,
@@ -73,7 +74,8 @@ export class CommandTemplate {
     tags: string[] = [],
     variables: CommandVariable[] = [],
     createdAtMs: number = Date.now(),
-    updatedAtMs: number = Date.now()
+    updatedAtMs: number = Date.now(),
+    favorite: boolean = false
   ) {
     this.id = id;
     this.name = name;
@@ -89,5 +91,6 @@ export class CommandTemplate {
     this.variables = variables;
     this.createdAtMs = createdAtMs;
     this.updatedAtMs = updatedAtMs;
+    this.favorite = favorite;
   }
 }

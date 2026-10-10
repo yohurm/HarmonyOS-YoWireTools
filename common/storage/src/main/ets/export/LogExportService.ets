@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit';
 import { Result, ResultError } from 'common_core';
 import { YoLog, YoLogTag, LogParams } from 'yolog';
 import { ExportFileWriter } from '../file/ExportFileWriter';
-import { LogIndexFilterUtil } from '../query/LogIndexFilterUtil';
 import { LogQuery } from '../query/LogQuery';
 import { LogRepository } from '../repository/LogRepository';
 import { StoreErrorCodes } from '../constants/StoreErrorCodes';
@@ -37,19 +36,17 @@ export class LogExportService {
       options.direction,
       '',
       options.startMs,
-      options.endMs
+      options.endMs,
+      options.module,
+      options.keyword,
+      options.protocol
     );
     const listed = await this.logRepository.list(query);
     if (!listed.success || listed.value === undefined) {
       logger.error(`export_failed code=${listed.error?.code ?? StoreErrorCodes.EXPORT_FAILED}`);
       return Result.fail(listed.error ?? new ResultError(StoreErrorCodes.EXPORT_FAILED, 'List logs failed'));
     }
-    const filteredItems = LogIndexFilterUtil.applyClientFilters(
-      listed.value.items,
-      options.module,
-      options.protocol,
-      options.keyword
-    );
+    const filteredItems = listed.value.items;
     const payloadMap = new Map<string, string>();
     if (options.includePayloadBytes) {
       for (let i = 0; i < filteredItems.length; i++) {

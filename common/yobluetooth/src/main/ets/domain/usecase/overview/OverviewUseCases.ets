@@ -1,7 +1,8 @@
-﻿import { Result } from 'common_core';
-import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
+﻿import { Result, ResultError } from 'common_core';
+import { EnsurePermissionUseCase, PermissionScenario, PermissionScenarioCoordinator, RadioSwitchReading } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import {
   BluetoothCapabilitySnapshot,
   BluetoothDevice,
@@ -68,6 +69,27 @@ export class ResolveBluetoothCapabilityUseCase {
     const adapter = await this.repository.loadAdapterState();
     const adapterOn = adapter.success && adapter.value !== undefined && adapter.value.enabled;
     return Result.ok(new BluetoothCapabilitySnapshot(permission.granted, adapterOn === true));
+  }
+}
+
+export class ReadBluetoothSwitchUseCase {
+  private readonly repository: BluetoothRepositoryContract;
+
+  constructor(repository: BluetoothRepositoryContract = BluetoothRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  async execute(): Promise<Result<string>> {
+    const granted = await PermissionScenarioCoordinator.getInstance()
+      .checkGranted(PermissionScenario.BLUETOOTH_SCAN_CONNECT);
+    if (!granted) {
+      return Result.ok(RadioSwitchReading.DENIED);
+    }
+    const adapter = await this.repository.getAdapterState();
+    if (!adapter.success || adapter.value === undefined) {
+      return Result.fail(adapter.error ?? new ResultError('YW-BT-STATE', 'adapter unread'));
+    }
+    return Result.ok(adapter.value.enabled ? RadioSwitchReading.ON : RadioSwitchReading.OFF);
   }
 }
 

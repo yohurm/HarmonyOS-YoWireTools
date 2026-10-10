@@ -1,12 +1,23 @@
 ﻿import { UIContextRegistry } from 'common_platform';
 import { YoColor } from 'youi_kit';
 import {
+  BluetoothSettingsPage,
   ClassicDeviceListItem,
   PairingGuideDialog,
   SppConnectDialog,
   SppTerminalNavParams,
   SppTerminalPage
 } from 'feature_bluetooth';
+import {
+  BluetoothCommandPage,
+  LogCenterPage,
+  LogDetailNavParams,
+  LogDetailPage,
+  NearLinkCommandPage,
+  WifiCommandPage
+} from 'feature_home';
+import { NearLinkSettingsPage } from 'feature_nearlink';
+import { WifiSettingsPage } from 'feature_wifi_network';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { MainTabContainer } from '../shell/MainTabContainer';
 import { BleMainPage } from './bluetooth/BleMainPage';
@@ -15,7 +26,7 @@ import { SppMainPage } from './bluetooth/SppMainPage';
 @Entry
 @ComponentV2
 struct Index {
-  @Local activeTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
+  @Local activeTabIndex: number = AppRoutes.TAB_INDEX_HOME;
   private rootNavStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
@@ -54,6 +65,14 @@ struct Index {
   private readTerminalSessionId(param: Object): string {
     const raw = param as SppTerminalNavParams;
     return raw.sessionId !== undefined ? raw.sessionId : '';
+  }
+
+  private readLogDetail(param: Object): LogDetailNavParams {
+    const raw = param as LogDetailNavParams;
+    if (raw.recordId === undefined) {
+      return new LogDetailNavParams('', '', '', '', '', 0);
+    }
+    return raw;
   }
 
   @LocalBuilder
@@ -97,6 +116,90 @@ struct Index {
         })
       }
       .hideTitleBar(true, false)
+    } else if (name === AppRoutes.LOG_CENTER) {
+      NavDestination() {
+        LogCenterPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          },
+          onOpenDetail: (params: LogDetailNavParams) => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.LOG_DETAIL,
+              param: params
+            });
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.LOG_DETAIL) {
+      NavDestination() {
+        LogDetailPage({
+          recordId: this.readLogDetail(param).recordId,
+          module: this.readLogDetail(param).module,
+          protocol: this.readLogDetail(param).protocol,
+          summary: this.readLogDetail(param).summary,
+          logDirection: this.readLogDetail(param).logDirection,
+          timestampMs: this.readLogDetail(param).timestampMs,
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_SETTINGS) {
+      NavDestination() {
+        BluetoothSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_COMMAND) {
+      NavDestination() {
+        BluetoothCommandPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.NEARLINK_SETTINGS) {
+      NavDestination() {
+        NearLinkSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.NEARLINK_COMMAND) {
+      NavDestination() {
+        NearLinkCommandPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.WIFI_SETTINGS) {
+      NavDestination() {
+        WifiSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.WIFI_COMMAND) {
+      NavDestination() {
+        WifiCommandPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
     }
   }
 
@@ -115,6 +218,33 @@ struct Index {
           onOpenBluetoothBle: () => {
             this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
             this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
+          },
+          onOpenBluetoothSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_SETTINGS });
+          },
+          onOpenBluetoothCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_COMMAND });
+          },
+          onOpenNearLinkSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_NEARLINK;
+            this.rootNavStack.pushPath({ name: AppRoutes.NEARLINK_SETTINGS });
+          },
+          onOpenNearLinkCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_NEARLINK;
+            this.rootNavStack.pushPath({ name: AppRoutes.NEARLINK_COMMAND });
+          },
+          onOpenWifiSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_WIFI;
+            this.rootNavStack.pushPath({ name: AppRoutes.WIFI_SETTINGS });
+          },
+          onOpenWifiCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_WIFI;
+            this.rootNavStack.pushPath({ name: AppRoutes.WIFI_COMMAND });
+          },
+          onOpenLog: () => {
+            this.rootNavStack.pushPath({ name: AppRoutes.LOG_CENTER });
           }
         })
       }
