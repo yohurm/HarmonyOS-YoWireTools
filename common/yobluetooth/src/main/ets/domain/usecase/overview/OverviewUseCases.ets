@@ -2,7 +2,6 @@
 import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import {
   BluetoothCapabilitySnapshot,
   BluetoothDevice,
@@ -15,8 +14,8 @@ export class LoadBluetoothOverviewUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -36,8 +35,8 @@ export class LoadBluetoothOverviewSnapshotUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -56,8 +55,8 @@ export class ResolveBluetoothCapabilityUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -75,7 +74,7 @@ export class ResolveBluetoothCapabilityUseCase {
 export class ObserveBluetoothDevicesUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

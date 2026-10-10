@@ -1,6 +1,7 @@
 import {
   BluetoothConstants,
   BluetoothErrorCodes,
+  BluetoothUseCaseFactory,
   BluetoothTransportType,
   ConnectSppUseCase,
   QuerySppConnectEligibilityUseCase,
@@ -84,9 +85,9 @@ export class SppConnectDialogController {
   private readonly uuidFavorites: SppUuidFavoriteUseCases;
 
   constructor(
-    connectSpp: ConnectSppUseCase = new ConnectSppUseCase(),
-    queryEligibility: QuerySppConnectEligibilityUseCase = new QuerySppConnectEligibilityUseCase(),
-    uuidFavorites: SppUuidFavoriteUseCases = new SppUuidFavoriteUseCases()
+    connectSpp: ConnectSppUseCase = BluetoothUseCaseFactory.connectSpp(),
+    queryEligibility: QuerySppConnectEligibilityUseCase = BluetoothUseCaseFactory.querySppEligibility(),
+    uuidFavorites: SppUuidFavoriteUseCases = BluetoothUseCaseFactory.sppUuidFavorites()
   ) {
     this.connectSpp = connectSpp;
     this.queryEligibility = queryEligibility;

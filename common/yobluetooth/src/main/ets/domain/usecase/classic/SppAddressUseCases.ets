@@ -1,7 +1,6 @@
 import { Result, ResultError } from 'common_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import {
   BluetoothTransportPolicy,
@@ -17,7 +16,7 @@ import { PairBluetoothDeviceUseCase } from './ClassicScanUseCases';
 export class ResolveSppTargetAddressUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -62,8 +61,8 @@ export class BridgeBleToClassicPairUseCase {
   private readonly pairDevice: PairBluetoothDeviceUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    pairDevice: PairBluetoothDeviceUseCase = new PairBluetoothDeviceUseCase()
+    repository: BluetoothRepositoryContract,
+    pairDevice: PairBluetoothDeviceUseCase
   ) {
     this.repository = repository;
     this.pairDevice = pairDevice;

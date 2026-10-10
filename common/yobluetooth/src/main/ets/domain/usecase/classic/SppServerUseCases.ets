@@ -3,7 +3,6 @@ import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { SppSocketKind } from '../../model/SppSocketKind';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 export class SppListenUseCase {
@@ -11,8 +10,8 @@ export class SppListenUseCase {
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;

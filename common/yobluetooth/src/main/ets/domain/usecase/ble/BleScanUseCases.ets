@@ -10,7 +10,6 @@ import {
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BleScanFilter } from '../../model/BleScanFilter';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import { BluetoothScanLogger } from '../../service/BluetoothScanLogger';
@@ -23,9 +22,9 @@ export class StartBleScanUseCase {
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -72,8 +71,8 @@ export class StopBleScanUseCase {
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase()
+    repository: BluetoothRepositoryContract,
+    stopSession: StopSessionUseCase
   ) {
     this.repository = repository;
     this.stopSession = stopSession;
@@ -99,7 +98,7 @@ export class StopBleScanUseCase {
 export class StartBleScanWithFilterUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -113,8 +112,8 @@ export class LoadPairedBleDevicesUseCase {
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -132,7 +131,7 @@ export class LoadPairedBleDevicesUseCase {
 export class ObserveBleDevicesUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

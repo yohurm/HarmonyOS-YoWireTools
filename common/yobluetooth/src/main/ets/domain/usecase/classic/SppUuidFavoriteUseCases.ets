@@ -1,7 +1,6 @@
 import { Result } from 'common_core';
 import { SppUuidFavoriteEntry } from '../../model/SppUuidFavoriteEntry';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 
 /**
  * Load / toggle / CRUD SPP custom UUID favorites.
@@ -9,7 +8,7 @@ import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 export class SppUuidFavoriteUseCases {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

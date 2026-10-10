@@ -3,6 +3,7 @@ import {
   BluetoothDevice,
   BluetoothErrorCodes,
   BluetoothRepository,
+  BluetoothUseCaseFactory,
   BleScanDutyPreset,
   BleScanFilter,
   ObserveBleDevicesUseCase,
@@ -54,9 +55,9 @@ export class BleMainViewModel {
   @Trace extraScanning: boolean = false;
   @Trace connectBlockedMessage: string = '';
 
-  private readonly startScanUseCase: StartBleScanUseCase = new StartBleScanUseCase();
-  private readonly stopScanUseCase: StopBleScanUseCase = new StopBleScanUseCase();
-  private readonly observeDevices: ObserveBleDevicesUseCase = new ObserveBleDevicesUseCase();
+  private readonly startScanUseCase: StartBleScanUseCase = BluetoothUseCaseFactory.startBleScan();
+  private readonly stopScanUseCase: StopBleScanUseCase = BluetoothUseCaseFactory.stopBleScan();
+  private readonly observeDevices: ObserveBleDevicesUseCase = BluetoothUseCaseFactory.observeBleDevices();
   private readonly repository: BluetoothRepository = BluetoothRepository.getInstance();
   private subscription: Subscription | undefined;
   private sessionId: string = '';

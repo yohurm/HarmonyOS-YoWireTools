@@ -1,6 +1,5 @@
 import { Result } from 'common_core';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 /**
@@ -12,8 +11,8 @@ export class EnableBluetoothUseCase {
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -33,8 +32,8 @@ export class DisableBluetoothUseCase {
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;

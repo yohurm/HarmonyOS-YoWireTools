@@ -3,7 +3,6 @@ import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 
 /**
  * Shared permission and adapter preconditions for bluetooth use cases.
@@ -13,8 +12,8 @@ export class BluetoothOperationGuard {
   private readonly repository: BluetoothRepositoryContract;
 
   constructor(
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
-    repository: BluetoothRepositoryContract = bluetoothRepository()
+    ensurePermission: EnsurePermissionUseCase,
+    repository: BluetoothRepositoryContract
   ) {
     this.ensurePermission = ensurePermission;
     this.repository = repository;

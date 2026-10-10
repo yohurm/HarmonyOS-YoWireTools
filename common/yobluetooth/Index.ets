@@ -1,4 +1,5 @@
 export { BluetoothRepository } from './src/main/ets/data/repository/BluetoothRepository';
+export { BluetoothUseCaseFactory } from './src/main/ets/data/factory/BluetoothUseCaseFactory';
 // L1–L3 SPP concretes (SppPlatformGateway / SppRfcommClient / SppTransportSession) stay module-internal.
 export { GattTransportSession } from './src/main/ets/data/transport/GattTransportSession';
 export {

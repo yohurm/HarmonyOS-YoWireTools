@@ -11,7 +11,6 @@ import {
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectSppResult, SppConnectParams } from '../../model/SppConnectParams';
 import { BluetoothTransportPolicy, BluetoothTransportType } from '../../model/BluetoothTransportType';
 import { asSppTransportFacet } from '../../model/spp/ISppTransportFacet';
@@ -38,12 +37,12 @@ export class ConnectSppUseCase {
   private readonly admissionPolicy: SppSessionAdmissionPolicy;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    resolveAddress: ResolveSppTargetAddressUseCase = new ResolveSppTargetAddressUseCase(),
-    ledger: SppSessionLedger = SppSessionLedger.getInstance()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap,
+    transportRegistry: TransportSessionRegistry,
+    resolveAddress: ResolveSppTargetAddressUseCase,
+    ledger: SppSessionLedger
   ) {
     this.repository = repository;
     this.guard = guard;

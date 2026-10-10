@@ -2,6 +2,7 @@ import {
   BluetoothConstants,
   BluetoothErrorCodes,
   BluetoothRepository,
+  BluetoothUseCaseFactory,
   ConnectGattUseCase,
   ConnectionParamPreset,
   DisconnectGattUseCase,
@@ -36,17 +37,17 @@ export class GattClientViewModel {
   @Trace throughputBytes: number = 0;
   @Trace throughputRunning: boolean = false;
 
-  private readonly connectGatt: ConnectGattUseCase = new ConnectGattUseCase();
-  private readonly disconnectGatt: DisconnectGattUseCase = new DisconnectGattUseCase();
-  private readonly discover: DiscoverGattServicesUseCase = new DiscoverGattServicesUseCase();
-  private readonly readChar: ReadGattCharacteristicUseCase = new ReadGattCharacteristicUseCase();
-  private readonly writeChar: WriteGattCharacteristicUseCase = new WriteGattCharacteristicUseCase();
-  private readonly readDescriptor: ReadGattDescriptorUseCase = new ReadGattDescriptorUseCase();
-  private readonly writeDescriptor: WriteGattDescriptorUseCase = new WriteGattDescriptorUseCase();
-  private readonly notify: SetGattNotificationUseCase = new SetGattNotificationUseCase();
-  private readonly requestMtu: RequestBleMtuUseCase = new RequestBleMtuUseCase();
-  private readonly readRssi: ReadGattRssiUseCase = new ReadGattRssiUseCase();
-  private readonly updateParam: UpdateGattConnectionParamUseCase = new UpdateGattConnectionParamUseCase();
+  private readonly connectGatt: ConnectGattUseCase = BluetoothUseCaseFactory.connectGatt();
+  private readonly disconnectGatt: DisconnectGattUseCase = BluetoothUseCaseFactory.disconnectGatt();
+  private readonly discover: DiscoverGattServicesUseCase = BluetoothUseCaseFactory.discoverGattServices();
+  private readonly readChar: ReadGattCharacteristicUseCase = BluetoothUseCaseFactory.readGattCharacteristic();
+  private readonly writeChar: WriteGattCharacteristicUseCase = BluetoothUseCaseFactory.writeGattCharacteristic();
+  private readonly readDescriptor: ReadGattDescriptorUseCase = BluetoothUseCaseFactory.readGattDescriptor();
+  private readonly writeDescriptor: WriteGattDescriptorUseCase = BluetoothUseCaseFactory.writeGattDescriptor();
+  private readonly notify: SetGattNotificationUseCase = BluetoothUseCaseFactory.setGattNotification();
+  private readonly requestMtu: RequestBleMtuUseCase = BluetoothUseCaseFactory.requestBleMtu();
+  private readonly readRssi: ReadGattRssiUseCase = BluetoothUseCaseFactory.readGattRssi();
+  private readonly updateParam: UpdateGattConnectionParamUseCase = BluetoothUseCaseFactory.updateGattConnectionParam();
   private readonly repository: BluetoothRepository = BluetoothRepository.getInstance();
   private throughput: ThroughputSession | undefined = undefined;
 

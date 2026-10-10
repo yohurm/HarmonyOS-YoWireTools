@@ -1,5 +1,6 @@
 import {
   AdvertisingRequest,
+  BluetoothUseCaseFactory,
   CloseGattServerUseCase,
   HexPayload,
   NotifyGattServerUseCase,
@@ -27,11 +28,11 @@ export class BlePeripheralViewModel {
   @Trace serverValueHex: string = '';
   @Trace serverPeerId: string = '';
 
-  private readonly startAdvertise: StartBleAdvertiseUseCase = new StartBleAdvertiseUseCase();
-  private readonly stopAdvertise: StopBleAdvertiseUseCase = new StopBleAdvertiseUseCase();
-  private readonly openServer: OpenGattServerUseCase = new OpenGattServerUseCase();
-  private readonly closeServer: CloseGattServerUseCase = new CloseGattServerUseCase();
-  private readonly notifyServerUseCase: NotifyGattServerUseCase = new NotifyGattServerUseCase();
+  private readonly startAdvertise: StartBleAdvertiseUseCase = BluetoothUseCaseFactory.startBleAdvertise();
+  private readonly stopAdvertise: StopBleAdvertiseUseCase = BluetoothUseCaseFactory.stopBleAdvertise();
+  private readonly openServer: OpenGattServerUseCase = BluetoothUseCaseFactory.openGattServer();
+  private readonly closeServer: CloseGattServerUseCase = BluetoothUseCaseFactory.closeGattServer();
+  private readonly notifyServerUseCase: NotifyGattServerUseCase = BluetoothUseCaseFactory.notifyGattServer();
 
   onDisappear(): void {
     if (this.advertising) {

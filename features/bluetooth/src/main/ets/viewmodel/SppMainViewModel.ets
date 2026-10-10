@@ -9,6 +9,7 @@ import {
   BluetoothDevice,
   BluetoothErrorCodes,
   BluetoothRepository,
+  BluetoothUseCaseFactory,
   BluetoothTransportType,
   ClassicDeviceMajorFilter,
   ClassicProfileCapability,
@@ -158,7 +159,7 @@ export class SppMainViewModel {
   @Trace listenError: string = '';
   private rateLimitedUntilMs: number = 0;
   private serverSocket: number = -1;
-  private readonly listenUseCase: SppListenUseCase = new SppListenUseCase();
+  private readonly listenUseCase: SppListenUseCase = BluetoothUseCaseFactory.sppListen();
 
   private readonly loadOverview: LoadBluetoothOverviewSnapshotUseCase;
   private readonly loadPaired: LoadPairedClassicDevicesUseCase;
@@ -177,14 +178,14 @@ export class SppMainViewModel {
   private hasLoadedOnce: boolean = false;
 
   constructor(
-    loadOverview: LoadBluetoothOverviewSnapshotUseCase = new LoadBluetoothOverviewSnapshotUseCase(),
-    loadPaired: LoadPairedClassicDevicesUseCase = new LoadPairedClassicDevicesUseCase(),
-    observeClassic: ObserveClassicDevicesUseCase = new ObserveClassicDevicesUseCase(),
-    startScan: StartClassicScanUseCase = new StartClassicScanUseCase(),
-    stopScan: StopClassicScanUseCase = new StopClassicScanUseCase(),
-    listSessions: ListSppSessionsUseCase = new ListSppSessionsUseCase(),
-    observeSessions: ObserveSppSessionsUseCase = new ObserveSppSessionsUseCase(),
-    disconnectSpp: DisconnectSppUseCase = new DisconnectSppUseCase(),
+    loadOverview: LoadBluetoothOverviewSnapshotUseCase = BluetoothUseCaseFactory.loadOverviewSnapshot(),
+    loadPaired: LoadPairedClassicDevicesUseCase = BluetoothUseCaseFactory.loadPairedClassic(),
+    observeClassic: ObserveClassicDevicesUseCase = BluetoothUseCaseFactory.observeClassicDevices(),
+    startScan: StartClassicScanUseCase = BluetoothUseCaseFactory.startClassicScan(),
+    stopScan: StopClassicScanUseCase = BluetoothUseCaseFactory.stopClassicScan(),
+    listSessions: ListSppSessionsUseCase = BluetoothUseCaseFactory.listSppSessions(),
+    observeSessions: ObserveSppSessionsUseCase = BluetoothUseCaseFactory.observeSppSessions(),
+    disconnectSpp: DisconnectSppUseCase = BluetoothUseCaseFactory.disconnectSpp(),
     repository: BluetoothRepository = BluetoothRepository.getInstance()
   ) {
     this.loadOverview = loadOverview;

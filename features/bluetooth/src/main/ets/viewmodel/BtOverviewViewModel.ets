@@ -19,6 +19,7 @@ import {
   BluetoothConstants,
   BluetoothOverviewSnapshot,
   BluetoothRepository,
+  BluetoothUseCaseFactory,
   DisableBluetoothUseCase,
   EnableBluetoothUseCase,
   LoadBluetoothOverviewSnapshotUseCase
@@ -47,10 +48,10 @@ export class BtOverviewViewModel {
   private lifecycleUnsubscribe: (() => void) | undefined;
 
   constructor(
-    loadOverview: LoadBluetoothOverviewSnapshotUseCase = new LoadBluetoothOverviewSnapshotUseCase(),
+    loadOverview: LoadBluetoothOverviewSnapshotUseCase = BluetoothUseCaseFactory.loadOverviewSnapshot(),
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
-    enableBluetooth: EnableBluetoothUseCase = new EnableBluetoothUseCase(),
-    disableBluetooth: DisableBluetoothUseCase = new DisableBluetoothUseCase(),
+    enableBluetooth: EnableBluetoothUseCase = BluetoothUseCaseFactory.enableBluetooth(),
+    disableBluetooth: DisableBluetoothUseCase = BluetoothUseCaseFactory.disableBluetooth(),
     repository: BluetoothRepository = BluetoothRepository.getInstance()
   ) {
     this.loadOverview = loadOverview;

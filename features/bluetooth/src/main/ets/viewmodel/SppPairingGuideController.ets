@@ -6,6 +6,7 @@ import {
 import { YoResourceUtil } from 'youi_kit';
 import {
   BluetoothErrorCodes,
+  BluetoothUseCaseFactory,
   ObservePairingEventsUseCase,
   PairBluetoothDeviceUseCase,
   PairingEvent,
@@ -49,8 +50,8 @@ export class SppPairingGuideController {
   };
 
   constructor(
-    pairDevice: PairBluetoothDeviceUseCase = new PairBluetoothDeviceUseCase(),
-    observePairing: ObservePairingEventsUseCase = new ObservePairingEventsUseCase()
+    pairDevice: PairBluetoothDeviceUseCase = BluetoothUseCaseFactory.pairDevice(),
+    observePairing: ObservePairingEventsUseCase = BluetoothUseCaseFactory.observePairing()
   ) {
     this.pairDevice = pairDevice;
     this.observePairing = observePairing;

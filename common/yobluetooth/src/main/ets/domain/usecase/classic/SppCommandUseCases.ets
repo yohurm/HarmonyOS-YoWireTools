@@ -19,8 +19,8 @@ export class SendSppCommandUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
-    sendCommand: SendCommandUseCase = new SendCommandUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    sendCommand: SendCommandUseCase,
+    transportRegistry: TransportSessionRegistry
   ) {
     this.sendCommand = sendCommand;
     this.transportRegistry = transportRegistry;

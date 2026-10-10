@@ -6,6 +6,7 @@ import {
   TransportSessionRegistry
 } from 'debug_core';
 import {
+  BluetoothUseCaseFactory,
   DisconnectSppUseCase,
   ListSppSessionsUseCase,
   ObserveSppSessionsUseCase,
@@ -79,7 +80,7 @@ export class SppTerminalViewModel {
   private readonly listSessions: ListSppSessionsUseCase;
   private readonly sendCommand: SendSppCommandUseCase;
   private readonly disconnectSpp: DisconnectSppUseCase;
-  private readonly queryMaxTransmit: QuerySppMaxTransmitUseCase = new QuerySppMaxTransmitUseCase();
+  private readonly queryMaxTransmit: QuerySppMaxTransmitUseCase = BluetoothUseCaseFactory.querySppMaxTransmit();
   private readonly transportRegistry: TransportSessionRegistry;
   private sessionsSubscription: Subscription | undefined;
   private incomingSubscription: Subscription | undefined;
@@ -87,10 +88,10 @@ export class SppTerminalViewModel {
   private logSeq: number = 0;
 
   constructor(
-    observeSessions: ObserveSppSessionsUseCase = new ObserveSppSessionsUseCase(),
-    listSessions: ListSppSessionsUseCase = new ListSppSessionsUseCase(),
-    sendCommand: SendSppCommandUseCase = new SendSppCommandUseCase(),
-    disconnectSpp: DisconnectSppUseCase = new DisconnectSppUseCase(),
+    observeSessions: ObserveSppSessionsUseCase = BluetoothUseCaseFactory.observeSppSessions(),
+    listSessions: ListSppSessionsUseCase = BluetoothUseCaseFactory.listSppSessions(),
+    sendCommand: SendSppCommandUseCase = BluetoothUseCaseFactory.sendSppCommand(),
+    disconnectSpp: DisconnectSppUseCase = BluetoothUseCaseFactory.disconnectSpp(),
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
     this.observeSessions = observeSessions;

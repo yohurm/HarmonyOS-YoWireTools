@@ -1,13 +1,12 @@
 import { Result } from 'common_core';
 import { DeviceFavoriteRecord } from 'common_storage';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 
 export class SaveBluetoothFavoriteUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -26,7 +25,7 @@ export class SaveBluetoothFavoriteUseCase {
 export class LoadRemoteProfileUuidsUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

@@ -9,7 +9,6 @@ import {
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectGattResult } from '../../model/GattConnectParams';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
@@ -22,10 +21,10 @@ export class ConnectGattBrowserUseCase {
   private readonly discoverServices: DiscoverGattServicesUseCase;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    discoverServices: DiscoverGattServicesUseCase = new DiscoverGattServicesUseCase()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap,
+    discoverServices: DiscoverGattServicesUseCase
   ) {
     this.repository = repository;
     this.guard = guard;

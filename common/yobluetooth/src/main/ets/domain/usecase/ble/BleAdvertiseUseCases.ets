@@ -2,7 +2,6 @@ import { Result, ResultError } from 'common_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { AdvertisingRequest } from '../../model/AdvertisingRequest';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 export class StartBleAdvertiseUseCase {
@@ -10,8 +9,8 @@ export class StartBleAdvertiseUseCase {
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -29,7 +28,7 @@ export class StartBleAdvertiseUseCase {
 export class StopBleAdvertiseUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

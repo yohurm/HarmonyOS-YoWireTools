@@ -14,8 +14,8 @@ export class BluetoothSessionBootstrap {
   private readonly startSession: StartSessionUseCase;
 
   constructor(
-    createSession: CreateSessionUseCase = new CreateSessionUseCase(),
-    startSession: StartSessionUseCase = new StartSessionUseCase()
+    createSession: CreateSessionUseCase,
+    startSession: StartSessionUseCase
   ) {
     this.createSession = createSession;
     this.startSession = startSession;

@@ -5,14 +5,13 @@ import { ConnectionParamPreset } from '../../model/ConnectionParamPreset';
 import { GattServiceTreeSnapshot } from '../../model/GattServiceTree';
 import { MtuBounds } from '../../model/MtuBounds';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { GattOperationQueue } from '../../service/GattOperationQueue';
 import { GattWriteChunker } from '../../service/GattWriteChunker';
 
 export class DiscoverGattServicesUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -26,8 +25,8 @@ export class ReadGattCharacteristicUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -49,8 +48,8 @@ export class WriteGattCharacteristicUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -89,8 +88,8 @@ export class SetGattNotificationUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -114,8 +113,8 @@ export class ReadGattDescriptorUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -138,8 +137,8 @@ export class WriteGattDescriptorUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -163,8 +162,8 @@ export class RequestBleMtuUseCase {
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -189,7 +188,7 @@ export class RequestBleMtuUseCase {
 export class ReadGattRssiUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -201,7 +200,7 @@ export class ReadGattRssiUseCase {
 export class UpdateGattConnectionParamUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

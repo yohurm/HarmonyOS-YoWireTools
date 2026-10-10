@@ -14,7 +14,7 @@ import { SppSessionCatalog } from '../../service/spp/SppSessionCatalog';
 export class QuerySppConnectEligibilityUseCase {
   private readonly admissionPolicy: SppSessionAdmissionPolicy;
 
-  constructor(admissionPolicy: SppSessionAdmissionPolicy = new SppSessionAdmissionPolicy()) {
+  constructor(admissionPolicy: SppSessionAdmissionPolicy) {
     this.admissionPolicy = admissionPolicy;
   }
 
@@ -36,8 +36,8 @@ export class ObserveSppSessionsUseCase {
   private readonly catalog: SppSessionCatalog;
 
   constructor(
-    runtimeStore: SessionRuntimeStore = SessionRuntimeStore.getInstance(),
-    catalog: SppSessionCatalog = new SppSessionCatalog()
+    runtimeStore: SessionRuntimeStore,
+    catalog: SppSessionCatalog
   ) {
     this.runtimeStore = runtimeStore;
     this.catalog = catalog;
@@ -56,7 +56,7 @@ export class ObserveSppSessionsUseCase {
 export class QuerySppMaxTransmitUseCase {
   private readonly registry: TransportSessionRegistry;
 
-  constructor(registry: TransportSessionRegistry = TransportSessionRegistry.getInstance()) {
+  constructor(registry: TransportSessionRegistry) {
     this.registry = registry;
   }
 

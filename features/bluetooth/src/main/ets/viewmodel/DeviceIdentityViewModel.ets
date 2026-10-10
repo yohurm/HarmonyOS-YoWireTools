@@ -2,6 +2,7 @@ import { AbilityContextRegistry, BluetoothSettingsNavigator } from 'common_platf
 import {
   BluetoothDevice,
   BluetoothDeviceDraft,
+  BluetoothUseCaseFactory,
   BridgeBleToClassicPairUseCase,
   SaveBluetoothFavoriteUseCase
 } from 'yobluetooth';
@@ -10,8 +11,8 @@ import {
 export class DeviceIdentityViewModel {
   @Trace message: string = '';
 
-  private readonly favorite: SaveBluetoothFavoriteUseCase = new SaveBluetoothFavoriteUseCase();
-  private readonly bridgePair: BridgeBleToClassicPairUseCase = new BridgeBleToClassicPairUseCase();
+  private readonly favorite: SaveBluetoothFavoriteUseCase = BluetoothUseCaseFactory.saveFavorite();
+  private readonly bridgePair: BridgeBleToClassicPairUseCase = BluetoothUseCaseFactory.bridgeBleToClassic();
 
   async saveBookmark(deviceId: string, displayName: string, addressText: string): Promise<void> {
     const draft = new BluetoothDeviceDraft();

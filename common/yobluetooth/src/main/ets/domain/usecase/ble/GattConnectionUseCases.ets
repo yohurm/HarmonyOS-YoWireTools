@@ -13,7 +13,6 @@ import {
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
-import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectGattResult, GattConnectParams } from '../../model/GattConnectParams';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
@@ -25,10 +24,10 @@ export class ConnectGattUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
-    repository: BluetoothRepositoryContract = bluetoothRepository(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap,
+    transportRegistry: TransportSessionRegistry
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -107,9 +106,9 @@ export class DisconnectGattUseCase {
   private readonly repository: BluetoothRepositoryContract;
 
   constructor(
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    repository: BluetoothRepositoryContract = bluetoothRepository()
+    transportRegistry: TransportSessionRegistry,
+    stopSession: StopSessionUseCase,
+    repository: BluetoothRepositoryContract
   ) {
     this.transportRegistry = transportRegistry;
     this.stopSession = stopSession;
