@@ -1,0 +1,146 @@
+---
+id: ui.wifi-network.inspect
+type: ui-design
+status: draft
+when: phase-c
+related: [ui.wifi-network.shell, checklist.wifi-network]
+---
+
+# 本应用连接检查
+
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell                         // TERMINAL
+        └── Column
+            ├── Row
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── List                        // 收发记录，边到边
+            │   └── ListItem
+            │       └── Text                // MONO_S，文本或 HEX
+            └── Row
+                ├── TextInput               // 或 TextArea
+                └── YoActionButton          // 发送 / 停止
+YoSplitScaffold                             // ≥600vp 用 6:4
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 见下方行为细则中的同名描述。 |
+| 按下 | 见下方行为细则中的同名描述。 |
+| 禁用 | 见下方行为细则中的同名描述。 |
+| 空 | 见下方行为细则中的同名描述。 |
+| 错误 | 见下方行为细则中的同名描述。 |
+| 加载 | 见下方行为细则中的同名描述。 |
+| 无权限 | 没有流量统计权限时不显示其他应用（WN-111）。本应用自己的字节与「无权限看别人」分两行。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `wifi-network/in-app-connection-inspect` |
+| 架构编号 | WN-064 至 WN-111（行为细则里逐条出现） |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7 。文件不在 `main` |
+| 工作台入口 | 工作台「网络」卡片，或底栏网络槽（下标 2） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
+本页只记录本应用自己发出的 TCP、UDP、TLS、WebSocket、HTTP 和组播，以及本应用的流量字节。其他应用的流量、整机抓包和洪泛不在这里。
+
+`YoNavDestinationKind.TERMINAL`。`YoPageShell` 标题「连接检查」，底栏隐藏，显示返回。
+
+## 布局
+
+顶部分段 `YoSegmentButton`：TCP、UDP、TLS、WebSocket、HTTP、组播、流量。窄窗放进横向 `Scroll`。
+
+每个分段都是：表单、一条状态胶囊、交换日志。日志主行是时间与方向（去或来）。次行是地址、端口、字节数、终态。HTTP 行可展开响应体。密钥、证书私钥不进日志（WN-064、WN-101）。
+
+`≥600vp`：`YoSplitScaffold` 左日志、右表单。`<600vp`：表单在上，日志占剩余高度，`contentEdgeToEdge = true`。
+
+### TCP
+
+输入主机、端口、一段文本。按钮「连接」「发送」「断开」。成功行含去向、地址、端口、字节数、成功（WN-097）。对端关闭：日志「关闭」，「发送」禁用，直到再次连接成功（WN-098）。
+
+### UDP
+
+按钮是「发送数据报」，没有「连接」。成功行标明 UDP、目标地址、字节数。日志里不出现「连接成功」（WN-099）。
+
+### 本机 TCP 服务
+
+按钮「监听」「停止」。对端连入并发送后，日志有对端地址和收到的字节数（WN-100）。
+
+### TLS
+
+在 TCP 字段上增加主机名。证书与主机名匹配：会话胶囊「TLS」（WN-101）。不匹配：失败，胶囊不写成「已加密成功」（WN-102）。错误行不含私钥。
+
+### WebSocket
+
+客户端：地址、一条文本、「连接」「发送」「断开」。日志有发出与收到。断开后「发送」禁用（WN-103）。
+
+服务端：API 不低于 19 时显示「启动服务」。客户端连入后能看到连接和一条消息。低于 19 时该分段的状态行写「当前系统不可用」，没有启动按钮的成功结果（WN-104）。
+
+### HTTP
+
+方法用 `YoSegmentButton`：GET、POST。URL、可选正文。每条日志分开保留方法、URL、状态码、耗时。响应体在行内展开（WN-105）。取消后的行状态「已取消」，没有状态码 200（WN-106）。
+
+代理块只读：`getDefaultHttpProxy` 的主机、端口、排除列表（WN-107）。明文 HTTP 被网络安全配置拒绝时，该行说明「明文被拒绝」（WN-108）。页面不把请求改写成 https 再标成功。
+
+### 组播
+
+组地址、端口、「加入」。收到数据报时日志含组地址。失败时显示 Socket 错误码，按钮回到可再次手动加入，页面不自动循环重试（WN-109）。
+
+### 流量
+
+API 不低于 22：最近 1 天、本应用、Wi-Fi，两格「接收字节」「发送字节」（WN-110）。起点早于 31 天时错误码 `2103019`。其他应用 UID 的位置是拒绝说明，不出现字节数（WN-111）。
+
+## 状态
+
+### 默认
+
+当前分段显示表单和已有日志。代理块有系统返回值。流量块有本应用字节或「未查询」。
+
+### 按下
+
+连接、发送、监听、取消、分段按下走组件按下态。展开响应体是行按下，再按一次收起。
+
+### 禁用
+
+TCP 未连接或已关闭：「发送」禁用，`disabledReason`「连接已关闭」或「尚未连接」。UDP 的发送按钮在目标地址为空时禁用，禁用原因不使用「未连接」。WebSocket 断开后发送禁用。HTTP 进行中「发送」禁用、「取消」可点。低 API 的 WebSocket 服务端动作不出现。
+
+### 空
+
+该分段还没有交换：日志 `YoEmpty`「还没有交换记录」，表单仍在。UDP 空态说明里不写「等待连接」。
+
+### 错误
+
+证书主机名不匹配、明文被拒绝、Socket 错误、`2103019`、取消，都进入行级或分段级 `YoError`，`nativeCode` 可见。取消行不是 200。组播失败不把页面留在加载。
+
+### 加载
+
+连接中、HTTP 进行中：对应按钮 `loading = true`，日志区不整页遮罩，以便看到已完成的行。完成、失败、取消、对端关闭后按钮离开加载。
+
+## 受限
+
+WN-111 的默认内容是「需要 GET_NETWORK_STATS」。没有其他应用的收发字节，没有获权后的成功表。
+
+## 依据
+
+- `docs/goal/architecture/wifi-network/WN-097.md` 至 `WN-111.md`
+- `common/youi_kit/src/main/ets/components/shell/YoNavDestinationKind.ets`
+- `开发/指南/开发/应用框架/ArkUI（方舟UI框架）/UI开发 (ArkTS声明式开发范式)/设置组件导航和页面路由/组件导航(Navigation) (推荐)/Navigation基础架构介绍.md`

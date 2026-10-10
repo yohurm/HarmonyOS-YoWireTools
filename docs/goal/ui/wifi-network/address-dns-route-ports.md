@@ -1,0 +1,133 @@
+---
+id: ui.wifi-network.address
+type: ui-design
+status: draft
+when: phase-c
+related: [ui.wifi-network.shell, checklist.wifi-network]
+---
+
+# 地址、DNS、路由与端口
+
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Scroll
+            └── Column
+                ├── Row
+                │   ├── Text
+                │   └── YoStatusPill
+                ├── TextInput
+                ├── YoSegmentButton
+                ├── List
+                │   └── ListItem
+                └── YoActionButton
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 见下方行为细则中的同名描述。 |
+| 按下 | 见下方行为细则中的同名描述。 |
+| 禁用 | 见下方行为细则中的同名描述。 |
+| 空 | 见下方行为细则中的同名描述。 |
+| 错误 | 见下方行为细则中的同名描述。 |
+| 加载 | 见下方行为细则中的同名描述。 |
+| 无权限 | 缺少 `INTERNET` 时 DNS 失败可见（WN-004）。缺少 `GET_NETWORK_INFO` 时不编造网关（WN-005）。没有路由跟踪权限时不显示跳数（WN-082）。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `wifi-network/address-dns-route-ports` |
+| 架构编号 | WN-074 至 WN-090（行为细则里逐条出现） |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7 。文件不在 `main` |
+| 工作台入口 | 工作台「网络」卡片，或底栏网络槽（下标 2） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
+本页读默认网络的连接属性，并做本应用发起的解析、系统探测和私网 TCP 端口检查。路由跟踪、整机监听表和邻居 MAC 只显示拒绝。
+
+## 布局
+
+`YoPageShell` 标题「地址与诊断」，`MODULE`。`YoSegmentButton` 四个标签：「属性」「解析」「探测」「端口」。分段在内容上方，外层负责宽度。
+
+### 属性
+
+行：网卡名、MTU。路由每条三列：目的前缀、网关、是否默认路由（WN-074）。`linkAddresses`、`routes` 或 `dnses` 为空的块写「系统未返回」（WN-075）。API 24 及以上，IPv4 与 IPv6 各一行「可用」或「不可用」。低于该版本，这两行写「当前系统无此字段」（WN-076）。数值 0 与空列表都不渲染成 `0.0.0.0`。
+
+### 解析
+
+输入主机名。API 23 及以上可再选地址族：系统默认、只要 IPv4、只要 IPv6（WN-080）。按钮「解析」。
+
+结果至少一条 IP，并有胶囊「默认网络」（WN-077）。主机名含中文时，结果同时给出 Unicode 与转码后的 ASCII；转码失败与解析失败分成两行（WN-079）。`netId` 为 0 时结果区是错误，不出现空字符串成功（WN-078）。非法主机名直接错误，端口分段不会因此开始扫描（WN-081）。
+
+### 探测
+
+API 不低于 26.0.0：输入主机，时长固定说明为 3 秒，按钮「系统探测」。结果为丢包率 0–100 和 4 个 RTT，方法胶囊「系统探测」（WN-084）。低于该版本，探测与路由跟踪两块都写「当前系统版本没有该接口」（WN-086）。探测途中网络关闭：进度结束，结果为失败（WN-085）。
+
+路由跟踪块的默认内容是拒绝，见下节。没有跳数表，没有四个 RTT（WN-082、WN-083）。
+
+### 端口
+
+输入私网地址、端口、超时。按钮「检查」「取消」。可连接的行：开、地址、端口、耗时（WN-087）。超时或拒绝：未打开或未知（WN-088）。取消后不再追加行，已完成的行保留（WN-089）。公网地址在提交前被拒绝，`disabledReason`「只检查私网地址」。
+
+整机 TCP/UDP 监听表与邻居 MAC 不在本分段里列表化。一块说明「没有 GET_IP_MAC_INFO」，没有其他进程的端口（WN-090）。
+
+`≥600vp` 左分段加表单，右结果。结果列表 `contentEdgeToEdge`。
+
+## 状态
+
+### 默认
+
+属性块显示系统返回的网卡、MTU 和路由。解析、探测、端口在未运行时显示上一份终态；没有上一份时见空态。
+
+### 按下
+
+分段、解析、探测、检查、取消按下时使用组件按下态。取消在检查进行中可按下。
+
+### 禁用
+
+非法主机名、`netId` 为 0、或检查进行中，「解析」或新的「检查」禁用。低版本时「系统探测」禁用，`disabledReason`「当前系统版本没有该接口」。路由跟踪没有可点的开始按钮。
+
+### 空
+
+某一属性数组为空：该块「系统未返回」，页面其他块仍在。端口还没有任何一行：`YoEmpty`「还没有端口结果」。解析失败、探测失败不用这个空态。
+
+### 错误
+
+`YoError` 带 `nativeCode`。示例：解析失败、探测中断网、非法主机名、私网检查调用失败。调用失败与「未打开」分列，未知不写成开。
+
+### 加载
+
+解析、探测、单个端口进行中，对应结果区 `LOADING`。探测文案含剩余意图：「系统探测中」。网络关闭或用户取消后立刻离开加载。属性首次读取用「正在读取连接属性」。
+
+## 受限
+
+| 条目 | 本页默认 |
+| --- | --- |
+| WN-082、WN-083 | 文案「未获 ACCESS_NET_TRACE_INFO」。可附 201 或「位置未授权」。不画跳数、地址和 RTT。没有获权后的第二套表 |
+| WN-090 | 文案「拒绝」。不列出其他进程端口，不列出邻居 MAC |
+
+这两处没有应用内成功态。
+
+## 依据
+
+- `docs/goal/architecture/wifi-network/WN-074.md` 至 `WN-090.md`
+- `docs/goal/architecture/wifi-network/WN-083.md`
+- `设计/设计指南/通用设计基础/布局/响应式布局方法.md`
+- `common/youi_kit/src/main/ets/components/controls/YoSegmentButton.ets`

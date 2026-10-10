@@ -1,0 +1,167 @@
+---
+id: ui.nearlink.session-log
+type: ui-design
+status: draft
+when: phase-c
+related:
+  - docs/goal/ui/nearlink/shell-navigation.md
+  - docs/goal/checklist/nearlink.md
+  - docs/goal/architecture/nearlink/NL-103.md
+  - docs/goal/architecture/nearlink/NL-107.md
+  - docs/goal/architecture/nearlink/NL-113.md
+---
+
+# 会话日志
+
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Scroll
+            │   └── YoSegmentButton         // 文本 / HEX / 混合
+            ├── List
+            │   └── ListItemGroup
+            │       └── ListItem
+            │           └── Column
+            │               ├── Text        // 时间、方向、错误码
+            │               └── Text        // MONO_S
+            └── Row
+                ├── YoActionButton          // 导出
+                └── YoActionButton          // 清空，先 AlertDialog
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 已有记录时列表可见。每条含时间、方向或内部类型、错误码（若有）、接口名（NL-107） |
+| 按下 | 行按下展开 HEX。导出松手后写文件。 |
+| 禁用 | 没有行时导出禁用。不出现「开始抓包」。 |
+| 空 | 「本会话还没有记录」。诊断区仍显示三项缺口 |
+| 错误 | 导出失败用 YoError，已有行保留。蓝牙 HCI 日志不写成星闪抓包成功（NL-113）。 |
+| 加载 | 打开页面读取已有记录时短 `YoLoading`。新日志到达不把列表换成加载 |
+| 无权限 | 日志页不申请权限。权限结果写成一行（NL-108）。没有记录是空，不是无权限。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `nearlink/session-log` |
+| 架构编号 | NL-103, NL-107, NL-113 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6 。文件不在 `main` |
+| 工作台入口 | 工作台「星闪」卡片，或底栏星闪槽（下标 3） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
+一次星闪调试会话的记录：时间、方向或内部类型、错误码、接口名。应用层收发计数的活数字在端口终端，这里只保留产生这些数字的记录。链路诊断里的三项缺口和空口抓包缺口也在这页，避免扫描列表出现假的测量列。
+
+架构：`docs/goal/architecture/nearlink/NL-103.md`、`NL-107.md`、`NL-108.md`、`NL-109.md`、`NL-113.md`。权限结果来自支持页的授权动作，记录格式在这里。
+
+## 导航
+
+| 从 | 到 | 方式 | 返回 |
+| --- | --- | --- | --- |
+| 根页「日志」 | 列表 `MODULE` | 压栈 | 返回根页。导出失败不离开本页 |
+| 窄屏一行 | 详情 `OBJECT` | 压栈 | 返回列表 |
+| 大于等于 600vp | 列表与详情分栏 4:6 | `YoSplitScaffold` | 右栏空时 `YoEmpty`「选择一条记录」 |
+| 「链路诊断」 | 同一页顶部的缺口区，不另建成功页 | 锚点 | 无 |
+| 导出 | 系统分享或保存 | 失败则留在本页 | 数据仍在列表 |
+
+SSAP 会话和端口终端各自可以打开「本会话日志」，过滤到当前地址。过滤是列表条件，不是另一套日志。
+
+## 信息密度
+
+| 留在屏上 | 放进详情 |
+| --- | --- |
+| 时间、短类型、错误码或「成功」、接口名 | 原始广播 HEX、解析字段、`reasonMsg` |
+| 方向：入、出、内部 | 完整载荷 |
+| 导出入口 | 导出文件的全文 |
+| 诊断三行固定为「Kit 未提供」 | 不在详情里补一个 PHY 数值 |
+
+一行高度 56vp。错误码用 `YoStatusPill` `error`，成功的接口结果用 `neutral` 或 `success`，但仅当该接口确实成功。缺口行不用 `success`。
+
+扫描 RSSI 不复制到这里。诊断区写明「RSSI 只在扫描行」（NL-103）。
+
+## 布局
+
+列表 `contentEdgeToEdge`。筛选用 `YoSegmentButton`：全部、错误、权限、收发。项多于四个时改为标题栏菜单，避免窄屏挤爆分段。分段的外层负责宽度，不在 `YoSegmentButton` 上链式写尺寸（`common/youi_kit/doc/YouiKit-API-Design.md`）。
+
+诊断区在列表之前，三行加空口说明，不随「没有日志」一起被空态替换掉。没有日志时，诊断区仍在，下面才是 `YoEmpty`。
+
+## 组件
+
+| 区域 | 组件 |
+| --- | --- |
+| 页壳 | `YoPageShell` |
+| 筛选 | `YoSegmentButton` 或 `YoTitleBarMenuItem` |
+| 错误码、缺口 | `YoStatusPill` |
+| 无记录 | `YoEmpty` |
+| 导出失败 | `YoError`，列表保持 |
+| 导出开始 | `YoToast`，不替代页内结果 |
+| 详情 HEX | 等宽文本，可选中复制。不使用已删除的 `PayloadViewerView` |
+
+日志行不恢复 `YoLogRow`。行是 `ListItem` 里的两行文本加胶囊。
+
+## 控件六态
+
+| 控件 | 默认 | 按下 | 禁用 | 空 | 错误 | 加载 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 记录行 | 可点 | 系统列表按压 | 无 | 无记录时不画假行 | 错误码在行上 | 无行级加载 |
+| 筛选 | 「全部」选中 | 分段按下 | 无 | 筛选后没有匹配：`YoEmpty`「没有符合的记录」，诊断区仍在 | 无 | 无 |
+| 导出 | 「导出」 | 按下 | 没有任何记录，原因「没有可导出的内容」 | 同上 | 失败：`YoError`，会话数据仍在（NL-109） | 按钮 `loading`，完成前不 Toast 成功 |
+| 诊断行 | 不可点的缺口文案 | 无按下成功 | 无「读取 PHY」按钮 | 不写成空测量 | 不把缺口画成读取失败后的重试成功 | 无加载后的数值 |
+
+## 页面状态
+
+| 状态 | 屏上 |
+| --- | --- |
+| 默认 | 已有记录时列表可见。每条含时间、方向或内部类型、错误码（若有）、接口名（NL-107） |
+| 空 | 「本会话还没有记录」。诊断区仍显示三项缺口 |
+| 加载 | 打开页面读取已有记录时短 `YoLoading`。新日志到达不把列表换成加载 |
+| 错误码示例 | 201、401、801、`1009700003`、`1009700023` 都能在行上看到码和接口名（NL-107） |
+| 权限 | 同意或拒绝各一条，类型为权限结果。不记录弹窗以外的个人信息（NL-108） |
+| 导出成功 | 内容含原始广播 HEX 与解析字段（NL-109）。Toast 只说已导出 |
+| 导出失败 | 列表仍在，`YoError.nextStep` 为再次导出 |
+| 后台 | 扫描停止的那条停止日志会出现在这里（NL-110 的证据落点）。扫描页负责把状态显示为已停止 |
+
+`reasonMsg` 只在详情，与 SSAP 客户端 NL-076 一致。星闪 MTU 失败的 `1009700099` 在行上，详情不出现蓝牙 `2900099`（NL-114 的日志侧）。
+
+## 缺口：PHY、连接间隔、对端 RSSI（NL-103）
+
+诊断区三行，标题分别是 PHY、连接间隔、对端 RSSI。每行胶囊 `warning`「Kit 未提供」。没有数值，没有刷新按钮，没有「已读取」成功态。
+
+第四句说明：扫描阶段的 RSSI 只在扫描列表。本区不复制 RSSI 列。
+
+依据：`docs/goal/architecture/nearlink/NL-103.md`。
+
+## 缺口：不能提供星闪空口帧（NL-113）
+
+诊断区下方一段说明：开发者选项中的 HCI 日志是蓝牙日志；Release 还会去掉载荷；本模块不能提供星闪空口帧。
+
+没有「开始抓包」，没有抓包文件成功态，没有把 HCI 日志嵌进本列表冒充星闪帧。胶囊「Kit 未提供」。
+
+依据：`docs/goal/architecture/nearlink/NL-113.md`。
+
+## 验收对照
+
+| 条目 | 屏上证据 |
+| --- | --- |
+| NL-103 | 三行缺口，无测量成功态；扫描行 RSSI 不在本页 |
+| NL-107 | 时间、方向或内部类型、错误码、接口名 |
+| NL-108 | 权限结果一条，无额外个人信息 |
+| NL-109 | 导出含 HEX 与解析字段；失败时列表仍在 |
+| NL-113 | 蓝牙 HCI 与星闪空口的说明，无抓包成功态 |
