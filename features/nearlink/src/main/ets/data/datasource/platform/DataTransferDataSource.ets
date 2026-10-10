@@ -1,6 +1,8 @@
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { dataTransfer } from '@kit.NearLinkKit';
+import constant from '@hms.nearlink.constant';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { NearLinkAdvParser } from '../../../domain/service/NearLinkAdvParser';
 import { Result, ResultError } from 'common_core';
 import { KitEventSubscription } from 'common_platform';
 import { NearLinkConstants } from '../../../constants/NearLinkConstants';
@@ -125,6 +127,32 @@ export class DataTransferDataSource {
       }, 'dataTransfer.connectionStateChanged');
       this.connectionHandler = undefined;
     }
+  }
+
+  watchLink(onState: (address: string, uuid: string, mtu: number, state: number) => void): Result<void> {
+    return this.onConnectionStateChanged((info: dataTransfer.ConnectionResult) => {
+      onState(info.address, info.uuid, info.mtu, DataTransferDataSource.stateCode(info.state));
+    });
+  }
+
+  watchRead(onRead: (address: string, uuid: string, hex: string, byteLength: number) => void): Result<void> {
+    return this.onReadData((info: dataTransfer.DataParams) => {
+      const bytes = new Uint8Array(info.data);
+      onRead(info.address, info.uuid, NearLinkAdvParser.toHex(bytes), bytes.byteLength);
+    });
+  }
+
+  private static stateCode(state: dataTransfer.ConnectionState): number {
+    if (state === constant.ConnectionState.STATE_CONNECTING) {
+      return 0;
+    }
+    if (state === constant.ConnectionState.STATE_CONNECTED) {
+      return 1;
+    }
+    if (state === constant.ConnectionState.STATE_DISCONNECTING) {
+      return 2;
+    }
+    return 3;
   }
 
   onReadData(listener: ReadDataListener): Result<void> {

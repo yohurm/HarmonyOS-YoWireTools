@@ -47,6 +47,9 @@ export struct NearLinkDetailBody {
           .fontColor(YoColor.TEXT_SECONDARY)
         Text(this.vm.detailReportedName)
           .fontSize(YoTypeStyle.BODY_M.size)
+        Text($r('app.string.nl_name_from_tlv'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
         if (this.vm.detailNameBytes >= 0) {
           Text($r('app.string.nl_device_info_len'))
             .fontSize(YoTypeStyle.BODY_S.size)
@@ -77,6 +80,11 @@ export struct NearLinkDetailBody {
         Text($r('app.string.nl_no_paired'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.TEXT_SECONDARY)
+      }
+      if (this.vm.addressStale()) {
+        Text($r('app.string.nl_old_address'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
       }
       if (this.vm.favoriteNote === 'saved') {
         Text($r('app.string.nl_favorite_saved'))

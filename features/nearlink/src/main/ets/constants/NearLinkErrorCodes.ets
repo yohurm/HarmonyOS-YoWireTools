@@ -39,4 +39,6 @@ export class NearLinkErrorCodes {
   static readonly ALREADY_PAIRED: string = 'already_paired';
   static readonly BLOCKED_UNENCRYPTED: string = 'blocked_unencrypted';
   static readonly GAP: string = 'gap';
+  static readonly MANUFACTURER_DATA_NEEDS_ID: string = 'YW-NL-1012';
+  static readonly ADV_INTERVAL_RANGE: string = 'YW-NL-1013';
 }

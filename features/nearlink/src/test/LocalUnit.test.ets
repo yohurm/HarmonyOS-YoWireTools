@@ -13,6 +13,7 @@ import {
 } from '../main/ets/domain/service/NearLinkDebugRules';
 import { NearLinkScanForm } from '../main/ets/domain/service/NearLinkScanForm';
 import { NearLinkPayloadRules, NearLinkScanPolicy } from '../main/ets/domain/service/NearLinkScanPolicy';
+import { NearLinkScreenRules } from '../main/ets/domain/service/NearLinkScreenRules';
 
 export default function localUnitTest() {
   describe('NearLinkLocalUnitTest', () => {
@@ -96,6 +97,36 @@ export default function localUnitTest() {
       expect(text.indexOf('reasonMsg=hidden') >= 0).assertTrue();
       const kept = NearLinkLogBook.retainOnFailure([entry]);
       expect(kept.length).assertEqual(1);
+    });
+
+    it('screen_rules_name_validation_and_version_gates', 0, () => {
+      expect(NearLinkScreenRules.sentenceKey(NearLinkErrorCodes.EMPTY_FILTER)).assertEqual('need_filter');
+      expect(NearLinkScreenRules.sentenceKey(NearLinkErrorCodes.DURATION_RANGE)).assertEqual('duration_range');
+      expect(NearLinkScreenRules.sentenceKey(NearLinkErrorCodes.MANUFACTURER_DATA_NEEDS_ID)).assertEqual('mfg_need_id');
+      expect(NearLinkScreenRules.sentenceKey(NearLinkErrorCodes.ADV_INTERVAL_RANGE)).assertEqual('adv_interval');
+      expect(NearLinkScreenRules.blocksApi(23, NearLinkConstants.API_REASON_MSG)).assertTrue();
+      expect(NearLinkScreenRules.blocksApi(26, NearLinkConstants.API_RSSI_FILTER)).assertFalse();
+      expect(NearLinkScreenRules.localNameCodeWhenOff(true)).assertEqual(`${NearLinkConstants.NATIVE_RADIO_OFF}`);
+      expect(NearLinkScreenRules.localNameCodeWhenOff(false)).assertEqual('');
+      expect(NearLinkScreenRules.durationElapsed(10, 10)).assertTrue();
+      expect(NearLinkScreenRules.durationElapsed(9, 9)).assertFalse();
+      expect(NearLinkScreenRules.readEnabled(NearLinkConstants.OP_WRITE_NO_RESPONSE)).assertFalse();
+      expect(NearLinkScreenRules.discoverAllowed(false)).assertFalse();
+      expect(NearLinkScreenRules.portIsConnected(1)).assertTrue();
+      expect(NearLinkScreenRules.portIsConnected(3)).assertFalse();
+      expect(NearLinkScreenRules.rejectBluetoothMtu('2900099')).assertEqual(`${NearLinkConstants.NATIVE_OPERATION_FAILED}`);
+      expect(NearLinkScreenRules.addressDiffers('aa', 'bb')).assertTrue();
+      expect(NearLinkScreenRules.gapHasSuccess(NearLinkGap.AIR)).assertFalse();
+      expect(NearLinkScreenRules.notifyLine(true, false, false)).assertEqual('not_enabled');
+      expect(NearLinkScreenRules.notifyLine(false, false, true)).assertEqual('reenable');
+      const missingId = new NearLinkScanFilter([new NearLinkSystemFilter('', '', -1, 'aa')]);
+      expect(missingId.validate().error?.code).assertEqual(NearLinkErrorCodes.MANUFACTURER_DATA_NEEDS_ID);
+      const grouped = NearLinkScanForm.toFilter('AA', '', '', '', '', '', false,
+        NearLinkScanMode.LOW_POWER, '10', false, '', false, 'BB', 'NameB');
+      expect(grouped.groups.length).assertEqual(2);
+      expect(grouped.groups[0].address).assertEqual('AA');
+      expect(grouped.groups[1].deviceName).assertEqual('NameB');
+      expect(NearLinkPayloadRules.validateAdvertisingInterval(10).error?.code).assertEqual(NearLinkErrorCodes.ADV_INTERVAL_RANGE);
     });
   });
 }

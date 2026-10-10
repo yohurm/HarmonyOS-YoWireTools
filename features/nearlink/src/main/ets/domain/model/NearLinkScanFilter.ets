@@ -126,7 +126,7 @@ export class NearLinkScanFilter {
       return new ResultError(NearLinkErrorCodes.NAME_LENGTH, 'api=startScan;field=deviceName');
     }
     if (group.manufacturerDataHex.length > 0 && group.manufacturerId < 0) {
-      return new ResultError(NearLinkErrorCodes.EMPTY_FILTER, 'api=startScan;field=manufacturerId');
+      return new ResultError(NearLinkErrorCodes.MANUFACTURER_DATA_NEEDS_ID, 'api=startScan;field=manufacturerId');
     }
     if (group.manufacturerId >= 0 &&
       (group.manufacturerId < NearLinkConstants.MANUFACTURER_ID_MIN ||

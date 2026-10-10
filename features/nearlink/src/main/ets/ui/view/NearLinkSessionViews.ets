@@ -9,6 +9,7 @@ import {
   YoTypeStyle
 } from 'youi_kit';
 import { NearLinkDestination } from '../../domain/model/NearLinkScreenCategory';
+import { SsapPropertyNode, SsapServiceNode } from '../../domain/model/SsapServiceTree';
 import { NearLinkSecurityState } from '../../domain/model/NearLinkSecurityState';
 import { NearLinkDebugModel } from '../state/NearLinkDebugModel';
 
@@ -51,6 +52,9 @@ export struct NearLinkAdvertisingView {
           void this.vm.beginAdvertising();
         }
       })
+      Text($r('app.string.nl_central_disconnect'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
       YoActionButton({
         label: $r('app.string.nl_adv_stop'),
         kind: YoActionButtonKind.SECONDARY,
@@ -91,16 +95,48 @@ export struct NearLinkSsapClientView {
     Column({ space: YoSpace.S }) {
       Text(this.vm.selectedAddress)
         .fontSize(YoTypeStyle.BODY_M.size)
+      if (this.vm.ssapConnecting) {
+        Text($r('app.string.nl_connecting'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+        Text($r('app.string.nl_waited'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+        Text(`${this.vm.waitedSec}`)
+          .fontSize(YoTypeStyle.BODY_S.size)
+      }
+      if (this.vm.addressStale()) {
+        Text($r('app.string.nl_old_address'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+      }
       if (this.vm.ssapReused) {
         Text($r('app.string.nl_client_reused'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.TEXT_SECONDARY)
       }
       if (this.vm.notifyHint && !this.vm.ssapConnected) {
-        Text($r('app.string.nl_notify_off'))
+        Text($r('app.string.nl_notify_reenable'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.WARNING)
+      } else if (this.vm.ssapConnected && !this.vm.notifyArmed()) {
+        Text($r('app.string.nl_notify_not_enabled'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
       }
+      ForEach(this.vm.services, (service: SsapServiceNode) => {
+        Column({ space: YoSpace.XS }) {
+          Text(service.serviceUuid)
+            .fontSize(YoTypeStyle.BODY_S.size)
+            .fontColor(YoColor.TEXT_PRIMARY)
+          ForEach(service.properties, (property: SsapPropertyNode) => {
+            Text(`${property.propertyUuid} ${property.operation} ${property.lastValueHex}`)
+              .fontSize(YoTypeStyle.BODY_S.size)
+              .fontColor(YoColor.TEXT_SECONDARY)
+          }, (property: SsapPropertyNode) => `${service.serviceUuid}-${property.propertyUuid}`)
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+      }, (service: SsapServiceNode) => service.serviceUuid)
       TextInput({ text: this.vm.ssapServiceUuid, placeholder: $r('app.string.nl_service_uuid') })
         .onChange((value: string) => {
           this.vm.ssapServiceUuid = value;
@@ -136,6 +172,14 @@ export struct NearLinkSsapClientView {
         }
       })
       YoActionButton({
+        label: $r('app.string.nl_reconnect'),
+        kind: YoActionButtonKind.SECONDARY,
+        isEnabled: this.vm.selectedAddress.length > 0,
+        onTap: () => {
+          void this.vm.connectSsap();
+        }
+      })
+      YoActionButton({
         label: $r('app.string.nl_disconnect'),
         kind: YoActionButtonKind.SECONDARY,
         onTap: () => {
@@ -143,12 +187,28 @@ export struct NearLinkSsapClientView {
         }
       })
       YoActionButton({
+        label: $r('app.string.nl_discover'),
+        kind: YoActionButtonKind.SECONDARY,
+        isEnabled: this.vm.ssapConnected,
+        disabledReason: $r('app.string.nl_not_connected'),
+        onTap: () => {
+          void this.vm.discoverSsap();
+        }
+      })
+      YoActionButton({
         label: $r('app.string.nl_read'),
         kind: YoActionButtonKind.SECONDARY,
+        isEnabled: this.vm.readEnabled(),
+        disabledReason: $r('app.string.nl_read_unsupported'),
         onTap: () => {
           void this.vm.readSsap();
         }
       })
+      if (!this.vm.readEnabled()) {
+        Text($r('app.string.nl_read_unsupported'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+      }
       YoActionButton({
         label: $r('app.string.nl_write'),
         kind: YoActionButtonKind.SECONDARY,
@@ -158,6 +218,9 @@ export struct NearLinkSsapClientView {
       })
       if (this.vm.sliceRequired) {
         Text($r('app.string.nl_slice_prompt'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+        Text(`${this.vm.ssapMtuLive()}`)
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.WARNING)
         YoActionButton({
@@ -190,6 +253,11 @@ export struct NearLinkSsapClientView {
         Text(this.vm.nativeCode)
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
+      }
+      if (this.vm.mtuNearLink) {
+        Text($r('app.string.nl_not_bluetooth_mtu'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
       }
     }
     .width('100%')
@@ -252,6 +320,31 @@ export struct NearLinkSsapServerView {
         }
       })
       YoActionButton({
+        label: $r('app.string.nl_respond_read'),
+        kind: YoActionButtonKind.SECONDARY,
+        isEnabled: this.vm.lastReadRequestId >= 0,
+        onTap: () => {
+          void this.vm.respondServerRead();
+        }
+      })
+      YoActionButton({
+        label: $r('app.string.nl_server_notify'),
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.notifyServer();
+        }
+      })
+      if (this.vm.serverClosed) {
+        Text($r('app.string.nl_server_closed'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+      }
+      if (this.vm.actionMessage.length > 0) {
+        Text(this.vm.actionLabel())
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.ERROR)
+      }
+      YoActionButton({
         label: $r('app.string.nl_close_server'),
         kind: YoActionButtonKind.DANGER,
         onTap: () => {
@@ -291,14 +384,45 @@ export struct NearLinkPortView {
     Column({ space: YoSpace.S }) {
       YoStatusPill({ label: $r('app.string.nl_role_peer'), tone: 'neutral' })
       YoStatusPill({ label: this.encryptLabel(), tone: this.encryptTone() })
+      Text($r('app.string.nl_uuid_must_match'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
+      Text($r('app.string.nl_port_basic_note'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
+      Text($r('app.string.nl_port_reliable_note'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
+      if (this.vm.security !== NearLinkSecurityState.ENCRYPTED) {
+        Text($r('app.string.nl_sensitive'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+      }
+      if (this.vm.portConnected) {
+        Text($r('app.string.nl_port_connected'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+        Text(`${this.vm.portNegotiatedMtu}`)
+          .fontSize(YoTypeStyle.BODY_M.size)
+      } else {
+        Text($r('app.string.nl_port_disconnected'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+      }
       Text($r('app.string.nl_app_layer'))
         .fontSize(YoTypeStyle.BODY_S.size)
       Text(`${this.vm.appTx} / ${this.vm.appRx}`)
+        .fontSize(YoTypeStyle.BODY_M.size)
+      Text($r('app.string.nl_packet_count'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+      Text(`${this.vm.portPacketsTx} / ${this.vm.portPacketsRx}`)
         .fontSize(YoTypeStyle.BODY_M.size)
       TextInput({ text: this.vm.portUuid, placeholder: $r('app.string.nl_service_uuid') })
         .onChange((value: string) => {
           this.vm.portUuid = value;
         })
+      Text($r('app.string.nl_port_mtu_default'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
       TextInput({ text: this.vm.portMtu, placeholder: $r('app.string.nl_mtu') })
         .onChange((value: string) => {
           this.vm.portMtu = value;
@@ -306,6 +430,10 @@ export struct NearLinkPortView {
       TextInput({ text: this.vm.ssapHex, placeholder: $r('app.string.nl_payload') })
         .onChange((value: string) => {
           this.vm.ssapHex = value;
+        })
+      TextInput({ text: this.vm.portText, placeholder: $r('app.string.nl_text_payload') })
+        .onChange((value: string) => {
+          this.vm.portText = value;
         })
       Row({ space: YoSpace.S }) {
         Toggle({ type: ToggleType.Switch, isOn: this.vm.portReliable })
@@ -337,12 +465,53 @@ export struct NearLinkPortView {
         }
       })
       YoActionButton({
-        label: $r('app.string.nl_send'),
+        label: $r('app.string.nl_send_hex'),
         kind: YoActionButtonKind.SECONDARY,
         onTap: () => {
           void this.vm.sendPort();
         }
       })
+      YoActionButton({
+        label: $r('app.string.nl_send_text'),
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.sendPortText(false);
+        }
+      })
+      YoActionButton({
+        label: $r('app.string.nl_disconnect'),
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          void this.vm.disconnectPort();
+        }
+      })
+      YoActionButton({
+        label: $r('app.string.nl_port_keep'),
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          this.vm.keepPort();
+        }
+      })
+      if (this.vm.portHeld) {
+        Text($r('app.string.nl_port_held'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+        Text(this.vm.portUuid)
+          .fontSize(YoTypeStyle.BODY_S.size)
+      }
+      if (this.vm.portSliceRequired) {
+        Text($r('app.string.nl_slice_prompt'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.WARNING)
+        Text(`${this.vm.portNegotiatedMtu}`)
+          .fontSize(YoTypeStyle.BODY_S.size)
+        YoActionButton({
+          label: $r('app.string.nl_slice_confirm'),
+          onTap: () => {
+            void this.vm.confirmPortSlice();
+          }
+        })
+      }
       YoActionButton({
         label: $r('app.string.nl_entry_pair'),
         kind: YoActionButtonKind.TEXT,
@@ -377,6 +546,11 @@ export struct NearLinkPortView {
           .fontColor(YoColor.WARNING)
         Text(this.vm.versionSince)
           .fontSize(YoTypeStyle.BODY_S.size)
+      }
+      if (this.vm.actionMessage.length > 0) {
+        Text(this.vm.actionLabel())
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.ERROR)
       }
       if (this.vm.nativeCode.length > 0) {
         Text(this.vm.nativeCode)

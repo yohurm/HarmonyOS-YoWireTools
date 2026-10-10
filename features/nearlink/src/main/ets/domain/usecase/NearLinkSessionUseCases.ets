@@ -44,6 +44,10 @@ export class NearLinkSessionUseCases {
   private security: NearLinkSecurityState = NearLinkSecurityState.UNKNOWN;
   private txCount: number = 0;
   private rxCount: number = 0;
+  private txPackets: number = 0;
+  private rxPackets: number = 0;
+  private portMtuNegotiated: number = 0;
+  private nextWriteAt: number = 0;
 
   constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
     this.repository = repository;
@@ -317,24 +321,64 @@ export class NearLinkSessionUseCases {
     return connected;
   }
 
-  async writePort(hex: string, blockUnlessEncrypted: boolean): Promise<Result<void>> {
+  async writePort(hex: string, blockUnlessEncrypted: boolean, sliceConfirmed: boolean = false): Promise<Result<void>> {
     if (!NearLinkPayloadRules.isEvenHex(hex)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.HEX_INVALID, 'api=writeData'));
     }
-    if (blockUnlessEncrypted && this.security !== NearLinkSecurityState.ENCRYPTED) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.BLOCKED_UNENCRYPTED, 'api=writeData'));
-    }
-    const bytes = NearLinkPayloadRules.hexToBytes(hex);
-    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    const written = await this.port.writeData(this.portAddress, this.portUuid, buffer);
-    if (written.success) {
-      this.txCount += bytes.length;
-    }
-    return written;
+    return this.writePortBytes(NearLinkPayloadRules.hexToBytes(hex), blockUnlessEncrypted, sliceConfirmed);
   }
 
-  notePortRead(byteLength: number): void {
-    this.rxCount += byteLength;
+  async writePortText(text: string, blockUnlessEncrypted: boolean, sliceConfirmed: boolean = false): Promise<Result<void>> {
+    if (text.length === 0) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.VALIDATION, 'api=writeData;field=text'));
+    }
+    return this.writePortBytes(NearLinkPayloadRules.utf8Bytes(text), blockUnlessEncrypted, sliceConfirmed);
+  }
+
+  notePortLink(mtu: number, connected: boolean): void {
+    if (connected && mtu > 0) {
+      this.portMtuNegotiated = mtu;
+    }
+    if (!connected) {
+      this.portMtuNegotiated = 0;
+    }
+  }
+
+  portMtu(): number {
+    return this.portMtuNegotiated;
+  }
+
+  watchPort(
+    onState: (address: string, uuid: string, mtu: number, state: number) => void,
+    onRead: (address: string, uuid: string, hex: string, byteLength: number) => void
+  ): Result<void> {
+    const linked = this.port.watchLink(onState);
+    if (!linked.success) {
+      return linked;
+    }
+    return this.port.watchRead(onRead);
+  }
+
+  unwatchPortRead(): void {
+    this.port.offReadData();
+  }
+
+  async respondServerRead(requestId: number, address: string, hex: string): Promise<Result<void>> {
+    if (hex.length > 0 && !NearLinkPayloadRules.isEvenHex(hex)) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.HEX_INVALID, 'api=sendResponse'));
+    }
+    const bytes = hex.length === 0 ? new Uint8Array(0) : NearLinkPayloadRules.hexToBytes(hex);
+    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    return this.server.respondRead(requestId, address, buffer);
+  }
+
+  notifyServer(address: string, serviceUuid: string, propertyUuid: string, operation: number, hex: string): Promise<Result<void>> {
+    if (hex.length > 0 && !NearLinkPayloadRules.isEvenHex(hex)) {
+      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.HEX_INVALID, 'api=notifyPropertyChanged')));
+    }
+    const bytes = hex.length === 0 ? new Uint8Array(0) : NearLinkPayloadRules.hexToBytes(hex);
+    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    return this.server.notifyPlain(address, serviceUuid, propertyUuid, operation, buffer);
   }
 
   appTx(): number {
@@ -345,7 +389,21 @@ export class NearLinkSessionUseCases {
     return this.rxCount;
   }
 
+  appTxPackets(): number {
+    return this.txPackets;
+  }
+
+  appRxPackets(): number {
+    return this.rxPackets;
+  }
+
+  notePortRead(byteLength: number): void {
+    this.rxCount += byteLength;
+    this.rxPackets += 1;
+  }
+
   async disconnectPort(): Promise<Result<void>> {
+    this.port.offReadData();
     return this.port.disconnect(this.portAddress, this.portUuid);
   }
 
@@ -410,6 +468,50 @@ export class NearLinkSessionUseCases {
       return Result.fail(new ResultError(NearLinkErrorCodes.VALIDATION, 'api=export'));
     }
     return NearLinkLogExportDataSource.copyText(text);
+  }
+
+  private async writePortBytes(bytes: Uint8Array, blockUnlessEncrypted: boolean, sliceConfirmed: boolean): Promise<Result<void>> {
+    if (blockUnlessEncrypted && this.security !== NearLinkSecurityState.ENCRYPTED) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.BLOCKED_UNENCRYPTED, 'api=writeData'));
+    }
+    if (this.portMtuNegotiated > 0 &&
+      NearLinkPayloadRules.exceedsMtu(bytes.length, this.portMtuNegotiated) &&
+      !sliceConfirmed) {
+      return Result.fail(new ResultError(NearLinkErrorCodes.VALIDATION, `api=writeData;slice=required;mtu=${this.portMtuNegotiated}`));
+    }
+    const now = Date.now();
+    if (now < this.nextWriteAt) {
+      await this.waitMs(this.nextWriteAt - now);
+    }
+    const limit = this.portMtuNegotiated > 0 ? this.portMtuNegotiated : bytes.length;
+    const plan = NearLinkSlicePlan.plan(bytes, limit, true);
+    const chunks = plan.value ?? [];
+    for (let i = 0; i < chunks.length; i++) {
+      if (i > 0) {
+        await this.waitMs(NearLinkConstants.CONGESTION_MIN_GAP_MS);
+      }
+      const payload = chunks[i];
+      const buffer = payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength);
+      const written = await this.port.writeData(this.portAddress, this.portUuid, buffer);
+      if (!written.success && written.error?.code === NearLinkErrorCodes.DT_WRITE_CONGESTED) {
+        this.nextWriteAt = Date.now() + NearLinkConstants.CONGESTION_MIN_GAP_MS;
+        return written;
+      }
+      if (!written.success) {
+        return written;
+      }
+      this.txCount += payload.byteLength;
+      this.txPackets += 1;
+    }
+    return Result.ok(undefined);
+  }
+
+  private waitMs(ms: number): Promise<void> {
+    return new Promise<void>((resolve: () => void) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
+    });
   }
 
   private client(): SsapClientDataSource | undefined {

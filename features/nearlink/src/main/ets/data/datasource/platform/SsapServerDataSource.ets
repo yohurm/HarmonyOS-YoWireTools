@@ -110,6 +110,23 @@ export class SsapServerDataSource {
     return this.sendResponse(requestId, address, new ArrayBuffer(0));
   }
 
+  notifyPlain(
+    address: string,
+    serviceUuid: string,
+    propertyUuid: string,
+    operation: number,
+    value: ArrayBuffer
+  ): Promise<Result<void>> {
+    const property: ssap.Property = {
+      serviceUuid: serviceUuid,
+      propertyUuid: propertyUuid,
+      value: value,
+      descriptors: [],
+      operation: operation
+    };
+    return this.notify(address, property, operation);
+  }
+
   notify(address: string, property: ssap.Property, operation: number): Promise<Result<void>> {
     if ((operation & NearLinkConstants.OP_NOTIFY) === 0) {
       return Promise.resolve(Result.fail(new ResultError(

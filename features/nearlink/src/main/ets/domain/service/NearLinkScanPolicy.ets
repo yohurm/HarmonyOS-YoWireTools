@@ -118,7 +118,7 @@ export class NearLinkPayloadRules {
   static validateAdvertisingInterval(interval: number): Result<void> {
     if (interval < NearLinkConstants.ADV_INTERVAL_MIN || interval > NearLinkConstants.ADV_INTERVAL_MAX) {
       return Result.fail(new ResultError(
-        NearLinkErrorCodes.VALIDATION,
+        NearLinkErrorCodes.ADV_INTERVAL_RANGE,
         'api=startAdvertising;field=interval'
       ));
     }
@@ -127,5 +127,39 @@ export class NearLinkPayloadRules {
 
   static shouldRespondToWrite(writeTypeValue: number): boolean {
     return writeTypeValue === 1;
+  }
+
+  static utf8Bytes(text: string): Uint8Array {
+    const units: number[] = [];
+    for (let i = 0; i < text.length; i++) {
+      let code = text.charCodeAt(i);
+      if (code >= 0xD800 && code <= 0xDBFF && i + 1 < text.length) {
+        const next = text.charCodeAt(i + 1);
+        if (next >= 0xDC00 && next <= 0xDFFF) {
+          code = 0x10000 + ((code - 0xD800) << 10) + (next - 0xDC00);
+          i++;
+        }
+      }
+      if (code < 0x80) {
+        units.push(code);
+      } else if (code < 0x800) {
+        units.push(0xC0 | (code >> 6));
+        units.push(0x80 | (code & 0x3F));
+      } else if (code < 0x10000) {
+        units.push(0xE0 | (code >> 12));
+        units.push(0x80 | ((code >> 6) & 0x3F));
+        units.push(0x80 | (code & 0x3F));
+      } else {
+        units.push(0xF0 | (code >> 18));
+        units.push(0x80 | ((code >> 12) & 0x3F));
+        units.push(0x80 | ((code >> 6) & 0x3F));
+        units.push(0x80 | (code & 0x3F));
+      }
+    }
+    const bytes = new Uint8Array(units.length);
+    for (let i = 0; i < units.length; i++) {
+      bytes[i] = units[i];
+    }
+    return bytes;
   }
 }

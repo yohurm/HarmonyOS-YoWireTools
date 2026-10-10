@@ -14,7 +14,9 @@ export class NearLinkScanForm {
     durationText: string,
     scanAll: boolean,
     localUuid: string,
-    localUuidEnabled: boolean
+    localUuidEnabled: boolean,
+    addressB: string = '',
+    nameB: string = ''
   ): NearLinkScanFilter {
     const manufacturerId = NearLinkScanForm.readManufacturerId(manufacturerIdText);
     const rssi = NearLinkScanForm.readNumber(rssiText);
@@ -29,8 +31,14 @@ export class NearLinkScanForm {
       systemRssi && hasRssi
     );
     const duration = durationText.trim().length === 0 ? 0 : NearLinkScanForm.readNumber(durationText);
+    const groups: NearLinkSystemFilter[] = [group];
+    const secondAddress = addressB.trim();
+    const secondName = nameB.trim();
+    if (secondAddress.length > 0 || secondName.length > 0) {
+      groups.push(new NearLinkSystemFilter(secondAddress, secondName));
+    }
     return new NearLinkScanFilter(
-      [group],
+      groups,
       mode,
       duration,
       scanAll,

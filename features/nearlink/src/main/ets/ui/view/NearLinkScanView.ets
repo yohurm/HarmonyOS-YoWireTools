@@ -153,6 +153,27 @@ export struct NearLinkScanView {
                 if (item.belowLocalRssiGate) {
                   YoStatusPill({ label: $r('app.string.nl_below_gate'), tone: 'warning' })
                 }
+                if (item.connectable) {
+                  Text($r('app.string.nl_connectable'))
+                    .fontSize(YoTypeStyle.BODY_S.size)
+                    .fontColor(YoColor.TEXT_SECONDARY)
+                } else {
+                  Text($r('app.string.nl_not_connectable'))
+                    .fontSize(YoTypeStyle.BODY_S.size)
+                    .fontColor(YoColor.TEXT_SECONDARY)
+                }
+                Text($r('app.string.nl_last_seen'))
+                  .fontSize(YoTypeStyle.BODY_S.size)
+                  .fontColor(YoColor.TEXT_SECONDARY)
+                Text(`${item.lastSeenMs}`)
+                  .fontSize(YoTypeStyle.BODY_S.size)
+                  .fontColor(YoColor.TEXT_SECONDARY)
+                Text($r('app.string.nl_seen'))
+                  .fontSize(YoTypeStyle.BODY_S.size)
+                  .fontColor(YoColor.TEXT_SECONDARY)
+                Text(`${item.seenCount}`)
+                  .fontSize(YoTypeStyle.BODY_S.size)
+                  .fontColor(YoColor.TEXT_SECONDARY)
                 if (item.deviceClass.length > 0) {
                   Text(item.deviceClass)
                     .fontSize(YoTypeStyle.BODY_S.size)
@@ -225,6 +246,17 @@ export struct NearLinkScanView {
       TextInput({ text: this.vm.filterName, placeholder: $r('app.string.nl_name') })
         .onChange((value: string) => {
           this.vm.filterName = value;
+        })
+      Text($r('app.string.nl_group_b'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
+      TextInput({ text: this.vm.filterAddressB, placeholder: $r('app.string.nl_address') })
+        .onChange((value: string) => {
+          this.vm.filterAddressB = value;
+        })
+      TextInput({ text: this.vm.filterNameB, placeholder: $r('app.string.nl_name') })
+        .onChange((value: string) => {
+          this.vm.filterNameB = value;
         })
       TextInput({ text: this.vm.filterManufacturerId, placeholder: $r('app.string.nl_manufacturer_id') })
         .onChange((value: string) => {

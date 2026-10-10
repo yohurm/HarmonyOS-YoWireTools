@@ -77,6 +77,9 @@ export struct NearLinkRootView {
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.WARNING)
       }
+      Text($r('app.string.nl_bluetooth_independent'))
+        .fontSize(YoTypeStyle.BODY_S.size)
+        .fontColor(YoColor.TEXT_SECONDARY)
       if (this.vm.radioCategory === NearLinkRadioCategory.OFF) {
         Text($r('app.string.nl_settings_path_a'))
           .fontSize(YoTypeStyle.BODY_S.size)

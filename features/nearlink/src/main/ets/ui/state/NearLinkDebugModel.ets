@@ -34,6 +34,8 @@ import {
   NearLinkPairedPresentation,
   NearLinkReasonPolicy
 } from '../../domain/service/NearLinkDebugRules';
+import { NearLinkPayloadRules } from '../../domain/service/NearLinkScanPolicy';
+import { NearLinkScreenRules } from '../../domain/service/NearLinkScreenRules';
 import { NearLinkScanForm } from '../../domain/service/NearLinkScanForm';
 import { StartNearLinkScanUseCase, StopNearLinkScanUseCase } from '../../domain/usecase/NearLinkUseCases';
 import { NearLinkSessionUseCases } from '../../domain/usecase/NearLinkSessionUseCases';
@@ -73,6 +75,8 @@ export class NearLinkDebugModel {
   @Trace filterDuration: string = '';
   @Trace filterUuid: string = '';
   @Trace filterUuidEnabled: boolean = false;
+  @Trace filterAddressB: string = '';
+  @Trace filterNameB: string = '';
   @Trace filterScanAll: boolean = false;
   @Trace scanModeIndex: number = 0;
   @Trace filterMessage: string = '';
@@ -93,16 +97,31 @@ export class NearLinkDebugModel {
   @Trace ssapWithResponse: boolean = true;
   @Trace ssapMtuText: string = `${NearLinkConstants.DEFAULT_MTU}`;
   @Trace ssapConnected: boolean = false;
+  @Trace ssapConnecting: boolean = false;
+  @Trace waitedSec: number = 0;
   @Trace ssapReused: boolean = false;
   @Trace notifyHint: boolean = false;
   @Trace sliceRequired: boolean = false;
   @Trace services: SsapServiceNode[] = [];
   @Trace serverOpen: boolean = false;
+  @Trace serverClosed: boolean = false;
+  @Trace lastReadRequestId: number = -1;
+  @Trace lastReadAddress: string = '';
+  @Trace lastClientAddress: string = '';
   @Trace serverLines: string[] = [];
   @Trace portUuid: string = '';
   @Trace portMtu: string = '';
   @Trace portReliable: boolean = false;
   @Trace portOpen: boolean = false;
+  @Trace portConnected: boolean = false;
+  @Trace portNegotiatedMtu: number = 0;
+  @Trace portPacketsTx: number = 0;
+  @Trace portPacketsRx: number = 0;
+  @Trace portHeld: boolean = false;
+  @Trace portText: string = '';
+  @Trace portSliceRequired: boolean = false;
+  @Trace savedFavoriteAddress: string = '';
+  @Trace mtuNearLink: boolean = false;
   @Trace blockUnencrypted: boolean = true;
   @Trace security: string = NearLinkSecurityState.UNKNOWN;
   @Trace appTx: number = 0;
@@ -126,9 +145,14 @@ export class NearLinkDebugModel {
   private lifeSub: Subscription | undefined = undefined;
   private scanSessionId: string = '';
   private logSerial: number = 0;
+  private durationTimer: number = -1;
+  private waitTimer: number = -1;
+  private connectStartedMs: number = 0;
+  private readonly loggedHex: string[] = [];
 
   async onAppear(): Promise<void> {
     this.deviceSub = this.repository.observeDevices().subscribe((devices: NearLinkDevice[]) => {
+      this.noteScanHex(devices);
       this.devices = devices;
       if (this.selectedAddress.length > 0) {
         this.refreshDetail();
@@ -155,18 +179,35 @@ export class NearLinkDebugModel {
       this.pushLog('internal', 'connectionStateChange', '', address, reasonMsg, '');
     });
     this.session.watchServer((record) => {
+      this.lastClientAddress = record.address;
       const line = record.responded ?
         `${record.requestId} WRITE ${record.valueHex}` :
         `${record.requestId} WRITE_NO_RESPONSE ${record.valueHex}`;
       this.pushServerLine(line);
       this.pushLog('in', 'propertyWrite', '', line, '', record.valueHex);
     }, (requestId: number, address: string, propertyUuid: string) => {
+      this.lastReadRequestId = requestId;
+      this.lastReadAddress = address;
+      this.lastClientAddress = address;
       this.pushServerLine(`${requestId} READ ${address} ${propertyUuid}`);
+    });
+    this.session.watchPort((address: string, uuid: string, mtu: number, state: number) => {
+      const connected = NearLinkScreenRules.portIsConnected(state);
+      this.portConnected = connected;
+      this.session.notePortLink(mtu, connected);
+      this.portNegotiatedMtu = connected ? mtu : 0;
+      this.pushLog('internal', 'connectionStateChanged', '', `${address} ${uuid} mtu=${mtu} state=${state}`, '', '');
+    }, (address: string, uuid: string, hex: string, byteLength: number) => {
+      this.session.notePortRead(byteLength);
+      this.portPacketsRx = this.session.appRxPackets();
+      this.appRx = this.session.appRx();
+      this.pushLog('in', 'readData', '', `${address} ${uuid}`, '', hex);
     });
     await this.refreshSupport();
   }
 
   async onDisappear(): Promise<void> {
+    this.clearWait();
     await this.stopScanIfNeeded();
     this.session.offRadio();
     this.session.offPairing();
@@ -259,6 +300,16 @@ export class NearLinkDebugModel {
   }
 
   async refreshLocalName(): Promise<void> {
+    if (this.radioCategory === NearLinkRadioCategory.OFF) {
+      this.localName = '';
+      this.localNameFailed = true;
+      this.nativeCode = NearLinkScreenRules.localNameCodeWhenOff(true);
+      this.pushLog('internal', 'getLocalName', this.nativeCode, 'radio off', '', '');
+      if (this.permissionGranted) {
+        this.session.readLocalName();
+      }
+      return;
+    }
     if (!this.permissionGranted) {
       this.localName = '';
       this.localNameFailed = false;
@@ -322,6 +373,7 @@ export class NearLinkDebugModel {
     }
     this.scanSessionId = started.value ?? '';
     this.scanPhase = NearLinkScanUiPhase.SCANNING;
+    this.armDuration(filter.durationSec);
     this.filterMessage = '';
     this.rssiFilterMode = this.session.systemRssiAvailable() && this.filterRssi.trim().length > 0 ? 'system' : (
       this.filterRssi.trim().length > 0 ? 'local' : 'none'
@@ -354,6 +406,9 @@ export class NearLinkDebugModel {
     }
     const saved = await this.repository.saveFavorite(device, device.effectiveName, 'nearlink');
     this.favoriteNote = saved.success ? 'saved' : (saved.error?.code ?? '');
+    if (saved.success) {
+      this.savedFavoriteAddress = device.randomAddress;
+    }
     this.pushLog('internal', 'saveFavorite', saved.success ? '' : (saved.error?.nativeCode ?? ''), device.randomAddress, '', '');
   }
 
@@ -386,11 +441,30 @@ export class NearLinkDebugModel {
     this.pushLog('internal', 'stopAdvertising', stopped.error?.nativeCode ?? '', '', '', '');
   }
 
+  addressStale(): boolean {
+    return NearLinkScreenRules.addressDiffers(this.savedFavoriteAddress, this.selectedAddress);
+  }
+
+  readEnabled(): boolean {
+    return NearLinkScreenRules.readEnabled(this.operationBits());
+  }
+
+  ssapMtuLive(): number {
+    return this.session.mtu();
+  }
+
   async connectSsap(): Promise<void> {
     if (!await this.ensureAccess() || this.selectedAddress.length === 0) {
       return;
     }
+    this.ssapConnecting = true;
+    this.ssapConnected = false;
+    this.connectStartedMs = Date.now();
+    this.waitedSec = 0;
+    this.armWait();
     const connected = await this.session.connectSsap(this.selectedAddress);
+    this.ssapConnecting = false;
+    this.clearWait();
     this.ssapConnected = connected.success;
     this.ssapReused = connected.success && connected.value === 'reused';
     this.actionMessage = connected.success ? '' : (connected.error?.code ?? '');
@@ -408,7 +482,23 @@ export class NearLinkDebugModel {
     this.pushLog('internal', 'disconnect', '', 'notify invalidated', '', '');
   }
 
+  async discoverSsap(): Promise<void> {
+    if (!NearLinkScreenRules.discoverAllowed(this.ssapConnected)) {
+      this.actionMessage = NearLinkErrorCodes.NOT_CONNECTED;
+      this.pushLog('internal', 'getServices', '', 'not connected', '', '');
+      return;
+    }
+    const found = await this.session.discoverSsap();
+    this.actionMessage = found.success ? '' : (found.error?.code ?? '');
+    this.pushLog('internal', 'getServices', found.error?.nativeCode ?? '', this.actionMessage, '', '');
+  }
+
   async readSsap(): Promise<void> {
+    if (!this.readEnabled()) {
+      this.actionMessage = NearLinkErrorCodes.SSAP_READ_FAILED;
+      this.pushLog('internal', 'readProperty', '', 'not readable', '', '');
+      return;
+    }
     const result = await this.session.readProperty(this.ssapServiceUuid, this.ssapPropertyUuid, this.operationBits());
     this.actionMessage = result.success ? (result.value ?? '') : (result.error?.code ?? '');
     this.pushLog('in', 'readProperty', result.error?.nativeCode ?? '', this.actionMessage, '', result.value ?? '');
@@ -447,11 +537,14 @@ export class NearLinkDebugModel {
   async requestMtu(): Promise<void> {
     const mtu = parseInt(this.ssapMtuText, 10);
     const result = await this.session.requestMtu(Number.isNaN(mtu) ? -1 : mtu);
+    const rawCode = result.error?.nativeCode ?? '';
+    this.mtuNearLink = rawCode === '2900099' || rawCode === `${NearLinkConstants.NATIVE_OPERATION_FAILED}`;
+    const native = NearLinkScreenRules.rejectBluetoothMtu(rawCode);
     this.actionMessage = result.success ? `${result.value ?? ''}` : (result.error?.code ?? '');
-    if ((result.error?.nativeCode ?? '') === `${NearLinkConstants.NATIVE_OPERATION_FAILED}`) {
-      this.nativeCode = `${NearLinkConstants.NATIVE_OPERATION_FAILED}`;
+    if (native === `${NearLinkConstants.NATIVE_OPERATION_FAILED}`) {
+      this.nativeCode = native;
     }
-    this.pushLog('out', 'requestMtuSize', result.error?.nativeCode ?? '', this.actionMessage, '', '');
+    this.pushLog('out', 'requestMtuSize', native, this.actionMessage, '', '');
   }
 
   openServer(): void {
@@ -468,8 +561,32 @@ export class NearLinkDebugModel {
 
   closeServer(): void {
     const closed = this.session.closeServer();
-    this.serverOpen = !closed.success;
+    this.serverOpen = false;
+    this.serverClosed = closed.success;
     this.pushLog('internal', 'close', closed.error?.nativeCode ?? '', 'server close', '', '');
+  }
+
+  async respondServerRead(): Promise<void> {
+    if (this.lastReadRequestId < 0) {
+      this.actionMessage = NearLinkErrorCodes.NOT_CONNECTED;
+      return;
+    }
+    const responded = await this.session.respondServerRead(this.lastReadRequestId, this.lastReadAddress, this.ssapHex);
+    this.actionMessage = responded.success ? `${this.lastReadRequestId}` : (responded.error?.code ?? '');
+    this.pushLog('out', 'sendResponse', responded.error?.nativeCode ?? '', `${this.lastReadRequestId} ${this.lastReadAddress}`, '', this.ssapHex);
+  }
+
+  async notifyServer(): Promise<void> {
+    const notified = await this.session.notifyServer(
+      this.lastClientAddress,
+      this.ssapServiceUuid,
+      this.ssapPropertyUuid,
+      this.operationBits(),
+      this.ssapHex
+    );
+    this.actionMessage = notified.success ? '' : (notified.error?.code ?? '');
+    this.pushLog('out', 'notifyPropertyChanged', notified.error?.nativeCode ?? '',
+      `${this.lastClientAddress} ${this.ssapPropertyUuid}`, '', this.ssapHex);
   }
 
   removeServerService(): void {
@@ -499,12 +616,50 @@ export class NearLinkDebugModel {
   }
 
   async sendPort(): Promise<void> {
-    const written = await this.session.writePort(this.ssapHex, this.blockUnencrypted);
+    const written = await this.session.writePort(this.ssapHex, this.blockUnencrypted, false);
+    this.portSliceRequired = !written.success && (written.error?.message ?? '').indexOf('slice=required') >= 0;
     this.appTx = this.session.appTx();
     this.appRx = this.session.appRx();
     this.actionMessage = written.success ? '' : (written.error?.code ?? '');
     this.nativeCode = written.error?.nativeCode ?? '';
-    this.pushLog('out', 'writeData', this.nativeCode, this.actionMessage, '', written.success ? this.ssapHex : '');
+    this.portPacketsTx = this.session.appTxPackets();
+    this.pushLog('out', 'writeData', this.nativeCode, `HEX ${this.actionMessage}`, '', written.success ? this.ssapHex : '');
+  }
+
+  async sendPortText(sliceConfirmed: boolean = false): Promise<void> {
+    const written = await this.session.writePortText(this.portText, this.blockUnencrypted, sliceConfirmed);
+    this.portSliceRequired = !written.success && (written.error?.message ?? '').indexOf('slice=required') >= 0;
+    this.appTx = this.session.appTx();
+    this.appRx = this.session.appRx();
+    this.actionMessage = written.success ? '' : (written.error?.code ?? '');
+    this.nativeCode = written.error?.nativeCode ?? '';
+    this.portPacketsTx = this.session.appTxPackets();
+    this.pushLog('out', 'writeData', this.nativeCode, `text bytes`, '', '');
+  }
+
+  async confirmPortSlice(): Promise<void> {
+    if (this.portText.length > 0) {
+      await this.sendPortText(true);
+      return;
+    }
+    const written = await this.session.writePort(this.ssapHex, this.blockUnencrypted, true);
+    this.portSliceRequired = !written.success && (written.error?.message ?? '').indexOf('slice=required') >= 0;
+    this.appTx = this.session.appTx();
+    this.actionMessage = written.success ? '' : (written.error?.code ?? '');
+    this.portPacketsTx = this.session.appTxPackets();
+    this.pushLog('out', 'writeData', written.error?.nativeCode ?? '', 'HEX slice', '', this.ssapHex);
+  }
+
+  async disconnectPort(): Promise<void> {
+    await this.session.disconnectPort();
+    this.portConnected = false;
+    this.portNegotiatedMtu = 0;
+    this.pushLog('internal', 'disconnect', '', 'port read off', '', '');
+  }
+
+  keepPort(): void {
+    this.portHeld = true;
+    this.pushLog('internal', 'createPort', '', `held ${this.portUuid}`, '', '');
   }
 
   destroyPort(): void {
@@ -704,7 +859,10 @@ export class NearLinkDebugModel {
       return $r('app.string.nl_block_send');
     }
     if (code === NearLinkErrorCodes.NOTIFY_UNSUPPORTED) {
-      return $r('app.string.nl_notify_off');
+      return $r('app.string.nl_notify_undeclared');
+    }
+    if (code === NearLinkErrorCodes.SSAP_READ_FAILED) {
+      return $r('app.string.nl_read_unsupported');
     }
     if (code === NearLinkErrorCodes.EMULATOR_UNAVAILABLE) {
       return $r('app.string.nl_need_device');
@@ -712,10 +870,35 @@ export class NearLinkDebugModel {
     if (code === NearLinkErrorCodes.SWITCH_OFF) {
       return $r('app.string.nl_radio_off');
     }
-    if (code === NearLinkErrorCodes.EMPTY_FILTER || code === NearLinkErrorCodes.DURATION_RANGE ||
-      code === NearLinkErrorCodes.NAME_LENGTH || code === NearLinkErrorCodes.MANUFACTURER_ID_RANGE ||
-      code === NearLinkErrorCodes.MASK_LENGTH_MISMATCH) {
-      return $r('app.string.nl_scan_fail');
+    if (code === NearLinkErrorCodes.EMPTY_FILTER) {
+      return $r('app.string.nl_need_filter');
+    }
+    if (code === NearLinkErrorCodes.DURATION_RANGE) {
+      return $r('app.string.nl_duration_range');
+    }
+    if (code === NearLinkErrorCodes.NAME_LENGTH) {
+      return $r('app.string.nl_name_length');
+    }
+    if (code === NearLinkErrorCodes.MANUFACTURER_DATA_NEEDS_ID) {
+      return $r('app.string.nl_mfg_need_id');
+    }
+    if (code === NearLinkErrorCodes.MASK_LENGTH_MISMATCH) {
+      return $r('app.string.nl_mask_len');
+    }
+    if (code === NearLinkErrorCodes.MANUFACTURER_ID_RANGE) {
+      return $r('app.string.nl_mfg_id_range');
+    }
+    if (code === NearLinkErrorCodes.ADV_INTERVAL_RANGE) {
+      return $r('app.string.nl_adv_interval_range');
+    }
+    if (code === NearLinkErrorCodes.DT_UUID_REGISTERED) {
+      return $r('app.string.nl_port_registered');
+    }
+    if (code === NearLinkErrorCodes.DT_PORT_LIMIT) {
+      return $r('app.string.nl_port_limit');
+    }
+    if (code === NearLinkErrorCodes.DT_UUID_NOT_REGISTERED) {
+      return $r('app.string.nl_port_missing');
     }
     if (code === NearLinkErrorCodes.VALIDATION) {
       return $r('app.string.nl_field_invalid');
@@ -762,7 +945,9 @@ export class NearLinkDebugModel {
       this.filterDuration,
       this.filterScanAll,
       this.filterUuid,
-      this.filterUuidEnabled
+      this.filterUuidEnabled,
+      this.filterAddressB,
+      this.filterNameB
     );
   }
 
@@ -844,12 +1029,77 @@ export class NearLinkDebugModel {
   }
 
   private async stopScanIfNeeded(): Promise<void> {
+    this.clearDuration();
     if (this.scanPhase !== NearLinkScanUiPhase.SCANNING && this.scanSessionId.length === 0) {
       return;
     }
     await this.stopScanUseCase.execute(this.scanSessionId);
     this.scanSessionId = '';
     this.pushLog('internal', 'stopScan', '', 'deviceFound off', '', '');
+  }
+
+  private armDuration(seconds: number): void {
+    this.clearDuration();
+    if (!NearLinkScreenRules.durationElapsed(seconds, seconds)) {
+      return;
+    }
+    this.durationTimer = setTimeout(() => {
+      this.durationTimer = -1;
+      void this.finishTimedScan(seconds);
+    }, seconds * 1000);
+  }
+
+  private async finishTimedScan(seconds: number): Promise<void> {
+    if (this.scanPhase !== NearLinkScanUiPhase.SCANNING) {
+      return;
+    }
+    await this.stopScanIfNeeded();
+    this.scanPhase = NearLinkScanUiPhase.STOPPED;
+    this.pushLog('internal', 'stopScan', '', `duration=${seconds}`, '', '');
+  }
+
+  private clearDuration(): void {
+    if (this.durationTimer >= 0) {
+      clearTimeout(this.durationTimer);
+      this.durationTimer = -1;
+    }
+  }
+
+  private armWait(): void {
+    this.clearWait();
+    this.waitTimer = setInterval(() => {
+      if (!this.ssapConnecting) {
+        this.clearWait();
+        return;
+      }
+      this.waitedSec = Math.floor((Date.now() - this.connectStartedMs) / 1000);
+    }, 1000);
+  }
+
+  private clearWait(): void {
+    if (this.waitTimer >= 0) {
+      clearInterval(this.waitTimer);
+      this.waitTimer = -1;
+    }
+  }
+
+  private noteScanHex(devices: NearLinkDevice[]): void {
+    for (let i = 0; i < devices.length; i++) {
+      const device = devices[i];
+      if (device.rawHex.length === 0) {
+        continue;
+      }
+      const key = `${device.randomAddress}|${device.rawHex}`;
+      if (this.loggedHex.indexOf(key) >= 0) {
+        continue;
+      }
+      this.loggedHex.push(key);
+      this.pushLog('in', 'deviceFound', '', device.randomAddress, '', device.rawHex);
+    }
+  }
+
+  notifyArmed(): boolean {
+    return this.session.notifyArmed();
   }
 
   private leavesScan(next: string): boolean {
