@@ -1,7 +1,7 @@
 ---
 id: checklist.wifi-network
 type: checklist
-status: draft
+status: active
 when: research
 when_to_use: 验收 Wi-Fi 与网络调试能力是否按官方边界可观察、可二判时
 related: [research.wifi-network, rule.common.acceptance]
