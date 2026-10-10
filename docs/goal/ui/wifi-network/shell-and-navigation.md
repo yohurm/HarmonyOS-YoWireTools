@@ -72,3 +72,19 @@ NavDestination
 | 会话日志 | `MODULE` | [session-log.md](session-log.md) | WN-128–WN-132 |
 
 离开子页时页面状态成对取消订阅。同一次系统回调只产生一行日志（WN-131）。页面不调用 `@kit.ConnectivityKit` 或 `@kit.NetworkKit`。
+
+## 可视化原型
+
+静态图，不是页面实现。网络是底栏第三槽。会话日志在标题菜单。
+
+![Wi-Fi 概览默认](../prototypes/phone-wifi-overview.png)
+
+默认：状态带和目的地入口卡。抓包与权限墙没有成功态。
+
+![Wi-Fi 概览空态](../prototypes/phone-wifi-overview-empty.png)
+
+空：尚未读取，主动作「打开 WLAN 状态」。声明缺失不用这个空态。
+
+![Wi-Fi 概览声明缺失](../prototypes/phone-wifi-overview-error.png)
+
+错误：系统授权未声明，`nativeCode` 201，不弹运行时窗。

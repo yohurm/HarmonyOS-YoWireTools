@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="956" viewBox="0 0 420 956">
+<rect x="0.0" y="0.0" width="420.0" height="956.0" rx="0" fill="#E8EAED" fill-opacity="1"/>
+<rect x="20.0" y="20.0" width="380.0" height="800.0" rx="28" fill="#1C1C1E" fill-opacity="1"/>
+<clipPath id="screen"><rect x="30" y="30" width="360" height="780" rx="18"/></clipPath>
+<g clip-path="url(#screen)">
+<rect x="30.0" y="30.0" width="360.0" height="780.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<g transform="translate(30,30)">
+<rect x="0.0" y="0.0" width="360.0" height="32.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<text x="16.0" y="21.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">9:41</text>
+<rect x="326.0" y="11.0" width="16.0" height="10.0" rx="2" fill="none" fill-opacity="1" stroke="#182431" stroke-width="1.2"/>
+<rect x="343.0" y="14.0" width="2.0" height="4.0" rx="0" fill="#182431" fill-opacity="1"/>
+<rect x="328.0" y="13.0" width="9.0" height="6.0" rx="1" fill="#182431" fill-opacity="1"/>
+<rect x="0.0" y="32.0" width="360.0" height="56.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<path d="M22 56 L15 62 L22 68" fill="none" stroke="#182431" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="36.0" y="66.0" font-family="WenQuanYi Micro Hei" font-size="20" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">日志中心</text>
+<g transform="translate(0,88)">
+<rect x="16.0" y="0.0" width="328.0" height="36.0" rx="18" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="23.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#8B939E" fill-opacity="1" text-anchor="start">搜索会话</text>
+<rect x="16.0" y="44.0" width="48.0" height="32.0" rx="16" fill="#0A59F7" fill-opacity="1"/>
+<text x="40.0" y="65.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">全部</text>
+<rect x="72.0" y="44.0" width="48.0" height="32.0" rx="16" fill="#FFFFFF" fill-opacity="1" stroke="#E6E8EE" stroke-width="1"/>
+<text x="96.0" y="65.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="middle">蓝牙</text>
+<rect x="128.0" y="44.0" width="48.0" height="32.0" rx="16" fill="#FFFFFF" fill-opacity="1" stroke="#E6E8EE" stroke-width="1"/>
+<text x="152.0" y="65.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="middle">网络</text>
+<rect x="184.0" y="44.0" width="48.0" height="32.0" rx="16" fill="#FFFFFF" fill-opacity="1" stroke="#E6E8EE" stroke-width="1"/>
+<text x="208.0" y="65.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="middle">星闪</text>
+<rect x="16.0" y="88.0" width="328.0" height="60.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="28" y1="148" x2="332" y2="148" stroke="#E6E8EE"/>
+<text x="28.0" y="112.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">10:21:08</text>
+<text x="28.0" y="132.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">发送 · 工装串口</text>
+<rect x="288.0" y="98.0" width="44.0" height="22.0" rx="11.0" fill="#E3ECFD" fill-opacity="1"/>
+<text x="310.0" y="113.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#0A59F7" fill-opacity="1" text-anchor="middle">蓝牙</text>
+<rect x="16.0" y="148.0" width="328.0" height="60.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="28" y1="208" x2="332" y2="208" stroke="#E6E8EE"/>
+<text x="28.0" y="172.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">10:20:41</text>
+<text x="28.0" y="192.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">接收 · 2501001</text>
+<rect x="288.0" y="158.0" width="44.0" height="22.0" rx="11.0" fill="#F8E4E1" fill-opacity="1"/>
+<text x="310.0" y="173.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#E84026" fill-opacity="1" text-anchor="middle">网络</text>
+<rect x="16.0" y="208.0" width="328.0" height="60.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="28" y1="268" x2="332" y2="268" stroke="#E6E8EE"/>
+<text x="28.0" y="232.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">10:18:02</text>
+<text x="28.0" y="252.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">权限失败 · 见详情</text>
+<rect x="288.0" y="218.0" width="44.0" height="22.0" rx="11.0" fill="#EEE4DF" fill-opacity="1"/>
+<text x="310.0" y="233.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#D45C11" fill-opacity="1" text-anchor="middle">星闪</text>
+<rect x="16.0" y="284.0" width="160.0" height="40.0" rx="20" fill="#E6E8EE" fill-opacity="1"/>
+<text x="96.0" y="310.0" font-family="WenQuanYi Micro Hei" font-size="14" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="middle">导出</text>
+<rect x="184.0" y="284.0" width="160.0" height="40.0" rx="20" fill="#0A59F7" fill-opacity="1"/>
+<text x="264.0" y="310.0" font-family="WenQuanYi Micro Hei" font-size="14" font-weight="bold" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">清空</text>
+</g>
+</g></g>
+<text x="20.0" y="848.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">窄屏 360 · 日志中心 · 默认</text>
+<text x="20.0" y="866.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">搜索、模块分段、最新在上。星闪行是权限失败，不挡住其他模块。</text>
+<text x="20.0" y="884.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#8A4B08" fill-opacity="1" text-anchor="start">待对齐：LOG-003 仍是缺口，本图行是示意，不是已接通的读模型</text>
+<text x="20.0" y="902.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">。</text>
+</svg>

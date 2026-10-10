@@ -181,3 +181,19 @@ Navigation
 | NL-111 | 星闪关闭不跟随蓝牙 |
 | NL-112 | 两条设置路径同时可见 |
 | NL-115 | 缺口页无成功态；扫描仍可按其前提启动 |
+
+## 可视化原型
+
+静态图，不是页面实现。星闪是底栏第四槽。进入本页不弹授权。
+
+![星闪概览默认](../prototypes/phone-nearlink-overview.png)
+
+默认：当前设备支持星闪且已打开，入口可点，没有打开开关的按钮。
+
+![星闪概览错误](../prototypes/phone-nearlink-overview-error.png)
+
+错误：801 与「当前系统版本不提供该能力」在一起，不画成开关关闭。
+
+![星闪概览已关闭](../prototypes/phone-nearlink-overview-closed.png)
+
+禁用：星闪已关闭，两条设置路径同时可见，扫描入口禁用。

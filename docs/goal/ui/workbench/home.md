@@ -77,3 +77,17 @@ YoPageShell                              // ROOT_TAB，HdsNavigation 标题「�
 | 命令面板 | [命令面板](command-panel.md) | 无架构编号。PRD 02 |
 
 PR #1（`cursor/workbench-feature-hub-434e`）有未合并的工作台草稿。本设计不把它的用例签名当成已入库接口。
+
+## 可视化原型
+
+静态图，不是页面实现。窄屏逻辑宽 360vp。
+
+![工作台默认（轻量）](../prototypes/phone-workbench.png)
+
+默认（轻量）：三枚状态胶囊、三张模块卡、最近会话、日志中心与命令面板。
+
+![工作台空态](../prototypes/phone-workbench-empty.png)
+
+空：没有最近会话，入口卡仍在。
+
+宽屏同一壳见 [侧栏展开的工作台](../prototypes/wide-shell-workbench.png)。清单见 [原型索引](../prototypes/README.md)。

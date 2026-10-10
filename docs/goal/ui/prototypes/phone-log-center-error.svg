@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="938" viewBox="0 0 420 938">
+<rect x="0.0" y="0.0" width="420.0" height="938.0" rx="0" fill="#E8EAED" fill-opacity="1"/>
+<rect x="20.0" y="20.0" width="380.0" height="800.0" rx="28" fill="#1C1C1E" fill-opacity="1"/>
+<clipPath id="screen"><rect x="30" y="30" width="360" height="780" rx="18"/></clipPath>
+<g clip-path="url(#screen)">
+<rect x="30.0" y="30.0" width="360.0" height="780.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<g transform="translate(30,30)">
+<rect x="0.0" y="0.0" width="360.0" height="32.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<text x="16.0" y="21.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">9:41</text>
+<rect x="326.0" y="11.0" width="16.0" height="10.0" rx="2" fill="none" fill-opacity="1" stroke="#182431" stroke-width="1.2"/>
+<rect x="343.0" y="14.0" width="2.0" height="4.0" rx="0" fill="#182431" fill-opacity="1"/>
+<rect x="328.0" y="13.0" width="9.0" height="6.0" rx="1" fill="#182431" fill-opacity="1"/>
+<rect x="0.0" y="32.0" width="360.0" height="56.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<path d="M22 56 L15 62 L22 68" fill="none" stroke="#182431" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="36.0" y="66.0" font-family="WenQuanYi Micro Hei" font-size="20" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">日志中心</text>
+<g transform="translate(0,88)">
+<rect x="16.0" y="16.0" width="328.0" height="118.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<rect x="16.0" y="28.0" width="3.0" height="94.0" rx="1.5" fill="#E84026" fill-opacity="1"/>
+<text x="34.0" y="48.0" font-family="WenQuanYi Micro Hei" font-size="16" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">日志来源未收口</text>
+<text x="34.0" y="74.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#E84026" fill-opacity="1" text-anchor="start">LOG-003 页面侧未接通</text>
+<text x="34.0" y="100.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">不显示编造的行。等待读模型收口。</text>
+</g>
+</g></g>
+<text x="20.0" y="848.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">窄屏 360 · 日志中心 · 错误</text>
+<text x="20.0" y="866.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">读模型未就绪：整页「日志来源未收口」，不显示编造的行。</text>
+<text x="20.0" y="884.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#8A4B08" fill-opacity="1" text-anchor="start">待对齐：LOG-003 页面侧未接通 debug_log_index。</text>
+</svg>

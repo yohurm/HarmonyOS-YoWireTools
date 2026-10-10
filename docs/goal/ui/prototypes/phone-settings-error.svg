@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="1238" viewBox="0 0 420 1238">
+<rect x="0.0" y="0.0" width="420.0" height="1238.0" rx="0" fill="#E8EAED" fill-opacity="1"/>
+<rect x="20.0" y="20.0" width="380.0" height="1100.0" rx="28" fill="#1C1C1E" fill-opacity="1"/>
+<clipPath id="screen"><rect x="30" y="30" width="360" height="1080" rx="18"/></clipPath>
+<g clip-path="url(#screen)">
+<rect x="30.0" y="30.0" width="360.0" height="1080.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<g transform="translate(30,30)">
+<rect x="0.0" y="0.0" width="360.0" height="32.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<text x="16.0" y="21.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">9:41</text>
+<rect x="326.0" y="11.0" width="16.0" height="10.0" rx="2" fill="none" fill-opacity="1" stroke="#182431" stroke-width="1.2"/>
+<rect x="343.0" y="14.0" width="2.0" height="4.0" rx="0" fill="#182431" fill-opacity="1"/>
+<rect x="328.0" y="13.0" width="9.0" height="6.0" rx="1" fill="#182431" fill-opacity="1"/>
+<rect x="0.0" y="32.0" width="360.0" height="56.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<text x="16.0" y="66.0" font-family="WenQuanYi Micro Hei" font-size="20" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">设置</text>
+<g transform="translate(0,88)">
+<text x="20.0" y="26.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">显示</text>
+<rect x="16.0" y="34.0" width="328.0" height="112.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="58.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">专家 / 轻量</text>
+<text x="30.0" y="76.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">尚未定义存储</text>
+<rect x="296.0" y="50.0" width="34.0" height="18.0" rx="9" fill="#E1E3E8" fill-opacity="1"/>
+<circle cx="313" cy="59" r="6" fill="#FFFFFF" stroke="#C5CAD3"/>
+<text x="290.0" y="62.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">未读取</text>
+<line x1="30" y1="90" x2="330" y2="90" stroke="#E6E8EE"/>
+<text x="30.0" y="114.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">主题</text>
+<text x="330.0" y="124.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">跟随系统</text>
+<text x="20.0" y="172.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">日志</text>
+<rect x="16.0" y="180.0" width="328.0" height="112.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="204.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">自动保存</text>
+<text x="30.0" y="222.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#E84026" fill-opacity="1" text-anchor="start">读取当前值失败</text>
+<text x="330.0" y="204.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#E84026" fill-opacity="1" text-anchor="end">错误</text>
+<line x1="30" y1="236" x2="330" y2="236" stroke="#E6E8EE"/>
+<text x="30.0" y="260.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">导出格式</text>
+<text x="330.0" y="270.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">未读取</text>
+<text x="20.0" y="318.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">后台</text>
+<rect x="16.0" y="326.0" width="328.0" height="112.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="350.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">后台记录</text>
+<text x="30.0" y="368.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">尚未定义存储</text>
+<rect x="296.0" y="342.0" width="34.0" height="18.0" rx="9" fill="#E1E3E8" fill-opacity="1"/>
+<circle cx="313" cy="351" r="6" fill="#FFFFFF" stroke="#C5CAD3"/>
+<text x="290.0" y="354.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">未读取</text>
+<line x1="30" y1="382" x2="330" y2="382" stroke="#E6E8EE"/>
+<text x="30.0" y="406.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">通知提醒</text>
+<text x="30.0" y="424.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">尚未定义存储</text>
+<rect x="296.0" y="398.0" width="34.0" height="18.0" rx="9" fill="#E1E3E8" fill-opacity="1"/>
+<circle cx="313" cy="407" r="6" fill="#FFFFFF" stroke="#C5CAD3"/>
+<text x="290.0" y="410.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">未读取</text>
+<text x="20.0" y="464.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">命令</text>
+<rect x="16.0" y="472.0" width="328.0" height="56.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="496.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">周期发送</text>
+<text x="30.0" y="514.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">尚未定义存储</text>
+<rect x="296.0" y="488.0" width="34.0" height="18.0" rx="9" fill="#E1E3E8" fill-opacity="1"/>
+<circle cx="313" cy="497" r="6" fill="#FFFFFF" stroke="#C5CAD3"/>
+<text x="290.0" y="500.0" font-family="WenQuanYi Micro Hei" font-size="11" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="end">未读取</text>
+<text x="20.0" y="554.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">蓝牙</text>
+<rect x="16.0" y="562.0" width="328.0" height="56.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="586.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">适配器与权限</text>
+<text x="318.0" y="596.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#0A59F7" fill-opacity="1" text-anchor="end">到模块</text>
+<path d="M328 584 L334 590 L328 596" fill="none" stroke="#0A59F7" stroke-width="1.4" stroke-linecap="round"/>
+<text x="20.0" y="644.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">Wi-Fi</text>
+<rect x="16.0" y="652.0" width="328.0" height="56.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="676.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">权限与能力</text>
+<text x="318.0" y="686.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#0A59F7" fill-opacity="1" text-anchor="end">到模块</text>
+<path d="M328 674 L334 680 L328 686" fill="none" stroke="#0A59F7" stroke-width="1.4" stroke-linecap="round"/>
+<text x="20.0" y="734.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">星闪</text>
+<rect x="16.0" y="742.0" width="328.0" height="56.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="766.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">支持与开关</text>
+<text x="318.0" y="776.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#0A59F7" fill-opacity="1" text-anchor="end">到模块</text>
+<path d="M328 764 L334 770 L328 776" fill="none" stroke="#0A59F7" stroke-width="1.4" stroke-linecap="round"/>
+<text x="20.0" y="824.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">安全</text>
+<rect x="16.0" y="832.0" width="328.0" height="56.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="30.0" y="856.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">清除本地数据</text>
+<text x="318.0" y="866.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="normal" fill="#0A59F7" fill-opacity="1" text-anchor="end">先确认</text>
+<path d="M328 854 L334 860 L328 866" fill="none" stroke="#0A59F7" stroke-width="1.4" stroke-linecap="round"/>
+</g>
+<rect x="28.0" y="1015.0" width="304.0" height="52.0" rx="26" fill="#000000" fill-opacity="0.08"/>
+<rect x="28.0" y="1012.0" width="304.0" height="52.0" rx="26" fill="#FFFFFF" fill-opacity="1"/>
+<path d="M49.4 1027 L58.4 1019 L67.4 1027 V1036 H61.4 V1030 H55.4 V1036 H49.4 Z" fill="#5C6570"/>
+<text x="58.4" y="1054.0" font-family="WenQuanYi Micro Hei" font-size="10" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">工作台</text>
+<path d="M117.19999999999999 1019 L123.19999999999999 1024 L117.19999999999999 1028 L123.19999999999999 1032 L117.19999999999999 1037 V1019" fill="none" stroke="#5C6570" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M114.19999999999999 1024 L117.19999999999999 1028 L114.19999999999999 1032" fill="none" stroke="#5C6570" stroke-width="1.6" stroke-linecap="round"/>
+<text x="119.2" y="1054.0" font-family="WenQuanYi Micro Hei" font-size="10" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">蓝牙</text>
+<path d="M172.0 1026 Q180.0 1020 188.0 1026" fill="none" stroke="#5C6570" stroke-width="1.7" stroke-linecap="round"/><path d="M175.0 1030 Q180.0 1026 185.0 1030" fill="none" stroke="#5C6570" stroke-width="1.7" stroke-linecap="round"/><circle cx="180.0" cy="1034" r="1.6" fill="#5C6570"/>
+<text x="180.0" y="1054.0" font-family="WenQuanYi Micro Hei" font-size="10" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">网络</text>
+<path d="M240.79999999999998 1018.5 L243.2 1025 L249.99999999999997 1025 L244.49999999999997 1029.2 L246.6 1036 L240.79999999999998 1032 L234.99999999999997 1036 L237.1 1029.2 L231.6 1025 L238.39999999999998 1025 Z" fill="#5C6570"/>
+<text x="240.8" y="1054.0" font-family="WenQuanYi Micro Hei" font-size="10" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">星闪</text>
+<circle cx="295.59999999999997" cy="1028" r="1.7" fill="#0A59F7"/>
+<circle cx="301.59999999999997" cy="1028" r="1.7" fill="#0A59F7"/>
+<circle cx="307.59999999999997" cy="1028" r="1.7" fill="#0A59F7"/>
+<text x="301.6" y="1054.0" font-family="WenQuanYi Micro Hei" font-size="10" font-weight="bold" fill="#0A59F7" fill-opacity="1" text-anchor="middle">更多</text>
+</g></g>
+<text x="20.0" y="1148.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">窄屏 360 · 设置 · 错误</text>
+<text x="20.0" y="1166.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">自动保存这一行读取失败。其他组仍在。设置页不申请射频权限。</text>
+<text x="20.0" y="1184.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#8A4B08" fill-opacity="1" text-anchor="start">待对齐：偏好读写函数尚未入库。</text>
+</svg>
