@@ -133,7 +133,7 @@ struct Index {
           module: this.readLogDetail(param).module,
           protocol: this.readLogDetail(param).protocol,
           summary: this.readLogDetail(param).summary,
-          direction: this.readLogDetail(param).direction,
+          logDirection: this.readLogDetail(param).logDirection,
           timestampMs: this.readLogDetail(param).timestampMs,
           onBack: () => {
             this.rootNavStack.pop();

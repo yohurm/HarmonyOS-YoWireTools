@@ -3,7 +3,7 @@ export class LogDetailNavParams {
   readonly module: string;
   readonly protocol: string;
   readonly summary: string;
-  readonly direction: string;
+  readonly logDirection: string;
   readonly timestampMs: number;
 
   constructor(
@@ -11,14 +11,14 @@ export class LogDetailNavParams {
     module: string,
     protocol: string,
     summary: string,
-    direction: string,
+    logDirection: string,
     timestampMs: number
   ) {
     this.recordId = recordId;
     this.module = module;
     this.protocol = protocol;
     this.summary = summary;
-    this.direction = direction;
+    this.logDirection = logDirection;
     this.timestampMs = timestampMs;
   }
 }

@@ -12,7 +12,7 @@ export struct LogDetailPage {
   @Param module: string = '';
   @Param protocol: string = '';
   @Param summary: string = '';
-  @Param direction: string = '';
+  @Param logDirection: string = '';
   @Param timestampMs: number = 0;
   @Event onBack: () => void = () => {
   };
@@ -22,7 +22,7 @@ export struct LogDetailPage {
     Column({ space: YoSpace.M }) {
       this.field($r('app.string.log_filter_all'), this.module)
       this.field($r('app.string.log_detail_protocol'), this.protocol)
-      this.field($r('app.string.log_detail_direction'), this.direction)
+      this.field($r('app.string.log_detail_direction'), this.logDirection)
       this.field($r('app.string.log_detail_summary'), this.summary)
       this.field($r('app.string.log_detail_time'), `${this.timestampMs}`)
       this.field($r('app.string.log_detail_hex'), $r('app.string.log_hex_missing'))
