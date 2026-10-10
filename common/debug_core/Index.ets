@@ -73,6 +73,7 @@ export { SessionLogQuery } from './src/main/ets/domain/model/SessionLogQuery';
 export { SettingsSnapshot } from './src/main/ets/domain/model/SettingsSnapshot';
 export {
   LoadWorkbenchOverviewUseCase,
+  CountSessionLogRowsUseCase,
   LoadSessionLogPreviewUseCase,
   ExportSessionLogUseCase,
   ClearSessionLogUseCase,

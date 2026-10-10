@@ -64,4 +64,4 @@ Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/Harmony
 
 读路径只有一条：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。
 
-终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003）。工作台不读这张表。命令面板走命令契约（WB-008–WB-012）。工作台三枚能力读数走各模块仓库的开关读取（WB-003）。WB-004、WB-005、WB-006 仍是缺口。射频仍是待真机。
+终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003）。工作台不读这张表。命令面板走命令契约（WB-008–WB-012）。工作台三枚能力读数走各模块仓库的开关读取（WB-003）。会话摘要计数在 `WorkbenchViewModel`（WB-005）。WB-004、WB-006 仍是缺口。射频仍是待真机。

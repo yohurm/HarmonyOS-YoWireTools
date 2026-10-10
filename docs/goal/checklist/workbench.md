@@ -48,7 +48,7 @@ related:
 - **Given** 工作台已显示
 - **When** 查看状态条
 - **Then** 有三枚 `YoStatusPill`：蓝牙、WLAN、星闪。开关读到后显示「已开启」或「已关闭」。未授权显示「未授权」，星闪不支持显示「不支持」，失败或未返回显示「未读取」。不调用 `requestPermissionsFromUser`
-- **证据：** `WorkbenchViewModel.figures` 只持有这三枚读数。蓝牙：`ReadBluetoothSwitchUseCase` → `BluetoothRepositoryContract.getAdapterState`。WLAN：`ReadWifiSwitchUseCase` → `WifiNetworkRepositoryContract.getWifiState`。星闪：`ReadNearLinkSwitchUseCase` → `NearLinkRepositoryContract.loadAdapterState`。读取在 `WorkbenchRadioState`，经 `bindCapability` 写入页面状态。说明见 [WB-003](../architecture/workbench/WB-003.md)
+- **证据：** `WorkbenchViewModel.figures` 含这三枚读数。蓝牙：`ReadBluetoothSwitchUseCase` → `BluetoothRepositoryContract.getAdapterState`。WLAN：`ReadWifiSwitchUseCase` → `WifiNetworkRepositoryContract.getWifiState`。星闪：`ReadNearLinkSwitchUseCase` → `NearLinkRepositoryContract.loadAdapterState`。读取在 `WorkbenchRadioState`，经 `bindCapability` 写入页面状态。说明见 [WB-003](../architecture/workbench/WB-003.md)
 
 ### WB-004 工作台下钻只进入已有功能栈
 
@@ -61,12 +61,12 @@ related:
 
 ### WB-005 工作台汇总会话摘要统计
 
-- **判定：** 缺口
+- **判定：** 支持
 - **屏幕：** 工作台（`screen.workbench.home`）
-- **Given** 进程里可能已有会话摘要
-- **When** 在工作台查找活动会话数或日志条数合计
-- **Then** 这两项不出现。`LoadWorkbenchOverviewUseCase` 返回 `DebugSessionSummary`，但不经过 `RepositoryContract`，直读 `SessionRuntimeStore`。看板不列出最近会话，也不把它当成启动器
-- **证据：** `WorkbenchViewModel` 没有会话列表，也没有会话统计字段
+- **Given** 进程里可能已有会话摘要，表 `debug_log_index` 里可能已有行
+- **When** 在工作台查找活动会话数、会话内日志条数合计、以及日志索引行数
+- **Then** `WorkbenchViewModel` 只保存这三个数字。活动会话数和会话内日志条数合计来自 `LoadWorkbenchOverviewUseCase` 对 `SessionRuntimeStore.listActiveSummaries` 的计数，不保留会话列表。日志索引行数来自 `CountSessionLogRowsUseCase` → `SessionLogRepositoryContract.list` 的 `total`。页面不列出会话供用户启动
+- **证据：** `WorkbenchViewModel.activeSessionCount`、`sessionLogCount`、`logIndexCount`。未在真机执行，射频仍是待真机
 
 ### WB-006 工作台聚合模块概览计数
 
@@ -139,7 +139,7 @@ related:
 
 | 判定 | 条数 | 编号 |
 | --- | --- | --- |
-| 支持 | 9 | WB-001、WB-002、WB-003、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
-| 缺口 | 3 | WB-004、WB-005、WB-006 |
+| 支持 | 10 | WB-001、WB-002、WB-003、WB-005、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
+| 缺口 | 2 | WB-004、WB-006 |
 
-命令面板已有页面，但不从工作台首页启动。工作台已接通的只有三枚能力读数。射频仍是待真机。
+命令面板已有页面，但不从工作台首页启动。WB-004 下钻和 WB-006 模块概览计数仍是缺口。射频仍是待真机。

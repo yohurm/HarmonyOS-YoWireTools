@@ -25,6 +25,7 @@ export struct HomeFeaturePage {
 
   aboutToAppear(): void {
     this.vm.bindCapability(this.bluetoothReading, this.wlanReading, this.nearlinkReading);
+    void this.vm.refreshCounts();
   }
 
   @Monitor('bluetoothReading', 'wlanReading', 'nearlinkReading')

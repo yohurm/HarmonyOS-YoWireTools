@@ -49,6 +49,25 @@ export class LoadWorkbenchOverviewUseCase {
   }
 }
 
+/**
+ * Count of rows in debug_log_index. The page keeps the number, not the rows.
+ */
+export class CountSessionLogRowsUseCase {
+  private readonly repository: SessionLogRepositoryContract;
+
+  constructor(repository: SessionLogRepositoryContract = new SessionLogRepository()) {
+    this.repository = repository;
+  }
+
+  async execute(): Promise<Result<number>> {
+    const listed = await this.repository.list(new SessionLogQuery('', 0, 1));
+    if (!listed.success || listed.value === undefined) {
+      return Result.fail(listed.error ?? new ResultError('YW-LOG-1001', 'Session log count failed'));
+    }
+    return Result.ok(listed.value.total);
+  }
+}
+
 export class LoadSessionLogPreviewUseCase {
   private readonly repository: SessionLogRepositoryContract;
 
