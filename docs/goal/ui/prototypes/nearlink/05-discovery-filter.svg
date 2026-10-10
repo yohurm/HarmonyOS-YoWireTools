@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img">
+  <title>发现台 · 过滤契约</title>
+  <rect width="390" height="844" fill="#F1F3F5"/>
+  <rect x="0" y="0" width="390" height="36" rx="0" fill="#FFFFFF"/>
+<text x="20" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="600" fill="#182431" text-anchor="start">9:41</text>
+<text x="318" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="start">5G</text>
+<rect x="342" y="14" width="22" height="10" rx="2" fill="none" stroke="#5C6B7A" stroke-width="1"/>
+<rect x="344" y="16" width="14" height="6" rx="1" fill="#182431"/>
+<rect x="0" y="36" width="390" height="56" rx="0" fill="#FFFFFF"/>
+<text x="18" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="28" font-weight="400" fill="#182431" text-anchor="start">‹</text>
+<text x="44" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="20" font-weight="600" fill="#182431" text-anchor="start">发现</text>
+<text x="370" y="69" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="500" fill="#0A59F7" text-anchor="end">停止</text>
+<line x1="0" y1="92" x2="390" y2="92" stroke="#E6E8EB" stroke-width="1"/>
+<rect x="0" y="92" width="390" height="36" rx="0" fill="#E8F0FE"/>
+<text x="16" y="115" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="500" fill="#0A59F7" text-anchor="start">开关已开  ·  权限已授  ·  API 13 拒绝空过滤</text>
+<rect x="128" y="826" width="134" height="5" rx="2.5" fill="#1A1A1A" opacity="0.35"/>
+<rect x="16" y="140" width="358" height="248" rx="16" fill="#FFFFFF"/>
+<text x="32" y="166" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="16" font-weight="600" fill="#182431" text-anchor="start">过滤组 1</text>
+<rect x="250" y="150" width="108" height="22" rx="11" fill="#E8F0FE"/>
+<text x="304.0" y="165.5" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#0A59F7" text-anchor="middle">组内同时满足</text>
+<text x="32" y="200" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#8A94A0" text-anchor="start">设备名</text>
+<rect x="32" y="208" width="326" height="40" rx="10" fill="#F1F3F5"/>
+<text x="44" y="234" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="400" fill="#182431" text-anchor="start">手写笔</text>
+<text x="32" y="272" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#8A94A0" text-anchor="start">地址</text>
+<text x="220" y="272" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#8A94A0" text-anchor="start">厂商 ID</text>
+<rect x="32" y="280" width="150" height="40" rx="10" fill="#F1F3F5"/>
+<text x="44" y="306" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="400" fill="#8A94A0" text-anchor="start">可空</text>
+<rect x="208" y="280" width="150" height="40" rx="10" fill="#F1F3F5"/>
+<text x="220" y="306" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="400" fill="#8A94A0" text-anchor="start">可空</text>
+<text x="32" y="348" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="500" fill="#0A59F7" text-anchor="start">再加一组：组与组之间满足任一</text>
+<text x="32" y="370" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">厂商数据必须带厂商 ID，掩码长度必须一致。</text>
+<rect x="16" y="400" width="358" height="108" rx="16" fill="#FFFFFF"/>
+<text x="32" y="426" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="500" fill="#8A94A0" text-anchor="start">扫描契约</text>
+<rect x="32" y="440" width="56" height="22" rx="11" fill="#0A59F7"/>
+<text x="60.0" y="455.5" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" text-anchor="middle">均衡</text>
+<rect x="96" y="440" width="72" height="22" rx="11" fill="#F0F1F3"/>
+<text x="132.0" y="455.5" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="middle">低功耗</text>
+<rect x="176" y="440" width="72" height="22" rx="11" fill="#F0F1F3"/>
+<text x="212.0" y="455.5" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="middle">低延迟</text>
+<text x="348" y="456" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="600" fill="#182431" text-anchor="end">30 秒</text>
+<text x="32" y="486" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">时长 10–60 秒，或单独选择持续发现。</text>
+<rect x="16" y="524" width="358" height="44" rx="22.0" fill="#0A59F7"/>
+<text x="195.0" y="551.0" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">按这组过滤开始发现</text>
+<text x="16" y="596" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">先确认过滤契约，再出现广播卡片。</text>
+</svg>

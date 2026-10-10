@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img">
+  <title>能力工作台 · 开关关闭</title>
+  <rect width="390" height="844" fill="#F1F3F5"/>
+  <rect x="0" y="0" width="390" height="36" rx="0" fill="#FFFFFF"/>
+<text x="20" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="600" fill="#182431" text-anchor="start">9:41</text>
+<text x="318" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="start">5G</text>
+<rect x="342" y="14" width="22" height="10" rx="2" fill="none" stroke="#5C6B7A" stroke-width="1"/>
+<rect x="344" y="16" width="14" height="6" rx="1" fill="#182431"/>
+<rect x="0" y="36" width="390" height="56" rx="0" fill="#FFFFFF"/>
+<text x="20" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="20" font-weight="600" fill="#182431" text-anchor="start">星闪</text>
+<line x1="0" y1="92" x2="390" y2="92" stroke="#E6E8EB" stroke-width="1"/>
+<rect x="128" y="826" width="134" height="5" rx="2.5" fill="#1A1A1A" opacity="0.35"/>
+<rect x="16" y="104" width="358" height="96" rx="16" fill="#FFFFFF"/>
+<text x="32" y="128" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="500" fill="#8A94A0" text-anchor="start">本机就绪</text>
+<text x="32" y="156" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="600" fill="#2E7D32" text-anchor="start">支持</text>
+<text x="32" y="178" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="400" fill="#8A94A0" text-anchor="start">硬件</text>
+<text x="118" y="156" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="600" fill="#C65A12" text-anchor="start">已关</text>
+<text x="118" y="178" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="400" fill="#8A94A0" text-anchor="start">开关</text>
+<text x="204" y="156" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="600" fill="#2E7D32" text-anchor="start">已授</text>
+<text x="204" y="178" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="400" fill="#8A94A0" text-anchor="start">权限</text>
+<text x="290" y="156" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="600" fill="#2E7D32" text-anchor="start">真机</text>
+<text x="290" y="178" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="400" fill="#8A94A0" text-anchor="start">环境</text>
+<rect x="16" y="212" width="358" height="188" rx="16" fill="#FFF3EB"/>
+<text x="32" y="246" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="18" font-weight="600" fill="#C65A12" text-anchor="start">星闪开关关闭</text>
+<text x="32" y="274" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#182431" text-anchor="start">当前状态 STATE_OFF。打开后才能发现和建链。</text>
+<text x="32" y="302" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="500" fill="#182431" text-anchor="start">路径：设置 › 多设备协同 › 星闪</text>
+<text x="32" y="328" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">应用内不直接调用打开开关。</text>
+<rect x="32" y="346" width="200" height="40" rx="20.0" fill="#C65A12"/>
+<text x="132.0" y="371.0" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">打开系统星闪设置</text>
+<text x="20" y="416" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">开关变为 STATE_ON 后，三个平面恢复可进入。</text>
+</svg>
