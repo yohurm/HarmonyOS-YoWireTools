@@ -10,6 +10,7 @@ import {
 import { BluetoothRepository } from '../repository/BluetoothRepository';
 import { BluetoothRepositoryContract } from '../../domain/repository/BluetoothRepositoryContract';
 import { PairingCoordinator } from '../../domain/service/PairingCoordinator';
+import { SppReconnectCoordinator } from '../../domain/service/SppReconnectCoordinator';
 import { SppSessionAdmissionPolicy } from '../../domain/service/spp/SppSessionAdmissionPolicy';
 import { SppSessionCatalog } from '../../domain/service/spp/SppSessionCatalog';
 import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
@@ -137,7 +138,7 @@ export class BluetoothUseCaseFactory {
   }
 
   static disconnectSpp(): DisconnectSppUseCase {
-    return new DisconnectSppUseCase();
+    return new DisconnectSppUseCase(SppReconnectCoordinator.getInstance());
   }
 
   static connectSpp(): ConnectSppUseCase {
@@ -148,7 +149,8 @@ export class BluetoothUseCaseFactory {
       BluetoothUseCaseFactory.bootstrap(),
       TransportSessionRegistry.getInstance(),
       new ResolveSppTargetAddressUseCase(repository),
-      SppSessionLedger.getInstance()
+      SppSessionLedger.getInstance(),
+      SppReconnectCoordinator.getInstance()
     );
   }
 

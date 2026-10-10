@@ -35,6 +35,7 @@ export class ConnectSppUseCase {
   private readonly resolveAddress: ResolveSppTargetAddressUseCase;
   private readonly ledger: SppSessionLedger;
   private readonly admissionPolicy: SppSessionAdmissionPolicy;
+  private readonly reconnect: SppReconnectCoordinator;
 
   constructor(
     repository: BluetoothRepositoryContract,
@@ -42,7 +43,8 @@ export class ConnectSppUseCase {
     sessionBootstrap: BluetoothSessionBootstrap,
     transportRegistry: TransportSessionRegistry,
     resolveAddress: ResolveSppTargetAddressUseCase,
-    ledger: SppSessionLedger
+    ledger: SppSessionLedger,
+    reconnect: SppReconnectCoordinator
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -51,6 +53,7 @@ export class ConnectSppUseCase {
     this.resolveAddress = resolveAddress;
     this.ledger = ledger;
     this.admissionPolicy = new SppSessionAdmissionPolicy(ledger);
+    this.reconnect = reconnect;
   }
 
   async execute(params: SppConnectParams): Promise<Result<ConnectSppResult>> {
@@ -151,7 +154,7 @@ export class ConnectSppUseCase {
     this.transportRegistry.register(session.value.id, transport);
     this.ledger.promoteConnected(sessionKey, facet.getClientSocketId());
     if (connectParams.autoReconnect) {
-      SppReconnectCoordinator.getInstance().bind(
+      this.reconnect.bind(
         session.value.id,
         classicId,
         (): Promise<void> => facet.reopenForReconnect(),
@@ -169,8 +172,14 @@ export class ConnectSppUseCase {
  * Coordinator.unbind → queue.reset → disconnect → TSR.remove → markClosing → release → stopSession → republish.
  */
 export class DisconnectSppUseCase {
+  private readonly reconnect: SppReconnectCoordinator;
+
+  constructor(reconnect: SppReconnectCoordinator) {
+    this.reconnect = reconnect;
+  }
+
   async execute(sessionId: string): Promise<Result<void>> {
-    SppReconnectCoordinator.getInstance().unbind(sessionId);
+    this.reconnect.unbind(sessionId);
     return await SppSessionTeardown.userDisconnectCleanup(sessionId);
   }
 }
