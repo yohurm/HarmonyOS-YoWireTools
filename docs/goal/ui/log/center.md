@@ -25,7 +25,7 @@ related:
 | 星闪 | `DebugLogRecord` | PR #6，NL-001；展示见 NL-107 |
 | Wi-Fi | `LogCaptureService`，落库 `LogRepository` | PR #7，WN-001；行字段见 WN-128 |
 
-本屏不新命名跨模块查询函数，也不把 `YoLog` 说成 `LogRepository`。页面只渲染页面状态给出的行。行从哪一个对象来，等功能 Goal 收成一条读模型之后再写进架构，不在 UI 文档里补接口。
+本屏不新命名跨模块查询函数，也不把 `YoLog` 说成 `LogRepository`。页面只渲染页面状态给出的行。单一读路径等待功能侧 shell function docs PR，不在这里猜路径，也不自编 `LOG-` 编号。
 
 ## 布局
 

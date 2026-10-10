@@ -19,7 +19,7 @@ related:
 
 本目录是 Phase C 的屏幕设计。它规定蓝牙调试台的导航、信息密度和每种状态看见什么。本阶段不写 ArkUI 产品代码，不开始特性实现。
 
-行为以已接受的清单和架构为准。界面只呈现 `common/yobluetooth` 给出的领域结果。控件只使用 `common/youi_kit` 已从 `Index.ets` 导出的符号。不新增第二套 UI Kit，不增加补丁层，不把已删除的 P1 组件加回来。
+行为以已接受的清单和架构为准。编号只追溯 `docs/goal/checklist/bluetooth.md` 与 `docs/goal/architecture/bluetooth/` 里的 BT-001–BT-098。下面的屏幕表是界面落点，不是第二份清单。对接的 PR 写在 [质量门禁](../QUALITY-GATE.md)。界面只呈现 `common/yobluetooth` 给出的领域结果。控件只使用 `common/youi_kit` 已从 `Index.ets` 导出的符号。不新增第二套 UI Kit，不增加补丁层，不把已删除的 P1 组件加回来。
 
 蓝牙屏幕只出现在蓝牙 Tab。子页进入 `product/phone` 的同一条根 `Navigation`，不另做蓝牙栈。不放进星闪（`AppRoutes.NEARLINK`、`feature_nearlink`）或 Wi‑Fi（`AppRoutes.WIFI`、`feature_wifi_network`）。
 

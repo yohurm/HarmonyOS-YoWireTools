@@ -8,6 +8,8 @@ related:
   - common/youi_kit/src/main/ets/token/foundation/YoSpace.ets
   - common/youi_kit/src/main/ets/token/semantic/YoColor.ets
   - common/youi_kit/src/main/ets/token/semantic/YoResponsive.ets
+  - common/youi_kit/src/main/ets/components/containers/YoStatusPill.ets
+  - docs/goal/ui/app-shell/color-scheme.md
 ---
 
 # Design Token
@@ -43,3 +45,40 @@ Foundation → Semantic → Component。业务页读 Semantic 和 Component。�
 ## 样例里的 Token 用法
 
 [HarmonyOSComponentUXExamples](https://gitcode.com/HarmonyOS_Samples/HarmonyOSComponentUXExamples) 把间距和圆角放在 `commons/componentuxexamplesbase/src/main/ets/designtoken/`（`SpaceToken`、`PaddingToken`、`CornerRadiusToken`、`ColorToken`）。本工程对应物已经是 `YoSpace`、`YoResponsive`、`YoRadius`、`YoColor`。不把样例的 Token 类再引入一份。
+
+## 状态胶囊目标色
+
+屏幕只使用 `YoStatusPill`。不另做一套胶囊，不新增 `youi_*` 资源名。`YoStatusPill` 的成功字色是 `YoColor.SUCCESS`（`youi_success`），背景是 `YoColor.SUCCESS_CONTAINER`（`youi_success_container`）。警告同样走 `youi_warning` 与 `youi_warning_container`。容器资源是前景色的约 10% 透明（alpha `0x19`，即 25/255），铺在页面底 `youi_background` 上。
+
+对比度按 `设计/设计指南/系统特性&能力/系统特性/深色模式.md`（来源 <https://developer.huawei.com/consumer/cn/doc/design-guides/dark-mode-0000001823255497>）。该文把辅助文本的优秀线定为大于 3:1，并写明分级来自 WCAG。计算用 WCAG 相对亮度：通道先线性化（`c/12.92`，或 `((c+0.055)/1.055)^2.4`），`L = 0.2126R + 0.7152G + 0.0722B`，对比度 `(L亮+0.05)/(L暗+0.05)`。8 位色先按 alpha 合成到页底，再算对比度。浅色页底 `#F1F3F5`，深色页底 `#191A1C`。深色还要避开该文的高对比不适区：文字对比度低于 15.7:1。
+
+色相沿用当前资源，只改明度。落地时替换同名资源的色值，不改 `YoStatusPill.ets` 的取色分支。`youi_on_success_container`、`youi_on_warning_container` 今天与字色相同，替换时一起换成下表的目标字色。Kit 资源文件不在本 PR 修改。
+
+### 待替换（当前 Kit，浅色）
+
+| 语气 | 当前字色 | 当前容器 | 合成背景 | 对比度 |
+| --- | --- | --- | --- | --- |
+| 成功 | `#64BB5C` | `#1964BB5C` | `#E3EEE6` | 2.00 |
+| 警告 | `#ED6F21` | `#19ED6F21` | `#F1E6E0` | 2.48 |
+
+成功：字色亮度 0.390227，合成底亮度 0.831931，`(0.831931+0.05)/(0.390227+0.05) = 2.0034`。警告：字色亮度 0.294832，合成底亮度 0.806762，`(0.806762+0.05)/(0.294832+0.05) = 2.4846`。两条都落在该文「一般」（1.9:1–3:1），不是优秀。这是待替换值。
+
+### 目标（浅色，大于 3:1）
+
+| 资源 | 目标值 | 合成背景 | 对比度 |
+| --- | --- | --- | --- |
+| `youi_success` / `youi_on_success_container` | `#44923D` | `#E0E9E3` | 3.12 |
+| `youi_success_container` | `#1944923D` | 同上 | 同上 |
+| `youi_warning` / `youi_on_warning_container` | `#D45C11` | `#EEE4DF` | 3.15 |
+| `youi_warning_container` | `#19D45C11` | 同上 | 同上 |
+
+成功：字色 `#44923D` 亮度 0.221236，合成底 `#E0E9E3` 亮度 0.796712，`(0.796712+0.05)/(0.221236+0.05) = 3.1217`。警告：字色 `#D45C11` 亮度 0.216918，合成底 `#EEE4DF` 亮度 0.789917，`(0.789917+0.05)/(0.216918+0.05) = 3.1467`。都大于 3:1。
+
+### 深色核过（沿用当前 Kit，不替换）
+
+| 语气 | 字色 | 容器 | 合成背景 | 对比度 |
+| --- | --- | --- | --- | --- |
+| 成功 | `#5BA854` | `#195BA854` | `#1F2821` | 5.18 |
+| 警告 | `#DB6B42` | `#19DB6B42` | `#2C2220` | 4.57 |
+
+成功：字色亮度 0.308695，合成底亮度 0.019187，`(0.308695+0.05)/(0.019187+0.05) = 5.1844`。警告：字色亮度 0.259688，合成底亮度 0.017838，`(0.259688+0.05)/(0.017838+0.05) = 4.5651`。都大于 3:1，且低于 15.7:1。深色资源保持现状，作为目标值。
