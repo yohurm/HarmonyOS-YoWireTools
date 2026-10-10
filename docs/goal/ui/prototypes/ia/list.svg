@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+<rect width="100%" height="100%" fill="#F4F4F2"/>
+<rect x="0" y="0" width="960" height="64" rx="0" fill="#E7E7E4" stroke="none" stroke-width="0"/>
+<text x="24" y="24" font-size="13" font-weight="700" fill="#8A4B08" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">信息架构草图 · 非高保真</text>
+<text x="24" y="46" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">列表页解剖</text>
+<text x="936" y="46" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">扫描、日志、局域网发现共用这一结构</text>
+<rect x="36" y="88" width="360" height="520" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="48" y1="124" x2="384" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="48" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">默认</text>
+<rect x="52" y="140" width="328" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="158.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">标题栏：返回 + 页名 + 一个主操作</text>
+<rect x="52" y="188" width="328" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="206.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">状态行：扫描中 / 已暂停 / 数量</text>
+<rect x="52" y="236" width="328" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="254.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">搜索（标签在框外，占位符只是示例）</text>
+<rect x="52" y="284" width="328" height="148" rx="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="52" y="284" width="328" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="320" x2="370" y2="320" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="302" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">设备或会话主行</text>
+<text x="368" y="302" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">状态</text>
+<rect x="52" y="320" width="328" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="356" x2="370" y2="356" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="338" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">辅行：地址、RSSI、时间</text>
+<text x="368" y="338" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif"></text>
+<rect x="52" y="356" width="328" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="392" x2="370" y2="392" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="374" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">下一行</text>
+<text x="368" y="374" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">状态</text>
+<rect x="52" y="392" width="328" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="428" x2="370" y2="428" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="410" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">再下一行</text>
+<text x="368" y="410" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">状态</text>
+<rect x="52" y="448" width="328" height="44" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="462.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">主按钮只在需要整页动作时出现</text>
+<text x="62" y="480.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">例如重新扫描</text>
+<text x="52" y="520" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">标题栏不随空、错、无权限更换。</text>
+<text x="52" y="542" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">变化只发生在状态行以下。</text>
+<rect x="430" y="88" width="490" height="520" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="442" y1="124" x2="908" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="442" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">同一页的另外三态</text>
+<rect x="446" y="148" width="458" height="100" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="456" y="190.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">空</text>
+<text x="456" y="208.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">内容区说明原因 + 一个动词按钮。不换成新页面。</text>
+<rect x="446" y="264" width="458" height="100" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="456" y="306.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">错</text>
+<text x="456" y="324.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">内容区一句原因 + 重试或去开启。不用整页转圈代替。</text>
+<rect x="446" y="380" width="458" height="100" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="456" y="422.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">无权限</text>
+<text x="456" y="440.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">内容区写明缺哪项权限 + 去授权。不放无解释的灰按钮。</text>
+<text x="446" y="520" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">适用：经典扫描、BLE 扫描、星闪扫描、</text>
+<text x="446" y="544" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">AP 列表、局域网发现、日志列表、命令列表。</text>
+</svg>

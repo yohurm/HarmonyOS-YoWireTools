@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+<rect width="100%" height="100%" fill="#F4F4F2"/>
+<rect x="0" y="0" width="960" height="64" rx="0" fill="#E7E7E4" stroke="none" stroke-width="0"/>
+<text x="24" y="24" font-size="13" font-weight="700" fill="#8A4B08" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">信息架构草图 · 非高保真</text>
+<text x="24" y="46" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">日志与设置</text>
+<text x="936" y="46" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">都是全局目的地</text>
+<rect x="36" y="88" width="420" height="520" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="48" y1="124" x2="444" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="48" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">日志</text>
+<rect x="52" y="140" width="388" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="158.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">标题栏：日志</text>
+<rect x="52" y="188" width="388" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="206.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">范围：全部 / 蓝牙 / Wi-Fi / 星闪</text>
+<rect x="52" y="236" width="388" height="148" rx="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="52" y="236" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="272" x2="430" y2="272" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="254" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">会话主行</text>
+<text x="428" y="254" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">时间</text>
+<rect x="52" y="272" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="308" x2="430" y2="308" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="290" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">协议 · 目标</text>
+<text x="428" y="290" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif"></text>
+<rect x="52" y="308" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="344" x2="430" y2="344" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="326" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">下一会话</text>
+<text x="428" y="326" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">时间</text>
+<rect x="52" y="344" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="380" x2="430" y2="380" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="362" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">空、错、无权限走列表解剖</text>
+<text x="428" y="362" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif"></text>
+<text x="52" y="408" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">点一行进入会话详情，仍在同一栈。</text>
+<rect x="52" y="432" width="388" height="120" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="484.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">详情</text>
+<text x="62" y="502.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">文本 / HEX / 混合只切换内容。导出是详情上的一个主动作。</text>
+<rect x="500" y="88" width="420" height="520" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="512" y1="124" x2="908" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="512" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">设置</text>
+<text x="516" y="140" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">分组，不按三种无线各做一页设置首页。</text>
+<rect x="516" y="164" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="192.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">显示</text>
+<text x="526" y="210.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">专家 / 轻量</text>
+<rect x="516" y="248" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="276.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">日志与后台</text>
+<text x="526" y="294.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">保存、导出、长连接</text>
+<rect x="516" y="332" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="360.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">命令</text>
+<text x="526" y="378.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">周期发送限制</text>
+<rect x="516" y="416" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="444.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">蓝牙 / Wi-Fi / 星闪默认值</text>
+<text x="526" y="462.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">仍是设置里的组</text>
+<rect x="516" y="500" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="528.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">安全</text>
+<text x="526" y="546.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">高风险确认、清除本地数据</text>
+</svg>
