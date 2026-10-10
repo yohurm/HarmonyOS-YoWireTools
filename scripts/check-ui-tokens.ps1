@@ -40,4 +40,11 @@ if ($readme -notmatch 'PR #19 已关闭未合并') {
   Write-Error 'README.md must record that PR 19 is closed and unmerged'
 }
 
+$sources = Get-Content -Raw (Join-Path $root 'docs/goal/ui/SOURCES.md')
+foreach ($needle in @('蓝牙通讯组件', '应用内可视化日志', '通用状态服务', '网络测速组件')) {
+  if ($sources -notmatch [regex]::Escape($needle)) {
+    Write-Error "SOURCES.md missing $needle"
+  }
+}
+
 Write-Host 'UI token checks passed'

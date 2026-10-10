@@ -6,6 +6,6 @@
 
 深色画布是 `background_secondary` `#191A1C`。主按钮仍是 `brand`，深色为 `#317AF7`，字保持 `font_on_primary`。`warning` / `alert` / `confirm` 换深色表中的对应值，色相不变。
 
-按下叠 `interactive_pressed`。禁用把文字降到 `font_fourth`，主按钮改为 `comp_emphasize_tertiary`，不另画灰色 Material 按钮。
+按下叠 `interactive_pressed`。禁用把文字降到 `font_fourth`，主按钮改为 `comp_emphasize_tertiary`，不另画灰色 Material 按钮。M1 的橙色运算符、M6 的彩虹日志边、M17 的绿色完成钮都不进入色板。
 
 分割线只用 `comp_divider`。不在深色里把分割线改成纯白实线。

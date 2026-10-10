@@ -2,7 +2,7 @@
 
 目标名 `/nearlink/scan`。来源：与 BLE 扫描同一张 E3 卡片和 H2 状态标题。不复制心率图。
 
-行 76vp：主行名称，次行地址与 RSSI，`tnum`。地址被 ViewModel 标为随机时，次行末尾中性胶囊「随机」（`font_secondary` 字，`comp_background_gray` 底）。行点击 `push` SSAP。右侧不放连接按钮，连接发生在 SSAP 页，避免和 BLE 行内按钮两套进入方式叠在星闪上。
+行与 M12、BLE 扫描同一张卡片：主行名称，次行地址与 RSSI，`tnum`。底部一颗「开始搜索 / 停止 / 重新搜索」。地址被 ViewModel 标为随机时，次行末尾中性胶囊「随机」（`font_secondary` 字，`comp_background_gray` 底）。行点击 `push` SSAP。右侧不放连接按钮，连接发生在 SSAP 页，避免和 BLE 行内按钮两套进入方式叠在星闪上。
 
 头与 BLE 相同：标题、辅文、文字按钮「开始搜索 / 停止 / 重新搜索」。
 

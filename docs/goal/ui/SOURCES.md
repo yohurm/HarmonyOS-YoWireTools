@@ -2,7 +2,7 @@
 
 定稿前读过下列独立来源。关键模式在各页用「来源」标出仓库或文档，不把未读的 GitCode 示例树写成依据。GitCode / AtomGit 在调研时返回 WAF，OpenHarmony `ComponentCollection` 的 Gitee raw 路径本次返回 404，因此组件选型改以已克隆的 Gitee 官方样例和 ArkUI 文档为准。
 
-工具库截图仍在扩大。市场条目用已有目录，不把未看到的画面写成布局。
+市场合计 28 条：先有 8 条，第二轮目录再加 20 条。定稿同时对照 Top 12 开源样例，以及本轮看过的工具壳、日志控制台、空态、蓝牙列表、测速和半模态。目录里没有附画面的条目只登记，不写成布局。
 
 ## 组件库与高星 ArkUI
 
@@ -55,3 +55,21 @@
 - H6 IKConsoleKit https://developer.huawei.com/consumer/cn/market/prod-detail/11090518ae8147e9b12f9ab8fb5cf815/c5ef800e4cc6476ab179493aa30dff52
 - H7 FastBle https://developer.huawei.com/consumer/cn/market/prod-detail/dca785c6dc1d458c8fd12568ecd78f05/PLATFORM
 - H8 BLE 通信 https://developer.huawei.com/consumer/cn/market/prod-detail/c0b2e7a68718427eb7fa8ba0fd8afd00/PLATFORM
+
+## 工具库第二轮（看过画面的）
+
+目录：`huawei-expand/CATALOG.md`。下面这些按画面改了布局。色相仍只用 D2，不采用计算器橙、记账绿、日志彩虹边框。
+
+| 编号 | 来源 | 链接 | 画面里取用 / 不取用 |
+| --- | --- | --- | --- |
+| M1 | 计算器应用模板 | https://developer.huawei.com/consumer/cn/market/prod-detail/545386ee7127455ea20d802258f46839/2adce9bbd4cb42d58a87e6add45594b3 | 标题下分段（选中实心、未选灰底）说明页内模式切换。不把键盘和橙色运算符搬进调试页 |
+| M2 | 综合工具应用模板 | https://developer.huawei.com/consumer/cn/market/prod-detail/65362ceb3ff6417fa93636eba9fae427/2adce9bbd4cb42d58a87e6add45594b3 | 底栏 + 首页宫格是工具箱壳。本应用底栏已是五个无线目的地，工作台不改成三列小工具宫格 |
+| M3 | 健康管理应用模板 | https://developer.huawei.com/consumer/cn/market/prod-detail/a535af340eb545f9bee62f47dce631db/2adce9bbd4cb42d58a87e6add45594b3 | 设备页是白卡片：名称、状态短句、次要动作。不放设备照片主视觉 |
+| M4 | 网络测速组件 | https://developer.huawei.com/consumer/cn/market/prod-detail/0dc4756853e8437db56dbc737bdcb0f8/2adce9bbd4cb42d58a87e6add45594b3 | 一个大数字加三个说明（时延、下载、上传）。不把整页改成深色仪表盘 |
+| M5 | 通用状态服务组件 | https://developer.huawei.com/consumer/cn/market/prod-detail/992591e621d3416da45cf37026e9d5d5/2adce9bbd4cb42d58a87e6add45594b3 | 空态/错误：中部标题和辅文，底部一颗胶囊主按钮。不要求行星插画 |
+| M6 | 应用内可视化日志查看工具 | https://developer.huawei.com/consumer/cn/market/prod-detail/a085f91630a04dbb85daf9aab948e78a/b6a17875746941e0b5606c9b1eb174f8 | 关键字搜索、Debug/Info/Warn/Error/Fatal 芯片、清空、滑动到底部。不加速浮「log」球，不提供彩虹背景色板 |
+| M12 | 蓝牙通讯组件 | https://developer.huawei.com/consumer/cn/market/prod-detail/bda40096ca854265937fee47e95a5a36/PLATFORM | 灰底白卡片、地址主行、浅底胶囊「连接」、底部一颗实心「搜索设备」。主行与次行不重复同一串地址 |
+| M17 | 账单管理半模态 | https://developer.huawei.com/consumer/cn/market/prod-detail/fb4020d8e0e1494390e845dc559e0a31/2adce9bbd4cb42d58a87e6add45594b3 | 半模态自带标题和关闭，模式分段在字段之上，一颗完成按钮在底部。不搬分类宫格和绿色 |
+| M19 | 消息管理 | https://developer.huawei.com/consumer/cn/market/prod-detail/b111d8b49c56423aa5cfb9e7afb6fb95/2adce9bbd4cb42d58a87e6add45594b3 | 顶部分段筛选、行内标题+时间+辅文。滑动露出的「标为已读 / 删除」是消息动作，日志流不照搬 |
+
+第二轮其余条目（UtilLog、hilog、debug db、NFCTag、beacon、图文识别、折叠屏扫码、账单图表、莓创图表、文件管理、物联工厂）在目录中，本轮没有用来改组件树。
