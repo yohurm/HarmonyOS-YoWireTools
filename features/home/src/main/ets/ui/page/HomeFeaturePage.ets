@@ -1,4 +1,5 @@
-﻿import { DebugSessionSummary, FeatureModuleId, RadioSwitchReading } from 'debug_core';
+﻿import { LengthMetrics } from '@kit.ArkUI';
+import { DebugSessionSummary, FeatureModuleId, RadioSwitchReading } from 'debug_core';
 import {
   YoEmpty,
   YoEmptyStateModel,
@@ -34,7 +35,7 @@ export struct HomeFeaturePage {
   @LocalBuilder
   pageContent() {
     Column({ space: YoSpace.L }) {
-      Flex({ wrap: FlexWrap.Wrap, space: { main: YoSpace.S, cross: YoSpace.S } }) {
+      Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(YoSpace.S), cross: LengthMetrics.vp(YoSpace.S) } }) {
         YoStatusPill({
           label: WorkbenchStatusText.label($r('app.string.home_capsule_bluetooth'), this.bluetoothReading),
           tone: WorkbenchStatusText.tone(this.bluetoothReading)
