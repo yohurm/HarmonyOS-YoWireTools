@@ -1,20 +1,15 @@
 ﻿import { LengthMetrics } from '@kit.ArkUI';
-import { DebugSessionSummary, FeatureModuleId, RadioSwitchReading } from 'debug_core';
+import { RadioSwitchReading } from 'debug_core';
 import {
-  YoEmpty,
-  YoEmptyStateModel,
-  YoModeEntryCard,
   YoNavDestinationKind,
   YoPageShell,
   YoSpace,
-  YoStatusPill,
-  YoTypeStyle,
-  YoColor
+  YoStatusPill
 } from 'youi_kit';
 import { WorkbenchStatusText } from '../../viewmodel/WorkbenchStatusText';
 import { WorkbenchViewModel } from '../../viewmodel/WorkbenchViewModel';
 
-/** Workbench root tab. Cards switch the existing shell tab. They do not scan. */
+/** Workbench root tab. Capability readings only. Deep debug stays in each feature tab. */
 @ComponentV2
 export struct HomeFeaturePage {
   @Event onOpenModule: (moduleId: string) => void = (_moduleId: string) => {
@@ -29,7 +24,12 @@ export struct HomeFeaturePage {
   @Local vm: WorkbenchViewModel = new WorkbenchViewModel();
 
   aboutToAppear(): void {
-    this.vm.refresh();
+    this.vm.bindCapability(this.bluetoothReading, this.wlanReading, this.nearlinkReading);
+  }
+
+  @Monitor('bluetoothReading', 'wlanReading', 'nearlinkReading')
+  onCapabilityChange(): void {
+    this.vm.bindCapability(this.bluetoothReading, this.wlanReading, this.nearlinkReading);
   }
 
   @LocalBuilder
@@ -37,119 +37,19 @@ export struct HomeFeaturePage {
     Column({ space: YoSpace.L }) {
       Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(YoSpace.S), cross: LengthMetrics.vp(YoSpace.S) } }) {
         YoStatusPill({
-          label: WorkbenchStatusText.label($r('app.string.home_capsule_bluetooth'), this.bluetoothReading),
-          tone: WorkbenchStatusText.tone(this.bluetoothReading)
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_bluetooth'), this.vm.bluetoothReading),
+          tone: WorkbenchStatusText.tone(this.vm.bluetoothReading)
         })
         YoStatusPill({
-          label: WorkbenchStatusText.label($r('app.string.home_capsule_wlan'), this.wlanReading),
-          tone: WorkbenchStatusText.tone(this.wlanReading)
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_wlan'), this.vm.wlanReading),
+          tone: WorkbenchStatusText.tone(this.vm.wlanReading)
         })
         YoStatusPill({
-          label: WorkbenchStatusText.label($r('app.string.home_capsule_nearlink'), this.nearlinkReading),
-          tone: WorkbenchStatusText.tone(this.nearlinkReading)
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_nearlink'), this.vm.nearlinkReading),
+          tone: WorkbenchStatusText.tone(this.vm.nearlinkReading)
         })
       }
       .width('100%')
-
-      Row({ space: YoSpace.M }) {
-        Column() {
-          YoModeEntryCard({
-            title: $r('app.string.home_card_bluetooth'),
-            description: $r('app.string.home_card_module_hint'),
-            onTap: () => {
-              this.onOpenModule(FeatureModuleId.BLUETOOTH);
-            }
-          })
-        }
-        .layoutWeight(1)
-
-        Column() {
-          YoModeEntryCard({
-            title: $r('app.string.home_card_network'),
-            description: $r('app.string.home_card_module_hint'),
-            onTap: () => {
-              this.onOpenModule(FeatureModuleId.WIFI);
-            }
-          })
-        }
-        .layoutWeight(1)
-
-        Column() {
-          YoModeEntryCard({
-            title: $r('app.string.home_card_nearlink'),
-            description: $r('app.string.home_card_module_hint'),
-            onTap: () => {
-              this.onOpenModule(FeatureModuleId.NEARLINK);
-            }
-          })
-        }
-        .layoutWeight(1)
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Top)
-
-      Row({ space: YoSpace.M }) {
-        Column() {
-          YoModeEntryCard({
-            title: $r('app.string.home_card_log'),
-            description: $r('app.string.home_card_tool_hint'),
-            onTap: () => {
-              this.onOpenLog();
-            }
-          })
-        }
-        .layoutWeight(1)
-
-        Column() {
-          YoModeEntryCard({
-            title: $r('app.string.home_card_command'),
-            description: $r('app.string.home_card_tool_hint'),
-            onTap: () => {
-              this.onOpenCommand();
-            }
-          })
-        }
-        .layoutWeight(1)
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Top)
-
-      Text($r('app.string.home_recent_title'))
-        .fontSize(YoTypeStyle.SUBTITLE_M.size)
-        .fontWeight(YoTypeStyle.SUBTITLE_M.weight)
-        .fontColor(YoColor.TEXT_PRIMARY)
-        .width('100%')
-
-      if (this.vm.sessions.length === 0) {
-        YoEmpty({
-          model: new YoEmptyStateModel(
-            $r('app.string.home_recent_empty_title'),
-            $r('app.string.home_recent_empty_message')
-          )
-        })
-      } else {
-        Column({ space: YoSpace.S }) {
-          ForEach(this.vm.sessions, (item: DebugSessionSummary) => {
-            Column({ space: YoSpace.XS }) {
-              Text(item.displayName)
-                .fontSize(YoTypeStyle.BODY_M.size)
-                .fontColor(YoColor.TEXT_PRIMARY)
-                .width('100%')
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-              Text(`${item.module} · ${item.protocol}`)
-                .fontSize(YoTypeStyle.BODY_S.size)
-                .fontColor(YoColor.TEXT_SECONDARY)
-                .width('100%')
-                .maxLines(1)
-            }
-            .width('100%')
-            .alignItems(HorizontalAlign.Start)
-            .padding({ top: YoSpace.S, bottom: YoSpace.S })
-          }, (item: DebugSessionSummary) => item.id)
-        }
-        .width('100%')
-      }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)

@@ -19,9 +19,9 @@ related:
 
 给 UI Goal 引用。本文件只列清单路径和编号范围。条目正文以各清单为准，架构正文以同编号的架构文件为准。
 
-视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
 
-`WB-` 覆盖工作台和命令面板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖设置。视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。
+`WB-` 覆盖工作台和命令面板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖设置。视觉不在本 PR。
 
 ## 清单
 
@@ -64,4 +64,4 @@ Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/Harmony
 
 读路径只有一条：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。
 
-终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003）。最近会话不读这张表（WB-005）。命令面板走命令契约（WB-008–WB-012）。工作台三枚状态胶囊走各模块仓库的开关读取（WB-003），不读这张表。壳编号没有缺口。射频仍是待真机。
+终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003）。工作台不读这张表。命令面板走命令契约（WB-008–WB-012）。工作台三枚能力读数走各模块仓库的开关读取（WB-003）。WB-004、WB-005、WB-006 仍是缺口。射频仍是待真机。

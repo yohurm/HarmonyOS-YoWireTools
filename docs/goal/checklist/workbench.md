@@ -15,9 +15,9 @@ related:
 - **支持**：在 Wi-Fi 分支上述提交的现有代码里，这个结果已经能被代码路径或界面证实。
 - **缺口**：界面或读链路没有这个结果。不得把已有类、表或用例写成已经成功。
 
-工作台用 WB-001–WB-007，命令面板用 WB-008–WB-012。前缀是 `WB-`。视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。
+工作台用 WB-001–WB-007，命令面板用 WB-008–WB-012。前缀是 `WB-`。视觉不在本 PR。
 
-视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
 
 导航见 `开发/指南/开发/应用框架/ArkUI（方舟UI框架）/UI开发 (ArkTS声明式开发范式)/设置组件导航和页面路由/组件导航(Navigation) (推荐)/Navigation基础架构介绍.md`：一个 Navigation 绑定一个 NavPathStack，显示模式含 Stack、Split、Auto。状态见 `开发/指南/开发/应用框架/ArkUI（方舟UI框架）/UI开发 (ArkTS声明式开发范式)/学习UI范式状态管理/MVVM模式（V2）.md`。关系型库见 `开发/指南/开发/应用框架/ArkData（方舟数据管理）/应用数据持久化/通过关系型数据库实现数据持久化 (ArkTS).md`。用户首选项见 `开发/指南/开发/应用框架/ArkData（方舟数据管理）/应用数据持久化/通过用户首选项实现数据持久化 (ArkTS).md`。进程日志见 `开发/API参考/系统/调测调优/Performance Analysis Kit（性能分析服务）/ArkTS API/ohos.hilog HiLog日志打印.md`。hilog 不是会话读模型。
 
@@ -47,35 +47,35 @@ related:
 - **屏幕：** 工作台（`screen.workbench.home`）
 - **Given** 工作台已显示
 - **When** 查看状态条
-- **Then** 有三枚 `YoStatusPill`：蓝牙、WLAN、星闪。开关读到后显示「已开启」或「已关闭」。未授权显示「未授权」，星闪不支持显示「不支持」，失败或未返回显示「未读取」。入口卡不设 `statusLabel`。不调用 `requestPermissionsFromUser`
-- **证据：** `HomeFeaturePage.ets`；`WorkbenchRadioState.ets`；`ReadBluetoothSwitchUseCase`；`ReadWifiSwitchUseCase`；`ReadNearLinkSwitchUseCase`。说明见 [WB-003](../architecture/workbench/WB-003.md)
+- **Then** 有三枚 `YoStatusPill`：蓝牙、WLAN、星闪。开关读到后显示「已开启」或「已关闭」。未授权显示「未授权」，星闪不支持显示「不支持」，失败或未返回显示「未读取」。不调用 `requestPermissionsFromUser`
+- **证据：** `WorkbenchViewModel.figures` 只持有这三枚读数。蓝牙：`ReadBluetoothSwitchUseCase` → `BluetoothRepositoryContract.getAdapterState`。WLAN：`ReadWifiSwitchUseCase` → `WifiNetworkRepositoryContract.getWifiState`。星闪：`ReadNearLinkSwitchUseCase` → `NearLinkRepositoryContract.loadAdapterState`。读取在 `WorkbenchRadioState`，经 `bindCapability` 写入页面状态。说明见 [WB-003](../architecture/workbench/WB-003.md)
 
-### WB-004 工作台有三张模块入口卡
+### WB-004 工作台下钻只进入已有功能栈
 
-- **判定：** 支持
+- **判定：** 缺口
 - **屏幕：** 工作台（`screen.workbench.home`）
-- **Given** 工作台已显示
-- **When** 查找蓝牙、网络、星闪入口卡
-- **Then** 页内有三张 `YoModeEntryCard`：蓝牙、网络、星闪。不设 `statusLabel`。点击只切换已有 Tab，不扫描，不申请权限
-- **证据：** `HomeFeaturePage.ets`；`MainTabContainer.openModule`
+- **Given** 工作台已显示某一能力读数
+- **When** 从该读数进入对应模块的深度调试
+- **Then** 只打开已有 feature 栈。看板契约没有下钻字段。页内没有模块入口卡，也没有日志或命令快捷入口
+- **证据：** `WorkbenchViewModel.figures` 没有下钻目标。`HomeFeaturePage` 不再放置 `YoModeEntryCard`
 
-### WB-005 工作台列出最近会话或空态
+### WB-005 工作台汇总会话摘要统计
 
-- **判定：** 支持
+- **判定：** 缺口
 - **屏幕：** 工作台（`screen.workbench.home`）
-- **Given** 进程里可能已有 `SessionRuntimeStore` 摘要
-- **When** 在工作台查找最近会话
-- **Then** 有 `DebugSessionSummary` 就列出名称、模块和协议。没有就显示「还没有会话」。来源是 `LoadWorkbenchOverviewUseCase`，不是 `debug_log_index`
-- **证据：** `WorkbenchViewModel.ets`；`HomeFeaturePage.ets`
+- **Given** 进程里可能已有会话摘要
+- **When** 在工作台查找活动会话数或日志条数合计
+- **Then** 这两项不出现。`LoadWorkbenchOverviewUseCase` 返回 `DebugSessionSummary`，但不经过 `RepositoryContract`，直读 `SessionRuntimeStore`。看板不列出最近会话，也不把它当成启动器
+- **证据：** `WorkbenchViewModel` 没有会话列表，也没有会话统计字段
 
-### WB-006 工作台有日志中心和命令面板入口
+### WB-006 工作台聚合模块概览计数
 
-- **判定：** 支持
+- **判定：** 缺口
 - **屏幕：** 工作台（`screen.workbench.home`）
-- **Given** 工作台已显示
-- **When** 查找日志中心与命令面板
-- **Then** 另有日志中心和命令面板两张卡。路由名是 `log/center` 与 `command/panel`，push 到同一棵 `NavPathStack`
-- **证据：** `AppRoutes.ets`；`Index.ets`
+- **Given** 各模块仓库快照里已有配对设备数、扫描 AP 数或星闪设备数
+- **When** 在工作台查找这些计数
+- **Then** 工作台不显示。`LoadBluetoothOverviewSnapshotUseCase` → `BluetoothRepositoryContract.loadOverview`、`WifiNetworkRepositoryContract.loadOverview`、`LoadNearLinkOverviewUseCase` → `NearLinkRepositoryContract.loadOverview` 都不由工作台调用。噪声、SNR、MCS、重传、PHY、空口 HCI、原始套接字没有 Kit 接口，工作台不补调用
+- **证据：** `WorkbenchViewModel.figures` 没有这些计数
 
 ### WB-007 工作台不弹出射频或网络授权
 
@@ -83,7 +83,7 @@ related:
 - **屏幕：** 工作台（`screen.workbench.home`）
 - **Given** 未授予蓝牙、星闪或位置权限
 - **When** 只进入工作台，不进入各模块
-- **Then** 只进入工作台或点入口卡，不出现 `requestPermissionsFromUser`
+- **Then** 只进入工作台，不出现 `requestPermissionsFromUser`
 - **证据：** `HomeFeaturePage.ets` 不引用权限编排。胶囊读取走 `checkGranted`，不调用 `requestPermissionsFromUser`
 
 ## 命令面板
@@ -139,7 +139,7 @@ related:
 
 | 判定 | 条数 | 编号 |
 | --- | --- | --- |
-| 支持 | 12 | WB-001、WB-002、WB-003、WB-004、WB-005、WB-006、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
-| 缺口 | 0 | 无 |
+| 支持 | 9 | WB-001、WB-002、WB-003、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
+| 缺口 | 3 | WB-004、WB-005、WB-006 |
 
-命令面板已有页面。工作台状态胶囊已接通。射频仍是待真机。
+命令面板已有页面，但不从工作台首页启动。工作台已接通的只有三枚能力读数。射频仍是待真机。

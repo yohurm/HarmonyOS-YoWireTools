@@ -21,7 +21,7 @@ related:
 
 这些编号是整机层，不计入三模块 350，也不改写壳清单 WB / LOG / SET。壳的屏幕行为仍以 [139ddc61d1f82e3d8f5c92980d420f19230bffec](https://github.com/yohurm/HarmonyOS-YoWireTools/commit/139ddc61d1f82e3d8f5c92980d420f19230bffec)（PR #20）为准。缺的屏幕保持缺口。
 
-视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
 
 分层见 `开发/最佳实践/架构设计/应用架构/分层架构设计.md`：产品定制层、基础特性层、公共能力层。安装包见 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAP.md` 与 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAR.md`。HAR 不能单独安装。单 UIAbility 场景官方优先一个 entry HAP。
 
@@ -74,10 +74,10 @@ related:
 ### APP-005 壳接到唯一读模型
 
 - **判定：** 支持
-- **屏幕：** 日志中心（`screen.log.center`）；工作台最近会话见 WB-005
+- **屏幕：** 日志中心（`screen.log.center`）
 - **Given** 写入侧已经进入表 `debug_log_index`（LOG-004，支持）
-- **When** 追踪壳上的一次会话行读取，以及工作台最近会话
-- **Then** 日志中心经 `LogCenterViewModel` → `LoadSessionLogPreviewUseCase` → `SessionLogRepositoryContract` → `LogIndexDataSource` → 表 `debug_log_index`。工作台最近会话经 `WorkbenchViewModel` → `LoadWorkbenchOverviewUseCase` → `SessionRuntimeStore`。两条都不读 `YoLog` 或 hilog（LOG-008，支持）
+- **When** 追踪壳上的一次会话行读取
+- **Then** 日志中心经 `LogCenterViewModel` → `LoadSessionLogPreviewUseCase` → `SessionLogRepositoryContract` → `LogIndexDataSource` → 表 `debug_log_index`。工作台不读这张表，也不把 `LoadWorkbenchOverviewUseCase` 的摘要列成最近会话。日志中心不读 `YoLog` 或 hilog（LOG-008，支持）
 - **证据：** `LogCenterPage.ets`；`HomeFeaturePage.ets`；`LogIndexDataSource.ets`。说明见 [APP-005](../architecture/app/APP-005.md)
 
 ### APP-006 没有按射频拆开的产品模块
@@ -98,4 +98,4 @@ related:
 | 支持 | 6 | APP-001、APP-002、APP-003、APP-004、APP-005、APP-006 |
 | 缺口 | 0 | 无 |
 
-壳编号没有缺口。WB-003 的三枚胶囊已接通。射频仍是待真机。
+工作台缺口是 WB-004、WB-005、WB-006。WB-003 的三枚能力读数已接通。射频仍是待真机。
