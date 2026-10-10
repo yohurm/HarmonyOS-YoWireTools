@@ -42,13 +42,27 @@ PRD《01-产品信息架构与模式PRD》把日志中心、命令面板、设�
 
 ## UI 边界
 
-页面不调用 Kit。这条边界来自未合并的架构稿，不来自本目录新发明的分层。
+页面不调用 Kit。整 App 的分层与 API 还没有文档，等待功能 Goal 的整 App 架构与统一工程。下面三行是各模块自己的架构稿，用来防止页面直调 Kit。把它们接在一起并不是应用契约，也不代替那份还没到的文档。
 
-| 模块 | 调用方向 | 出处（均未进入 `main`） |
+| 模块 | 该模块稿里的调用方向 | 出处（均未进入 `main`，且不是整 App 契约） |
 | --- | --- | --- |
 | 蓝牙 | `product/phone` 薄壳转发点击 → `features/bluetooth` 页面状态 → 用例 → `common/yobluetooth` 数据源 → `ohos.bluetooth.*`。`common/youi_kit` 不解释蓝牙，不调用 `ohos.bluetooth.*` | [PR #8](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8) `docs/goal/architecture/bluetooth/BT-001.md`，提交 `acdc64fbebe693e4b3fc020c0dc98d6d8202cee5` |
 | 星闪 | 页面只读页面状态；页面状态调用领域用例；`@kit.NearLinkKit` 只在 `features/nearlink` 数据源的调用点 | [PR #6](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6) `docs/goal/architecture/nearlink/NL-001.md`，提交 `45188bf6745101d4fd56940f5f4da1e8a9fbd138` |
 | Wi-Fi / 网络 | `product/phone` → `features/wifi_network` 页面 → 页面状态 → `domain` → `data` → Kit。页面只订阅页面状态 | [PR #7](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7) `docs/goal/architecture/wifi-network/WN-001.md`，提交 `a5d202385cd37108da16f86b94c86cf4b73aee79` |
+
+## 待对齐的页面状态
+
+壳上的七态写在 [navigation.md](navigation.md)，那是呈现，不是领域状态 API。页面只读页面状态、页面状态再往下调用，方向与上表一致。状态对象的类型、谁创建、三个模块的结果怎样进入同一个壳，等功能侧整 App 架构文档里的分层与 API。
+
+还没到的位置：
+
+| 位置 | 现在能说的 | 还不写 |
+| --- | --- | --- |
+| 页面持有什么 | 新界面用状态管理 V2，`@Local` 持有页面状态 | 新的状态类型名或字段表 |
+| 点击交给谁 | 交给页面状态，页面不调用 Kit | 跨模块的用例或仓库签名 |
+| 会话日志怎么读 | 只允许 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) `LOG-003` 那一条，而且判定仍是缺口 | 把这条缺口说成整 App 状态模型已经接通 |
+
+不在本目录起草这套契约。
 
 `main` 的 `git ls-tree origin/main docs` 为空。BT / NL / WN 的清单、架构和总表路径写在 [质量门禁](../QUALITY-GATE.md) 的对接点，不在这里再抄一份编号表。在那些文档进入 `main` 之前，这仍是阻塞项，不是授权本设计另写一套 Repository。
 

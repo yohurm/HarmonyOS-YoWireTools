@@ -14,6 +14,8 @@ related:
 
 **结论：不可进入大规模页面实现。**
 
+整 App 架构与契约尚未就绪。在功能侧补上整 App 架构文档和统一工程（分层与 API）之前，本门禁不得全部通过。这不是把蓝牙、星闪、Wi-Fi 三套模块界面拼在一起就能勾掉的项。
+
 下面每一项都按仓库里的文件或本轮读过的文档填写。未通过的项不能靠「文档已经写了」勾掉。
 
 ## 自检
@@ -33,8 +35,9 @@ related:
 | 11. 工作台、命令面板、日志、设置的 WB- / LOG- / SET- 编号 | 阻塞 | 范围仍是 WB-001–WB-012、LOG-001–LOG-008、SET-001–SET-006。功能侧清单在同一 head：与 Wi-Fi 树代码对齐、判定「支持」的 6 条是 WB-001、WB-002、WB-007、LOG-004、LOG-008、SET-003。其余 20 条判定「缺口」，含命令面板 WB-008–WB-012。这是清单判定，不是本 UI 规范自编的未做页面。文件未进 `main` |
 | 12. 跨模块日志有一条已写明的读模型 | 阻塞 | 终点是表 `debug_log_index`。唯一允许路径：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`（`docs/goal/architecture/log/LOG-003.md`）。LOG-003 判定仍是「缺口」：`LoadSessionLogPreviewUseCase` 直连 `LogRepository`，页面侧未接通，不是已经接通。`LOG-008` 禁止第二日志库，不读 `YoLog` 或 hilog。未进 `main` |
 | 13. 官方样例引用到具体目录，而不是只贴首页 | 通过 | 见下方样例。华为工具库目录页在本环境抓取结果为空，因此没有把该首页当成案例证据 |
+| 14. 整 App 架构与契约先于大规模页面 | 阻塞 | 依赖功能侧即将补的整 App 架构文档与统一工程（分层与 API）。不是把三模块 UI 拼成一个壳。`origin/main` 没有 `docs/`。已打开的 PR #1–#20 里没有这份文档。PR #20 的 `docs/goal/citation.md` 只索引编号，不是该契约。等待功能 Goal。不猜文件名，不在本目录起草功能架构 |
 
-第 9 项按设计目标通过。第 10、11、12 项的对接文件已经在未合并的 PR 上，但都还没进入 `main`，所以保持阻塞。文首结论仍是不可进入大规模页面实现。
+第 9 项按设计目标通过，对比度目标色不改。第 10、11、12 项继续阻塞。第 14 项在整 App 架构与契约就绪前不得改成通过，所以文首结论仍是不可进入大规模页面实现。
 
 真机朗读和目视对比没有做。这是设计稿阶段，没有新页面可装。不把「未实机」算成上表里的通过项，也不把它写成已经验收。
 
@@ -50,6 +53,7 @@ related:
 | 10. 总表 | 同上 | `docs/goal/checklist/master.md`。`citation.md` 写明复制自 [PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5) 的 `95c4f93d1b316f76f098a15da20d5b1fecbd9b7d`。WB / LOG / SET 不计入该文件的 350 条 | 不把总表抄进 UI 目录 |
 | 11. WB- / LOG- / SET- | 文件在 PR #20 草案，未进 `main` | 索引 `docs/goal/citation.md`。清单：`docs/goal/checklist/workbench.md`、`log.md`、`settings.md`。架构：`docs/goal/architecture/workbench/`（WB-001–WB-012）、`log/`（LOG-001–LOG-008）、`settings/`（SET-001–SET-006）。与 Wi-Fi 树代码对齐、判定「支持」：WB-001、WB-002、WB-007、LOG-004、LOG-008、SET-003。判定「缺口」的 20 条：WB-003–WB-006、WB-008–WB-012（命令面板全部）、LOG-001–LOG-003、LOG-005–LOG-007、SET-001、SET-002、SET-004–SET-006。缺口来自这些清单，不是本 UI 规范另写的未做页面 | 屏幕指向这些编号。不把「支持」写成页面已按本设计铺完，也不把「缺口」改写成另一套编号 |
 | 12. 跨模块日志读模型 | 允许路径已写明，LOG-003 仍是缺口，且未进 `main` | 终点是表 `debug_log_index`。唯一允许路径见 `docs/goal/architecture/log/LOG-003.md` 与 `docs/goal/citation.md`：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。LOG-003 判定「缺口」：`LoadSessionLogPreviewUseCase` 直连 `LogRepository.getInstance().list`，中间没有页面、页面状态、RepositoryContract、DataSource。不是已经接通。`LOG-008` 判定「支持」：禁止第二日志库，会话列表不读 `YoLog` 或 hilog | 日志中心只渲染页面状态给出的行，不新命名查询函数，也不把直连用例当成已接通 |
+| 14. 整 App 架构与契约 | 功能侧文档还没有 | 等待功能 Goal 的整 App 架构文档与统一工程（分层与 API）。已查 `main` 与已打开 PR，没有可引用的路径。PR #20 的编号索引和三份模块架构（PR #6、#7、#8）都不是这份契约 | 壳层导航和页面状态只标待对齐位置，见 `docs/goal/ui/app-shell/navigation.md` 与 `information-architecture.md`。不发明路由类型、页面状态类型或跨模块跳转函数 |
 
 ## 样例
 
@@ -72,3 +76,4 @@ related:
 - `main` 上工作台与更多仍是空的 `YoPageShell`。
 - 浅色成功、警告的目标色已写在 `design-tokens.md`。替换 `common/youi_kit` 的 `color.json` 留给实现阶段，不在本 PR。
 - [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61` 仍是草案。壳层 26 条里，功能清单判定「支持」的是 WB-001、WB-002、WB-007、LOG-004、LOG-008、SET-003；其余 20 条是「缺口」。LOG-003 的读路径终点是表 `debug_log_index`，页面侧未接通。这些文件尚未进入 `main`。
+- 整 App 架构文档与统一工程（分层与 API）仍等待功能 Goal。没有可引用的路径。在它到达并进入可引用位置之前，门禁不得全部通过。
