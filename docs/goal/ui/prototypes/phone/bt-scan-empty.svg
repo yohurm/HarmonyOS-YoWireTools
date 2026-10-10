@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="280" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M275 18 A6 6 0 0 1 285 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M271.5 14 A11 11 0 0 1 288.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M269 10 A15 15 0 0 1 291 10" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="296" y="18" width="3" height="4" rx="1" fill="#1A1A1A"/>
+<rect x="301" y="15" width="3" height="7" rx="1" fill="#1A1A1A"/>
+<rect x="306" y="12" width="3" height="10" rx="1" fill="#1A1A1A"/>
+<rect x="311" y="9" width="3" height="13" rx="1" fill="#1A1A1A"/>
+<rect x="324" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="343" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
+<path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">经典蓝牙</text>
+<line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
+<circle cx="180.0" cy="268" r="28" fill="#E7EFFE"/>
+<circle cx="180.0" cy="268" r="28" fill="none" stroke="#0A59F7" stroke-width="1.5" opacity="0.35"/>
+<path d="M180.0 259 V277 M180.0 259 L186.0 264 L180.0 268 L186.0 272 L180.0 277 M180.0 268 L175.0 264 M180.0 268 L175.0 272" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="324" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">未发现设备</text>
+<text x="180.0" y="352" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">确认设备已开机并可被发现</text>
+<rect x="48" y="380" width="264" height="40" rx="20" fill="#0A59F7"/>
+<text x="180.0" y="406" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">重新搜索</text>
+</svg>

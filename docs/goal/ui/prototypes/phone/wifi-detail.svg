@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="280" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M275 18 A6 6 0 0 1 285 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M271.5 14 A11 11 0 0 1 288.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M269 10 A15 15 0 0 1 291 10" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="296" y="18" width="3" height="4" rx="1" fill="#1A1A1A"/>
+<rect x="301" y="15" width="3" height="7" rx="1" fill="#1A1A1A"/>
+<rect x="306" y="12" width="3" height="10" rx="1" fill="#1A1A1A"/>
+<rect x="311" y="9" width="3" height="13" rx="1" fill="#1A1A1A"/>
+<rect x="324" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="343" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
+<path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">wlanaccessv2.0</text>
+<line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
+<text x="16" y="100" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已连接 · WPA2 · 2.4 GHz</text>
+<rect x="16" y="116" width="328" height="288" rx="16" fill="#FFFFFF"/>
+<text x="32" y="146" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">MAC 地址</text>
+<text x="328" y="146" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">28:6e:d4:01:22:ab</text>
+<line x1="32" y1="164" x2="328" y2="164" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="194" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">IP 地址</text>
+<text x="328" y="194" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.23</text>
+<line x1="32" y1="212" x2="328" y2="212" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="242" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">子网掩码</text>
+<text x="328" y="242" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">255.255.255.0</text>
+<line x1="32" y1="260" x2="328" y2="260" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="290" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网关</text>
+<text x="328" y="290" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
+<line x1="32" y1="308" x2="328" y2="308" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="338" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">DNS</text>
+<text x="328" y="338" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
+<line x1="32" y1="356" x2="328" y2="356" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="386" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">BSSID</text>
+<text x="328" y="386" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">需要对端 MAC 权限</text>
+<rect x="16" y="428" width="328" height="40" rx="20" fill="#0A59F7"/>
+<text x="180.0" y="454" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络诊断</text>
+</svg>
