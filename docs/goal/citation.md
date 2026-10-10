@@ -12,6 +12,7 @@ related:
   - docs/goal/checklist/workbench.md
   - docs/goal/checklist/log.md
   - docs/goal/checklist/settings.md
+  - docs/goal/checklist/app.md
 ---
 
 # 功能编号引用
@@ -32,7 +33,8 @@ PR #19 写明当时还没有 `WB-` / `LOG-` / `SET-` 架构编号，并用这三
 | [docs/goal/checklist/workbench.md](checklist/workbench.md) | WB-001–WB-012 | 本 PR 新写。工作台 WB-001–WB-007，命令面板 WB-008–WB-012 |
 | [docs/goal/checklist/log.md](checklist/log.md) | LOG-001–LOG-008 | 本 PR 新写。日志中心与日志详情 |
 | [docs/goal/checklist/settings.md](checklist/settings.md) | SET-001–SET-006 | 本 PR 新写 |
-| [docs/goal/checklist/master.md](checklist/master.md) | 索引，不是条目 | 从 [PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5) 的 `95c4f93d1b316f76f098a15da20d5b1fecbd9b7d` 复制。三模块合计仍以该文件的 350 为准。WB / LOG / SET 不计入那 350 |
+| [docs/goal/checklist/app.md](checklist/app.md) | APP-001–APP-006 | 整机架构。不计入 350，也不改写 WB / LOG / SET。壳行为仍以 `139ddc61d1f82e3d8f5c92980d420f19230bffec` 为准 |
+| [docs/goal/checklist/master.md](checklist/master.md) | 索引，不是条目 | 从 [PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5) 的 `95c4f93d1b316f76f098a15da20d5b1fecbd9b7d` 复制。三模块合计仍以该文件的 350 为准。WB / LOG / SET / APP 不计入那 350 |
 
 研究笔记与本 PR 一起复制，仍留在未合并的模块 PR 上：
 
@@ -56,6 +58,7 @@ Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/Harmony
 | `docs/goal/architecture/workbench/` | WB-001–WB-012 |
 | `docs/goal/architecture/log/` | LOG-001–LOG-008 |
 | `docs/goal/architecture/settings/` | SET-001–SET-006 |
+| `docs/goal/architecture/app/` | APP-001–APP-006 |
 
 ## 跨模块日志
 

@@ -14,6 +14,7 @@ related:
   - docs/goal/checklist/workbench.md
   - docs/goal/checklist/log.md
   - docs/goal/checklist/settings.md
+  - docs/goal/checklist/app.md
   - docs/goal/citation.md
 ---
 
@@ -163,3 +164,18 @@ related:
 | SET-006 | 缺口 | 设置页不展示专家或轻量 | [settings.md](./settings.md) |
 
 本段与 WB / LOG / SET 清单不一致时，以那份清单为准。三模块 350 条仍以各模块清单为准。
+
+## 整机
+
+下面每一条都在 [app.md](./app.md) 和同编号架构文件里。判定与那份清单相同。这些编号不计入 350，也不改写上面的 WB / LOG / SET。
+
+| 编号 | 判定 | 标题 | 清单 |
+| --- | --- | --- | --- |
+| APP-001 | 支持 | 只有一个可安装 HAP | [app.md](./app.md) |
+| APP-002 | 支持 | 壳依赖 feature，feature 只依赖 common | [app.md](./app.md) |
+| APP-003 | 缺口 | feature 的包入口还导出了内部类型 | [app.md](./app.md) |
+| APP-004 | 缺口 | 领域用例仍直接引用数据源或传输 | [app.md](./app.md) |
+| APP-005 | 缺口 | 壳的会话列表还没有接到唯一读模型 | [app.md](./app.md) |
+| APP-006 | 支持 | 没有按射频拆开的产品模块 | [app.md](./app.md) |
+
+本段与整机清单不一致时，以 [app.md](./app.md) 为准。
