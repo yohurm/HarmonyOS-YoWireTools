@@ -1,7 +1,7 @@
 ---
 id: checklist.goal.master
 type: index
-status: draft
+status: active
 when: research
 when_to_use: 查三模块 Phase A 的编号范围与分桶时；条目正文以模块文件为准
 related:
@@ -131,12 +131,35 @@ related:
 
 ## 壳与跨模块
 
-下面这些编号不计入上面的 350。条目在各自清单里。UI 引用路径见 [citation.md](../citation.md)。
+下面每一条都在壳清单和同编号架构文件里。判定与清单相同。这些编号不计入上面的 350。命令面板 WB-008–WB-012 是缺口，不是已经实现。
 
-| 范围 | 编号 | 清单 |
-| --- | --- | --- |
-| 工作台与命令面板 | WB-001–WB-012 | [workbench.md](./workbench.md) |
-| 跨模块日志 | LOG-001–LOG-008 | [log.md](./log.md) |
-| 设置 | SET-001–SET-006 | [settings.md](./settings.md) |
+| 编号 | 判定 | 标题 | 清单 |
+| --- | --- | --- | --- |
+| WB-001 | 支持 | 工作台是根 Tab，标题为「工作台」 | [workbench.md](./workbench.md) |
+| WB-002 | 支持 | 一条 Navigation、一个 NavPathStack、Stack 模式 | [workbench.md](./workbench.md) |
+| WB-003 | 缺口 | 工作台不显示蓝牙、WLAN、星闪状态胶囊 | [workbench.md](./workbench.md) |
+| WB-004 | 缺口 | 工作台没有三张模块入口卡 | [workbench.md](./workbench.md) |
+| WB-005 | 缺口 | 工作台不列出最近会话 | [workbench.md](./workbench.md) |
+| WB-006 | 缺口 | 工作台没有日志中心和命令面板入口 | [workbench.md](./workbench.md) |
+| WB-007 | 支持 | 工作台不弹出射频或网络授权 | [workbench.md](./workbench.md) |
+| WB-008 | 缺口 | 命令面板没有页面，也没有路由 | [workbench.md](./workbench.md) |
+| WB-009 | 缺口 | 命令面板没有收藏列表和只读参数 | [workbench.md](./workbench.md) |
+| WB-010 | 缺口 | 命令面板不能执行一次 | [workbench.md](./workbench.md) |
+| WB-011 | 缺口 | 命令面板不能周期发送 | [workbench.md](./workbench.md) |
+| WB-012 | 缺口 | 没有「新建命令」成功态 | [workbench.md](./workbench.md) |
+| LOG-001 | 缺口 | 日志中心没有页面 | [log.md](./log.md) |
+| LOG-002 | 缺口 | 日志详情没有页面 | [log.md](./log.md) |
+| LOG-003 | 缺口 | 跨模块读路径还没有接到页面 | [log.md](./log.md) |
+| LOG-004 | 支持 | 三模块会话行写入同一张 debug_log_index | [log.md](./log.md) |
+| LOG-005 | 缺口 | LogQuery 不能按模块或关键字过滤 | [log.md](./log.md) |
+| LOG-006 | 缺口 | 预览行丢掉模块和协议 | [log.md](./log.md) |
+| LOG-007 | 缺口 | 导出和清空没有接到日志中心 | [log.md](./log.md) |
+| LOG-008 | 支持 | 没有任何界面把 YoLog 或 hilog 当成会话列表 | [log.md](./log.md) |
+| SET-001 | 缺口 | 设置八组没有出现，更多页是空壳 | [settings.md](./settings.md) |
+| SET-002 | 缺口 | 设置页没有页面状态，启动读设置也不经过页面 | [settings.md](./settings.md) |
+| SET-003 | 支持 | 设置页不申请蓝牙、星闪或 WLAN 权限 | [settings.md](./settings.md) |
+| SET-004 | 缺口 | 主题在关系库，其余设置键在用户首选项 | [settings.md](./settings.md) |
+| SET-005 | 缺口 | 没有清除本地数据的确认 | [settings.md](./settings.md) |
+| SET-006 | 缺口 | 设置页不展示专家或轻量 | [settings.md](./settings.md) |
 
-本段与模块清单不一致时，仍以模块清单为准。WB / LOG / SET 与模块清单不一致时，以 WB / LOG / SET 自己的清单为准。
+本段与 WB / LOG / SET 清单不一致时，以那份清单为准。三模块 350 条仍以各模块清单为准。

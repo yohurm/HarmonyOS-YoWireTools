@@ -1,7 +1,7 @@
 ---
 id: checklist.goal.log
 type: checklist
-status: draft
+status: active
 when: design
 when_to_use: UI Goal 引用壳与跨模块编号时。判定以本文件为准
 related:

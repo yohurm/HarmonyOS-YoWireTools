@@ -1,7 +1,7 @@
 ---
 id: goal.citation
 type: index
-status: draft
+status: active
 when: design
 when_to_use: UI Goal 引用功能清单路径和编号范围时
 related:
@@ -26,8 +26,8 @@ PR #19 写明当时还没有 `WB-` / `LOG-` / `SET-` 架构编号，并用这三
 
 | 清单 | 编号 | 来源 |
 | --- | --- | --- |
-| [docs/goal/checklist/bluetooth.md](checklist/bluetooth.md) | BT-001–BT-098 | 本 PR 从蓝牙树 `fba7e5d6dc3dd725f1baf3af4dea322943baf506` 复制。该树在未合并的 [PR #13](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/13)（`cursor/bluetooth-phase-d-06c7`）。`80ef99ef` 的 `docs/goal` 与此树相同；`fba7e5d6` 只在 `features/wifi_network/oh-package.json5` 增加 yolog 依赖，本 PR 不复制那一行 |
-| [docs/goal/checklist/nearlink.md](checklist/nearlink.md) | NL-001–NL-120 | 本 PR 按星闪树 `59032baff804d6966d1ff385bda90e6a8a3ae140` 复制。`docs/goal` 与较早通过的 `a2ca82b1` 相同；`59032baf` 只把 `NearLinkRepositoryContract` 注入 `NearLinkDebugModel`，本 PR 不复制那两份 ets。同一清单仍在未合并的 [PR #14](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/14)（`cursor/nearlink-phase-d-b651`） |
+| [docs/goal/checklist/bluetooth.md](checklist/bluetooth.md) | BT-001–BT-098 | 本 PR 从蓝牙树 `fba7e5d6dc3dd725f1baf3af4dea322943baf506` 复制 `docs/goal`。同一清单仍在未合并的 [PR #13](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/13)（`cursor/bluetooth-phase-d-06c7`）。本 PR 不复制该树上的 ets |
+| [docs/goal/checklist/nearlink.md](checklist/nearlink.md) | NL-001–NL-120 | 本 PR 从星闪树 `d58de1c9b6e7681bada1e642c1955c1a02079570` 复制 `docs/goal`。同一清单仍在未合并的 [PR #14](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/14)（`cursor/nearlink-phase-d-b651`）。本 PR 不复制该树上的 ets |
 | [docs/goal/checklist/wifi-network.md](checklist/wifi-network.md) | WN-001–WN-132 | 本 PR 从 `7295d1771288a0fb957021bd0e948073f435d96c` 复制。同一文件仍在未合并的 [PR #12](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/12)（`cursor/wifi-network-phase-d-4072`） |
 | [docs/goal/checklist/workbench.md](checklist/workbench.md) | WB-001–WB-012 | 本 PR 新写。工作台 WB-001–WB-007，命令面板 WB-008–WB-012 |
 | [docs/goal/checklist/log.md](checklist/log.md) | LOG-001–LOG-008 | 本 PR 新写。日志中心与日志详情 |
@@ -39,7 +39,7 @@ PR #19 写明当时还没有 `WB-` / `LOG-` / `SET-` 架构编号，并用这三
 | 研究 | 树 |
 | --- | --- |
 | [docs/goal/research/bluetooth.md](research/bluetooth.md) | `fba7e5d6dc3dd725f1baf3af4dea322943baf506`，PR #13 |
-| [docs/goal/research/nearlink.md](research/nearlink.md) | `59032baff804d6966d1ff385bda90e6a8a3ae140`，PR #14 |
+| [docs/goal/research/nearlink.md](research/nearlink.md) | `d58de1c9b6e7681bada1e642c1955c1a02079570`，PR #14 |
 | [docs/goal/research/wifi-network.md](research/wifi-network.md) | `7295d1771288a0fb957021bd0e948073f435d96c`，PR #12 |
 
 Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/3)、[#2](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/2)、[#4](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/4)。Phase B 架构原文还在 [#8](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8)、[#6](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6)、[#7](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7)。本 PR 复制的是上表提交里的 `docs/goal/research`、`docs/goal/checklist`、`docs/goal/architecture`，不含 `docs/goal/ui/`。
@@ -59,8 +59,8 @@ Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/Harmony
 
 ## 跨模块日志
 
-读路径只有一条：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → Kit 或日志库。
+读路径只有一条：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。
 
-终点是已有日志库 `LogRepository` 的 `debug_log_index`，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心和日志详情的页面仍是缺口（LOG-001、LOG-002）。
+终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心和日志详情的页面仍是缺口（LOG-001、LOG-002）。
 
 命令面板没有页面，WB-008–WB-012 全部是缺口。
