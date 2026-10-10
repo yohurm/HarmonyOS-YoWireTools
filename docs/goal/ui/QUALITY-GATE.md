@@ -37,15 +37,15 @@ related:
 | 13. 官方样例引用到具体目录，而不是只贴首页 | 通过 | 见下方样例。华为工具库目录页在本环境抓取结果为空，因此没有把该首页当成案例证据 |
 | 14. 整 App 架构与契约先于大规模页面 | 阻塞 | 依赖功能侧即将补的整 App 架构文档与统一工程（分层与 API）。不是把三模块 UI 拼成一个壳。`origin/main` 没有 `docs/`。已打开的 PR #1–#20 里没有这份文档。PR #20 的 `docs/goal/citation.md` 只索引编号，不是该契约。等待功能 Goal。不猜文件名，不在本目录起草功能架构 |
 
-第 9 项按设计目标通过，对比度目标色不改。第 10、11、12、14 项继续阻塞，所以文首结论仍是不可进入大规模页面实现。可视化原型还没到，也不把「没有原型」写成可以铺页面。
+第 9 项按设计目标通过，对比度目标色不改。第 10、11、12、14 项继续阻塞，所以文首结论仍是不可进入大规模页面实现。第一批原型已经在 [PR #22](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/22)，图的存在不改成可以铺页面。
 
 ## 可视化原型
 
-可视化原型由 UI 原型图 Goal 交付，agent `bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`，目录是 `docs/goal/ui/prototypes/`。本文件不创建该目录，也不放图。
+第一批静态图在 [PR #22](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/22)（`cursor/ui-prototypes-55cb`，head `da7dcde`），目录 `docs/goal/ui/prototypes/`。该 head 上有 `README.md`，以及同名成对的 PNG 与 SVG。交付方是 UI 原型图 Goal，agent `bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`。本 PR 不拷这些图。
 
 原型的依据是本 PR 的文字规范：各屏布局、ArkUI 组件树、状态矩阵，以及 `app-shell` 里的 Design Token 和壳层。原型不另起一套布局或组件。
 
-目录到达之后，门禁只核对原型与这些文字规范一致。对不齐就改原型或先改文字规范，不在原型里新开控件。原型缺失、或原型已经对齐，都不取消第 10、11、12、14 项。那些项仍阻塞时，结论保持不可进入大规模页面实现。
+门禁对原型只核对与这些文字规范一致。对不齐就改原型或先改文字规范，不在原型里新开控件。核对一致也不取消第 10、11、12、14 项。那些项仍阻塞时，结论保持不可进入大规模页面实现。
 
 真机朗读和目视对比没有做。这是设计稿阶段，没有新页面可装。不把「未实机」算成上表里的通过项，也不把它写成已经验收。
 
@@ -85,4 +85,4 @@ related:
 - 浅色成功、警告的目标色已写在 `design-tokens.md`。替换 `common/youi_kit` 的 `color.json` 留给实现阶段，不在本 PR。
 - [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61` 仍是草案。壳层 26 条里，功能清单判定「支持」的是 WB-001、WB-002、WB-007、LOG-004、LOG-008、SET-003；其余 20 条是「缺口」。LOG-003 的读路径终点是表 `debug_log_index`，页面侧未接通。这些文件尚未进入 `main`。
 - 整 App 架构文档与统一工程（分层与 API）仍等待功能 Goal。没有可引用的路径。在它到达并进入可引用位置之前，门禁不得全部通过。
-- 可视化原型由 UI 原型图 Goal（`bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`）交到 `docs/goal/ui/prototypes/`。本 PR 不放图。原型缺失不构成可以铺页面。
+- 第一批原型在 [PR #22](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/22) 的 `docs/goal/ui/prototypes/`，不在本 PR。只核对与文字规范一致。有图也不取消第 10、11、12、14 项。
