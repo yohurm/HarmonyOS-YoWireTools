@@ -15,17 +15,11 @@ related:
 
 设计屏号 `screen.log.center`。从工作台进入，层级 `MODULE`。各模块标题菜单里的「会话日志」仍进入该模块自己的日志屏，不强制改道到这里。
 
-## 读模型缺口
+## 读模型
 
-三份未合并架构稿没有一条共同的读接口：
+单一读路径在未合并的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20)，文件是 `docs/goal/architecture/log/LOG-003.md`：UI → 页面状态 → 用例 → 仓库契约 → 数据源 → `LogRepository`（表 `debug_log_index`）。`docs/goal/architecture/log/LOG-008.md` 写明会话列表不读 `YoLog` 或 hilog。清单是 `docs/goal/checklist/log.md`（LOG-001–LOG-008）。这些文件不在 `main` 上。
 
-| 模块 | 架构稿里的日志名字 | 出处 |
-| --- | --- | --- |
-| 蓝牙 | 进程日志走 `YoLog`。会话导出见 BT-090 | PR #8，BT-001 与 BT-090 |
-| 星闪 | `DebugLogRecord` | PR #6，NL-001；展示见 NL-107 |
-| Wi-Fi | `LogCaptureService`，落库 `LogRepository` | PR #7，WN-001；行字段见 WN-128 |
-
-本屏不新命名跨模块查询函数，也不把 `YoLog` 说成 `LogRepository`。页面只渲染页面状态给出的行。单一读路径等待功能侧 shell function docs PR，不在这里猜路径，也不自编 `LOG-` 编号。
+本屏不新命名查询函数。页面只渲染页面状态给出的行。模块会话页仍各看各的 BT / NL / WN 编号，不把本屏说成那些编号的替身。
 
 ## 布局
 

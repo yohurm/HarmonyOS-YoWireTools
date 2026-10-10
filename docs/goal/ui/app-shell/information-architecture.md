@@ -36,7 +36,7 @@ PRD《01-产品信息架构与模式PRD》把日志中心、命令面板、设�
 | 日志中心 | 工作台入口，也可从各模块标题菜单进入本模块会话日志 | 跨模块列表见 [日志中心](../log/center.md) |
 | 设置 | 「更多」 | 当前路由就是 `/more/hub` |
 
-工作台、日志、设置的 `WB-` / `LOG-` / `SET-` 编号由功能侧 shell function docs 补齐。该文档 PR 尚未转发，本设计不猜路径，也不自编这些编号。合入前只用设计屏号 `screen.workbench.home`、`screen.workbench.command`、`screen.log.center`、`screen.log.detail`、`screen.settings.hub`。这些屏号不是接口，也不代替架构编号。
+工作台、命令面板、日志、设置的编号在未合并的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20)：`docs/goal/checklist/workbench.md`、`docs/goal/checklist/log.md`、`docs/goal/checklist/settings.md`，以及同号的 `docs/goal/architecture/workbench/`、`log/`、`settings/`。索引入口是 `docs/goal/citation.md`。这些文件不在 `main` 上。设计屏号 `screen.workbench.home`、`screen.workbench.command`、`screen.log.center`、`screen.log.detail`、`screen.settings.hub` 仍只是屏名，不代替那些编号。
 
 目录名继续用 Phase-C 的 `docs/goal/ui/wifi-network/`。特性包目录是 `features/wifi_network`。不另建 `docs/goal/ui/wifi_network/`，避免两套路径。
 
@@ -52,7 +52,7 @@ PRD《01-产品信息架构与模式PRD》把日志中心、命令面板、设�
 
 `main` 的 `git ls-tree origin/main docs` 为空。BT / NL / WN 的清单、架构和总表路径写在 [质量门禁](../QUALITY-GATE.md) 的对接点，不在这里再抄一份编号表。在那些文档进入 `main` 之前，这仍是阻塞项，不是授权本设计另写一套 Repository。
 
-跨模块日志还没有单一读路径。蓝牙架构稿写进程日志走 `YoLog`。Wi-Fi 的 WN-001 写会话行进 `common/debug_core` 的 `LogCaptureService`，再由 `common/storage` 的 `LogRepository` 落库。星闪的 NL-001 写 `DebugLogRecord`。收口等待功能侧 shell function docs PR，不在这里猜文件路径。日志中心只规定行长什么样，不新命名查询函数。见 [日志中心](../log/center.md)。
+跨模块会话日志的读路径写在 PR #20 的 `docs/goal/architecture/log/LOG-003.md`：页面只读页面状态，终点是 `LogRepository` 的 `debug_log_index`。`LOG-008.md` 写明会话列表不读 `YoLog` 或 hilog。该 PR 未进 `main`。日志中心不新命名查询函数。见 [日志中心](../log/center.md)。
 
 ## 模块内屏幕
 
