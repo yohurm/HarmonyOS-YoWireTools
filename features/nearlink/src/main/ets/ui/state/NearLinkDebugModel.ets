@@ -13,7 +13,6 @@ import {
   YoLoadingStateModel,
   YoPageState
 } from 'youi_kit';
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkRepositoryContract } from '../../domain/repository/NearLinkRepositoryContract';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
@@ -157,8 +156,7 @@ export class NearLinkDebugModel {
   private connectStartedMs: number = 0;
   private readonly loggedHex: string[] = [];
 
-  constructor() {
-    const repository: NearLinkRepositoryContract = NearLinkRepository.getInstance();
+  constructor(repository: NearLinkRepositoryContract) {
     this.devicesUseCase = new ObserveNearLinkDevicesUseCase(repository);
     this.favoritesUseCase = new SaveNearLinkFavoriteUseCase(repository);
     this.session = new NearLinkSessionUseCases(repository);

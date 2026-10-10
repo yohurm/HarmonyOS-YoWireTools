@@ -1,3 +1,4 @@
+import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkDestination } from '../../domain/model/NearLinkScreenCategory';
 import { NearLinkDebugModel } from '../state/NearLinkDebugModel';
 import { NearLinkCdsmView } from '../view/NearLinkCdsmView';
@@ -15,7 +16,7 @@ import {
 
 @ComponentV2
 export struct NearLinkFeaturePage {
-  @Local vm: NearLinkDebugModel = new NearLinkDebugModel();
+  @Local vm: NearLinkDebugModel = new NearLinkDebugModel(NearLinkRepository.getInstance());
 
   aboutToAppear(): void {
     void this.vm.onAppear();
