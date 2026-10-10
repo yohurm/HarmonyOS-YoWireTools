@@ -533,7 +533,7 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     return this.networkDataSource.readConnectionProperties();
   }
 
-  readHttpProxy(): Result<HttpProxyFacts> {
+  readHttpProxy(): Promise<Result<HttpProxyFacts>> {
     return this.networkDataSource.readHttpProxy();
   }
 

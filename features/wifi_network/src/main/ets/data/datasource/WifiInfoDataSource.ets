@@ -343,7 +343,12 @@ export class WifiInfoDataSource {
           caPath: '',
           clientCertAlias: '',
           certEntry: new Uint8Array(),
-          certPassword: ''
+          certPassword: '',
+          altSubjectMatch: '',
+          domainSuffixMatch: '',
+          realm: '',
+          plmn: '',
+          eapSubId: 0
         };
       }
       const networkId = await wifiManager.addCandidateConfig(config);

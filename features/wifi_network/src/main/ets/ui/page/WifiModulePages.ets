@@ -578,7 +578,9 @@ export struct WifiInspectPage {
       YoActionButton({
         label: '读取代理',
         kind: YoActionButtonKind.TEXT,
-        onTap: () => this.vm.loadProxy()
+        onTap: (): void => {
+          void this.vm.loadProxy();
+        }
       })
       WifiFactText({ text: this.vm.trafficLine })
       YoActionButton({

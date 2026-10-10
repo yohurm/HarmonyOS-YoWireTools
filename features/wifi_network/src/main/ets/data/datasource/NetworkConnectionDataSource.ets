@@ -1,4 +1,4 @@
-import { abilityAccessCtrl, bundleManager } from '@kit.AbilityKit';
+import { abilityAccessCtrl, bundleManager, Permissions } from '@kit.AbilityKit';
 import { connection, statistics } from '@kit.NetworkKit';
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { Observable, Result, ResultError } from 'common_core';
@@ -22,28 +22,14 @@ const netLog = YoLog.tag('YoWire.Wifi');
 type NetworkStateListener = (snapshot: NetworkStateSnapshot) => void;
 type NetEventListener = (name: string, detail: string) => void;
 
-interface DnsQueryOptions {
-  family: number;
-  netId: number;
-}
-
 interface AddressFamilyCarrier {
   isIPv4LinkValid?: boolean;
   isIPv6LinkValid?: boolean;
 }
 
-interface TraceRouteCallOption {
-  maxJumpNumber: number;
-}
-
-interface TraceRouteHopRaw {
-  jumpNo: number;
-  address: string;
-  rtt?: number[];
-}
-
-interface TraceRouteCall {
-  queryTraceRoute(destination: string, option: TraceRouteCallOption): Promise<TraceRouteHopRaw[]>;
+interface DnsConvertFailureAttributes {
+  unicode: string;
+  ascii: string;
 }
 
 /**
@@ -164,9 +150,9 @@ export class NetworkConnectionDataSource {
     }
   }
 
-  readHttpProxy(): Result<HttpProxyFacts> {
+  async readHttpProxy(): Promise<Result<HttpProxyFacts>> {
     try {
-      const proxy = connection.getDefaultHttpProxy();
+      const proxy = await connection.getDefaultHttpProxy();
       const exclusions = proxy.exclusionList !== undefined ? proxy.exclusionList.join(', ') : '';
       return Result.ok(new HttpProxyFacts(proxy.host, `${proxy.port}`, exclusions));
     } catch (error) {
@@ -191,19 +177,22 @@ export class NetworkConnectionDataSource {
           asciiHost = await connection.getDnsAscii(trimmed);
         } catch (convertError) {
           const convert = convertError as BusinessError;
+          const attributes: DnsConvertFailureAttributes = { unicode: trimmed, ascii: '' };
           return Result.fail(new ResultError(
             WifiNetworkErrorCodes.DNS_FAILED,
             `转码失败 ${convert.message}`,
             convert,
-            { unicode: trimmed, ascii: '' },
+            NetworkConnectionDataSource.copyAttributes(attributes),
             `${convert.code}`
           ));
         }
       }
       let addresses: connection.NetAddress[] = [];
       if (deviceInfo.sdkApiVersion >= WifiNetworkConstants.DNS_OPTIONS_MIN_API && family !== 0) {
-        const options: DnsQueryOptions = { family: family, netId: netHandle.netId };
-        addresses = await connection.getAddressesByName(asciiHost, options);
+        const option: connection.QueryOptions = {
+          family: family === 2 ? connection.FamilyType.FAMILY_TYPE_IPV6 : connection.FamilyType.FAMILY_TYPE_IPV4
+        };
+        addresses = await connection.getAddressesByNameWithOptions(asciiHost, option);
       } else {
         addresses = await connection.getAddressesByName(asciiHost);
       }
@@ -240,9 +229,11 @@ export class NetworkConnectionDataSource {
       return Result.fail(refusal);
     }
     try {
-      const option: TraceRouteCallOption = { maxJumpNumber: WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS };
-      const kit = connection as TraceRouteCall;
-      const hops = await kit.queryTraceRoute(trimmed, option);
+      const option: connection.TraceRouteOptions = {
+        maxJumpNumber: WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS,
+        packetsType: connection.PacketsType.NETCONN_PACKETS_ICMP
+      };
+      const hops = await connection.queryTraceRoute(trimmed, option);
       const facts: TraceHopFact[] = [];
       const limit = hops.length > WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS ?
         WifiNetworkConstants.TRACE_ROUTE_MAX_HOPS : hops.length;
@@ -430,7 +421,7 @@ export class NetworkConnectionDataSource {
     return undefined;
   }
 
-  private permissionGranted(permission: string): boolean {
+  private permissionGranted(permission: Permissions): boolean {
     try {
       const bundleInfo = bundleManager.getBundleInfoForSelfSync(
         bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION
@@ -455,6 +446,13 @@ export class NetworkConnectionDataSource {
       return WifiNetworkConstants.SYSTEM_NOT_RETURNED;
     }
     return `${rtt[0]}, ${rtt[1]}, ${rtt[2]}, ${rtt[3]}`;
+  }
+
+  private static copyAttributes(source: DnsConvertFailureAttributes): Record<string, string | number | boolean> {
+    const attributes: Record<string, string | number | boolean> = {};
+    attributes['unicode'] = source.unicode;
+    attributes['ascii'] = source.ascii;
+    return attributes;
   }
 
   private hasNonAscii(host: string): boolean {

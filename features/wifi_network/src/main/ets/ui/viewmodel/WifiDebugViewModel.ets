@@ -962,8 +962,8 @@ export class WifiDebugViewModel {
     this.appendLog('readProperties', 'listed', '');
   }
 
-  loadProxy(): void {
-    const proxy = this.repository.readHttpProxy();
+  async loadProxy(): Promise<void> {
+    const proxy = await this.repository.readHttpProxy();
     if (!proxy.success || proxy.value === undefined) {
       this.proxyLine = proxy.error !== undefined ? proxy.error.message : '失败';
       return;

@@ -67,7 +67,7 @@ export interface WifiNetworkRepositoryContract {
   readDefaultNet(): Promise<Result<NetworkStateSnapshot>>;
   readOnlineStatus(): Promise<Result<string>>;
   readConnectionProperties(): Promise<Result<NetworkPropertyFacts>>;
-  readHttpProxy(): Result<HttpProxyFacts>;
+  readHttpProxy(): Promise<Result<HttpProxyFacts>>;
   resolveHost(host: string, family: number): Promise<Result<DnsLookupFacts>>;
   queryProbe(destination: string): Promise<Result<ProbeFacts>>;
   queryTraceRoute(destination: string): Promise<Result<TraceHopFact[]>>;
