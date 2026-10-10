@@ -15,6 +15,13 @@ export class WifiChannelCalculator {
     return 0;
   }
 
+  static fromChannel24(channel: number): number {
+    if (channel === 14) {
+      return 2484;
+    }
+    return 2407 + (5 * channel);
+  }
+
   static bandLabel(band: number): string {
     if (band === 1) {
       return '2.4GHz';

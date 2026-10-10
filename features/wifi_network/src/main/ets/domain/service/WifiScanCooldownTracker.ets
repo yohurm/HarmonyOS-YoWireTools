@@ -1,44 +1,54 @@
 import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 
 /**
- * Tracks foreground scan rate limits and app cooldown per architecture wifi_network/01-§5.
+ * Foreground limit is 4 startScan calls per 2 minutes.
+ * Background limit is 1 startScan per 30 minutes.
+ * The 30-second getScanInfoList cache is not a startScan gate.
  */
 export class WifiScanCooldownTracker {
-  private readonly scanTimestampsMs: number[] = [];
-  private lastScanAtMs: number = 0;
+  private readonly foregroundTimestampsMs: number[] = [];
+  private lastBackgroundScanAtMs: number = 0;
 
   canScanNow(nowMs: number = Date.now()): boolean {
-    const elapsed = nowMs - this.lastScanAtMs;
-    if (elapsed < WifiNetworkConstants.DEFAULT_SCAN_COOLDOWN_MS) {
-      return false;
-    }
-    this.pruneOld(nowMs);
-    return this.scanTimestampsMs.length < WifiNetworkConstants.FOREGROUND_SCAN_MAX_COUNT;
+    return this.foregroundSlotsLeft(nowMs) > 0;
+  }
+
+  foregroundSlotsLeft(nowMs: number = Date.now()): number {
+    this.pruneForeground(nowMs);
+    const left = WifiNetworkConstants.FOREGROUND_SCAN_MAX_COUNT - this.foregroundTimestampsMs.length;
+    return left > 0 ? left : 0;
   }
 
   remainingCooldownMs(nowMs: number = Date.now()): number {
-    const appCooldown = WifiNetworkConstants.DEFAULT_SCAN_COOLDOWN_MS - (nowMs - this.lastScanAtMs);
-    if (appCooldown > 0) {
-      return appCooldown;
+    this.pruneForeground(nowMs);
+    if (this.foregroundTimestampsMs.length < WifiNetworkConstants.FOREGROUND_SCAN_MAX_COUNT) {
+      return 0;
     }
-    this.pruneOld(nowMs);
-    if (this.scanTimestampsMs.length >= WifiNetworkConstants.FOREGROUND_SCAN_MAX_COUNT) {
-      const oldest = this.scanTimestampsMs[0];
-      return WifiNetworkConstants.FOREGROUND_SCAN_WINDOW_MS - (nowMs - oldest);
+    const oldest = this.foregroundTimestampsMs[0];
+    const left = WifiNetworkConstants.FOREGROUND_SCAN_WINDOW_MS - (nowMs - oldest);
+    return left > 0 ? left : 0;
+  }
+
+  canScanInBackground(nowMs: number = Date.now()): boolean {
+    if (this.lastBackgroundScanAtMs === 0) {
+      return true;
     }
-    return 0;
+    return nowMs - this.lastBackgroundScanAtMs >= WifiNetworkConstants.BACKGROUND_SCAN_WINDOW_MS;
   }
 
   recordScan(nowMs: number = Date.now()): void {
-    this.lastScanAtMs = nowMs;
-    this.scanTimestampsMs.push(nowMs);
-    this.pruneOld(nowMs);
+    this.foregroundTimestampsMs.push(nowMs);
+    this.pruneForeground(nowMs);
   }
 
-  private pruneOld(nowMs: number): void {
+  recordBackgroundScan(nowMs: number = Date.now()): void {
+    this.lastBackgroundScanAtMs = nowMs;
+  }
+
+  private pruneForeground(nowMs: number): void {
     const windowStart = nowMs - WifiNetworkConstants.FOREGROUND_SCAN_WINDOW_MS;
-    while (this.scanTimestampsMs.length > 0 && this.scanTimestampsMs[0] < windowStart) {
-      this.scanTimestampsMs.shift();
+    while (this.foregroundTimestampsMs.length > 0 && this.foregroundTimestampsMs[0] < windowStart) {
+      this.foregroundTimestampsMs.shift();
     }
   }
 }
