@@ -1,19 +1,20 @@
 import { Result, ResultError } from 'common_core';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { SppPlatformGateway } from '../../../data/platform/spp/SppPlatformGateway';
 import { SppSocketKind } from '../../model/SppSocketKind';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 export class SppListenUseCase {
-  private readonly gateway: SppPlatformGateway;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    gateway: SppPlatformGateway = new SppPlatformGateway(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard()
   ) {
-    this.gateway = gateway;
+    this.repository = repository;
     this.guard = guard;
   }
 
@@ -30,14 +31,14 @@ export class SppListenUseCase {
     if (kind !== SppSocketKind.RFCOMM && psm <= 0) {
       return Result.fail(new ResultError(BluetoothErrorCodes.L2CAP_PSM_REQUIRED, 'L2CAP listen requires a PSM'));
     }
-    return this.gateway.listen(name, uuid, false, kind, psm);
+    return this.repository.listenSpp(name, uuid, false, kind, psm);
   }
 
   async accept(serverSocket: number): Promise<Result<number>> {
-    return this.gateway.accept(serverSocket);
+    return this.repository.acceptSpp(serverSocket);
   }
 
   closeServer(serverSocket: number): Result<void> {
-    return this.gateway.closeServer(serverSocket);
+    return this.repository.closeSppServer(serverSocket);
   }
 }

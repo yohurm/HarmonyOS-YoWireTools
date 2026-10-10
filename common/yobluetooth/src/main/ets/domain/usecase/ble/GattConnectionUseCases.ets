@@ -3,6 +3,7 @@ import {
   AppMode,
   CreateSessionInput,
   DebugTarget,
+  ITransportSession,
   ModuleType,
   ProtocolType,
   SessionType,
@@ -11,20 +12,20 @@ import {
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
-import { GattTransportSession } from '../../../data/transport/GattTransportSession';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectGattResult, GattConnectParams } from '../../model/GattConnectParams';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
 
 export class ConnectGattUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
   private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
     sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
@@ -62,7 +63,7 @@ export class ConnectGattUseCase {
         `GATT session limit ${BluetoothConstants.GATT_MAX_SESSIONS}`
       ));
     }
-    this.repository.stopBleScan();
+    this.repository.stopBleScan('');
     const target = new DebugTarget(
       params.bleDeviceId,
       ModuleType.BLUETOOTH,
@@ -84,7 +85,8 @@ export class ConnectGattUseCase {
       this.repository.releaseBleConnection();
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
-    const transport = new GattTransportSession(session.value.id);
+    const created = this.repository.createGattTransport(session.value.id);
+    const transport = created as ITransportSession;
     try {
       await transport.connect(params.toConnectRecord());
     } catch (error) {
@@ -102,12 +104,12 @@ export class ConnectGattUseCase {
 export class DisconnectGattUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
   private readonly stopSession: StopSessionUseCase;
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
   constructor(
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
     stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    repository: BluetoothRepository = BluetoothRepository.getInstance()
+    repository: BluetoothRepositoryContract = bluetoothRepository()
   ) {
     this.transportRegistry = transportRegistry;
     this.stopSession = stopSession;

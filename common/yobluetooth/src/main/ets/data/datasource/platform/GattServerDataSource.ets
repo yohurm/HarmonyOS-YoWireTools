@@ -63,6 +63,41 @@ export class GattServerDataSource {
     }
   }
 
+  addPrimaryService(serviceUuid: string, characteristicUuid: string, value: Uint8Array): Result<void> {
+    this.setValue(serviceUuid, characteristicUuid, value);
+    const descriptors: Array<ble.BLEDescriptor> = [];
+    const characteristic: ble.BLECharacteristic = {
+      serviceUuid: serviceUuid,
+      characteristicUuid: characteristicUuid,
+      characteristicValue: GattServerDataSource.copyBytes(value),
+      descriptors: descriptors
+    };
+    const includeServices: Array<ble.GattService> = [];
+    const service: ble.GattService = {
+      serviceUuid: serviceUuid,
+      isPrimary: true,
+      characteristics: [characteristic],
+      includeServices: includeServices
+    };
+    return this.addService(service);
+  }
+
+  notifyValue(
+    deviceId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    value: Uint8Array,
+    confirm: boolean
+  ): Result<void> {
+    const characteristic: ble.NotifyCharacteristic = {
+      serviceUuid: serviceUuid,
+      characteristicUuid: characteristicUuid,
+      characteristicValue: GattServerDataSource.copyBytes(value),
+      confirm: confirm
+    };
+    return this.notify(deviceId, characteristic);
+  }
+
   closeServer(): Result<void> {
     try {
       if (this.server !== undefined) {
@@ -116,6 +151,12 @@ export class GattServerDataSource {
         value: new ArrayBuffer(0)
       });
     });
+  }
+
+  private static copyBytes(value: Uint8Array): ArrayBuffer {
+    const buffer = new ArrayBuffer(value.byteLength);
+    new Uint8Array(buffer).set(value);
+    return buffer;
   }
 
   private static key(serviceUuid: string, characteristicUuid: string): string {

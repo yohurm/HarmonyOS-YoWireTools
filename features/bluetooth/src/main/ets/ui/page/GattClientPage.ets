@@ -7,28 +7,9 @@ import {
   YoSpace,
   YoTypeStyle
 } from 'youi_kit';
-import {
-  BluetoothConstants,
-  BluetoothErrorCodes,
-  BluetoothRepository,
-  ConnectGattUseCase,
-  ConnectionParamPreset,
-  DisconnectGattUseCase,
-  DiscoverGattServicesUseCase,
-  GattConnectParams,
-  HexPayload,
-  MtuBounds,
-  ReadGattCharacteristicUseCase,
-  ReadGattDescriptorUseCase,
-  ReadGattRssiUseCase,
-  RequestBleMtuUseCase,
-  SetGattNotificationUseCase,
-  ThroughputSession,
-  UpdateGattConnectionParamUseCase,
-  WriteGattCharacteristicUseCase,
-  WriteGattDescriptorUseCase
-} from 'yobluetooth';
+import { ConnectionParamPreset } from 'yobluetooth';
 import { BluetoothObjectNavParams } from '../../navigation/BluetoothObjectNavParams';
+import { GattClientViewModel } from '../../viewmodel/GattClientViewModel';
 
 @ComponentV2
 export struct GattClientPage {
@@ -37,37 +18,10 @@ export struct GattClientPage {
   };
   @Event onOpenLog: (sessionId: string) => void = (_sessionId: string) => {
   };
-  @Local sessionId: string = '';
-  @Local serviceUuid: string = '';
-  @Local characteristicUuid: string = '';
-  @Local descriptorUuid: string = '';
-  @Local payloadHex: string = '';
-  @Local mtuText: string = '23';
-  @Local mtuShown: number = BluetoothConstants.BLE_DEFAULT_MTU;
-  @Local mtuPending: boolean = false;
-  @Local rssiText: string = '';
-  @Local statusText: string = '';
-  @Local securityHint: string = '';
-  @Local throughputBytes: number = 0;
-  @Local throughputRunning: boolean = false;
-  private readonly connectGatt: ConnectGattUseCase = new ConnectGattUseCase();
-  private readonly disconnectGatt: DisconnectGattUseCase = new DisconnectGattUseCase();
-  private readonly discover: DiscoverGattServicesUseCase = new DiscoverGattServicesUseCase();
-  private readonly readChar: ReadGattCharacteristicUseCase = new ReadGattCharacteristicUseCase();
-  private readonly writeChar: WriteGattCharacteristicUseCase = new WriteGattCharacteristicUseCase();
-  private readonly readDescriptor: ReadGattDescriptorUseCase = new ReadGattDescriptorUseCase();
-  private readonly writeDescriptor: WriteGattDescriptorUseCase = new WriteGattDescriptorUseCase();
-  private readonly notify: SetGattNotificationUseCase = new SetGattNotificationUseCase();
-  private readonly requestMtu: RequestBleMtuUseCase = new RequestBleMtuUseCase();
-  private readonly readRssi: ReadGattRssiUseCase = new ReadGattRssiUseCase();
-  private readonly updateParam: UpdateGattConnectionParamUseCase = new UpdateGattConnectionParamUseCase();
-  private readonly repository: BluetoothRepository = BluetoothRepository.getInstance();
-  private throughput: ThroughputSession | undefined = undefined;
+  @Local private vm: GattClientViewModel = new GattClientViewModel();
 
   aboutToDisappear(): void {
-    if (this.throughput !== undefined) {
-      this.throughput.stop();
-    }
+    this.vm.onDisappear();
   }
 
   build() {
@@ -90,12 +44,12 @@ export struct GattClientPage {
         .fontSize(YoTypeStyle.BODY_S.size)
         .fontColor(YoColor.TEXT_TERTIARY)
         .width('100%')
-      Text(this.mtuPending ? $r('app.string.bt_mtu_negotiating') : `${this.mtuShown}`)
+      Text(this.vm.mtuPending ? $r('app.string.bt_mtu_negotiating') : `${this.vm.mtuShown}`)
         .fontSize(YoTypeStyle.BODY_M.size)
         .width('100%')
-      TextInput({ text: this.mtuText, placeholder: $r('app.string.bt_mtu_request') })
+      TextInput({ text: this.vm.mtuText, placeholder: $r('app.string.bt_mtu_request') })
         .onChange((value: string) => {
-          this.mtuText = value;
+          this.vm.mtuText = value;
         })
       Text($r('app.string.bt_phy_unverified'))
         .fontSize(YoTypeStyle.BODY_S.size)
@@ -105,57 +59,57 @@ export struct GattClientPage {
         .fontSize(YoTypeStyle.BODY_S.size)
         .fontColor(YoColor.TEXT_SECONDARY)
         .width('100%')
-      if (this.securityHint === '2901005') {
+      if (this.vm.securityHint === '2901005') {
         Text($r('app.string.bt_gatt_security_encryption'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
-      if (this.securityHint === '2901006') {
+      if (this.vm.securityHint === '2901006') {
         Text($r('app.string.bt_gatt_security_authentication'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
-      if (this.securityHint === '2901007') {
+      if (this.vm.securityHint === '2901007') {
         Text($r('app.string.bt_gatt_security_authorization'))
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
-      if (this.statusText.length > 0) {
-        Text(this.statusText)
+      if (this.vm.statusText.length > 0) {
+        Text(this.vm.statusText)
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
-      if (this.rssiText.length > 0) {
-        Text(this.rssiText)
+      if (this.vm.rssiText.length > 0) {
+        Text(this.vm.rssiText)
           .fontSize(YoTypeStyle.BODY_S.size)
           .width('100%')
       }
-      TextInput({ text: this.serviceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
+      TextInput({ text: this.vm.serviceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
         .onChange((value: string) => {
-          this.serviceUuid = value;
+          this.vm.serviceUuid = value;
         })
-      TextInput({ text: this.characteristicUuid, placeholder: $r('app.string.bt_gatt_characteristic') })
+      TextInput({ text: this.vm.characteristicUuid, placeholder: $r('app.string.bt_gatt_characteristic') })
         .onChange((value: string) => {
-          this.characteristicUuid = value;
+          this.vm.characteristicUuid = value;
         })
-      TextInput({ text: this.descriptorUuid, placeholder: $r('app.string.bt_gatt_descriptor') })
+      TextInput({ text: this.vm.descriptorUuid, placeholder: $r('app.string.bt_gatt_descriptor') })
         .onChange((value: string) => {
-          this.descriptorUuid = value;
+          this.vm.descriptorUuid = value;
         })
-      TextInput({ text: this.payloadHex, placeholder: $r('app.string.bt_gatt_payload_hex') })
+      TextInput({ text: this.vm.payloadHex, placeholder: $r('app.string.bt_gatt_payload_hex') })
         .onChange((value: string) => {
-          this.payloadHex = value;
+          this.vm.payloadHex = value;
         })
       YoActionButton({
         label: $r('app.string.bt_gatt_connect'),
         kind: YoActionButtonKind.PRIMARY,
         isEnabled: this.params.connectable,
         onTap: () => {
-          void this.connect();
+          void this.vm.connect(this.params.deviceId, this.params.displayName, this.params.connectable);
         }
       })
       if (!this.params.connectable) {
@@ -165,61 +119,61 @@ export struct GattClientPage {
       }
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_conn_low_power')).onClick(() => {
-          void this.applyPreset(ConnectionParamPreset.LOW_POWER);
+          void this.vm.applyPreset(ConnectionParamPreset.LOW_POWER);
         })
         Button($r('app.string.bt_conn_balanced')).onClick(() => {
-          void this.applyPreset(ConnectionParamPreset.BALANCED);
+          void this.vm.applyPreset(ConnectionParamPreset.BALANCED);
         })
         Button($r('app.string.bt_conn_high')).onClick(() => {
-          void this.applyPreset(ConnectionParamPreset.HIGH);
+          void this.vm.applyPreset(ConnectionParamPreset.HIGH);
         })
       }
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_gatt_read')).onClick(() => {
-          void this.readValue();
+          void this.vm.readValue();
         })
         Button($r('app.string.bt_gatt_write')).onClick(() => {
-          void this.writeValue(false);
+          void this.vm.writeValue(false);
         })
         Button($r('app.string.bt_gatt_write_no_response')).onClick(() => {
-          void this.writeValue(true);
+          void this.vm.writeValue(true);
         })
       }
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_gatt_read_descriptor')).onClick(() => {
-          void this.readDescriptorValue();
+          void this.vm.readDescriptorValue();
         })
         Button($r('app.string.bt_gatt_write_descriptor')).onClick(() => {
-          void this.writeDescriptorValue();
+          void this.vm.writeDescriptorValue();
         })
         Button($r('app.string.bt_gatt_disconnect')).onClick(() => {
-          void this.disconnect();
+          void this.vm.disconnect();
         })
       }
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_gatt_notify')).onClick(() => {
-          void this.subscribe(false);
+          void this.vm.subscribe(false);
         })
         Button($r('app.string.bt_gatt_indicate')).onClick(() => {
-          void this.subscribe(true);
+          void this.vm.subscribe(true);
         })
         Button($r('app.string.bt_gatt_rssi')).onClick(() => {
-          void this.readLinkRssi();
+          void this.vm.readLinkRssi();
         })
         Button($r('app.string.bt_mtu_apply')).onClick(() => {
-          void this.applyMtu();
+          void this.vm.applyMtu();
         })
       }
-      Text(`${this.throughputBytes}`)
+      Text(`${this.vm.throughputBytes}`)
         .fontSize(YoTypeStyle.BODY_M.size)
       YoActionButton({
-        label: this.throughputRunning ? $r('app.string.bt_throughput_stop') : $r('app.string.bt_throughput_start'),
+        label: this.vm.throughputRunning ? $r('app.string.bt_throughput_stop') : $r('app.string.bt_throughput_start'),
         kind: YoActionButtonKind.SECONDARY,
         onTap: () => {
-          if (this.throughputRunning) {
-            this.stopThroughput();
+          if (this.vm.throughputRunning) {
+            this.vm.stopThroughput();
           } else {
-            void this.startThroughput();
+            void this.vm.startThroughput();
           }
         }
       })
@@ -227,205 +181,10 @@ export struct GattClientPage {
         label: $r('app.string.bt_entry_session_log'),
         kind: YoActionButtonKind.TEXT,
         onTap: () => {
-          this.onOpenLog(this.sessionId);
+          this.onOpenLog(this.vm.sessionId);
         }
       })
     }
     .width('100%')
-  }
-
-  private async connect(): Promise<void> {
-    if (!this.params.connectable) {
-      this.statusText = 'not_connectable';
-      return;
-    }
-    const connected = await this.connectGatt.execute(
-      new GattConnectParams(this.params.deviceId, this.params.displayName)
-    );
-    if (!connected.success || connected.value === undefined) {
-      this.noteError(connected.error?.code ?? '', connected.error?.message ?? '');
-      return;
-    }
-    this.sessionId = connected.value.sessionId;
-    this.mtuShown = this.repository.gattCurrentMtu(this.sessionId);
-    const discovered = await this.discover.execute(this.sessionId, this.params.deviceId, this.mtuShown);
-    if (!discovered.success) {
-      this.noteError(discovered.error?.code ?? '', discovered.error?.message ?? '');
-    }
-  }
-
-  private async applyMtu(): Promise<void> {
-    const requested = Number(this.mtuText);
-    const bounds = MtuBounds.accept(requested);
-    if (!bounds.success) {
-      this.statusText = bounds.error?.message ?? '';
-      return;
-    }
-    this.mtuPending = true;
-    const result = await this.requestMtu.execute(this.sessionId, requested);
-    this.mtuPending = this.repository.gattMtuPending(this.sessionId);
-    this.mtuShown = this.repository.gattCurrentMtu(this.sessionId);
-    if (!result.success) {
-      this.mtuPending = false;
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private async applyPreset(preset: ConnectionParamPreset): Promise<void> {
-    const result = await this.updateParam.execute(this.sessionId, preset);
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private async readValue(): Promise<void> {
-    const result = await this.readChar.execute(this.sessionId, this.serviceUuid, this.characteristicUuid);
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-      return;
-    }
-    this.statusText = result.value ?? '';
-  }
-
-  private async readDescriptorValue(): Promise<void> {
-    const result = await this.readDescriptor.execute(
-      this.sessionId,
-      this.serviceUuid,
-      this.characteristicUuid,
-      this.descriptorUuid
-    );
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-      return;
-    }
-    this.statusText = result.value ?? '';
-  }
-
-  private async writeDescriptorValue(): Promise<void> {
-    const parsed = HexPayload.parse(this.payloadHex);
-    if (!parsed.success || parsed.value === undefined) {
-      this.statusText = parsed.error?.message ?? '';
-      return;
-    }
-    const result = await this.writeDescriptor.execute(
-      this.sessionId,
-      this.serviceUuid,
-      this.characteristicUuid,
-      this.descriptorUuid,
-      parsed.value
-    );
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private async disconnect(): Promise<void> {
-    if (this.sessionId.length === 0) {
-      this.statusText = 'not_connected';
-      return;
-    }
-    const result = await this.disconnectGatt.execute(this.sessionId);
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-      return;
-    }
-    this.sessionId = '';
-    this.mtuPending = false;
-  }
-
-  private async writeValue(noResponse: boolean): Promise<void> {
-    const parsed = HexPayload.parse(this.payloadHex);
-    if (!parsed.success || parsed.value === undefined) {
-      this.statusText = parsed.error?.message ?? '';
-      return;
-    }
-    const bytes = parsed.value;
-    const result = await this.writeChar.execute(
-      this.sessionId,
-      this.serviceUuid,
-      this.characteristicUuid,
-      bytes,
-      noResponse
-    );
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private async subscribe(indication: boolean): Promise<void> {
-    const result = await this.notify.execute(
-      this.sessionId,
-      this.serviceUuid,
-      this.characteristicUuid,
-      true,
-      indication
-    );
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private async readLinkRssi(): Promise<void> {
-    const result = await this.readRssi.execute(this.sessionId);
-    if (!result.success || result.value === undefined) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-      return;
-    }
-    this.rssiText = `${result.value} dBm`;
-  }
-
-  private async startThroughput(): Promise<void> {
-    const parsed = HexPayload.parse(this.payloadHex.length > 0 ? this.payloadHex : '00');
-    if (!parsed.success || parsed.value === undefined) {
-      this.statusText = parsed.error?.message ?? '';
-      return;
-    }
-    const bytes = parsed.value;
-    const session = new ThroughputSession();
-    this.throughput = session;
-    this.throughputRunning = true;
-    const result = await session.run(
-      this.sessionId,
-      bytes,
-      this.mtuShown,
-      async (chunk: Uint8Array) => {
-        return this.writeChar.execute(this.sessionId, this.serviceUuid, this.characteristicUuid, chunk, true);
-      }
-    );
-    const snapshot = session.snapshot();
-    this.throughputBytes = snapshot.bytesSent;
-    this.throughputRunning = false;
-    if (!result.success) {
-      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
-    }
-  }
-
-  private stopThroughput(): void {
-    if (this.throughput !== undefined) {
-      this.throughput.stop();
-      const snapshot = this.throughput.snapshot();
-      this.throughputBytes = snapshot.bytesSent;
-    }
-    this.throughputRunning = false;
-  }
-
-  private noteError(code: string, message: string): void {
-    this.statusText = message.length > 0 ? message : code;
-    if (code === BluetoothErrorCodes.GATT_INSUFFICIENT_ENCRYPTION) {
-      this.securityHint = '2901005';
-      return;
-    }
-    if (code === BluetoothErrorCodes.GATT_INSUFFICIENT_AUTHENTICATION) {
-      this.securityHint = '2901006';
-      return;
-    }
-    if (code === BluetoothErrorCodes.GATT_INSUFFICIENT_AUTHORIZATION) {
-      this.securityHint = '2901007';
-      return;
-    }
-    if (code === BluetoothErrorCodes.GATT_TIMEOUT || code === BluetoothErrorCodes.GATT_SEQUENCE) {
-      this.securityHint = '';
-      this.statusText = code;
-    }
   }
 }

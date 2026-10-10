@@ -8,20 +8,21 @@ import {
   SessionType
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectGattResult } from '../../model/GattConnectParams';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
 import { DiscoverGattServicesUseCase } from './GattOperationUseCases';
 
 export class ConnectGattBrowserUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
   private readonly discoverServices: DiscoverGattServicesUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
     sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
     discoverServices: DiscoverGattServicesUseCase = new DiscoverGattServicesUseCase()
@@ -49,7 +50,7 @@ export class ConnectGattBrowserUseCase {
         'GATT session limit'
       ));
     }
-    this.repository.stopBleScan();
+    this.repository.stopBleScan('');
     const target = new DebugTarget(
       bleDeviceId,
       ModuleType.BLUETOOTH,

@@ -1,5 +1,6 @@
 import { Result } from 'common_core';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 /**
@@ -7,11 +8,11 @@ import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
  * not the promise returned by enable or disable.
  */
 export class EnableBluetoothUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard()
   ) {
     this.repository = repository;
@@ -28,11 +29,11 @@ export class EnableBluetoothUseCase {
 }
 
 export class DisableBluetoothUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard()
   ) {
     this.repository = repository;

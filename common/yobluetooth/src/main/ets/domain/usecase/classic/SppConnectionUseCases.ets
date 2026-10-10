@@ -10,7 +10,8 @@ import {
   TransportSessionRegistry
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { ConnectSppResult, SppConnectParams } from '../../model/SppConnectParams';
 import { BluetoothTransportPolicy, BluetoothTransportType } from '../../model/BluetoothTransportType';
 import { asSppTransportFacet } from '../../model/spp/ISppTransportFacet';
@@ -28,7 +29,7 @@ import { SppSessionKey } from '../../model/SppSessionKey';
  * guard → resolve → admission/ledger.reserve → stop discovery → bootstrap → connect → register → promote → bind reconnect.
  */
 export class ConnectSppUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
   private readonly transportRegistry: TransportSessionRegistry;
@@ -37,7 +38,7 @@ export class ConnectSppUseCase {
   private readonly admissionPolicy: SppSessionAdmissionPolicy;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
     sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),

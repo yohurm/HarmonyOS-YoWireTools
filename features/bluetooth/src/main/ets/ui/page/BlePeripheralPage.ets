@@ -7,46 +7,16 @@ import {
   YoSpace,
   YoTypeStyle
 } from 'youi_kit';
-import {
-  AdvertisingRequest,
-  CloseGattServerUseCase,
-  HexPayload,
-  NotifyGattServerUseCase,
-  OpenGattServerUseCase,
-  StartBleAdvertiseUseCase,
-  StopBleAdvertiseUseCase
-} from 'yobluetooth';
+import { BlePeripheralViewModel } from '../../viewmodel/BlePeripheralViewModel';
 
 @ComponentV2
 export struct BlePeripheralPage {
   @Event onBack: () => void = () => {
   };
-  @Local serviceUuid: string = '';
-  @Local serviceDataUuid: string = '';
-  @Local serviceDataHex: string = '';
-  @Local manufacturerIdText: string = '';
-  @Local manufacturerHex: string = '';
-  @Local includeName: boolean = false;
-  @Local extended: boolean = false;
-  @Local connectable: boolean = true;
-  @Local scanResponseHex: string = '';
-  @Local statusText: string = '';
-  @Local advertising: boolean = false;
-  @Local serverOpen: boolean = false;
-  @Local serverServiceUuid: string = '';
-  @Local serverCharacteristicUuid: string = '';
-  @Local serverValueHex: string = '';
-  @Local serverPeerId: string = '';
-  private readonly startAdvertise: StartBleAdvertiseUseCase = new StartBleAdvertiseUseCase();
-  private readonly openServer: OpenGattServerUseCase = new OpenGattServerUseCase();
+  @Local private vm: BlePeripheralViewModel = new BlePeripheralViewModel();
 
   aboutToDisappear(): void {
-    if (this.advertising) {
-      void this.stop();
-    }
-    if (this.serverOpen) {
-      this.closeGattServer();
-    }
+    this.vm.onDisappear();
   }
 
   build() {
@@ -66,42 +36,42 @@ export struct BlePeripheralPage {
         .fontSize(YoTypeStyle.BODY_S.size)
         .fontColor(YoColor.TEXT_SECONDARY)
         .width('100%')
-      TextInput({ text: this.serviceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
+      TextInput({ text: this.vm.serviceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
         .onChange((value: string) => {
-          this.serviceUuid = value;
+          this.vm.serviceUuid = value;
         })
-      TextInput({ text: this.serviceDataUuid, placeholder: $r('app.string.bt_peripheral_service_data_uuid') })
+      TextInput({ text: this.vm.serviceDataUuid, placeholder: $r('app.string.bt_peripheral_service_data_uuid') })
         .onChange((value: string) => {
-          this.serviceDataUuid = value;
+          this.vm.serviceDataUuid = value;
         })
-      TextInput({ text: this.serviceDataHex, placeholder: $r('app.string.bt_peripheral_service_data') })
+      TextInput({ text: this.vm.serviceDataHex, placeholder: $r('app.string.bt_peripheral_service_data') })
         .onChange((value: string) => {
-          this.serviceDataHex = value;
+          this.vm.serviceDataHex = value;
         })
-      TextInput({ text: this.manufacturerIdText, placeholder: $r('app.string.bt_ble_manufacturer') })
+      TextInput({ text: this.vm.manufacturerIdText, placeholder: $r('app.string.bt_ble_manufacturer') })
         .onChange((value: string) => {
-          this.manufacturerIdText = value;
+          this.vm.manufacturerIdText = value;
         })
-      TextInput({ text: this.manufacturerHex, placeholder: $r('app.string.bt_peripheral_manufacturer_data') })
+      TextInput({ text: this.vm.manufacturerHex, placeholder: $r('app.string.bt_peripheral_manufacturer_data') })
         .onChange((value: string) => {
-          this.manufacturerHex = value;
+          this.vm.manufacturerHex = value;
         })
-      TextInput({ text: this.scanResponseHex, placeholder: $r('app.string.bt_peripheral_scan_response') })
+      TextInput({ text: this.vm.scanResponseHex, placeholder: $r('app.string.bt_peripheral_scan_response') })
         .onChange((value: string) => {
-          this.scanResponseHex = value;
+          this.vm.scanResponseHex = value;
         })
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_peripheral_toggle_name'))
           .onClick(() => {
-            this.includeName = !this.includeName;
+            this.vm.includeName = !this.vm.includeName;
           })
         Button($r('app.string.bt_peripheral_toggle_extended'))
           .onClick(() => {
-            this.extended = !this.extended;
+            this.vm.extended = !this.vm.extended;
           })
         Button($r('app.string.bt_peripheral_toggle_connectable'))
           .onClick(() => {
-            this.connectable = !this.connectable;
+            this.vm.connectable = !this.vm.connectable;
           })
       }
       Text($r('app.string.bt_peripheral_extended_mutex'))
@@ -112,136 +82,55 @@ export struct BlePeripheralPage {
         .fontSize(YoTypeStyle.BODY_S.size)
         .fontColor(YoColor.TEXT_SECONDARY)
         .width('100%')
-      if (this.statusText.length > 0) {
-        Text(this.statusText)
+      if (this.vm.statusText.length > 0) {
+        Text(this.vm.statusText)
           .fontSize(YoTypeStyle.BODY_S.size)
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
-      TextInput({ text: this.serverServiceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
+      TextInput({ text: this.vm.serverServiceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
         .onChange((value: string) => {
-          this.serverServiceUuid = value;
+          this.vm.serverServiceUuid = value;
         })
-      TextInput({ text: this.serverCharacteristicUuid, placeholder: $r('app.string.bt_gatt_characteristic') })
+      TextInput({ text: this.vm.serverCharacteristicUuid, placeholder: $r('app.string.bt_gatt_characteristic') })
         .onChange((value: string) => {
-          this.serverCharacteristicUuid = value;
+          this.vm.serverCharacteristicUuid = value;
         })
-      TextInput({ text: this.serverValueHex, placeholder: $r('app.string.bt_peripheral_server_value') })
+      TextInput({ text: this.vm.serverValueHex, placeholder: $r('app.string.bt_peripheral_server_value') })
         .onChange((value: string) => {
-          this.serverValueHex = value;
+          this.vm.serverValueHex = value;
         })
-      TextInput({ text: this.serverPeerId, placeholder: $r('app.string.bt_peripheral_server_device') })
+      TextInput({ text: this.vm.serverPeerId, placeholder: $r('app.string.bt_peripheral_server_device') })
         .onChange((value: string) => {
-          this.serverPeerId = value;
+          this.vm.serverPeerId = value;
         })
       Row({ space: YoSpace.S }) {
         Button($r('app.string.bt_peripheral_server_open')).onClick(() => {
-          void this.openGattServer();
+          void this.vm.openGattServer();
         })
         Button($r('app.string.bt_peripheral_server_notify'))
-          .enabled(this.serverOpen)
+          .enabled(this.vm.serverOpen)
           .onClick(() => {
-            void this.notifyServer();
+            void this.vm.notifyServer();
           })
         Button($r('app.string.bt_peripheral_server_close'))
-          .enabled(this.serverOpen)
+          .enabled(this.vm.serverOpen)
           .onClick(() => {
-            this.closeGattServer();
+            this.vm.closeGattServer();
           })
       }
       YoActionButton({
-        label: this.advertising ? $r('app.string.bt_peripheral_stop') : $r('app.string.bt_peripheral_start'),
+        label: this.vm.advertising ? $r('app.string.bt_peripheral_stop') : $r('app.string.bt_peripheral_start'),
         kind: YoActionButtonKind.PRIMARY,
         onTap: () => {
-          if (this.advertising) {
-            void this.stop();
+          if (this.vm.advertising) {
+            void this.vm.stop();
           } else {
-            void this.start();
+            void this.vm.start();
           }
         }
       })
     }
     .width('100%')
-  }
-
-  private async start(): Promise<void> {
-    const manufacturerId = this.manufacturerIdText.length === 0 ? -1 : Number(this.manufacturerIdText);
-    const uuids: string[] = [];
-    if (this.serviceUuid.length > 0) {
-      uuids.push(this.serviceUuid);
-    }
-    const request = new AdvertisingRequest(
-      uuids,
-      this.serviceDataUuid,
-      this.serviceDataHex,
-      Number.isNaN(manufacturerId) ? -1 : manufacturerId,
-      this.manufacturerHex,
-      this.includeName,
-      '',
-      this.extended,
-      this.connectable,
-      this.scanResponseHex,
-      0
-    );
-    const started = await this.startAdvertise.execute(request);
-    if (!started.success) {
-      this.advertising = false;
-      this.statusText = started.error?.message ?? '';
-      return;
-    }
-    this.advertising = true;
-    this.statusText = '';
-  }
-
-  private async openGattServer(): Promise<void> {
-    const parsed = HexPayload.parse(this.serverValueHex.length > 0 ? this.serverValueHex : '00');
-    if (!parsed.success || parsed.value === undefined) {
-      this.serverOpen = false;
-      this.statusText = parsed.error?.message ?? '';
-      return;
-    }
-    const opened = await this.openServer.executeFields(
-      this.serverServiceUuid,
-      this.serverCharacteristicUuid,
-      parsed.value
-    );
-    this.serverOpen = opened.success;
-    this.statusText = opened.success ? '' : (opened.error?.message ?? '');
-  }
-
-  private closeGattServer(): void {
-    const closed = new CloseGattServerUseCase(this.openServer.source()).execute();
-    this.serverOpen = false;
-    if (!closed.success) {
-      this.statusText = closed.error?.message ?? '';
-    }
-  }
-
-  private async notifyServer(): Promise<void> {
-    if (!this.serverOpen) {
-      this.statusText = 'server_closed';
-      return;
-    }
-    const parsed = HexPayload.parse(this.serverValueHex.length > 0 ? this.serverValueHex : '00');
-    if (!parsed.success || parsed.value === undefined) {
-      this.statusText = parsed.error?.message ?? '';
-      return;
-    }
-    const notified = new NotifyGattServerUseCase(this.openServer.source()).executeValue(
-      this.serverPeerId,
-      this.serverServiceUuid,
-      this.serverCharacteristicUuid,
-      parsed.value,
-      false
-    );
-    if (!notified.success) {
-      this.statusText = notified.error?.message ?? '';
-    }
-  }
-
-  private async stop(): Promise<void> {
-    const stopper = new StopBleAdvertiseUseCase(this.startAdvertise.source());
-    await stopper.execute();
-    this.advertising = false;
   }
 }

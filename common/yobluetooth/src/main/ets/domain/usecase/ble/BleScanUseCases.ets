@@ -9,7 +9,8 @@ import {
 } from 'debug_core';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BleScanFilter } from '../../model/BleScanFilter';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import { BluetoothScanLogger } from '../../service/BluetoothScanLogger';
@@ -17,12 +18,12 @@ import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
 
 export class StartBleScanUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
     sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap()
   ) {
@@ -67,11 +68,11 @@ export class StartBleScanUseCase {
 }
 
 export class StopBleScanUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
     this.repository = repository;
@@ -79,7 +80,7 @@ export class StopBleScanUseCase {
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    const stopped = this.repository.stopBleScan();
+    const stopped = this.repository.stopBleScan('');
     if (!stopped.success) {
       return stopped;
     }
@@ -96,9 +97,9 @@ export class StopBleScanUseCase {
 }
 
 export class StartBleScanWithFilterUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
     this.repository = repository;
   }
 
@@ -108,11 +109,11 @@ export class StartBleScanWithFilterUseCase {
 }
 
 export class LoadPairedBleDevicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard()
   ) {
     this.repository = repository;
@@ -129,9 +130,9 @@ export class LoadPairedBleDevicesUseCase {
 }
 
 export class ObserveBleDevicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
     this.repository = repository;
   }
 

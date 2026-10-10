@@ -1,18 +1,19 @@
 import { Result, ResultError } from 'common_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BleAdvertiserDataSource } from '../../../data/datasource/platform/BleAdvertiserDataSource';
 import { AdvertisingRequest } from '../../model/AdvertisingRequest';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
+import { bluetoothRepository } from '../../repository/BluetoothRepositories';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 
 export class StartBleAdvertiseUseCase {
-  private readonly advertiser: BleAdvertiserDataSource;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    advertiser: BleAdvertiserDataSource = new BleAdvertiserDataSource(),
+    repository: BluetoothRepositoryContract = bluetoothRepository(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard()
   ) {
-    this.advertiser = advertiser;
+    this.repository = repository;
     this.guard = guard;
   }
 
@@ -21,22 +22,18 @@ export class StartBleAdvertiseUseCase {
     if (!ready.success) {
       return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.PERMISSION_DENIED, 'Not ready'));
     }
-    return this.advertiser.start(request);
-  }
-
-  source(): BleAdvertiserDataSource {
-    return this.advertiser;
+    return this.repository.startBleAdvertise(request);
   }
 }
 
 export class StopBleAdvertiseUseCase {
-  private readonly advertiser: BleAdvertiserDataSource;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(advertiser: BleAdvertiserDataSource) {
-    this.advertiser = advertiser;
+  constructor(repository: BluetoothRepositoryContract = bluetoothRepository()) {
+    this.repository = repository;
   }
 
   async execute(): Promise<Result<void>> {
-    return this.advertiser.stop();
+    return this.repository.stopBleAdvertise();
   }
 }
