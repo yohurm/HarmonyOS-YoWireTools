@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
 <rect width="360" height="800" fill="#F1F3F5"/>
-<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="start">08:20</text>
 <circle cx="294" cy="22" r="1.5" fill="#1A1A1A"/>
 <path d="M289 18 A6 6 0 0 1 299 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M285.5 14 A11 11 0 0 1 302.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -8,19 +8,19 @@
 <rect x="337" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
 <rect x="320" y="14" width="11" height="5" rx="1" fill="#1A1A1A"/>
 <path d="M18 45 L11 52 L18 59" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">经典蓝牙</text>
-<text x="16" y="108" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">正在搜索</text>
+<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="middle">经典蓝牙</text>
+<text x="16" y="108" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="start">正在搜索</text>
 <circle cx="132" cy="102" r="8" fill="none" stroke="#D5D8DE" stroke-width="2"/>
 <path d="M132 94 A8 8 0 0 1 140 102" fill="none" stroke="#0A59F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="16" y="136" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已发现的设备会留在列表里</text>
+<text x="16" y="136" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="start">已发现的设备会留在列表里</text>
 <rect x="16" y="172" width="328" height="76" rx="16" fill="#FFFFFF"/>
 <rect x="264" y="196" width="64" height="28" rx="14" fill="#F1F3F5"/>
-<text x="296.0" y="215" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<text x="296.0" y="215" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="middle">连接</text>
 <clipPath id="t1"><rect x="32" y="172" width="220" height="76"/></clipPath>
 <g clip-path="url(#t1)">
-<text x="32" y="204" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A</text>
-<text x="32" y="226" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">AA:BB:CC:01:02:03</text>
+<text x="32" y="204" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="start">工装-A</text>
+<text x="32" y="226" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', monospace" text-anchor="start">AA:BB:CC:01:02:03</text>
 </g>
 <rect x="16" y="744" width="328" height="40" rx="20" fill="#0A59F7"/>
-<text x="180.0" y="770" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">停止</text>
+<text x="180.0" y="770" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'HarmonyOS Sans SC', sans-serif" text-anchor="middle">停止</text>
 </svg>
