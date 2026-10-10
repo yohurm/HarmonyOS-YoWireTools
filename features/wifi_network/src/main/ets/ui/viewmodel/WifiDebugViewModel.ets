@@ -8,7 +8,7 @@ import {
 } from 'common_platform';
 import { ExportFileWriter } from 'common_storage';
 import { YoPageState, YoToast } from 'youi_kit';
-import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
+import { WifiDebugUseCaseBundle, WifiDebugUseCaseFactory } from '../../data/repository/WifiDebugUseCaseFactory';
 import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
 import { WifiCandidateDraft, WifiFeatureFact, WifiIpv4Facts, WifiIpv6Facts } from '../../domain/model/WifiDebugFacts';
@@ -164,23 +164,22 @@ export class WifiDebugViewModel {
   @Trace httpBody: string = '';
   @Trace httpBodyOpen: boolean = false;
 
-  private readonly repository: WifiNetworkRepository = WifiNetworkRepository.getInstance();
-  private readonly debugCases: WifiDebugUseCases = new WifiDebugUseCases(this.repository);
-  private readonly httpCase: ExecuteHttpRequestUseCase = new ExecuteHttpRequestUseCase();
-  private readonly portCase: StartPortScanUseCase = new StartPortScanUseCase();
-  private readonly mdnsCase: StartMdnsDiscoveryUseCase = new StartMdnsDiscoveryUseCase();
-  private readonly stopMdnsCase: StopMdnsDiscoveryUseCase = new StopMdnsDiscoveryUseCase();
-  private readonly tcpCase: ConnectTcpClientUseCase = new ConnectTcpClientUseCase();
-  private readonly disconnectTcpCase: DisconnectTcpClientSessionUseCase = new DisconnectTcpClientSessionUseCase();
-  private readonly udpCase: OpenUdpSessionUseCase = new OpenUdpSessionUseCase();
-  private readonly closeUdpCase: CloseUdpSessionUseCase = new CloseUdpSessionUseCase();
-  private readonly tcpServerCase: OpenTcpServerUseCase = new OpenTcpServerUseCase();
-  private readonly stopTcpServerCase: StopTcpServerSessionUseCase = new StopTcpServerSessionUseCase();
-  private readonly wsCase: OpenWebSocketUseCase = new OpenWebSocketUseCase();
-  private readonly wsServerCase: OpenWebSocketServerUseCase = new OpenWebSocketServerUseCase();
-  private readonly stopWsServerCase: StopWebSocketServerUseCase = new StopWebSocketServerUseCase();
-  private readonly multicastCase: OpenMulticastSessionUseCase = new OpenMulticastSessionUseCase();
-  private readonly leaveMulticastCase: LeaveMulticastSessionUseCase = new LeaveMulticastSessionUseCase();
+  private readonly debugCases: WifiDebugUseCases;
+  private readonly httpCase: ExecuteHttpRequestUseCase;
+  private readonly portCase: StartPortScanUseCase;
+  private readonly mdnsCase: StartMdnsDiscoveryUseCase;
+  private readonly stopMdnsCase: StopMdnsDiscoveryUseCase;
+  private readonly tcpCase: ConnectTcpClientUseCase;
+  private readonly disconnectTcpCase: DisconnectTcpClientSessionUseCase;
+  private readonly udpCase: OpenUdpSessionUseCase;
+  private readonly closeUdpCase: CloseUdpSessionUseCase;
+  private readonly tcpServerCase: OpenTcpServerUseCase;
+  private readonly stopTcpServerCase: StopTcpServerSessionUseCase;
+  private readonly wsCase: OpenWebSocketUseCase;
+  private readonly wsServerCase: OpenWebSocketServerUseCase;
+  private readonly stopWsServerCase: StopWebSocketServerUseCase;
+  private readonly multicastCase: OpenMulticastSessionUseCase;
+  private readonly leaveMulticastCase: LeaveMulticastSessionUseCase;
   private subscribed: boolean = false;
   private tcpSessionId: string = '';
   private tcpStateSub: Subscription | undefined;
@@ -200,10 +199,30 @@ export class WifiDebugViewModel {
   private cacheReadAtMs: number = 0;
   private backgroundBlocked: boolean = false;
 
+  constructor() {
+    const cases: WifiDebugUseCaseBundle = WifiDebugUseCaseFactory.create();
+    this.debugCases = cases.debug;
+    this.httpCase = cases.http;
+    this.portCase = cases.port;
+    this.mdnsCase = cases.mdns;
+    this.stopMdnsCase = cases.stopMdns;
+    this.tcpCase = cases.tcp;
+    this.disconnectTcpCase = cases.disconnectTcp;
+    this.udpCase = cases.udp;
+    this.closeUdpCase = cases.closeUdp;
+    this.tcpServerCase = cases.tcpServer;
+    this.stopTcpServerCase = cases.stopTcpServer;
+    this.wsCase = cases.ws;
+    this.wsServerCase = cases.wsServer;
+    this.stopWsServerCase = cases.stopWsServer;
+    this.multicastCase = cases.multicast;
+    this.leaveMulticastCase = cases.leaveMulticast;
+  }
+
   async enter(): Promise<void> {
     this.pageState = YoPageState.LOADING;
     this.loadingText = '正在核对权限声明';
-    this.emulatorNotPassed = this.repository.isEmulatorRuntime();
+    this.emulatorNotPassed = this.debugCases.isEmulatorRuntime();
     this.walls = WifiDebugViewModel.buildWalls(this.emulatorNotPassed);
     const opened = await this.debugCases.openPage();
     if (!opened.success) {
@@ -216,7 +235,7 @@ export class WifiDebugViewModel {
     this.wifiActiveLabel = '未读取';
     this.refreshWsServerGate();
     this.subscribe();
-    this.repository.startNetObservation((snapshot: NetworkStateSnapshot) => {
+    this.debugCases.startNetObservation((snapshot: NetworkStateSnapshot) => {
       this.netIdLabel = snapshot.hasDefaultNet ? snapshot.netType : '无';
     }, (name: string, detail: string) => {
       this.noteNetEvent(name, detail);
@@ -228,7 +247,7 @@ export class WifiDebugViewModel {
 
   leave(): void {
     this.unsubscribe();
-    this.repository.stopNetObservation();
+    this.debugCases.stopNetObservation();
     this.unbindLan();
     void this.stopMdnsCase.execute();
     this.releaseInspect();
@@ -239,7 +258,7 @@ export class WifiDebugViewModel {
       return;
     }
     this.subscribed = true;
-    this.repository.onWifiPowerState((state: number) => {
+    this.debugCases.onWifiPowerState((state: number) => {
       const label = WifiFieldLabels.wifiPowerState(state);
       this.appendLog('wifiStateChange', label, '');
       this.wifiActiveLabel = state === 1 ? '已激活' : '未激活';
@@ -248,14 +267,14 @@ export class WifiDebugViewModel {
         this.wlanLines = ['未激活', 'STA 未打开'];
       }
     });
-    this.repository.onWifiConnectionState((state: number) => {
+    this.debugCases.onWifiConnectionState((state: number) => {
       const label = WifiFieldLabels.connState(state);
       this.appendLog('wifiConnectionChange', label, '');
       if (label === 'DISCONNECTED' || label === 'UNKNOWN') {
         this.clearSsid();
       }
     });
-    this.repository.onWifiRssi((rssi: number) => {
+    this.debugCases.onWifiRssi((rssi: number) => {
       this.linkRssi = rssi;
       this.appendLog('wifiRssiChange', `${rssi} dBm`, '');
     });
@@ -265,21 +284,21 @@ export class WifiDebugViewModel {
     if (!this.subscribed) {
       return;
     }
-    this.repository.offWifiPowerState();
-    this.repository.offWifiConnectionState();
-    this.repository.offWifiRssi();
+    this.debugCases.offWifiPowerState();
+    this.debugCases.offWifiConnectionState();
+    this.debugCases.offWifiRssi();
     this.subscribed = false;
   }
 
   async refreshWlan(): Promise<void> {
-    const active = await this.repository.getWifiState();
+    const active = await this.debugCases.getWifiState();
     if (!active.success) {
       this.applyNative(active.error !== undefined ? active.error : undefined, 'readWifiState');
       return;
     }
     this.wifiActiveLabel = active.value === true ? '已激活' : '未激活';
-    const connected = await this.repository.isStaConnected();
-    const hotspot = await this.repository.isHotspotActive();
+    const connected = await this.debugCases.isStaConnected();
+    const hotspot = await this.debugCases.isHotspotActive();
     const lines: string[] = [];
     lines.push(active.value === true ? '已激活' : '未激活');
     if (connected.success) {
@@ -311,7 +330,7 @@ export class WifiDebugViewModel {
 
   async refreshFeatures(): Promise<void> {
     this.featureState = YoPageState.LOADING;
-    const result = await this.repository.readFeatureSupport();
+    const result = await this.debugCases.readFeatureSupport();
     if (!result.success || result.value === undefined) {
       this.featureState = YoPageState.ERROR;
       this.applyNative(result.error, 'featureProbe');
@@ -342,7 +361,7 @@ export class WifiDebugViewModel {
         this.backgroundBlocked = true;
         this.scanStatus = '该次未执行';
       } else if (message === '剩余冷却') {
-        this.scanStatus = `剩余冷却 ${this.formatDuration(this.repository.getScanCooldownRemainingMs())}`;
+        this.scanStatus = `剩余冷却 ${this.formatDuration(this.debugCases.getScanCooldownRemainingMs())}`;
       } else {
         this.scanStatus = this.scanFailure;
       }
@@ -450,7 +469,7 @@ export class WifiDebugViewModel {
   }
 
   async refreshLink(): Promise<void> {
-    const linked = await this.repository.getLinkedInfo(this.peersMacGranted);
+    const linked = await this.debugCases.getLinkedInfo(this.peersMacGranted);
     if (!linked.success || linked.value === undefined) {
       const code = linked.error !== undefined ? linked.error.nativeCode : '';
       const message = linked.error !== undefined ? linked.error.message : '读取失败';
@@ -479,11 +498,11 @@ export class WifiDebugViewModel {
       this.link = linked.value;
       this.linkRssi = linked.value.rssi;
     }
-    const ipv4 = await this.repository.readIpv4();
+    const ipv4 = await this.debugCases.readIpv4();
     if (ipv4.success) {
       this.ipv4 = ipv4.value;
     }
-    const ipv6 = await this.repository.readIpv6();
+    const ipv6 = await this.debugCases.readIpv6();
     if (ipv6.success) {
       this.ipv6 = ipv6.value;
     }
@@ -528,7 +547,7 @@ export class WifiDebugViewModel {
     this.connectCode = '';
     this.appendLog('connectCandidate', this.connectMessage, '');
     this.appendLog('secret', masked, '');
-    const names = await this.repository.listCandidateSsids();
+    const names = await this.debugCases.listCandidateSsids();
     if (names.success && names.value !== undefined) {
       this.candidateNames = names.value;
     }
@@ -543,7 +562,7 @@ export class WifiDebugViewModel {
     }
     const removed = await this.debugCases.removeCandidate(networkId);
     this.connectMessage = removed.success ? '已移除' : (removed.error !== undefined ? removed.error.message : '移除失败');
-    const names = await this.repository.listCandidateSsids();
+    const names = await this.debugCases.listCandidateSsids();
     if (names.success && names.value !== undefined) {
       this.candidateNames = names.value;
     }
@@ -551,8 +570,8 @@ export class WifiDebugViewModel {
   }
 
   async refreshDefaultNet(): Promise<void> {
-    const state = await this.repository.getWifiState();
-    const net = await this.repository.readDefaultNet();
+    const state = await this.debugCases.getWifiState();
+    const net = await this.debugCases.readDefaultNet();
     const lines: string[] = [];
     if (!net.success || net.value === undefined) {
       const message = net.error !== undefined ? net.error.message : 'netUnavailable';
@@ -568,7 +587,7 @@ export class WifiDebugViewModel {
       this.netIdLabel = '无';
       this.appendLog('readDefaultNet', 'netUnavailable', '');
     }
-    const online = await this.repository.readOnlineStatus();
+    const online = await this.debugCases.readOnlineStatus();
     if (online.success && online.value !== undefined) {
       this.capabilityLabel = online.value;
       lines.push(online.value);
@@ -612,13 +631,13 @@ export class WifiDebugViewModel {
   }
 
   cancelPortScan(): void {
-    this.repository.cancelPortScan();
+    this.debugCases.cancelPortScan();
     this.portScanning = false;
     this.appendLog('portScan', 'cancelled', '');
   }
 
   async runTrace(): Promise<void> {
-    const result = await this.repository.queryTraceRoute(this.hostInput);
+    const result = await this.debugCases.queryTraceRoute(this.hostInput);
     if (!result.success || result.value === undefined) {
       const message = result.error !== undefined ?
         result.error.message : '失败码 201。未授予 ACCESS_NET_TRACE_INFO，不显示跳数表。';
@@ -734,7 +753,7 @@ export class WifiDebugViewModel {
 
   abortHttp(): void {
     this.httpCancelled = true;
-    this.repository.abortHttp();
+    this.debugCases.abortHttp();
     this.speedPhase = '中止';
     this.speedMbps = '';
     this.uploadMbps = '';
@@ -742,7 +761,7 @@ export class WifiDebugViewModel {
   }
 
   async startLan(serviceType: string): Promise<void> {
-    const connected = await this.repository.isStaConnected();
+    const connected = await this.debugCases.isStaConnected();
     if (!connected.success || connected.value !== true) {
       this.lanError = '需要 Wi-Fi';
       this.lanLines = [];
@@ -808,8 +827,8 @@ export class WifiDebugViewModel {
     if (this.scanPaused) {
       return '已暂停';
     }
-    if (this.repository.foregroundSlotsLeft() === 0) {
-      return `剩余冷却 ${this.formatDuration(this.repository.getScanCooldownRemainingMs())}`;
+    if (this.debugCases.foregroundSlotsLeft() === 0) {
+      return `剩余冷却 ${this.formatDuration(this.debugCases.getScanCooldownRemainingMs())}`;
     }
     if (this.wifiActiveLabel === '未激活') {
       return '先打开 WLAN';
@@ -818,9 +837,9 @@ export class WifiDebugViewModel {
   }
 
   refreshCooldown(): void {
-    const left = this.repository.foregroundSlotsLeft();
+    const left = this.debugCases.foregroundSlotsLeft();
     if (left === 0) {
-      this.cooldownText = `冷却中 ${this.formatDuration(this.repository.getScanCooldownRemainingMs())}`;
+      this.cooldownText = `冷却中 ${this.formatDuration(this.debugCases.getScanCooldownRemainingMs())}`;
     } else {
       this.cooldownText = `2 分钟内还可扫描 ${left} 次`;
     }
@@ -952,7 +971,7 @@ export class WifiDebugViewModel {
   }
 
   async loadProperties(): Promise<void> {
-    const props = await this.repository.readConnectionProperties();
+    const props = await this.debugCases.readConnectionProperties();
     if (!props.success || props.value === undefined) {
       this.propertyLines = [props.error !== undefined ? props.error.message : '失败'];
       this.appendLog('readProperties', this.propertyLines[0], props.error !== undefined ? props.error.nativeCode : '');
@@ -979,7 +998,7 @@ export class WifiDebugViewModel {
   }
 
   async loadProxy(): Promise<void> {
-    const proxy = await this.repository.readHttpProxy();
+    const proxy = await this.debugCases.readHttpProxy();
     if (!proxy.success || proxy.value === undefined) {
       this.proxyLine = proxy.error !== undefined ? proxy.error.message : '失败';
       return;
@@ -989,7 +1008,7 @@ export class WifiDebugViewModel {
   }
 
   async resolveHost(): Promise<void> {
-    const result = await this.repository.resolveHost(this.hostInput, this.dnsFamily);
+    const result = await this.debugCases.resolveHost(this.hostInput, this.dnsFamily);
     if (!result.success || result.value === undefined) {
       const message = result.error !== undefined ? result.error.message : '解析失败';
       this.addressLines = [`Unicode ${this.hostInput}`, message];
@@ -1013,7 +1032,7 @@ export class WifiDebugViewModel {
     const token = this.probeToken + 1;
     this.probeToken = token;
     this.probeRunning = true;
-    const result = await this.repository.queryProbe(this.hostInput);
+    const result = await this.debugCases.queryProbe(this.hostInput);
     if (token !== this.probeToken) {
       return;
     }
@@ -1038,7 +1057,7 @@ export class WifiDebugViewModel {
   async readTraffic(olderThan31Days: boolean): Promise<void> {
     const end = Date.now();
     const start = olderThan31Days ? end - (32 * 24 * 60 * 60 * 1000) : end - (24 * 60 * 60 * 1000);
-    const result = await this.repository.readSelfWifiTraffic(start, end);
+    const result = await this.debugCases.readSelfWifiTraffic(start, end);
     if (!result.success || result.value === undefined) {
       this.trafficLine = result.error !== undefined ? `${result.error.message} ${result.error.nativeCode}` : '失败';
       this.appendLog('selfTraffic', this.trafficLine, result.error !== undefined ? result.error.nativeCode : '');
@@ -1118,7 +1137,7 @@ export class WifiDebugViewModel {
       this.appendLog('udpSend', 'failed', opened.error !== undefined ? opened.error.nativeCode : '');
       return;
     }
-    const written = await opened.value.transport.write(this.textBytes(this.payloadInput));
+    const written = await this.udpCase.write(opened.value.sessionId, this.textBytes(this.payloadInput));
     await this.closeUdpCase.execute(opened.value.sessionId);
     if (!written.success) {
       this.pushInspect(`UDP ${this.hostInput} ${written.message} ${written.nativeCode}`);
@@ -1243,7 +1262,7 @@ export class WifiDebugViewModel {
 
   async stopInspectWsServer(): Promise<void> {
     await this.stopWsServerCase.execute();
-    if (this.repository.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
+    if (this.debugCases.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
       this.wsServerLine = '当前系统不可用';
     } else {
       this.wsServerLine = '未启动';
@@ -1289,7 +1308,7 @@ export class WifiDebugViewModel {
   }
 
   private refreshWsServerGate(): void {
-    if (this.repository.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
+    if (this.debugCases.sdkApiVersion() < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
       this.wsServerLine = '当前系统不可用';
     }
   }
@@ -1310,7 +1329,7 @@ export class WifiDebugViewModel {
 
   private bindLan(): void {
     this.unbindLan();
-    this.lanSub = this.mdnsCase.getDataSource().observeServices().subscribe((services: DiscoveredNetworkService[]) => {
+    this.lanSub = this.mdnsCase.observeServices().subscribe((services: DiscoveredNetworkService[]) => {
       this.applyLan(services);
     }, true);
   }
@@ -1414,7 +1433,7 @@ export class WifiDebugViewModel {
     if (this.wsServerSub !== undefined) {
       this.wsServerSub.dispose();
     }
-    this.wsServerSub = this.wsServerCase.getDataSource().observeClients()
+    this.wsServerSub = this.wsServerCase.observeClients()
       .subscribe((clients: WebSocketServerClientRecord[]) => {
         this.applyWsServerClients(clients);
       }, false);

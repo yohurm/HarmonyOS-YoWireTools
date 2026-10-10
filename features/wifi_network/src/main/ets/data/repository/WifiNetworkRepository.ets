@@ -1,12 +1,22 @@
+import { AbilityContextRegistry } from 'common_platform';
 import { CancellationTokenSource, ResultError } from 'common_core';
 import { Observable, Result } from 'common_core';
+import { TransportSessionRegistry, TransportStateSnapshot, WriteResult } from 'debug_core';
 import { WifiInfoDataSource } from '../datasource/WifiInfoDataSource';
 import { NetworkConnectionDataSource, NetworkStateSnapshot } from '../datasource/NetworkConnectionDataSource';
 import { TcpSocketDataSource } from '../datasource/TcpSocketDataSource';
 import { UdpSocketDataSource } from '../datasource/UdpSocketDataSource';
+import { MdnsDataSource } from '../datasource/MdnsDataSource';
+import { MulticastSocketDataSource } from '../datasource/MulticastSocketDataSource';
+import { SsdpDiscoveryDataSource } from '../datasource/SsdpDiscoveryDataSource';
 import { MqttClientDataSource } from '../datasource/MqttClientDataSource';
 import { HttpDataSource } from '../datasource/HttpDataSource';
 import { WebSocketDataSource } from '../datasource/WebSocketDataSource';
+import { WebSocketServerDataSource } from '../datasource/WebSocketServerDataSource';
+import { TcpClientSessionCoordinator } from '../transport/TcpClientSessionCoordinator';
+import { TcpServerSessionCoordinator } from '../transport/TcpServerSessionCoordinator';
+import { MulticastSessionCoordinator } from '../transport/MulticastSessionCoordinator';
+import { UdpTransportSession } from '../transport/UdpTransportSession';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
 import {
   WifiCandidateDraft,
@@ -24,10 +34,16 @@ import {
   DiagnosticStepState,
   NetworkDiagnosticPlan
 } from '../../domain/model/NetworkDiagnosticModels';
-import { SocketConnectionParams, UdpSessionConfig } from '../../domain/model/SocketModels';
+import { MulticastSessionConfig, SocketConnectionParams, TcpServerClientRecord, UdpSessionConfig } from '../../domain/model/SocketModels';
 import { HttpRequestDraft, HttpResponseRecord } from '../../domain/model/HttpModels';
-import { WebSocketConfig } from '../../domain/model/WebSocketModels';
-import { MqttConnectConfig } from '../../domain/model/MqttModels';
+import {
+  WebSocketClientPhase,
+  WebSocketConfig,
+  WebSocketMessageRecord,
+  WebSocketServerClientRecord,
+  WebSocketServerConfigModel
+} from '../../domain/model/WebSocketModels';
+import { DiscoveredNetworkService, MqttConnectConfig } from '../../domain/model/MqttModels';
 import {
   LanDiscoveryConfig,
   LanHostAliveState,
@@ -57,6 +73,14 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
   private readonly mqttDataSource: MqttClientDataSource;
   private readonly httpDataSource: HttpDataSource;
   private readonly webSocketDataSource: WebSocketDataSource;
+  private readonly mdnsDataSource: MdnsDataSource;
+  private readonly ssdpDataSource: SsdpDiscoveryDataSource;
+  private readonly webSocketServerDataSource: WebSocketServerDataSource;
+  private readonly multicastDataSource: MulticastSocketDataSource;
+  private readonly tcpClient: TcpClientSessionCoordinator;
+  private readonly tcpServer: TcpServerSessionCoordinator;
+  private readonly multicastSession: MulticastSessionCoordinator;
+  private readonly transportRegistry: TransportSessionRegistry;
   private readonly scanCooldown: WifiScanCooldownTracker = new WifiScanCooldownTracker();
   private lastScanResults: WifiAccessPointSnapshot[] = [];
   private lastScanAtMs: number = 0;
@@ -73,7 +97,15 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     udpDataSource: UdpSocketDataSource = UdpSocketDataSource.getInstance(),
     mqttDataSource: MqttClientDataSource = MqttClientDataSource.getInstance(),
     httpDataSource: HttpDataSource = HttpDataSource.getInstance(),
-    webSocketDataSource: WebSocketDataSource = WebSocketDataSource.getInstance()
+    webSocketDataSource: WebSocketDataSource = WebSocketDataSource.getInstance(),
+    mdnsDataSource: MdnsDataSource = MdnsDataSource.getInstance(),
+    ssdpDataSource: SsdpDiscoveryDataSource = SsdpDiscoveryDataSource.getInstance(),
+    webSocketServerDataSource: WebSocketServerDataSource = WebSocketServerDataSource.getInstance(),
+    multicastDataSource: MulticastSocketDataSource = MulticastSocketDataSource.getInstance(),
+    tcpClient: TcpClientSessionCoordinator = TcpClientSessionCoordinator.getInstance(),
+    tcpServer: TcpServerSessionCoordinator = TcpServerSessionCoordinator.getInstance(),
+    multicastSession: MulticastSessionCoordinator = MulticastSessionCoordinator.getInstance(),
+    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
     this.wifiDataSource = wifiDataSource;
     this.networkDataSource = networkDataSource;
@@ -82,6 +114,14 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     this.mqttDataSource = mqttDataSource;
     this.httpDataSource = httpDataSource;
     this.webSocketDataSource = webSocketDataSource;
+    this.mdnsDataSource = mdnsDataSource;
+    this.ssdpDataSource = ssdpDataSource;
+    this.webSocketServerDataSource = webSocketServerDataSource;
+    this.multicastDataSource = multicastDataSource;
+    this.tcpClient = tcpClient;
+    this.tcpServer = tcpServer;
+    this.multicastSession = multicastSession;
+    this.transportRegistry = transportRegistry;
   }
 
   static getInstance(): WifiNetworkRepository {
@@ -278,8 +318,16 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
     return this.webSocketDataSource.disconnect();
   }
 
-  getWebSocketDataSource(): WebSocketDataSource {
-    return this.webSocketDataSource;
+  sendWebSocketText(text: string): Promise<Result<void>> {
+    return this.webSocketDataSource.sendText(text);
+  }
+
+  observeWebSocketPhase(): Observable<WebSocketClientPhase> {
+    return this.webSocketDataSource.observePhase();
+  }
+
+  observeWebSocketMessages(): Observable<WebSocketMessageRecord[]> {
+    return this.webSocketDataSource.observeMessages();
   }
 
   async startLanDiscovery(
@@ -566,5 +614,160 @@ export class WifiNetworkRepository implements WifiNetworkRepositoryContract {
 
   stopNetObservation(): void {
     this.networkDataSource.stopListening();
+  }
+
+  async openUdpSession(sessionId: string, config: UdpSessionConfig): Promise<Result<void>> {
+    const bound = await this.udpDataSource.bind(config.localPort, config.allowBroadcast);
+    if (!bound.success || bound.value === undefined) {
+      return Result.fail(bound.error ?? new ResultError(WifiNetworkErrorCodes.UDP_NOT_BOUND, 'UDP bind failed'));
+    }
+    const transport = new UdpTransportSession(sessionId);
+    transport.bindSocket(bound.value, config.remoteHost, config.remotePort);
+    this.transportRegistry.register(sessionId, transport);
+    return Result.ok(undefined);
+  }
+
+  writeUdpSession(sessionId: string, payload: Uint8Array): Promise<WriteResult> {
+    const transport = this.transportRegistry.get(sessionId);
+    if (transport === undefined) {
+      return Promise.resolve(new WriteResult(false, 0, WifiNetworkErrorCodes.UDP_NOT_BOUND, 'UDP not bound'));
+    }
+    return transport.write(payload);
+  }
+
+  async closeUdpSession(sessionId: string): Promise<void> {
+    const transport = this.transportRegistry.get(sessionId);
+    if (transport !== undefined) {
+      await transport.disconnect('close');
+      this.transportRegistry.remove(sessionId);
+    }
+  }
+
+  async joinMulticast(sessionId: string, config: MulticastSessionConfig): Promise<Result<void>> {
+    const joined = await this.multicastDataSource.bindAndJoin(config.localPort, config.groupAddress);
+    if (!joined.success || joined.value === undefined) {
+      return Result.fail(joined.error ?? new ResultError(WifiNetworkErrorCodes.SOCKET_ERRNO, 'Multicast join failed'));
+    }
+    this.multicastSession.attach(sessionId, joined.value);
+    return Result.ok(undefined);
+  }
+
+  setMulticastMessageListener(listener: (text: string) => void): void {
+    this.multicastSession.setMessageListener(listener);
+  }
+
+  leaveMulticast(): Promise<void> {
+    return this.multicastSession.detach();
+  }
+
+  startMdnsDiscovery(serviceType: string): Promise<Result<void>> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound')));
+    }
+    return this.mdnsDataSource.startDiscovery(context, serviceType);
+  }
+
+  stopMdnsDiscovery(): Promise<void> {
+    return this.mdnsDataSource.stopDiscovery();
+  }
+
+  publishMdns(serviceName: string, serviceType: string, port: number): Promise<Result<void>> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound')));
+    }
+    return this.mdnsDataSource.publishLocal(context, serviceName, serviceType, port);
+  }
+
+  unpublishMdns(serviceName: string, serviceType: string): Promise<Result<void>> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound')));
+    }
+    return this.mdnsDataSource.removeLocal(context, serviceName, serviceType);
+  }
+
+  observeMdnsServices(): Observable<DiscoveredNetworkService[]> {
+    return this.mdnsDataSource.observeServices();
+  }
+
+  listMdnsServices(): DiscoveredNetworkService[] {
+    return this.mdnsDataSource.getServices();
+  }
+
+  startSsdpDiscovery(): Promise<Result<void>> {
+    return this.ssdpDataSource.startDiscovery();
+  }
+
+  stopSsdpDiscovery(): Promise<void> {
+    return this.ssdpDataSource.stopDiscovery();
+  }
+
+  observeSsdpServices(): Observable<DiscoveredNetworkService[]> {
+    return this.ssdpDataSource.observeServices();
+  }
+
+  listSsdpServices(): DiscoveredNetworkService[] {
+    return this.ssdpDataSource.getServices();
+  }
+
+  startWebSocketServer(config: WebSocketServerConfigModel): Promise<Result<void>> {
+    return this.webSocketServerDataSource.start(config);
+  }
+
+  stopWebSocketServer(): Promise<void> {
+    return this.webSocketServerDataSource.stop();
+  }
+
+  observeWebSocketServerClients(): Observable<WebSocketServerClientRecord[]> {
+    return this.webSocketServerDataSource.observeClients();
+  }
+
+  disconnectMqtt(): Promise<void> {
+    return this.mqttDataSource.disconnect();
+  }
+
+  publishMqtt(topic: string, payload: string): Promise<Result<void>> {
+    return this.mqttDataSource.publish(topic, payload);
+  }
+
+  onMqttMessage(listener: (payload: string) => void): Result<void> {
+    return this.mqttDataSource.onMessage(listener);
+  }
+
+  connectTcpSession(sessionId: string, params: SocketConnectionParams): Promise<Result<void>> {
+    return this.tcpClient.connectSession(sessionId, params);
+  }
+
+  observeTcpState(sessionId: string): Observable<TransportStateSnapshot> | undefined {
+    return this.tcpClient.observeState(sessionId);
+  }
+
+  sendTcpText(sessionId: string, text: string): Promise<WriteResult> {
+    return this.tcpClient.sendText(sessionId, text);
+  }
+
+  disconnectTcpSession(sessionId: string): Promise<void> {
+    return this.tcpClient.disconnect(sessionId);
+  }
+
+  watchTcpServer(
+    onClientMessage: (clientId: string, text: string) => void,
+    onClientsChanged: () => void
+  ): void {
+    this.tcpServer.setCallbacks(onClientMessage, onClientsChanged);
+  }
+
+  startTcpServer(port: number): Promise<Result<void>> {
+    return this.tcpServer.start(port);
+  }
+
+  stopTcpServer(): Promise<void> {
+    return this.tcpServer.stop();
+  }
+
+  listTcpServerClients(): TcpServerClientRecord[] {
+    return this.tcpServer.listClients();
   }
 }

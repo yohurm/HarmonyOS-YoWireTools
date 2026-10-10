@@ -12,28 +12,26 @@ import {
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase,
-  TransportSessionRegistry,
-  TransportState,
   TransportStateSnapshot,
   WriteResult
 } from 'debug_core';
 import { DeviceFavoriteRecord, TargetRepository } from 'common_storage';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
-import { MqttClientDataSource } from '../../data/datasource/MqttClientDataSource';
-import { TcpClientSessionCoordinator } from '../../data/transport/TcpClientSessionCoordinator';
-import { TcpClientTransportSession } from '../../data/transport/TcpClientTransportSession';
-import { TcpServerSessionCoordinator } from '../../data/transport/TcpServerSessionCoordinator';
 import { MqttConnectConfig } from '../model/MqttModels';
+import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 import { SocketConnectionParams, TcpServerClientRecord } from '../model/SocketModels';
 import { WifiMessageLogger } from '../service/WifiMessageLogger';
 
 export class OpenTcpServerUseCase {
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private knownClientIds: string[] = [];
 
   constructor(
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
   }
 
@@ -42,14 +40,13 @@ export class OpenTcpServerUseCase {
     onBytes: (address: string, port: number, byteCount: number) => void
   ): void {
     this.knownClientIds = [];
-    const coordinator = TcpServerSessionCoordinator.getInstance();
-    coordinator.setCallbacks((clientId: string, text: string) => {
+    this.repository.watchTcpServer((clientId: string, text: string) => {
       const record = this.findClient(clientId);
       if (record !== undefined) {
         onBytes(record.remoteAddress, record.remotePort, text.length);
       }
     }, () => {
-      const clients = coordinator.listClients();
+      const clients = this.repository.listTcpServerClients();
       for (let i = 0; i < clients.length; i++) {
         const client = clients[i];
         if (!this.clientKnown(client.id)) {
@@ -65,11 +62,11 @@ export class OpenTcpServerUseCase {
     if (!perm.granted) {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
     }
-    return TcpServerSessionCoordinator.getInstance().start(port);
+    return this.repository.startTcpServer(port);
   }
 
   private findClient(clientId: string): TcpServerClientRecord | undefined {
-    const clients = TcpServerSessionCoordinator.getInstance().listClients();
+    const clients = this.repository.listTcpServerClients();
     for (let i = 0; i < clients.length; i++) {
       if (clients[i].id === clientId) {
         return clients[i];
@@ -89,7 +86,7 @@ export class OpenTcpServerUseCase {
 }
 
 export class OpenMqttSessionUseCase {
-  private readonly mqttDataSource: MqttClientDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
@@ -97,13 +94,13 @@ export class OpenMqttSessionUseCase {
   private activeSessionId: string = '';
 
   constructor(
-    mqttDataSource: MqttClientDataSource = MqttClientDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase(),
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
-    this.mqttDataSource = mqttDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
@@ -127,7 +124,7 @@ export class OpenMqttSessionUseCase {
       return Result.fail(created.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     await this.startSession.execute(created.value.id);
-    const connected = await this.mqttDataSource.connect(config);
+    const connected = await this.repository.createMqttSession(config);
     if (!connected.success) {
       await this.stopSession.execute(created.value.id, 'mqtt_connect_failed');
       return Result.fail(connected.error ?? new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'MQTT connect failed'));
@@ -137,7 +134,7 @@ export class OpenMqttSessionUseCase {
   }
 
   async disconnect(sessionId: string): Promise<Result<void>> {
-    await this.mqttDataSource.disconnect();
+    await this.repository.disconnectMqtt();
     this.activeSessionId = '';
     if (sessionId.length > 0) {
       return this.stopSession.execute(sessionId, 'mqtt_disconnected');
@@ -146,7 +143,7 @@ export class OpenMqttSessionUseCase {
   }
 
   onMessage(listener: (payload: string) => void): Result<void> {
-    return this.mqttDataSource.onMessage((payload: string) => {
+    return this.repository.onMqttMessage((payload: string) => {
       if (this.activeSessionId.length > 0) {
         void WifiMessageLogger.logText(
           this.activeSessionId,
@@ -161,7 +158,7 @@ export class OpenMqttSessionUseCase {
   }
 
   async publish(topic: string, payload: string): Promise<Result<void>> {
-    const result = await this.mqttDataSource.publish(topic, payload);
+    const result = await this.repository.publishMqtt(topic, payload);
     if (result.success && this.activeSessionId.length > 0) {
       void WifiMessageLogger.logText(
         this.activeSessionId,
@@ -211,18 +208,15 @@ export class OpenTcpClientSessionUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
-  private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
-    startSession: StartSessionUseCase = new StartSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
-    this.transportRegistry = transportRegistry;
   }
 
   async execute(params: SocketConnectionParams): Promise<Result<string>> {
@@ -244,44 +238,29 @@ export class OpenTcpClientSessionUseCase {
     await this.startSession.execute(created.value.id);
     return Result.ok(created.value.id);
   }
-
-  registerTransport(sessionId: string, transport: TcpClientTransportSession): void {
-    this.transportRegistry.register(sessionId, transport);
-  }
 }
 
 export class ConnectTcpClientUseCase {
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly openTcpSession: OpenTcpClientSessionUseCase;
-  private readonly tcpCoordinator: TcpClientSessionCoordinator;
   private readonly stopSession: StopSessionUseCase;
-  private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
+    repository: WifiNetworkRepositoryContract,
     openTcpSession: OpenTcpClientSessionUseCase = new OpenTcpClientSessionUseCase(),
-    tcpCoordinator: TcpClientSessionCoordinator = TcpClientSessionCoordinator.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
+    this.repository = repository;
     this.openTcpSession = openTcpSession;
-    this.tcpCoordinator = tcpCoordinator;
     this.stopSession = stopSession;
-    this.transportRegistry = transportRegistry;
   }
 
   observeState(sessionId: string): Observable<TransportStateSnapshot> | undefined {
-    const transport = this.transportRegistry.get(sessionId);
-    if (transport === undefined) {
-      return undefined;
-    }
-    return transport.observeState();
+    return this.repository.observeTcpState(sessionId);
   }
 
   async sendText(sessionId: string, text: string): Promise<WriteResult> {
-    const transport = this.transportRegistry.get(sessionId);
-    if (transport === undefined || transport.state !== TransportState.CONNECTED) {
-      return new WriteResult(false, 0, WifiNetworkErrorCodes.NOT_CONNECTED, '发送不可用');
-    }
-    return transport.write(ConnectTcpClientUseCase.toBytes(text));
+    return this.repository.sendTcpText(sessionId, text);
   }
 
   async execute(params: SocketConnectionParams): Promise<Result<string>> {
@@ -289,48 +268,42 @@ export class ConnectTcpClientUseCase {
     if (!session.success || session.value === undefined) {
       return Result.fail(session.error ?? new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'Session open failed'));
     }
-    const connected = await this.tcpCoordinator.connectSession(session.value, params);
+    const connected = await this.repository.connectTcpSession(session.value, params);
     if (!connected.success) {
       await this.stopSession.execute(session.value, 'tcp_connect_failed');
       return Result.fail(connected.error ?? new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, 'Connect failed'));
     }
     return Result.ok(session.value);
   }
-
-  private static toBytes(text: string): Uint8Array {
-    const bytes = new Uint8Array(text.length);
-    for (let i = 0; i < text.length; i++) {
-      bytes[i] = text.charCodeAt(i) & 0xff;
-    }
-    return bytes;
-  }
 }
 
 export class DisconnectTcpClientSessionUseCase {
-  private readonly transportRegistry: TransportSessionRegistry;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
-    this.transportRegistry = transportRegistry;
+    this.repository = repository;
     this.stopSession = stopSession;
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    const transport = this.transportRegistry.get(sessionId);
-    if (transport !== undefined) {
-      await transport.disconnect('tcp_disconnected');
-      this.transportRegistry.remove(sessionId);
-    }
+    await this.repository.disconnectTcpSession(sessionId);
     return this.stopSession.execute(sessionId, 'tcp_disconnected');
   }
 }
 
 export class StopTcpServerSessionUseCase {
+  private readonly repository: WifiNetworkRepositoryContract;
+
+  constructor(repository: WifiNetworkRepositoryContract) {
+    this.repository = repository;
+  }
+
   async execute(): Promise<Result<void>> {
-    await TcpServerSessionCoordinator.getInstance().stop();
+    await this.repository.stopTcpServer();
     return Result.ok(undefined);
   }
 }

@@ -2,7 +2,10 @@ import { Result, ResultError } from 'common_core';
 import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
 import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
-import { WifiCandidateDraft, WifiScanBatch } from '../model/WifiDebugFacts';
+import { WifiCandidateDraft, WifiFeatureFact, WifiIpv4Facts, WifiIpv6Facts, WifiScanBatch } from '../model/WifiDebugFacts';
+import { WifiLinkedInfoSnapshot } from '../model/WifiLinkedInfoSnapshot';
+import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts, TraceHopFact } from '../model/NetworkInspectFacts';
+import { NetworkStateSnapshot } from '../model/NetworkStateSnapshot';
 import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 import { WifiCandidateRejection, WifiCandidateRules } from '../service/WifiCandidateRules';
 import { WifiScanLogger } from '../service/WifiScanLogger';
@@ -19,8 +22,127 @@ export class WifiDebugUseCases {
     this.ensurePermission = ensurePermission;
   }
 
-  repositoryContract(): WifiNetworkRepositoryContract {
-    return this.repository;
+  isEmulatorRuntime(): boolean {
+    return this.repository.isEmulatorRuntime();
+  }
+
+  sdkApiVersion(): number {
+    return this.repository.sdkApiVersion();
+  }
+
+  startNetObservation(
+    listener: (snapshot: NetworkStateSnapshot) => void,
+    events: (name: string, detail: string) => void
+  ): void {
+    this.repository.startNetObservation(listener, events);
+  }
+
+  stopNetObservation(): void {
+    this.repository.stopNetObservation();
+  }
+
+  onWifiPowerState(listener: (state: number) => void): Result<void> {
+    return this.repository.onWifiPowerState(listener);
+  }
+
+  offWifiPowerState(): void {
+    this.repository.offWifiPowerState();
+  }
+
+  onWifiConnectionState(listener: (state: number) => void): Result<void> {
+    return this.repository.onWifiConnectionState(listener);
+  }
+
+  offWifiConnectionState(): void {
+    this.repository.offWifiConnectionState();
+  }
+
+  onWifiRssi(listener: (rssi: number) => void): Result<void> {
+    return this.repository.onWifiRssi(listener);
+  }
+
+  offWifiRssi(): void {
+    this.repository.offWifiRssi();
+  }
+
+  getWifiState(): Promise<Result<boolean>> {
+    return this.repository.getWifiState();
+  }
+
+  isStaConnected(): Promise<Result<boolean>> {
+    return this.repository.isStaConnected();
+  }
+
+  isHotspotActive(): Promise<Result<boolean>> {
+    return this.repository.isHotspotActive();
+  }
+
+  readFeatureSupport(): Promise<Result<WifiFeatureFact[]>> {
+    return this.repository.readFeatureSupport();
+  }
+
+  getScanCooldownRemainingMs(): number {
+    return this.repository.getScanCooldownRemainingMs();
+  }
+
+  foregroundSlotsLeft(): number {
+    return this.repository.foregroundSlotsLeft();
+  }
+
+  getLinkedInfo(bssidVisible: boolean): Promise<Result<WifiLinkedInfoSnapshot>> {
+    return this.repository.getLinkedInfo(bssidVisible);
+  }
+
+  readIpv4(): Promise<Result<WifiIpv4Facts>> {
+    return this.repository.readIpv4();
+  }
+
+  readIpv6(): Promise<Result<WifiIpv6Facts>> {
+    return this.repository.readIpv6();
+  }
+
+  listCandidateSsids(): Promise<Result<string[]>> {
+    return this.repository.listCandidateSsids();
+  }
+
+  readDefaultNet(): Promise<Result<NetworkStateSnapshot>> {
+    return this.repository.readDefaultNet();
+  }
+
+  readOnlineStatus(): Promise<Result<string>> {
+    return this.repository.readOnlineStatus();
+  }
+
+  cancelPortScan(): void {
+    this.repository.cancelPortScan();
+  }
+
+  queryTraceRoute(destination: string): Promise<Result<TraceHopFact[]>> {
+    return this.repository.queryTraceRoute(destination);
+  }
+
+  abortHttp(): void {
+    this.repository.abortHttp();
+  }
+
+  readConnectionProperties(): Promise<Result<NetworkPropertyFacts>> {
+    return this.repository.readConnectionProperties();
+  }
+
+  readHttpProxy(): Promise<Result<HttpProxyFacts>> {
+    return this.repository.readHttpProxy();
+  }
+
+  resolveHost(host: string, family: number): Promise<Result<DnsLookupFacts>> {
+    return this.repository.resolveHost(host, family);
+  }
+
+  queryProbe(destination: string): Promise<Result<ProbeFacts>> {
+    return this.repository.queryProbe(destination);
+  }
+
+  readSelfWifiTraffic(startMs: number, endMs: number): Promise<Result<string>> {
+    return this.repository.readSelfWifiTraffic(startMs, endMs);
   }
 
   async openPage(): Promise<Result<void>> {

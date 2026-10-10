@@ -1,12 +1,19 @@
-import { Observable } from 'common_core';
+import { Observable, Result } from 'common_core';
+import { TransportStateSnapshot, WriteResult } from 'debug_core';
 import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
 import { WifiLinkedInfoSnapshot } from '../model/WifiLinkedInfoSnapshot';
 import { WifiOverviewSnapshot } from '../model/WifiOverviewSnapshot';
 import { NetworkDiagnosticPlan, DiagnosticStepResult } from '../model/NetworkDiagnosticModels';
-import { SocketConnectionParams, UdpSessionConfig } from '../model/SocketModels';
+import { MulticastSessionConfig, SocketConnectionParams, TcpServerClientRecord, UdpSessionConfig } from '../model/SocketModels';
 import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';
-import { WebSocketConfig } from '../model/WebSocketModels';
-import { MqttConnectConfig } from '../model/MqttModels';
+import {
+  WebSocketClientPhase,
+  WebSocketConfig,
+  WebSocketMessageRecord,
+  WebSocketServerClientRecord,
+  WebSocketServerConfigModel
+} from '../model/WebSocketModels';
+import { DiscoveredNetworkService, MqttConnectConfig } from '../model/MqttModels';
 import { LanDiscoveryConfig, LanHostResult, PortScanConfig, PortProbeResult } from '../model/LanDiscoveryModels';
 import { DnsLookupFacts, HttpProxyFacts, NetworkPropertyFacts, ProbeFacts, TraceHopFact } from '../model/NetworkInspectFacts';
 import { NetworkStateSnapshot } from '../model/NetworkStateSnapshot';
@@ -17,7 +24,6 @@ import {
   WifiIpv6Facts,
   WifiScanBatch
 } from '../model/WifiDebugFacts';
-import { Result } from 'common_core';
 
 /**
  * Domain repository contract per architecture 03-§13.1.
@@ -78,4 +84,44 @@ export interface WifiNetworkRepositoryContract {
     events: (name: string, detail: string) => void
   ): void;
   stopNetObservation(): void;
+  onWifiStateChange(listener: (active: boolean) => void): void;
+  offWifiStateChange(): void;
+  onWifiConnectionChange(listener: () => void): void;
+  offWifiConnectionChange(): void;
+  sendWebSocketText(text: string): Promise<Result<void>>;
+  observeWebSocketPhase(): Observable<WebSocketClientPhase>;
+  observeWebSocketMessages(): Observable<WebSocketMessageRecord[]>;
+  openUdpSession(sessionId: string, config: UdpSessionConfig): Promise<Result<void>>;
+  writeUdpSession(sessionId: string, payload: Uint8Array): Promise<WriteResult>;
+  closeUdpSession(sessionId: string): Promise<void>;
+  joinMulticast(sessionId: string, config: MulticastSessionConfig): Promise<Result<void>>;
+  setMulticastMessageListener(listener: (text: string) => void): void;
+  leaveMulticast(): Promise<void>;
+  startMdnsDiscovery(serviceType: string): Promise<Result<void>>;
+  stopMdnsDiscovery(): Promise<void>;
+  publishMdns(serviceName: string, serviceType: string, port: number): Promise<Result<void>>;
+  unpublishMdns(serviceName: string, serviceType: string): Promise<Result<void>>;
+  observeMdnsServices(): Observable<DiscoveredNetworkService[]>;
+  listMdnsServices(): DiscoveredNetworkService[];
+  startSsdpDiscovery(): Promise<Result<void>>;
+  stopSsdpDiscovery(): Promise<void>;
+  observeSsdpServices(): Observable<DiscoveredNetworkService[]>;
+  listSsdpServices(): DiscoveredNetworkService[];
+  startWebSocketServer(config: WebSocketServerConfigModel): Promise<Result<void>>;
+  stopWebSocketServer(): Promise<void>;
+  observeWebSocketServerClients(): Observable<WebSocketServerClientRecord[]>;
+  disconnectMqtt(): Promise<void>;
+  publishMqtt(topic: string, payload: string): Promise<Result<void>>;
+  onMqttMessage(listener: (payload: string) => void): Result<void>;
+  connectTcpSession(sessionId: string, params: SocketConnectionParams): Promise<Result<void>>;
+  observeTcpState(sessionId: string): Observable<TransportStateSnapshot> | undefined;
+  sendTcpText(sessionId: string, text: string): Promise<WriteResult>;
+  disconnectTcpSession(sessionId: string): Promise<void>;
+  watchTcpServer(
+    onClientMessage: (clientId: string, text: string) => void,
+    onClientsChanged: () => void
+  ): void;
+  startTcpServer(port: number): Promise<Result<void>>;
+  stopTcpServer(): Promise<void>;
+  listTcpServerClients(): TcpServerClientRecord[];
 }

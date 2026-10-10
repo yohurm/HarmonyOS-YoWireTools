@@ -14,7 +14,7 @@ import {
 } from 'debug_core';
 import { WifiScanLogger } from '../service/WifiScanLogger';
 import { WifiMessageLogger } from '../service/WifiMessageLogger';
-import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
+import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 import { WifiOverviewSnapshot } from '../model/WifiOverviewSnapshot';
 import { WifiAccessPointSnapshot } from '../model/WifiAccessPointSnapshot';
@@ -26,9 +26,9 @@ import { LanDiscoveryConfig, LanHostResult, PortScanConfig, PortProbeResult } fr
 import { SocketConnectionParams } from '../model/SocketModels';
 
 export class ObserveWifiStateUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
 
-  constructor(repository: WifiNetworkRepository = WifiNetworkRepository.getInstance()) {
+  constructor(repository: WifiNetworkRepositoryContract) {
     this.repository = repository;
   }
 
@@ -44,11 +44,11 @@ export class ObserveWifiStateUseCase {
 }
 
 export class WifiScanCacheFacade {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePeersMac: EnsurePermissionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePeersMac: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -74,14 +74,14 @@ export class WifiScanCacheFacade {
 }
 
 export class StartWifiScanUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase(),
@@ -146,11 +146,11 @@ export class StartWifiScanUseCase {
 }
 
 export class RunNetworkDiagnosticsUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -168,11 +168,11 @@ export class RunNetworkDiagnosticsUseCase {
 }
 
 export class ExecuteHttpRequestUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -189,7 +189,7 @@ export class ExecuteHttpRequestUseCase {
 }
 
 export class OpenWebSocketUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
@@ -199,7 +199,7 @@ export class OpenWebSocketUseCase {
   private loggedMessageCount: number = 0;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase(),
@@ -240,15 +240,15 @@ export class OpenWebSocketUseCase {
   }
 
   async sendText(text: string): Promise<Result<void>> {
-    return this.repository.getWebSocketDataSource().sendText(text);
+    return this.repository.sendWebSocketText(text);
   }
 
   observePhase(): Observable<WebSocketClientPhase> {
-    return this.repository.getWebSocketDataSource().observePhase();
+    return this.repository.observeWebSocketPhase();
   }
 
   observeMessages(): Observable<WebSocketMessageRecord[]> {
-    return this.repository.getWebSocketDataSource().observeMessages();
+    return this.repository.observeWebSocketMessages();
   }
 
   async disconnect(sessionId: string = ''): Promise<Result<void>> {
@@ -265,7 +265,7 @@ export class OpenWebSocketUseCase {
   private bindMessageEvidence(): void {
     this.unbindMessageEvidence();
     this.loggedMessageCount = 0;
-    this.messageSubscription = this.repository.getWebSocketDataSource().observeMessages()
+    this.messageSubscription = this.repository.observeWebSocketMessages()
       .subscribe((messages: WebSocketMessageRecord[]) => {
         if (this.activeSessionId.length === 0 || messages.length <= this.loggedMessageCount) {
           this.loggedMessageCount = messages.length;
@@ -295,11 +295,11 @@ export class OpenWebSocketUseCase {
 }
 
 export class StartLanDiscoveryUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -316,11 +316,11 @@ export class StartLanDiscoveryUseCase {
 }
 
 export class StartPortScanUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
