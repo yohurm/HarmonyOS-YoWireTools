@@ -9,4 +9,7 @@ export class NearLinkConstants {
   static readonly CONGESTION_INITIAL_BACKOFF_MS: number = 50;
   static readonly CONGESTION_MAX_BACKOFF_MS: number = 500;
   static readonly CONGESTION_MAX_RETRY: number = 5;
+  static readonly GAP_UNPAIR: string = 'unpair';
+  static readonly GAP_CDSM_UNSUPPORTED: string = 'cdsm_unsupported';
+  static readonly CDSM_UNSUPPORTED_CODE: string = '1009700050';
 }

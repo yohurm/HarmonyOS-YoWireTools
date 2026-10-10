@@ -20,6 +20,7 @@ import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
 import { NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
+import { NearLinkGapNotice } from '../model/NearLinkGapNotice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
 import { CapabilityResult } from 'common_platform';
 import { NearLinkCapabilityService } from '../service/NearLinkCapabilityService';
@@ -193,5 +194,29 @@ export class ReadNearLinkSwitchUseCase {
       return Result.ok(RadioSwitchReading.UNSUPPORTED);
     }
     return Result.ok(adapter.value.enabled ? RadioSwitchReading.ON : RadioSwitchReading.OFF);
+  }
+}
+
+export class ReadNearLinkUnpairBoundaryUseCase {
+  private readonly repository: NearLinkRepositoryContract;
+
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(): NearLinkGapNotice {
+    return this.repository.describeUnpairBoundary();
+  }
+}
+
+export class ReadCdsmBoundaryUseCase {
+  private readonly repository: NearLinkRepositoryContract;
+
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+    this.repository = repository;
+  }
+
+  execute(): NearLinkGapNotice {
+    return this.repository.describeCdsmBoundary();
   }
 }

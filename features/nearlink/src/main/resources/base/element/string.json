@@ -3,6 +3,18 @@
     {
       "name": "nl_title_overview",
       "value": "星闪"
+    },
+    {
+      "name": "nl_unpair_refusal_body",
+      "value": "本模块没有解除配对接口，不会显示解除成功。请到系统设置处理：设置 > 多设备协同 > 星闪，或设置 > 星闪和蓝牙 > 星闪。"
+    },
+    {
+      "name": "nl_unpair_open_settings",
+      "value": "打开系统设置"
+    },
+    {
+      "name": "nl_cdsm_unsupported",
+      "value": "本设备不支持合作设备集。扫描和 SSAP 不以此为前提，仍按各自条件使用。"
     }
   ]
 }

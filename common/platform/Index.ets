@@ -28,6 +28,7 @@ export { AbilityContextRegistry } from './src/main/ets/context/AbilityContextReg
 export { UIContextRegistry } from './src/main/ets/context/UIContextRegistry';
 export { KitEventSubscription, PlatformErrorCodes } from './src/main/ets/kit/KitEventSubscription';
 export { BluetoothSettingsNavigator } from './src/main/ets/navigation/BluetoothSettingsNavigator';
+export { NearLinkSettingsNavigator } from './src/main/ets/navigation/NearLinkSettingsNavigator';
 export { PendingModuleNavigation } from './src/main/ets/navigation/PendingModuleNavigation';
 export { QuickLinkIds } from './src/main/ets/navigation/QuickLinkIds';
 export { WifiSettingsNavigator } from './src/main/ets/navigation/WifiSettingsNavigator';

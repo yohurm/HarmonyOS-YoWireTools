@@ -26,6 +26,7 @@ import {
   SsapServiceTreeSnapshot
 } from '../../domain/model/SsapServiceTree';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
+import { NearLinkGapNotice } from '../../domain/model/NearLinkGapNotice';
 import { NearLinkAdvParser } from '../../domain/service/NearLinkAdvParser';
 import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
 import { SsapPropertyChangeDispatcher } from '../service/SsapPropertyChangeDispatcher';
@@ -547,5 +548,17 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
       return NearLinkErrorCodes.RSSI_INVALID;
     }
     return '';
+  }
+
+  describeUnpairBoundary(): NearLinkGapNotice {
+    return new NearLinkGapNotice(NearLinkConstants.GAP_UNPAIR, true);
+  }
+
+  describeCdsmBoundary(): NearLinkGapNotice {
+    return new NearLinkGapNotice(
+      NearLinkConstants.GAP_CDSM_UNSUPPORTED,
+      false,
+      NearLinkConstants.CDSM_UNSUPPORTED_CODE
+    );
   }
 }

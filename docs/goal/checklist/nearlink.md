@@ -771,7 +771,7 @@ related: [docs/goal/research/nearlink.md]
 - 前置：设备已配对。
 - 动作：在模块内查找解除配对。
 - 结果：没有解除配对成功态。说明需在系统设置中处理，本模块无该 API。
-- 证据：平台墙：星闪没有解除配对 API。本树没有解除配对成功态，也没有系统设置说明文案。
+- 证据：数据源没有解除配对方法。`ReadNearLinkUnpairBoundaryUseCase` 只返回缺口说明，`NearLinkSettingsNavigator.openNearLinkSettings` 打开系统设置，不记为解除成功。未在真机执行，射频仍是待真机。
 
 ## 吞吐、重连、日志与诊断
 
@@ -873,7 +873,7 @@ related: [docs/goal/research/nearlink.md]
 - 前置：`1009700050` 或设备无 CDSM。
 - 动作：使用扫描和 SSAP。
 - 结果：扫描与 SSAP 仍可按自身前提使用。CDSM 页显示本设备不支持合作设备集。
-- 证据：平台墙：合作设备集不是扫描或 SSAP 的前提。本树没有 CDSM 页文案；扫描不因缺少 CDSM 被禁止。
+- 证据：`ReadCdsmBoundaryUseCase` 标明本设备不支持合作设备集。`StartNearLinkScanUseCase` 不读取 CDSM，也不因 `1009700050` 拒绝扫描。未在真机执行，射频仍是待真机。
 
 ## 覆盖摘要
 
@@ -881,7 +881,11 @@ related: [docs/goal/research/nearlink.md]
 
 ### 可验收实现
 
-NL-002、NL-004–NL-022、NL-025–NL-033、NL-037–NL-050、NL-053–NL-075、NL-077–NL-096、NL-098、NL-099、NL-102、NL-104–NL-112、NL-114、NL-116–NL-120。
+NL-002、NL-004–NL-022、NL-025–NL-033、NL-037–NL-050、NL-053–NL-075、NL-077–NL-096、NL-098、NL-099、NL-101、NL-102、NL-104–NL-112、NL-114、NL-115、NL-116–NL-120。
+
+NL-101 归在这里：模块内没有解除配对成功态，并打开系统设置。未在真机执行，射频仍是待真机。
+
+NL-115 归在这里：页面标明不支持合作设备集，扫描不读取 CDSM。未在真机执行，射频仍是待真机。
 
 NL-105 归在这里：通过标准是用户点击后用当前地址重新连接。系统自动重连不是这条的目标。
 
@@ -897,7 +901,7 @@ NL-001、NL-003、NL-023、NL-024、NL-034、NL-035、NL-051、NL-052、NL-076�
 
 通过标准是界面写明 Kit 未提供该能力，并且不出现该能力的成功态。
 
-NL-036、NL-101、NL-103、NL-113、NL-115。
+NL-036、NL-103、NL-113。
 
 NL-105 与 NL-110 不在本集合。
 
