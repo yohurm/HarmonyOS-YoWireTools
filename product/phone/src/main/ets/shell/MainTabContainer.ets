@@ -6,6 +6,7 @@ import { WifiFeaturePage } from 'feature_wifi_network';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { BluetoothOverviewPage } from '../pages/bluetooth/BluetoothOverviewPage';
 import { MoreFeaturePage } from './MoreFeaturePage';
+import { WorkbenchRadioState } from './WorkbenchRadioState';
 
 @Builder
 function networkTab() {
@@ -35,6 +36,7 @@ export struct MainTabContainer {
   };
   @Event onOpenCommand: () => void = () => {
   };
+  @Local radio: WorkbenchRadioState = new WorkbenchRadioState();
   private readonly tabItems: YoSideNavItem[] = [
     { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
     { index: 1, label: $r('app.string.tab_bluetooth'), symbol: $r('sys.symbol.trunk') },
@@ -46,6 +48,9 @@ export struct MainTabContainer {
   @LocalBuilder
   workbenchTab() {
     HomeFeaturePage({
+      bluetoothReading: this.radio.bluetooth,
+      wlanReading: this.radio.wlan,
+      nearlinkReading: this.radio.nearlink,
       onOpenModule: (moduleId: string) => {
         this.openModule(moduleId);
       },
@@ -56,6 +61,10 @@ export struct MainTabContainer {
         this.onOpenCommand();
       }
     })
+  }
+
+  aboutToAppear(): void {
+    this.radio.refresh();
   }
 
   private openModule(moduleId: string): void {
@@ -86,6 +95,9 @@ export struct MainTabContainer {
       items: this.tabItems,
       onTabChange: (index: number) => {
         this.onTabChange(index);
+        if (index === AppRoutes.TAB_INDEX_WORKBENCH) {
+          this.radio.refresh();
+        }
       },
       tabContent0: this.workbenchTab,
       tabContent1: this.bluetoothTab,

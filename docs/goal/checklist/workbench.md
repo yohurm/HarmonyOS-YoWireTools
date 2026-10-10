@@ -41,14 +41,14 @@ related:
 - **Then** 仍然是同一棵 `Navigation`、同一个 `NavPathStack`、`NavigationMode.Stack`。工作台切换只改 `activeTabIndex`，不新开栈
 - **证据：** `product/phone/src/main/ets/pages/Index.ets`。官方导航架构写明 Navigation 绑定一个 NavPathStack；本工程选用 Stack，不用 Auto。行为对照 Wi-Fi 分支 `cursor/wifi-network-phase-d-4072` 的 `7295d1771288a0fb957021bd0e948073f435d96c`。本清单不改 ets。
 
-### WB-003 工作台不显示蓝牙、WLAN、星闪状态胶囊
+### WB-003 工作台显示蓝牙、WLAN、星闪状态胶囊
 
-- **判定：** 缺口
+- **判定：** 支持
 - **屏幕：** 工作台（`screen.workbench.home`）
 - **Given** 工作台已显示
 - **When** 查看状态条
-- **Then** 没有三枚射频状态胶囊，也没有「未读取」状态条。入口卡不带 `statusLabel`。不得把卡片说成状态已经读到
-- **证据：** `HomeFeaturePage` 的 `YoModeEntryCard` 不设置 `statusLabel`，也不调用射频状态用例。
+- **Then** 有三枚 `YoStatusPill`：蓝牙、WLAN、星闪。开关读到后显示「已开启」或「已关闭」。未授权显示「未授权」，星闪不支持显示「不支持」，失败或未返回显示「未读取」。入口卡不设 `statusLabel`。不调用 `requestPermissionsFromUser`
+- **证据：** `HomeFeaturePage.ets`；`WorkbenchRadioState.ets`；`ReadBluetoothSwitchUseCase`；`ReadWifiSwitchUseCase`；`ReadNearLinkSwitchUseCase`。说明见 [WB-003](../architecture/workbench/WB-003.md)
 
 ### WB-004 工作台有三张模块入口卡
 
@@ -84,7 +84,7 @@ related:
 - **Given** 未授予蓝牙、星闪或位置权限
 - **When** 只进入工作台，不进入各模块
 - **Then** 只进入工作台或点入口卡，不出现 `requestPermissionsFromUser`
-- **证据：** `HomeFeaturePage.ets` 不引用权限编排
+- **证据：** `HomeFeaturePage.ets` 不引用权限编排。胶囊读取走 `checkGranted`，不调用 `requestPermissionsFromUser`
 
 ## 命令面板
 
@@ -139,7 +139,7 @@ related:
 
 | 判定 | 条数 | 编号 |
 | --- | --- | --- |
-| 支持 | 11 | WB-001、WB-002、WB-004、WB-005、WB-006、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
-| 缺口 | 1 | WB-003 |
+| 支持 | 12 | WB-001、WB-002、WB-003、WB-004、WB-005、WB-006、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
+| 缺口 | 0 | 无 |
 
-命令面板已有页面。仍是缺口的只有 WB-003。
+命令面板已有页面。工作台状态胶囊已接通。射频仍是待真机。

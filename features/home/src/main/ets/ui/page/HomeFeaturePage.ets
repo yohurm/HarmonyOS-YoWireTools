@@ -1,4 +1,4 @@
-﻿import { DebugSessionSummary, FeatureModuleId } from 'debug_core';
+﻿import { DebugSessionSummary, FeatureModuleId, RadioSwitchReading } from 'debug_core';
 import {
   YoEmpty,
   YoEmptyStateModel,
@@ -6,9 +6,11 @@ import {
   YoNavDestinationKind,
   YoPageShell,
   YoSpace,
+  YoStatusPill,
   YoTypeStyle,
   YoColor
 } from 'youi_kit';
+import { WorkbenchStatusText } from '../../viewmodel/WorkbenchStatusText';
 import { WorkbenchViewModel } from '../../viewmodel/WorkbenchViewModel';
 
 /** Workbench root tab. Cards switch the existing shell tab. They do not scan. */
@@ -20,6 +22,9 @@ export struct HomeFeaturePage {
   };
   @Event onOpenCommand: () => void = () => {
   };
+  @Param bluetoothReading: string = RadioSwitchReading.UNREAD;
+  @Param wlanReading: string = RadioSwitchReading.UNREAD;
+  @Param nearlinkReading: string = RadioSwitchReading.UNREAD;
   @Local vm: WorkbenchViewModel = new WorkbenchViewModel();
 
   aboutToAppear(): void {
@@ -29,6 +34,22 @@ export struct HomeFeaturePage {
   @LocalBuilder
   pageContent() {
     Column({ space: YoSpace.L }) {
+      Flex({ wrap: FlexWrap.Wrap, space: { main: YoSpace.S, cross: YoSpace.S } }) {
+        YoStatusPill({
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_bluetooth'), this.bluetoothReading),
+          tone: WorkbenchStatusText.tone(this.bluetoothReading)
+        })
+        YoStatusPill({
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_wlan'), this.wlanReading),
+          tone: WorkbenchStatusText.tone(this.wlanReading)
+        })
+        YoStatusPill({
+          label: WorkbenchStatusText.label($r('app.string.home_capsule_nearlink'), this.nearlinkReading),
+          tone: WorkbenchStatusText.tone(this.nearlinkReading)
+        })
+      }
+      .width('100%')
+
       Row({ space: YoSpace.M }) {
         Column() {
           YoModeEntryCard({

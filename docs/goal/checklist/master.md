@@ -132,13 +132,13 @@ related:
 
 ## 壳与跨模块
 
-下面每一条都在壳清单和同编号架构文件里。判定与清单相同。这些编号不计入上面的 350。仍是缺口的只有 WB-003。
+下面每一条都在壳清单和同编号架构文件里。判定与清单相同。这些编号不计入上面的 350。壳编号没有缺口。射频仍是待真机。
 
 | 编号 | 判定 | 标题 | 清单 |
 | --- | --- | --- | --- |
 | WB-001 | 支持 | 工作台是根 Tab，标题为「工作台」 | [workbench.md](./workbench.md) |
 | WB-002 | 支持 | 一条 Navigation、一个 NavPathStack、Stack 模式 | [workbench.md](./workbench.md) |
-| WB-003 | 缺口 | 工作台没有射频状态胶囊 | [workbench.md](./workbench.md) |
+| WB-003 | 支持 | 工作台显示蓝牙、WLAN、星闪状态胶囊 | [workbench.md](./workbench.md) |
 | WB-004 | 支持 | 工作台有三张模块入口卡 | [workbench.md](./workbench.md) |
 | WB-005 | 支持 | 工作台列出最近会话或空态 | [workbench.md](./workbench.md) |
 | WB-006 | 支持 | 工作台有日志中心和命令面板入口 | [workbench.md](./workbench.md) |

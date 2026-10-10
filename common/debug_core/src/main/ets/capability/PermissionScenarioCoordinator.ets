@@ -32,6 +32,20 @@ export class PermissionScenarioCoordinator {
     return this.orchestrator.ensurePermissions(permissions, reason, presentation);
   }
 
+  /**
+   * Read-only check. Does not call requestPermissionsFromUser.
+   */
+  async checkGranted(scenario: PermissionScenario): Promise<boolean> {
+    const permissions = PermissionScenarioCatalog.permissionsFor(scenario);
+    for (let i = 0; i < permissions.length; i++) {
+      const status = await this.orchestrator.checkPermission(permissions[i]);
+      if (status !== PermissionStatus.GRANTED) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   async buildUiStateForScenario(scenario: PermissionScenario): Promise<PermissionUiState> {
     const permissions = PermissionScenarioCatalog.permissionsFor(scenario);
     const statuses: PermissionStatus[] = [];

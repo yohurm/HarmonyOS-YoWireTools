@@ -68,6 +68,7 @@ export {
   RepeatCommandCoordinator
 } from './src/main/ets/service/RepeatCommandCoordinator';
 export { FeatureModuleId } from './src/main/ets/domain/model/FeatureModuleId';
+export { RadioSwitchReading } from './src/main/ets/domain/model/RadioSwitchReading';
 export { SessionLogQuery } from './src/main/ets/domain/model/SessionLogQuery';
 export { SettingsSnapshot } from './src/main/ets/domain/model/SettingsSnapshot';
 export {

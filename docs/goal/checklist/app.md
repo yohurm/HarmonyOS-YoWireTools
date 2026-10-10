@@ -59,7 +59,7 @@ related:
 - **屏幕：** 无单独屏幕。入口是各 feature 的 `Index.ets`
 - **Given** 壳只构造页面和蓝牙页已经用到的视图模型
 - **When** 看四个 feature 的包入口
-- **Then** `feature_nearlink` 只导出 `NearLinkFeaturePage`。`feature_wifi_network` 只导出 `WifiFeaturePage`。`feature_home` 只导出 `HomeFeaturePage`、`LogCenterPage`、`LogDetailPage`、`CommandPanelPage`、`SettingsHubPage`、`LogDetailNavParams`。`feature_bluetooth` 只导出 `product/phone` 已 import 的页面与视图模型。仓库、传输、用例、探测类不在入口
+- **Then** `feature_nearlink` 导出 `NearLinkFeaturePage` 与 `ReadNearLinkSwitchUseCase`。`feature_wifi_network` 导出 `WifiFeaturePage` 与 `ReadWifiSwitchUseCase`。`feature_home` 只导出 `HomeFeaturePage`、`LogCenterPage`、`LogDetailPage`、`CommandPanelPage`、`SettingsHubPage`、`LogDetailNavParams`。`feature_bluetooth` 只导出 `product/phone` 已 import 的页面与视图模型。蓝牙开关用例是 `yobluetooth` 的 `ReadBluetoothSwitchUseCase`。仓库、传输、探测类不在 feature 入口
 - **证据：** 四个 `Index.ets`。契约在 `common/debug_core`，名单见 [APP-003](../architecture/app/APP-003.md)
 
 ### APP-004 一条数据路径
@@ -98,4 +98,4 @@ related:
 | 支持 | 6 | APP-001、APP-002、APP-003、APP-004、APP-005、APP-006 |
 | 缺口 | 0 | 无 |
 
-壳屏幕里仍然是缺口的编号只有 WB-003。本文件不把状态胶囊写成已经出现。
+壳编号没有缺口。WB-003 的三枚胶囊已接通。射频仍是待真机。
