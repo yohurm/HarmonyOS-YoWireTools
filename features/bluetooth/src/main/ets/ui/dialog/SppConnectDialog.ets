@@ -21,7 +21,7 @@ import {
   YoToast,
   YoTypeStyle
 } from 'youi_kit';
-import { BluetoothConstants, SppUuidFavoriteEntry } from 'yobluetooth';
+import { BluetoothConstants, SppSocketKind, SppSocketRequestPolicy, SppUuidFavoriteEntry } from 'yobluetooth';
 import { ClassicDeviceListItem } from '../../viewmodel/SppMainViewModel';
 import {
   SppConnectDialogController,
@@ -563,10 +563,48 @@ struct SppConnectDialogContent {
         (isOn: boolean) => {
           this.params.autoReconnect = isOn;
         },
-        true
+        false
       );
+      Divider()
+        .color(YoColor.DIVIDER)
+        .strokeWidth(0.5)
+      this.buildSocketKindRow();
     }
     .width('100%')
+  }
+
+  @Builder
+  buildSocketKindRow() {
+    Column({ space: YoSpace.XS }) {
+      Row({ space: YoSpace.S }) {
+        Button($r('app.string.bt_spp_socket_rfcomm'))
+          .enabled(!this.params.connecting)
+          .onClick(() => {
+            this.params.socketKind = SppSocketKind.RFCOMM;
+          })
+        Button($r('app.string.bt_spp_socket_l2cap'))
+          .enabled(!this.params.connecting)
+          .onClick(() => {
+            this.params.socketKind = SppSocketKind.L2CAP;
+          })
+        Button($r('app.string.bt_spp_socket_l2cap_ble'))
+          .enabled(!this.params.connecting)
+          .onClick(() => {
+            this.params.socketKind = SppSocketKind.L2CAP_BLE;
+          })
+      }
+      .width('100%')
+      if (SppSocketRequestPolicy.psmRequired(this.params.socketKind)) {
+        TextInput({ text: this.params.psmText, placeholder: $r('app.string.bt_spp_psm_label') })
+          .type(InputType.Number)
+          .enabled(!this.params.connecting)
+          .onChange((text: string) => {
+            this.params.psmText = text;
+          })
+      }
+    }
+    .width('100%')
+    .padding({ top: YoSpace.S, bottom: YoSpace.S })
   }
 
   @Builder

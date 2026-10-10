@@ -9,6 +9,10 @@ import {
 } from 'youi_kit';
 import {
   AdvertisingRequest,
+  CloseGattServerUseCase,
+  HexPayload,
+  NotifyGattServerUseCase,
+  OpenGattServerUseCase,
   StartBleAdvertiseUseCase,
   StopBleAdvertiseUseCase
 } from 'yobluetooth';
@@ -28,11 +32,20 @@ export struct BlePeripheralPage {
   @Local scanResponseHex: string = '';
   @Local statusText: string = '';
   @Local advertising: boolean = false;
+  @Local serverOpen: boolean = false;
+  @Local serverServiceUuid: string = '';
+  @Local serverCharacteristicUuid: string = '';
+  @Local serverValueHex: string = '';
+  @Local serverPeerId: string = '';
   private readonly startAdvertise: StartBleAdvertiseUseCase = new StartBleAdvertiseUseCase();
+  private readonly openServer: OpenGattServerUseCase = new OpenGattServerUseCase();
 
   aboutToDisappear(): void {
     if (this.advertising) {
       void this.stop();
+    }
+    if (this.serverOpen) {
+      this.closeGattServer();
     }
   }
 
@@ -105,6 +118,37 @@ export struct BlePeripheralPage {
           .fontColor(YoColor.ERROR)
           .width('100%')
       }
+      TextInput({ text: this.serverServiceUuid, placeholder: $r('app.string.bt_ble_service_uuid') })
+        .onChange((value: string) => {
+          this.serverServiceUuid = value;
+        })
+      TextInput({ text: this.serverCharacteristicUuid, placeholder: $r('app.string.bt_gatt_characteristic') })
+        .onChange((value: string) => {
+          this.serverCharacteristicUuid = value;
+        })
+      TextInput({ text: this.serverValueHex, placeholder: $r('app.string.bt_peripheral_server_value') })
+        .onChange((value: string) => {
+          this.serverValueHex = value;
+        })
+      TextInput({ text: this.serverPeerId, placeholder: $r('app.string.bt_peripheral_server_device') })
+        .onChange((value: string) => {
+          this.serverPeerId = value;
+        })
+      Row({ space: YoSpace.S }) {
+        Button($r('app.string.bt_peripheral_server_open')).onClick(() => {
+          void this.openGattServer();
+        })
+        Button($r('app.string.bt_peripheral_server_notify'))
+          .enabled(this.serverOpen)
+          .onClick(() => {
+            void this.notifyServer();
+          })
+        Button($r('app.string.bt_peripheral_server_close'))
+          .enabled(this.serverOpen)
+          .onClick(() => {
+            this.closeGattServer();
+          })
+      }
       YoActionButton({
         label: this.advertising ? $r('app.string.bt_peripheral_stop') : $r('app.string.bt_peripheral_start'),
         kind: YoActionButtonKind.PRIMARY,
@@ -147,6 +191,52 @@ export struct BlePeripheralPage {
     }
     this.advertising = true;
     this.statusText = '';
+  }
+
+  private async openGattServer(): Promise<void> {
+    const parsed = HexPayload.parse(this.serverValueHex.length > 0 ? this.serverValueHex : '00');
+    if (!parsed.success || parsed.value === undefined) {
+      this.serverOpen = false;
+      this.statusText = parsed.error?.message ?? '';
+      return;
+    }
+    const opened = await this.openServer.executeFields(
+      this.serverServiceUuid,
+      this.serverCharacteristicUuid,
+      parsed.value
+    );
+    this.serverOpen = opened.success;
+    this.statusText = opened.success ? '' : (opened.error?.message ?? '');
+  }
+
+  private closeGattServer(): void {
+    const closed = new CloseGattServerUseCase(this.openServer.source()).execute();
+    this.serverOpen = false;
+    if (!closed.success) {
+      this.statusText = closed.error?.message ?? '';
+    }
+  }
+
+  private async notifyServer(): Promise<void> {
+    if (!this.serverOpen) {
+      this.statusText = 'server_closed';
+      return;
+    }
+    const parsed = HexPayload.parse(this.serverValueHex.length > 0 ? this.serverValueHex : '00');
+    if (!parsed.success || parsed.value === undefined) {
+      this.statusText = parsed.error?.message ?? '';
+      return;
+    }
+    const notified = new NotifyGattServerUseCase(this.openServer.source()).executeValue(
+      this.serverPeerId,
+      this.serverServiceUuid,
+      this.serverCharacteristicUuid,
+      parsed.value,
+      false
+    );
+    if (!notified.success) {
+      this.statusText = notified.error?.message ?? '';
+    }
   }
 
   private async stop(): Promise<void> {

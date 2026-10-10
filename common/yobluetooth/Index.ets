@@ -16,7 +16,8 @@ export {
 } from './src/main/ets/domain/usecase/classic/SppConnectionUseCases';
 export {
   QuerySppConnectEligibilityUseCase,
-  ObserveSppSessionsUseCase
+  ObserveSppSessionsUseCase,
+  QuerySppMaxTransmitUseCase
 } from './src/main/ets/domain/usecase/classic/SppSessionQueryUseCases';
 export {
   ResolveSppTargetAddressUseCase,
@@ -138,7 +139,9 @@ export { StartBleAdvertiseUseCase, StopBleAdvertiseUseCase } from './src/main/et
 export { OpenGattServerUseCase, CloseGattServerUseCase, NotifyGattServerUseCase } from './src/main/ets/domain/usecase/ble/GattServerUseCases';
 export {
   ReadGattRssiUseCase,
-  UpdateGattConnectionParamUseCase
+  UpdateGattConnectionParamUseCase,
+  ReadGattDescriptorUseCase,
+  WriteGattDescriptorUseCase
 } from './src/main/ets/domain/usecase/ble/GattOperationUseCases';
 export { AdvertisingRequest } from './src/main/ets/domain/model/AdvertisingRequest';
 export { ConnectionParamPreset } from './src/main/ets/domain/model/ConnectionParamPreset';
@@ -148,3 +151,7 @@ export { ThroughputSession, ThroughputSnapshot } from './src/main/ets/domain/ser
 export { ExportBluetoothSessionLogUseCase } from './src/main/ets/domain/usecase/log/ExportBluetoothSessionLogUseCase';
 export { BleScanDutyPreset } from './src/main/ets/domain/model/BleScanFilter';
 export { BleGattReconnectCoordinator } from './src/main/ets/domain/service/BleGattReconnectCoordinator';
+export { SppSocketRequestPolicy } from './src/main/ets/domain/service/SppSocketRequestPolicy';
+export { RssiDisplay } from './src/main/ets/domain/service/RssiDisplay';
+export { AdapterOperationalDecision } from './src/main/ets/domain/service/AdapterOperationalDecision';
+export { HexPayload } from './src/main/ets/domain/service/HexPayload';

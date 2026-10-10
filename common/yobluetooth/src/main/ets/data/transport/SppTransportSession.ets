@@ -1,4 +1,4 @@
-import { IdGenerator, Observable, TimeUtil } from 'common_core';
+import { IdGenerator, Observable, Result, TimeUtil } from 'common_core';
 import {
   ITransportSession,
   IncomingPayload,
@@ -189,6 +189,10 @@ export class SppTransportSession implements ITransportSession, ISppTransportFace
     this.transition(TransportState.DISCONNECTING, reason);
     await this.rfcommClient.close();
     this.transition(TransportState.DISCONNECTED, reason);
+  }
+
+  maxTransmitBytes(): Result<number> {
+    return this.rfcommClient.maxTransmitLimit();
   }
 
   async write(payload: Uint8Array, _options?: WriteOptions): Promise<WriteResult> {

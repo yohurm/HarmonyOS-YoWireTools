@@ -15,6 +15,7 @@ import {
 } from 'debug_core';
 import {
   BluetoothAdapterSnapshot,
+  AdapterOperationalDecision,
   BluetoothConstants,
   BluetoothOverviewSnapshot,
   BluetoothRepository,
@@ -154,14 +155,14 @@ export class BtOverviewViewModel {
   isClassicReady(): boolean {
     return !this.emulatorBlocked && !this.switchPending && !this.serviceStopped &&
       this.permissionGranted &&
-      this.adapterStateCode === BluetoothConstants.ADAPTER_STATE_ON &&
+      AdapterOperationalDecision.isOperational(this.adapterStateCode) &&
       this.classicSupported;
   }
 
   isBleReady(): boolean {
     return !this.emulatorBlocked && !this.switchPending && !this.serviceStopped &&
       this.permissionGranted &&
-      this.adapterStateCode === BluetoothConstants.ADAPTER_STATE_ON &&
+      AdapterOperationalDecision.isOperational(this.adapterStateCode) &&
       this.bleSupported;
   }
 

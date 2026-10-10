@@ -606,7 +606,7 @@
     },
     {
       "name": "bt_emulator_limitation",
-      "value": "蓝牙模块暂不支持模拟器。这里不会开始扫描，也不会列出伪造设备。"
+      "value": "蓝牙模块暂不支持模拟器。这里不会开始扫描，也不会列出伪造设备。下一步：在真机上打开本页后再扫描。"
     },
     {
       "name": "bt_error_service_stopped",
@@ -626,15 +626,15 @@
     },
     {
       "name": "bt_classic_filter_limitation",
-      "value": "名称和信号只过滤已经上报的结果。开始发现本身没有过滤参数。"
+      "value": "名称和信号只过滤已经上报的结果。开始发现本身没有过滤参数。下一步：先开始发现，再用名称或信号缩小已上报的列表。"
     },
     {
       "name": "bt_pairing_no_system_confirm",
-      "value": "普通应用不会调用系统配对确认。"
+      "value": "普通应用不会调用系统配对确认。下一步：在系统弹出的配对框里确认，应用内没有确认成功按钮。"
     },
     {
       "name": "bt_pairing_cannot_unpair",
-      "value": "应用不能取消配对。请到系统蓝牙设置中操作。"
+      "value": "应用不能取消配对。下一步：打开系统蓝牙设置，在那里取消配对。"
     },
     {
       "name": "bt_spp_action_listen",
@@ -678,15 +678,15 @@
     },
     {
       "name": "bt_identity_favorite_bookmark",
-      "value": "收藏只是本机书签，不是免配对固化，也不会显示为已固化。"
+      "value": "收藏只是本机书签，不是免配对固化，也不会显示为已固化。未证实：没有把地址固化成功的路径。下一步：重新发现，或先配对后再连接。"
     },
     {
       "name": "bt_identity_no_spp_from_ble",
-      "value": "BLE 扫描地址不能传给 sppConnect。需要经典地址，或先用该 BLE 地址配对。"
+      "value": "BLE 扫描地址不能传给 sppConnect。下一步：改用经典发现里的地址连接，或先用该 BLE 地址配对。"
     },
     {
       "name": "bt_identity_no_classic_to_gatt",
-      "value": "没有从经典连接自动转到 GATT 的路径。GATT 需要 BLE 扫描地址。"
+      "value": "没有从经典连接自动转到 GATT 的路径。下一步：到 BLE 扫描里选择可连接广播，再打开 GATT。"
     },
     {
       "name": "bt_identity_stale_address",
@@ -794,7 +794,7 @@
     },
     {
       "name": "bt_peripheral_no_custom_ad_type",
-      "value": "没有自定义 AD Type。可用字段只对应服务 UUID、服务数据 0x16、厂商数据 0xFF 和设备名 0x09。"
+      "value": "没有自定义 AD Type。可用字段只对应服务 UUID、服务数据 0x16、厂商数据 0xFF 和设备名 0x09。下一步：只填写这四项，不要输入其他广播类型。"
     },
     {
       "name": "bt_peripheral_service_data_uuid",
@@ -858,11 +858,11 @@
     },
     {
       "name": "bt_phy_unverified",
-      "value": "PHY 未证实，不发起切换。"
+      "value": "PHY 未证实，不发起切换。没有 readPhy 或 setPhy。下一步：保持这一行，等真机单独验证，不要把它当成已切换。"
     },
     {
       "name": "bt_connection_param_presets_only",
-      "value": "连接参数只有低功耗、均衡、高速率三档。没有连接间隔、从机延迟或监督超时的数字输入。"
+      "value": "连接参数只有低功耗、均衡、高速率三档。没有连接间隔、从机延迟或监督超时的数字输入。下一步：只点这三档之一。"
     },
     {
       "name": "bt_gatt_characteristic",
@@ -938,7 +938,7 @@
     },
     {
       "name": "bt_session_log_no_hci",
-      "value": "应用内不生成 HCI 抓包文件。"
+      "value": "应用内不生成 HCI 抓包文件。下一步：到诊断页查看开发者模式和电脑工具，不要在这里导出空口文件。"
     },
     {
       "name": "bt_session_log_clear_hint",
@@ -962,11 +962,11 @@
     },
     {
       "name": "bt_diagnostics_no_hci",
-      "value": "普通应用不能在应用内抓空口 HCI。需要开发者模式采集，再用电脑上的工具打开。"
+      "value": "普通应用不能在应用内抓空口 HCI。下一步：打开开发者模式采集，再用电脑上的工具打开。"
     },
     {
       "name": "bt_diagnostics_release_hci",
-      "value": "Release 版本的开发者 HCI 采集预期只有 Header，载荷会被去掉。"
+      "value": "Release 版本的开发者 HCI 采集预期只有 Header，载荷会被去掉。下一步：需要载荷时用 Debug 包采集，不要把 Header 当成完整空口。"
     },
     {
       "name": "bt_diagnostics_background_suspend",
@@ -983,6 +983,62 @@
     {
       "name": "bt_diagnostics_background_off",
       "value": "取消后台保持"
+    },
+    {
+      "name": "bt_spp_socket_rfcomm",
+      "value": "RFCOMM"
+    },
+    {
+      "name": "bt_spp_socket_l2cap",
+      "value": "L2CAP"
+    },
+    {
+      "name": "bt_spp_socket_l2cap_ble",
+      "value": "L2CAP BLE"
+    },
+    {
+      "name": "bt_spp_psm_label",
+      "value": "PSM"
+    },
+    {
+      "name": "bt_spp_max_transmit",
+      "value": "最大发送长度"
+    },
+    {
+      "name": "bt_peripheral_server_open",
+      "value": "打开服务端"
+    },
+    {
+      "name": "bt_peripheral_server_close",
+      "value": "关闭服务端"
+    },
+    {
+      "name": "bt_peripheral_server_notify",
+      "value": "发送通知"
+    },
+    {
+      "name": "bt_peripheral_server_device",
+      "value": "对端设备 ID"
+    },
+    {
+      "name": "bt_peripheral_server_value",
+      "value": "服务端 HEX 值"
+    },
+    {
+      "name": "bt_gatt_descriptor",
+      "value": "描述符 UUID"
+    },
+    {
+      "name": "bt_gatt_read_descriptor",
+      "value": "读描述符"
+    },
+    {
+      "name": "bt_gatt_write_descriptor",
+      "value": "写描述符"
+    },
+    {
+      "name": "bt_gatt_disconnect",
+      "value": "断开 GATT"
     }
   ]
 }

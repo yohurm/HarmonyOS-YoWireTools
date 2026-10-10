@@ -18,6 +18,7 @@ import {
   ListSppSessionsUseCase,
   LoadBluetoothOverviewSnapshotUseCase,
   LoadPairedClassicDevicesUseCase,
+  RssiDisplay,
   ObserveClassicDevicesUseCase,
   ObserveSppSessionsUseCase,
   SppListenUseCase,
@@ -520,10 +521,7 @@ export class SppMainViewModel {
   }
 
   private formatRssi(device: BluetoothDevice): string {
-    if (!device.rssiKnown) {
-      return '';
-    }
-    return `${device.rssi} dBm`;
+    return RssiDisplay.format(device.rssiKnown, device.rssi);
   }
 
   private formatTransportLabel(transport: BluetoothTransportType): ResourceStr {

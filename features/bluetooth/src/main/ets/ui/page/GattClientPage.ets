@@ -16,14 +16,17 @@ import {
   DisconnectGattUseCase,
   DiscoverGattServicesUseCase,
   GattConnectParams,
+  HexPayload,
   MtuBounds,
   ReadGattCharacteristicUseCase,
+  ReadGattDescriptorUseCase,
   ReadGattRssiUseCase,
   RequestBleMtuUseCase,
   SetGattNotificationUseCase,
   ThroughputSession,
   UpdateGattConnectionParamUseCase,
-  WriteGattCharacteristicUseCase
+  WriteGattCharacteristicUseCase,
+  WriteGattDescriptorUseCase
 } from 'yobluetooth';
 import { BluetoothObjectNavParams } from '../../navigation/BluetoothObjectNavParams';
 
@@ -37,6 +40,7 @@ export struct GattClientPage {
   @Local sessionId: string = '';
   @Local serviceUuid: string = '';
   @Local characteristicUuid: string = '';
+  @Local descriptorUuid: string = '';
   @Local payloadHex: string = '';
   @Local mtuText: string = '23';
   @Local mtuShown: number = BluetoothConstants.BLE_DEFAULT_MTU;
@@ -51,6 +55,8 @@ export struct GattClientPage {
   private readonly discover: DiscoverGattServicesUseCase = new DiscoverGattServicesUseCase();
   private readonly readChar: ReadGattCharacteristicUseCase = new ReadGattCharacteristicUseCase();
   private readonly writeChar: WriteGattCharacteristicUseCase = new WriteGattCharacteristicUseCase();
+  private readonly readDescriptor: ReadGattDescriptorUseCase = new ReadGattDescriptorUseCase();
+  private readonly writeDescriptor: WriteGattDescriptorUseCase = new WriteGattDescriptorUseCase();
   private readonly notify: SetGattNotificationUseCase = new SetGattNotificationUseCase();
   private readonly requestMtu: RequestBleMtuUseCase = new RequestBleMtuUseCase();
   private readonly readRssi: ReadGattRssiUseCase = new ReadGattRssiUseCase();
@@ -136,6 +142,10 @@ export struct GattClientPage {
         .onChange((value: string) => {
           this.characteristicUuid = value;
         })
+      TextInput({ text: this.descriptorUuid, placeholder: $r('app.string.bt_gatt_descriptor') })
+        .onChange((value: string) => {
+          this.descriptorUuid = value;
+        })
       TextInput({ text: this.payloadHex, placeholder: $r('app.string.bt_gatt_payload_hex') })
         .onChange((value: string) => {
           this.payloadHex = value;
@@ -173,6 +183,17 @@ export struct GattClientPage {
         })
         Button($r('app.string.bt_gatt_write_no_response')).onClick(() => {
           void this.writeValue(true);
+        })
+      }
+      Row({ space: YoSpace.S }) {
+        Button($r('app.string.bt_gatt_read_descriptor')).onClick(() => {
+          void this.readDescriptorValue();
+        })
+        Button($r('app.string.bt_gatt_write_descriptor')).onClick(() => {
+          void this.writeDescriptorValue();
+        })
+        Button($r('app.string.bt_gatt_disconnect')).onClick(() => {
+          void this.disconnect();
         })
       }
       Row({ space: YoSpace.S }) {
@@ -266,12 +287,59 @@ export struct GattClientPage {
     this.statusText = result.value ?? '';
   }
 
-  private async writeValue(noResponse: boolean): Promise<void> {
-    const bytes = GattClientPage.hexToBytes(this.payloadHex);
-    if (bytes === undefined) {
-      this.statusText = 'invalid_hex';
+  private async readDescriptorValue(): Promise<void> {
+    const result = await this.readDescriptor.execute(
+      this.sessionId,
+      this.serviceUuid,
+      this.characteristicUuid,
+      this.descriptorUuid
+    );
+    if (!result.success) {
+      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
       return;
     }
+    this.statusText = result.value ?? '';
+  }
+
+  private async writeDescriptorValue(): Promise<void> {
+    const parsed = HexPayload.parse(this.payloadHex);
+    if (!parsed.success || parsed.value === undefined) {
+      this.statusText = parsed.error?.message ?? '';
+      return;
+    }
+    const result = await this.writeDescriptor.execute(
+      this.sessionId,
+      this.serviceUuid,
+      this.characteristicUuid,
+      this.descriptorUuid,
+      parsed.value
+    );
+    if (!result.success) {
+      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
+    }
+  }
+
+  private async disconnect(): Promise<void> {
+    if (this.sessionId.length === 0) {
+      this.statusText = 'not_connected';
+      return;
+    }
+    const result = await this.disconnectGatt.execute(this.sessionId);
+    if (!result.success) {
+      this.noteError(result.error?.code ?? '', result.error?.message ?? '');
+      return;
+    }
+    this.sessionId = '';
+    this.mtuPending = false;
+  }
+
+  private async writeValue(noResponse: boolean): Promise<void> {
+    const parsed = HexPayload.parse(this.payloadHex);
+    if (!parsed.success || parsed.value === undefined) {
+      this.statusText = parsed.error?.message ?? '';
+      return;
+    }
+    const bytes = parsed.value;
     const result = await this.writeChar.execute(
       this.sessionId,
       this.serviceUuid,
@@ -307,10 +375,12 @@ export struct GattClientPage {
   }
 
   private async startThroughput(): Promise<void> {
-    const bytes = GattClientPage.hexToBytes(this.payloadHex.length > 0 ? this.payloadHex : '00');
-    if (bytes === undefined) {
+    const parsed = HexPayload.parse(this.payloadHex.length > 0 ? this.payloadHex : '00');
+    if (!parsed.success || parsed.value === undefined) {
+      this.statusText = parsed.error?.message ?? '';
       return;
     }
+    const bytes = parsed.value;
     const session = new ThroughputSession();
     this.throughput = session;
     this.throughputRunning = true;
@@ -357,21 +427,5 @@ export struct GattClientPage {
       this.securityHint = '';
       this.statusText = code;
     }
-  }
-
-  private static hexToBytes(text: string): Uint8Array | undefined {
-    const normalized = text.replace(/\s+/g, '');
-    if (normalized.length === 0 || normalized.length % 2 !== 0) {
-      return undefined;
-    }
-    const bytes = new Uint8Array(normalized.length / 2);
-    for (let i = 0; i < bytes.length; i++) {
-      const value = parseInt(normalized.substring(i * 2, i * 2 + 2), 16);
-      if (Number.isNaN(value)) {
-        return undefined;
-      }
-      bytes[i] = value;
-    }
-    return bytes;
   }
 }

@@ -114,9 +114,12 @@ export struct SppMainPage {
       $r('sys.symbol.more'),
       $r('app.string.youi_more_actions'),
       () => {
-        openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID, () => {
+        const opened = openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID, () => {
           void this.vm.openBluetoothSettings();
         });
+        if (!opened) {
+          void this.vm.openBluetoothSettings();
+        }
       },
       true,
       SPP_TITLE_MORE_MENU_ID

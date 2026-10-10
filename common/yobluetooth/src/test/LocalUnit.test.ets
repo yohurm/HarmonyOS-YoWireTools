@@ -24,6 +24,18 @@ import { SppReadStrategy } from '../main/ets/domain/model/SppRuntimeState';
 import { SppUuidLabel } from '../main/ets/domain/service/spp/SppUuidLabel';
 import { BluetoothConstants } from '../main/ets/constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../main/ets/constants/BluetoothErrorCodes';
+import { BluetoothPlatformCodes } from '../main/ets/constants/BluetoothPlatformCodes';
+import { ClassicDiscoveryAdmission } from '../main/ets/domain/service/ClassicDiscoveryAdmission';
+import { ClassicScanPhase } from '../main/ets/domain/model/ClassicScanPhase';
+import { AdvertisingRequest, AdvertisingRequestPolicy } from '../main/ets/domain/model/AdvertisingRequest';
+import { MtuBounds } from '../main/ets/domain/model/MtuBounds';
+import { BleScanFilter } from '../main/ets/domain/model/BleScanFilter';
+import { SppConnectFailureHints } from '../main/ets/domain/service/SppConnectFailureHints';
+import { RssiDisplay } from '../main/ets/domain/service/RssiDisplay';
+import { AdapterOperationalDecision } from '../main/ets/domain/service/AdapterOperationalDecision';
+import { HexPayload } from '../main/ets/domain/service/HexPayload';
+import { SppSocketRequestPolicy } from '../main/ets/domain/service/SppSocketRequestPolicy';
+import { SppSocketKind } from '../main/ets/domain/model/SppSocketKind';
 import { BluetoothDevice, BluetoothDeviceDraft } from '../main/ets/domain/model/BluetoothDevice';
 import { DiscoverySource } from '../main/ets/domain/model/DiscoverySource';
 import { BluetoothListRail, BluetoothTransportType } from '../main/ets/domain/model/BluetoothTransportType';
@@ -442,6 +454,88 @@ export default function localUnitTest() {
       ledger.release(key, 'test');
       expect(ledger.findBySessionId('runtime-session-1') === undefined).assertTrue();
       ledger.resetForTests();
+    });
+
+    it('ClassicDiscoveryAdmission_rejects_overlap_and_pending_stop', 0, () => {
+      expect(ClassicDiscoveryAdmission.admit(ClassicScanPhase.IDLE, false).success).assertTrue();
+      const pending = ClassicDiscoveryAdmission.admit(ClassicScanPhase.STOPPING, false);
+      expect(pending.success).assertFalse();
+      expect(pending.error?.code).assertEqual(BluetoothErrorCodes.SCAN_STOP_PENDING);
+      const running = ClassicDiscoveryAdmission.admit(ClassicScanPhase.SCANNING, false);
+      expect(running.error?.code).assertEqual(BluetoothErrorCodes.SCAN_ALREADY_RUNNING);
+      const platform = ClassicDiscoveryAdmission.admit(ClassicScanPhase.IDLE, true);
+      expect(platform.error?.code).assertEqual(BluetoothErrorCodes.SCAN_ALREADY_RUNNING);
+    });
+
+    it('AdvertisingRequestPolicy_rejects_mutex_and_legacy_over_31', 0, () => {
+      const mutex = new AdvertisingRequest([], '', '', -1, '', false, '', true, true, 'AA', 0);
+      expect(AdvertisingRequestPolicy.validate(mutex).error?.code).assertEqual(BluetoothErrorCodes.ADV_REJECTED);
+      const longName = '0123456789012345678901234567890';
+      const legacy = new AdvertisingRequest([], '', '', -1, '', true, longName, false, true, '', 0);
+      expect(AdvertisingRequestPolicy.legacyPayloadBytes(legacy) > BluetoothConstants.ADV_LEGACY_MAX_BYTES)
+        .assertTrue();
+      expect(AdvertisingRequestPolicy.validate(legacy).error?.code).assertEqual(BluetoothErrorCodes.ADV_TOO_LONG);
+      const ok = new AdvertisingRequest(['180F'], '', '', -1, '', false, '', false, true, '', 0);
+      expect(AdvertisingRequestPolicy.validate(ok).success).assertTrue();
+    });
+
+    it('MtuBounds_accepts_only_23_to_517', 0, () => {
+      expect(MtuBounds.accept(22).error?.code).assertEqual(BluetoothErrorCodes.MTU_OUT_OF_RANGE);
+      expect(MtuBounds.accept(518).success).assertFalse();
+      expect(MtuBounds.accept(23).success).assertTrue();
+      expect(MtuBounds.accept(517).success).assertTrue();
+    });
+
+    it('BleScanFilter_matchesPostFilter_name_rssi_and_favorite', 0, () => {
+      const filter = new BleScanFilter('Yo', '', '', -1, '', '', -80, true);
+      expect(filter.matchesPostFilter('YoWire', -70, true)).assertTrue();
+      expect(filter.matchesPostFilter('Other', -70, true)).assertFalse();
+      expect(filter.matchesPostFilter('YoWire', -90, true)).assertFalse();
+      expect(filter.matchesPostFilter('YoWire', -70, false)).assertFalse();
+    });
+
+    it('BluetoothPlatformCodes_maps_not_paired_and_adapter_off', 0, () => {
+      expect(BluetoothPlatformCodes.domainCode(2900016)).assertEqual(BluetoothErrorCodes.NOT_PAIRED);
+      expect(BluetoothPlatformCodes.domainCode(2900003)).assertEqual(BluetoothErrorCodes.ADAPTER_OFF);
+      expect(BluetoothPlatformCodes.domainCode(2900001)).assertEqual(BluetoothErrorCodes.SERVICE_STOPPED);
+      expect(BluetoothPlatformCodes.domainCode(801)).assertEqual(BluetoothErrorCodes.CAPABILITY_UNSUPPORTED);
+    });
+
+    it('SppConnectFailureHints_not_paired_is_not_a_timeout', 0, () => {
+      const hints = SppConnectFailureHints.explain(BluetoothErrorCodes.NOT_PAIRED, '');
+      expect(hints.length >= 2).assertTrue();
+      expect(hints[0].indexOf('2900016') >= 0).assertTrue();
+      expect(hints[1].indexOf('not a connection timeout') >= 0).assertTrue();
+    });
+
+    it('RssiDisplay_hides_unknown_rssi', 0, () => {
+      expect(RssiDisplay.format(false, 0)).assertEqual('');
+      expect(RssiDisplay.format(true, -62)).assertEqual('-62 dBm');
+    });
+
+    it('AdapterOperationalDecision_only_state_on', 0, () => {
+      expect(AdapterOperationalDecision.isOperational(BluetoothConstants.ADAPTER_STATE_ON)).assertTrue();
+      expect(AdapterOperationalDecision.isOperational(BluetoothConstants.ADAPTER_STATE_OFF)).assertFalse();
+      expect(AdapterOperationalDecision.isOperational(BluetoothConstants.ADAPTER_STATE_BLE_ON)).assertFalse();
+      expect(AdapterOperationalDecision.isOperational(BluetoothConstants.ADAPTER_STATE_TURNING_ON)).assertFalse();
+    });
+
+    it('HexPayload_rejects_odd_and_non_hex', 0, () => {
+      expect(HexPayload.parse('0').success).assertFalse();
+      expect(HexPayload.parse('0G').success).assertFalse();
+      const parsed = HexPayload.parse('0a ff');
+      expect(parsed.success).assertTrue();
+      expect(parsed.value?.length).assertEqual(2);
+      expect(parsed.value?.[0]).assertEqual(10);
+      expect(parsed.value?.[1]).assertEqual(255);
+    });
+
+    it('SppSocketRequestPolicy_rfcomm_skips_psm_l2cap_requires_it', 0, () => {
+      expect(SppSocketRequestPolicy.acceptPsm(SppSocketKind.RFCOMM, 0).value).assertEqual(0);
+      const missing = SppSocketRequestPolicy.acceptPsm(SppSocketKind.L2CAP, 0);
+      expect(missing.error?.code).assertEqual(BluetoothErrorCodes.L2CAP_PSM_REQUIRED);
+      expect(SppSocketRequestPolicy.acceptPsm(SppSocketKind.L2CAP_BLE, Number.NaN).success).assertFalse();
+      expect(SppSocketRequestPolicy.acceptPsm(SppSocketKind.L2CAP, 37).value).assertEqual(37);
     });
   });
 }
