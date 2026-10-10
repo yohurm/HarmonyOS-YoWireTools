@@ -67,7 +67,7 @@ related: [research.wifi-network, rule.common.acceptance]
 - [ ] **WN-033** [普通应用] Given 已知频率，When 查看信道列，Then 信道号由频率换算并标注「由频率换算」，API 未返回信道号时不显示成驱动字段。
 - [ ] **WN-034** [普通应用] Given 2.4 GHz 上有重叠 AP，When 打开信道占用，Then 每个信道显示落入其频率范围的 AP 数量，当前已连接 AP 在「最强干扰」统计中被排除。
 - [ ] **WN-035** [普通应用] Given 存在占用很低的信道，When 查看推荐信道，Then 推荐列表只含干扰强度为最低两档的信道，并写明这是重叠估计。
-- [ ] **WN-036** [缺口] Given 任意扫描结果，When 查找噪声、SNR、MCS、重传次数，Then 这些列标明未提供，单元格不是 0 或空被当成测量值。
+- [ ] **WN-036** [缺口] Given 任意扫描结果，When 查找噪声、SNR、MCS、重传次数，Then 这些列标明未提供，单元格不是 0 或空被当成测量值。平台墙：`WifiScanInfo` 没有这四列，本树也不显示「未提供」。
 - [ ] **WN-037** [普通应用] Given 扫描进行中，When 点击暂停，Then 不再发起新的 `startScan`，已显示的缓存保留。
 - [ ] **WN-038** [普通应用] Given 用户导出当前列表，When 打开导出文本，Then 含 SSID、频率、RSSI、加密、时间戳，不含候选网络密钥。
 - [ ] **WN-039** [真机] Given 仅模拟器，When 对照真机扫描，Then 模拟器结果不作为扫描通过证据；记录写明未用真机。
@@ -83,7 +83,7 @@ related: [research.wifi-network, rule.common.acceptance]
 - [ ] **WN-046** [普通应用] Given API 18 且 `wifiLinkType` 有值，When 查看链路，Then 显示默认、Wi-Fi 7 单链路、MLSR、EMLSR 或 STR 之一。API 低于 18 时该行写明当前系统无此字段。
 - [ ] **WN-047** [普通应用] Given 已连接，When 查看 IPv4，Then 地址为点分十进制，并有网关、掩码、主 DNS、备 DNS、DHCP 服务器与租约秒数；数值 0 的字段显示为未获得而不是 `0.0.0.0` 被当成有效地址。
 - [ ] **WN-048** [普通应用] Given 网络有 IPv6，When 查看 IPv6，Then 显示链路地址、全局地址、网关与 DNS。随机全局地址字段按文档「暂不支持」显示为未提供。
-- [ ] **WN-049** [缺口] Given 已连接，When 查找噪声底或 SNR，Then 标明未提供。
+- [ ] **WN-049** [缺口] Given 已连接，When 查找噪声底或 SNR，Then 标明未提供。平台墙：`WifiLinkedInfo` 没有这两列，本树也不显示「未提供」。
 - [ ] **WN-050** [普通应用] Given 用户开启距离估算，When 查看 AP 详情，Then 距离标注「按自由空间路径损耗估算」，单位米，并同时保留 RSSI 与频率。
 
 ## 连接与认证
@@ -175,8 +175,8 @@ related: [research.wifi-network, rule.common.acceptance]
 
 - [ ] **WN-118** [开发者选项] Given Phone 或 Tablet 已开开发者模式且 USB 连接到 Windows，When 用户按指南打开网络报文分析，Then 应用内只提供说明：开关在开发者选项，抓包在 PC 的 Wireshark，且与 USB 调试互斥。应用内没有开始抓包按钮。
 - [ ] **WN-119** [开发者选项] Given USB 未连接，When 查看报文分析说明，Then 写明开关会不可用。
-- [ ] **WN-120** [缺口] Given 普通应用，When 查找捕获其他应用流量或导出整机 pcap 的动作，Then 没有该动作。
-- [ ] **WN-121** [缺口] Given PC/2in1 上的普通界面应用，When 查找 PF_PACKET 原始帧，Then 说明仅限带 `kernel.NET_RAW` 且 sudo 的二进制，本应用不提供。
+- [ ] **WN-120** [支持] Given 普通应用，When 查找捕获其他应用流量或导出整机 pcap 的动作，Then 没有该动作。证据：`features/wifi_network` 与 `product/phone` 没有该动作。未在真机执行，射频仍是待真机。
+- [ ] **WN-121** [缺口] Given PC/2in1 上的普通界面应用，When 查找 PF_PACKET 原始帧，Then 说明仅限带 `kernel.NET_RAW` 且 sudo 的二进制，本应用不提供。平台墙：本应用没有原始套接字，也没有这条说明文案。
 - [ ] **WN-122** [开发者选项] Given 手机或平板开发者选项，When 查看弱网模拟，Then 应用内说明场景在网络领航员，入口不是应用内的带宽滑杆。
 - [ ] **WN-123** [受限] Given 没有 `LINKTURBO`，When 查看多网并发，Then 标明需要受限权限，不发起多网激活。
 - [ ] **WN-124** [真机] Given 模拟器，When 打开 P2P 或 VPN 或网络加速，Then 界面写明模拟器不支持对应项，不把失败记成真机缺陷。
@@ -190,7 +190,7 @@ related: [research.wifi-network, rule.common.acceptance]
 - [ ] **WN-129** [普通应用] Given 错误码 2501000、2501001、2501005、2501006、2501007 之一，When 查看该行，Then 同时有数字码和一句对应说明：操作失败、STA 未打开、用户未响应、用户拒绝、参数无效。
 - [ ] **WN-130** [普通应用] Given 日志超过一屏，When 清空，Then 列表为空，下一次新动作仍能写入。
 - [ ] **WN-131** [普通应用] Given 页面离开，When 再进入，Then 订阅成对取消，不会对同一次开关事件写出两行重复来源。
-- [ ] **WN-132** [缺口] Given 任意页面，When 查找洪泛、其他应用阻断、密码破解，Then 没有这些入口。
+- [ ] **WN-132** [支持] Given 任意页面，When 查找洪泛、其他应用阻断、密码破解，Then 没有这些入口。证据：`features/wifi_network`、`product/phone` 路由和命令模板都没有这三类动作。未在真机执行，射频仍是待真机。
 
 ## 汇总
 
@@ -202,6 +202,7 @@ related: [research.wifi-network, rule.common.acceptance]
 | 受限 | 10 |
 | 系统或企业 | 4 |
 | 开发者选项 | 3 |
-| 缺口 | 5 |
+| 缺口 | 3 |
+| 支持 | 2 |
 | 真机 | 2 |
 | 合计 | 132 |

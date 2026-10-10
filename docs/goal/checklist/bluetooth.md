@@ -81,7 +81,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 运行在模拟器
 - **When** 打开蓝牙调试入口
 - **Then** 明确显示蓝牙不可用；不展示会成功的扫描按钮结果
-- **证据：** `开发/指南/开发/系统/网络/Connectivity Kit（短距通信服务）/蓝牙/蓝牙服务开发概述.md`「蓝牙模块暂不支持模拟器」
+- **证据：** 平台墙：蓝牙模块暂不支持模拟器。本树没有模拟器探测，入口也不会把扫描标成已成功。
 
 ## 2. 经典发现
 
@@ -135,11 +135,11 @@ related: [docs/goal/research/bluetooth.md]
 
 ### BT-015 经典发现没有平台过滤参数
 
-- **判定：** 缺口（平台过滤）
+- **判定：** 支持
 - **Given** 用户设置名称或 RSSI 条件
 - **When** 开始经典发现
 - **Then** 条件只作用于已上报结果；调用本身没有过滤参数
-- **证据：** FAQ「如何通过已连接的 BLE 蓝牙设备的虚拟 MAC 地址建立经典蓝牙连接」：经典扫描无法配置过滤参数
+- **证据：** `ClassicBluetoothDataSource.startBluetoothDiscovery` 不带过滤参数。名称和 RSSI 只经 `ScanResultMerger.filter` 作用在已上报结果。未在真机执行，射频仍是待真机。
 
 ### BT-016 经典发现结果按传输类型分流
 
@@ -201,19 +201,19 @@ related: [docs/goal/research/bluetooth.md]
 
 ### BT-023 应用不能取消配对
 
-- **判定：** 缺口
+- **判定：** 支持
 - **Given** 设备已配对
 - **When** 用户在应用内要求取消配对
 - **Then** 不存在成功的取消配对调用；提供打开系统蓝牙设置
-- **证据：** 最佳实践「如何通过代码调用取消配对」；FAQ 同结论
+- **证据：** 代码没有取消配对方法。`BluetoothSettingsNavigator.openBluetoothSettings` 由概览、SPP 和配对引导打开。未在真机执行，射频仍是待真机。
 
 ### BT-024 普通应用不调用系统级配对确认
 
-- **判定：** 缺口（普通应用）
+- **判定：** 支持
 - **Given** 应用不是系统应用
 - **When** 收到需要确认的配对
 - **Then** 不调用 `setDevicePairingConfirmation`（该接口还要 `MANAGE_BLUETOOTH`）
-- **证据：** `ohos.bluetooth.connection` 中该接口的权限说明
+- **证据：** 全仓库没有 `setDevicePairingConfirmation`。`product/phone/src/main/module.json5` 不声明 `MANAGE_BLUETOOTH`。配对走 `pairDevice`。未在真机执行，射频仍是待真机。
 
 ### BT-025 配置文件连接不等于 SPP 已连接
 
@@ -291,19 +291,19 @@ related: [docs/goal/research/bluetooth.md]
 
 ### BT-034 BLE 扫描地址不能直接用于 SPP
 
-- **判定：** 缺口（混用地址）
+- **判定：** 支持
 - **Given** 只有 BLE 扫描得到的地址
 - **When** 用户要求立刻 SPP
 - **Then** 不把该地址传给 `sppConnect`；说明需要经典地址或先按 FAQ 做 BLE 地址配对
-- **证据：** FAQ「ble.startBLEScan 扫描出来的地址可以放到 socket.sppConnect 吗」答案为不可以
+- **证据：** `ResolveSppTargetAddressUseCase` 与 `BluetoothRepository` 拒绝该地址，错误码 `SPP_BLE_ADDRESS_REJECTED`。`SppConnectDialog` 展示 `SppConnectFailureHints`。未在真机执行，射频仍是待真机。
 
 ### BT-035 不提供「先经典再 BLE」的自动桥
 
-- **判定：** 缺口
+- **判定：** 支持
 - **Given** 仅有经典连接
 - **When** 用户要求自动转成 GATT
 - **Then** 不出现成功的自动桥接；若要 GATT，走 BLE 扫描或已有 BLE 地址
-- **证据：** 同一 FAQ：目前不支持先经典再 BLE
+- **证据：** 没有经典到 GATT 的自动桥。`GattConnectionUseCases` 对纯经典返回 `GATT_CLASSIC_ADDRESS_REJECTED`。未在真机执行，射频仍是待真机。
 
 ### BT-036 已连接 BLE 地址可以发起配对以得到经典记录
 
@@ -535,7 +535,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 用户想发送 Type 0x01 或其他未列出的 Type
 - **When** 编辑广播
 - **Then** 没有「自定义 Type」成功路径。可用字段只对应固定 Type：服务 UUID、serviceData 0x16、厂商数据 0xFF、设备名 0x09
-- **证据：** FAQ「蓝牙 BLE 广播是否支持自定义广播 Type 数据」
+- **证据：** 平台墙：广播没有任意 AD Type 字段。本树没有广播编辑器，也不提供自定义 Type 成功路径。
 
 ### BT-064 扩展广播遵守可连接与扫描响应互斥
 
@@ -707,7 +707,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** API 22+ 且已连接
 - **When** 用户选择低功耗、均衡或高速率
 - **Then** 调用 `updateConnectionParam` 的对应枚举。没有连接间隔、从机延迟、监督超时的数字输入
-- **证据：** `ConnectionParam22+` 只有 `LOW_POWER`、`BALANCED`、`HIGH`
+- **证据：** 平台墙：`ConnectionParam22+` 只有三档枚举，没有连接间隔、从机延迟、监督超时的数字参数。本树没有这三档控件。
 
 ### BT-085 PHY 读写失败时显示能力不支持
 
@@ -741,7 +741,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 普通应用会话
 - **When** 用户要求抓空口包
 - **Then** 不出现应用内 HCI 文件；说明需开发者模式采集，再用 PC 工具打开
-- **证据：** `开发/指南/系统/网络/Connectivity Kit（短距通信服务）/蓝牙/蓝牙常见问题/如何抓取蓝牙HCI日志/如何抓取蓝牙HCI日志.md`
+- **证据：** 平台墙：空口 HCI 只在开发者模式采集，应用没有抓包 API，也不生成 HCI 文件。
 
 ### BT-089 Release 的 HCI 日志没有载荷
 
@@ -749,7 +749,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** Release 版本上的开发者 HCI 采集
 - **When** 用 Wireshark 或 Ellisys 打开
 - **Then** 预期只有 Header；界面若引导抓包，写明载荷被去掉
-- **证据：** 同上
+- **证据：** 平台墙：Release 的 HCI 日志去掉载荷。应用不解析、不补载荷，也没有引导文案。
 
 ### BT-090 会话日志可按条导出且含原始值
 
@@ -831,8 +831,8 @@ related: [docs/goal/research/bluetooth.md]
 
 | 判定开头 | 条数 | 编号 |
 |----------|------|------|
-| 支持 | 86 | 其余全部。其中应用层即可测量、平台无单独 API 的有 BT-046、BT-083、BT-086、BT-087、BT-090、BT-092。BT-054 仅 API 23+ 有 RSSI 门限，更低版本是缺口。BT-064 的扩展广播互斥字段从 API 26.0.0 起。BT-094 写的是未申请长时任务时会被挂起 |
-| 缺口 | 10 | BT-008 模拟器、BT-015 经典扫描无平台过滤、BT-023 不能取消配对、BT-024 普通应用不能做系统配对确认、BT-034 BLE 地址不能直接 SPP、BT-035 不能先经典再 BLE、BT-063 不能任意 AD Type、BT-084 没有数字连接间隔（三档枚举仍支持）、BT-088 应用内无 HCI、BT-089 Release HCI 无载荷 |
+| 支持 | 91 | 其余全部，另含 BT-015、BT-023、BT-024、BT-034、BT-035。其中应用层即可测量、平台无单独 API 的有 BT-046、BT-083、BT-086、BT-087、BT-090、BT-092。BT-054 仅 API 23+ 有 RSSI 门限，更低版本是缺口。BT-064 的扩展广播互斥字段从 API 26.0.0 起。BT-094 写的是未申请长时任务时会被挂起。上述支持未在真机执行 |
+| 缺口 | 5 | BT-008 模拟器、BT-063 不能任意 AD Type、BT-084 没有数字连接间隔（三档枚举仍无控件）、BT-088 应用内无 HCI、BT-089 Release HCI 无载荷 |
 | 待证 | 2 | BT-030 免配对地址固化（ACL）、BT-085 PHY 是否返回 801 |
 
 本清单不包含星闪、A2DP 听歌、HID 注入、DFU。那些不是本次蓝牙通用调试范围。
