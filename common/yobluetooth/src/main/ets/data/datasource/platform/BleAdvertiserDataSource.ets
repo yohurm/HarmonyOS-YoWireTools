@@ -80,34 +80,50 @@ export class BleAdvertiserDataSource {
   }
 
   private static toAdvertiseData(request: AdvertisingRequest): ble.AdvertiseData {
-    const data: ble.AdvertiseData = {
-      includeDeviceName: request.includeDeviceName
-    };
-    if (request.serviceUuids.length > 0) {
-      data.serviceUuids = request.serviceUuids;
+    const serviceUuids: Array<string> = [];
+    for (let i = 0; i < request.serviceUuids.length; i++) {
+      serviceUuids.push(request.serviceUuids[i]);
     }
+    const serviceData: Array<ble.ServiceData> = [];
     if (request.serviceDataUuid.length > 0 && request.serviceDataHex.length > 0) {
-      data.serviceData = [{
+      const unit: ble.ServiceData = {
         serviceUuid: request.serviceDataUuid,
         serviceValue: BleAdvertiserDataSource.hexToBuffer(request.serviceDataHex)
-      }];
+      };
+      serviceData.push(unit);
     }
+    const manufactureData: Array<ble.ManufactureData> = [];
     if (request.manufacturerId >= 0 && request.manufacturerHex.length > 0) {
-      data.manufactureData = [{
+      const unit: ble.ManufactureData = {
         manufactureId: request.manufacturerId,
         manufactureValue: BleAdvertiserDataSource.hexToBuffer(request.manufacturerHex)
-      }];
+      };
+      manufactureData.push(unit);
     }
+    const data: ble.AdvertiseData = {
+      serviceUuids: serviceUuids,
+      manufactureData: manufactureData,
+      serviceData: serviceData,
+      includeDeviceName: request.includeDeviceName
+    };
     return data;
   }
 
   private static responseData(hex: string): ble.AdvertiseData {
-    return {
-      serviceData: [{
-        serviceUuid: '0000',
-        serviceValue: BleAdvertiserDataSource.hexToBuffer(hex)
-      }]
+    const serviceUuids: Array<string> = [];
+    const manufactureData: Array<ble.ManufactureData> = [];
+    const serviceData: Array<ble.ServiceData> = [];
+    const unit: ble.ServiceData = {
+      serviceUuid: '0000',
+      serviceValue: BleAdvertiserDataSource.hexToBuffer(hex)
     };
+    serviceData.push(unit);
+    const data: ble.AdvertiseData = {
+      serviceUuids: serviceUuids,
+      manufactureData: manufactureData,
+      serviceData: serviceData
+    };
+    return data;
   }
 
   private static hexToBuffer(hex: string): ArrayBuffer {

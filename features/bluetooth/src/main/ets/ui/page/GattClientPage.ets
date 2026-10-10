@@ -13,6 +13,7 @@ import {
   BluetoothRepository,
   ConnectGattUseCase,
   ConnectionParamPreset,
+  DisconnectGattUseCase,
   DiscoverGattServicesUseCase,
   GattConnectParams,
   MtuBounds,

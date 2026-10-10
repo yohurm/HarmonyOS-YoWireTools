@@ -53,7 +53,7 @@ export class LogCaptureService {
     nativeCode: string = ''
   ): Promise<Result<DebugLogRecord>> {
     if (this.pausedPacketSessions.has(sessionId)) {
-      const summary = new NormalizedPayload(`${bytes.length}`, DisplayHint.NONE, LogRecordType.DATA);
+      const summary = new NormalizedPayload(`${bytes.length}`, DisplayHint.NONE, LogRecordType.BYTES);
       return this.captureRecord(
         sessionId,
         module,

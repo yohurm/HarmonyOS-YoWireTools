@@ -30,7 +30,7 @@ export class BluetoothInteractionTask {
         ],
         actionType: wantAgent.OperationType.START_ABILITY,
         requestCode: 0,
-        wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT]
+        wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
       };
       const agent = await wantAgent.getWantAgent(info);
       await backgroundTaskManager.startBackgroundRunning(

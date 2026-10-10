@@ -148,4 +148,3 @@ export { ThroughputSession, ThroughputSnapshot } from './src/main/ets/domain/ser
 export { ExportBluetoothSessionLogUseCase } from './src/main/ets/domain/usecase/log/ExportBluetoothSessionLogUseCase';
 export { BleScanDutyPreset } from './src/main/ets/domain/model/BleScanFilter';
 export { BleGattReconnectCoordinator } from './src/main/ets/domain/service/BleGattReconnectCoordinator';
-export { SppReconnectCoordinator } from './src/main/ets/domain/service/SppReconnectCoordinator';
