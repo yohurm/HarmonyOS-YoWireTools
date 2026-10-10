@@ -28,7 +28,6 @@ import { NearLinkConstants } from '../../constants/NearLinkConstants';
 
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
 
 import { SsapOperationQueue } from '../service/SsapOperationQueue';
@@ -51,7 +50,7 @@ import { ConnectDataTransferResult } from '../model/ConnectDataTransferResult';
 import { NearLinkSecurityState, NearLinkEncryptionLabel } from '../model/NearLinkSecurityState';
 export class SaveNearLinkFavoriteUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(device: NearLinkDevice, alias: string, protocol: string, uuid: string = ''): Promise<Result<void>> {
@@ -68,7 +67,7 @@ export class ConnectSsapClientUseCase {
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
@@ -126,9 +125,9 @@ export class DisconnectSsapClientUseCase {
   private readonly stopSession: StopSessionUseCase;
   private readonly transportRegistry: TransportSessionRegistry;
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    repository: NearLinkRepositoryContract,
+    transportRegistry: TransportSessionRegistry,
+    stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
     this.repository = repository;
     this.stopSession = stopSession;
@@ -145,7 +144,7 @@ export class DisconnectSsapClientUseCase {
 
 export class BindSsapTransportUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   execute(sessionId: string, serviceUuid: string, propertyUuid: string): Result<void> {
@@ -156,7 +155,7 @@ export class BindSsapTransportUseCase {
 export class ReadSsapPropertyUseCase {
   private readonly repository: NearLinkRepositoryContract;
   private readonly queue: SsapOperationQueue = new SsapOperationQueue();
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(sessionId: string, serviceUuid: string, propertyUuid: string): Promise<Result<string>> {
@@ -176,7 +175,7 @@ export class ReadSsapPropertyUseCase {
 export class WriteSsapPropertyUseCase {
   private readonly repository: NearLinkRepositoryContract;
   private readonly queue: SsapOperationQueue = new SsapOperationQueue();
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(sessionId: string, serviceUuid: string, propertyUuid: string, hex: string): Promise<Result<void>> {
@@ -198,12 +197,9 @@ export class SetSsapNotificationUseCase {
   private readonly repository: NearLinkRepositoryContract;
   private readonly queue: SsapOperationQueue = new SsapOperationQueue();
   private readonly bindTransport: BindSsapTransportUseCase;
-  constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
-    bindTransport: BindSsapTransportUseCase = new BindSsapTransportUseCase()
-  ) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
-    this.bindTransport = bindTransport;
+    this.bindTransport = new BindSsapTransportUseCase(repository);
   }
   async execute(
     sessionId: string,
@@ -226,7 +222,7 @@ export class SetSsapNotificationUseCase {
 export class RequestSsapMtuUseCase {
   private readonly repository: NearLinkRepositoryContract;
   private readonly queue: SsapOperationQueue = new SsapOperationQueue();
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(sessionId: string, mtu: number): Promise<Result<number>> {
@@ -239,7 +235,7 @@ export class RequestSsapMtuUseCase {
 
 export class ObserveSsapPropertyNotifyUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   execute(sessionId: string, listener: (payload: SsapPropertyNotifyPayload) => void): Subscription {
@@ -249,7 +245,7 @@ export class ObserveSsapPropertyNotifyUseCase {
 
 export class ObserveDataTransferPacketsUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   execute(listener: (packet: DataTransferPacket) => void): Subscription {
@@ -261,12 +257,14 @@ export class ConnectDataTransferUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
-  private readonly repository: NearLinkRepositoryContract = NearLinkRepository.getInstance();
+  private readonly repository: NearLinkRepositoryContract;
   constructor(
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
@@ -343,7 +341,7 @@ export class ConnectDataTransferUseCase {
 
 export class WriteDataTransferUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(sessionId: string, hex: string): Promise<Result<void>> {
@@ -368,9 +366,9 @@ export class DisconnectDataTransferUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
   private readonly repository: NearLinkRepositoryContract;
   constructor(
-    stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()
+    repository: NearLinkRepositoryContract,
+    transportRegistry: TransportSessionRegistry,
+    stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
     this.stopSession = stopSession;
     this.transportRegistry = transportRegistry;
@@ -388,7 +386,7 @@ export class DisconnectDataTransferUseCase {
 
 export class PairNearLinkDeviceUseCase {
   private readonly repository: NearLinkRepositoryContract;
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
   async execute(address: string): Promise<Result<NearLinkSecurityState>> {
@@ -411,9 +409,15 @@ export class PairNearLinkDeviceUseCase {
 export class SendNearLinkCommandUseCase {
   private readonly sendCommand: SendCommandUseCase;
   private readonly writeDataTransfer: WriteDataTransferUseCase;
-  constructor(sendCommand: SendCommandUseCase = new SendCommandUseCase()) {
+  private readonly transportRegistry: TransportSessionRegistry;
+  constructor(
+    repository: NearLinkRepositoryContract,
+    transportRegistry: TransportSessionRegistry,
+    sendCommand: SendCommandUseCase = new SendCommandUseCase()
+  ) {
     this.sendCommand = sendCommand;
-    this.writeDataTransfer = new WriteDataTransferUseCase();
+    this.transportRegistry = transportRegistry;
+    this.writeDataTransfer = new WriteDataTransferUseCase(repository);
   }
   async execute(
     sessionId: string,
@@ -421,7 +425,7 @@ export class SendNearLinkCommandUseCase {
     encoding: PayloadEncoding = PayloadEncoding.TEXT,
     lineEnding: LineEndingMode = LineEndingMode.LF
   ): Promise<Result<DebugLogRecord | void>> {
-    const transport = TransportSessionRegistry.getInstance().get(sessionId);
+    const transport = this.transportRegistry.get(sessionId);
     if (transport === undefined) {
       return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'Transport not connected'));
     }

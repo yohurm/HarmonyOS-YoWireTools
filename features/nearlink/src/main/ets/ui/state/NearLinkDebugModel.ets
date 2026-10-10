@@ -13,6 +13,8 @@ import {
   YoLoadingStateModel,
   YoPageState
 } from 'youi_kit';
+import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
+import { NearLinkRepositoryContract } from '../../domain/repository/NearLinkRepositoryContract';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { SaveNearLinkFavoriteUseCase } from '../../domain/usecase/NearLinkExtendedUseCases';
@@ -138,11 +140,11 @@ export class NearLinkDebugModel {
   @Trace exportFailed: boolean = false;
   @Trace pageState: YoPageState = YoPageState.LOADING;
 
-  private readonly devicesUseCase: ObserveNearLinkDevicesUseCase = new ObserveNearLinkDevicesUseCase();
-  private readonly favoritesUseCase: SaveNearLinkFavoriteUseCase = new SaveNearLinkFavoriteUseCase();
-  private readonly session: NearLinkSessionUseCases = new NearLinkSessionUseCases();
-  private readonly startScanUseCase: StartNearLinkScanUseCase = new StartNearLinkScanUseCase();
-  private readonly stopScanUseCase: StopNearLinkScanUseCase = new StopNearLinkScanUseCase();
+  private readonly devicesUseCase: ObserveNearLinkDevicesUseCase;
+  private readonly favoritesUseCase: SaveNearLinkFavoriteUseCase;
+  private readonly session: NearLinkSessionUseCases;
+  private readonly startScanUseCase: StartNearLinkScanUseCase;
+  private readonly stopScanUseCase: StopNearLinkScanUseCase;
   private readonly ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase();
   private readonly trail: string[] = [NearLinkDestination.ROOT];
   private deviceSub: Subscription | undefined = undefined;
@@ -154,6 +156,15 @@ export class NearLinkDebugModel {
   private waitTimer: number = -1;
   private connectStartedMs: number = 0;
   private readonly loggedHex: string[] = [];
+
+  constructor() {
+    const repository: NearLinkRepositoryContract = NearLinkRepository.getInstance();
+    this.devicesUseCase = new ObserveNearLinkDevicesUseCase(repository);
+    this.favoritesUseCase = new SaveNearLinkFavoriteUseCase(repository);
+    this.session = new NearLinkSessionUseCases(repository);
+    this.startScanUseCase = new StartNearLinkScanUseCase(repository);
+    this.stopScanUseCase = new StopNearLinkScanUseCase(repository);
+  }
 
   async onAppear(): Promise<void> {
     this.deviceSub = this.devicesUseCase.execute((devices: NearLinkDevice[]) => {

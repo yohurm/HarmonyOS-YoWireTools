@@ -15,7 +15,6 @@ import {
 } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
 import { NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
@@ -30,7 +29,7 @@ export class StartNearLinkScanUseCase {
   private readonly startSession: StartSessionUseCase;
 
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
@@ -82,7 +81,7 @@ export class StopNearLinkScanUseCase {
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
     this.repository = repository;
@@ -111,7 +110,7 @@ export class LoadNearLinkOverviewUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -130,7 +129,7 @@ export class LoadNearLinkOverviewUseCase {
 export class ObserveNearLinkDevicesUseCase {
   private readonly repository: NearLinkRepositoryContract;
 
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
 
@@ -144,7 +143,7 @@ export class ResolveNearLinkCapabilityUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: NearLinkRepositoryContract = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;

@@ -1,7 +1,6 @@
 import { Result, ResultError, Subscription } from 'common_core';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
 import { NearLinkAdvertisingPacket } from '../model/NearLinkAdvertisingPacket';
 import { NearLinkPairingNotice, NearLinkRadioSnapshot, NearLinkSupportQuery } from '../model/NearLinkRadio';
@@ -38,7 +37,7 @@ export class NearLinkSessionUseCases {
   private portMtuNegotiated: number = 0;
   private nextWriteAt: number = 0;
 
-  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
 
