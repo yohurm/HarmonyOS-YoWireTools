@@ -31,6 +31,9 @@ export class SsapServerDataSource {
   }
 
   open(): Result<void> {
+    if (this.server !== undefined && !this.closed) {
+      return Result.ok(undefined);
+    }
     try {
       this.server = ssap.createServer();
       this.closed = false;

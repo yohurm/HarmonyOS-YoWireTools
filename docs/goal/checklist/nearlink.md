@@ -1,7 +1,7 @@
 ---
 id: checklist.nearlink-debug
 type: checklist
-status: draft
+status: active
 when: research
 when_to_use: 验收星闪专业调试能力是否按官方 Kit 行为可观察地成立
 related: [docs/goal/research/nearlink.md]
@@ -433,9 +433,9 @@ related: [docs/goal/research/nearlink.md]
 
 ### NL-059 同一远端只建一次客户端
 
-- 前置：已对地址 A 创建 Client。
+- 前置：已对地址 A 创建 Client。官方 SSAP 对 Client 与 Server 都写明：一个应用针对一个远端设备只需要创建一次实例。
 - 动作：再次对 A 发起连接。
-- 结果：复用已有 Client，不创建第二个实例。
+- 结果：复用已有 Client，不创建第二个实例。已打开的 Server 同样不再调用 `createServer`。
 - 证据：日志中的创建次数为 1。
 
 ### NL-060 连接中的可见状态
