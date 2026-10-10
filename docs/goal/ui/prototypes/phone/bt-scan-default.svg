@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.0" y="0.0" width="360.0" height="36.0" rx="0" fill="#FFFFFF" stroke="none"/>
+<text x="16.0" y="18.0" font-size="14" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">08:20</text>
+<text x="312.0" y="18.0" font-size="12" font-weight="400" fill="#182431" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">100%</text>
+<rect x="320.0" y="12.0" width="18.0" height="11.0" rx="2" fill="none" stroke="#182431" stroke-width="1.2"/>
+<rect x="322.0" y="14.0" width="12.0" height="7.0" rx="1" fill="#182431" stroke="none"/>
+<rect x="338.0" y="15.0" width="2.0" height="5.0" rx="0" fill="#182431" stroke="none"/>
+<text x="16.0" y="72.0" font-size="28" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">搜索成功</text>
+<text x="16.0" y="108.0" font-size="16" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已搜索到周边设备</text>
+<rect x="158.0" y="194.0" width="44.0" height="72.0" rx="8" fill="none" stroke="#182431" stroke-width="1.6"/>
+<rect x="172.0" y="200.0" width="16.0" height="4.0" rx="2" fill="#182431" stroke="none"/>
+<path d="M144 230 A36 36 0 0 1 172.8 204.8" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+<path d="M216 230 A36 36 0 0 0 187.2 204.8" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+<path d="M128 230 A52 52 0 0 1 169.6 193.6" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+<path d="M232 230 A52 52 0 0 0 190.4 193.6" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+<path d="M112 230 A68 68 0 0 1 166.4 182.4" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
+<path d="M248 230 A68 68 0 0 0 193.6 182.4" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.18"/>
+<text x="180.0" y="330.0" font-size="16" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">重新搜索</text>
+<text x="16.0" y="370.0" font-size="22" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已搜索到设备</text>
+<circle cx="28.0" cy="432.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
+<text x="28.0" y="432.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工</text>
+<text x="52.0" y="422.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工装-A</text>
+<text x="52.0" y="444.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">AA:BB:CC:DD:EE:01 · 已配对</text>
+<circle cx="332.0" cy="428.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="428.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="68.0" y1="464.0" x2="396.0" y2="464.0" stroke="#E6E6E6" stroke-width="1"/>
+<circle cx="28.0" cy="496.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
+<text x="28.0" y="496.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">H</text>
+<text x="52.0" y="486.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">HC-05</text>
+<text x="52.0" y="508.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">AA:BB:CC:DD:EE:22 · 未配对 · -67 dBm</text>
+<circle cx="332.0" cy="492.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="492.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="68.0" y1="528.0" x2="396.0" y2="528.0" stroke="#E6E6E6" stroke-width="1"/>
+<circle cx="28.0" cy="560.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
+<text x="28.0" y="560.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">M</text>
+<text x="52.0" y="550.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Meter-3</text>
+<text x="52.0" y="572.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">AA:BB:CC:DD:EE:30 · 已配对 · -71 dBm</text>
+<circle cx="332.0" cy="556.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="556.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="68.0" y1="592.0" x2="396.0" y2="592.0" stroke="#E6E6E6" stroke-width="1"/>
+</svg>

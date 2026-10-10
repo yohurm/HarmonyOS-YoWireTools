@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.0" y="0.0" width="360.0" height="36.0" rx="0" fill="#FFFFFF" stroke="none"/>
+<text x="16.0" y="18.0" font-size="14" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">08:20</text>
+<text x="312.0" y="18.0" font-size="12" font-weight="400" fill="#182431" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">100%</text>
+<rect x="320.0" y="12.0" width="18.0" height="11.0" rx="2" fill="none" stroke="#182431" stroke-width="1.2"/>
+<rect x="322.0" y="14.0" width="12.0" height="7.0" rx="1" fill="#182431" stroke="none"/>
+<rect x="338.0" y="15.0" width="2.0" height="5.0" rx="0" fill="#182431" stroke="none"/>
+<rect x="0.0" y="36.0" width="360.0" height="48.0" rx="0" fill="#FFFFFF" stroke="none"/>
+<path d="M26 53 L18 60 L26 67" fill="none" stroke="#182431" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="60.0" font-size="18" font-weight="700" fill="#182431" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">串口</text>
+<line x1="0.0" y1="84.0" x2="360.0" y2="84.0" stroke="#E6E6E6" stroke-width="1"/>
+<text x="16.0" y="112.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工装-A · AA:BB:CC:DD:EE:01</text>
+<text x="16.0" y="136.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已断开 · RX 128 · TX 36</text>
+<line x1="0.0" y1="152.0" x2="360.0" y2="152.0" stroke="#E6E6E6" stroke-width="1"/>
+<text x="16.0" y="172.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">08:12:01</text>
+<text x="96.0" y="172.0" font-size="13" font-weight="700" fill="#0A59F7" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">TX</text>
+<text x="140.0" y="172.0" font-size="14" font-weight="400" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">AT</text>
+<text x="16.0" y="200.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">08:12:02</text>
+<text x="96.0" y="200.0" font-size="13" font-weight="700" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">系统</text>
+<text x="140.0" y="200.0" font-size="14" font-weight="400" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei Mono, WenQuanYi Micro Hei, monospace">发送失败，连接已中断</text>
+<text x="180.0" y="700.0" font-size="16" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">重新连接</text>
+</svg>
