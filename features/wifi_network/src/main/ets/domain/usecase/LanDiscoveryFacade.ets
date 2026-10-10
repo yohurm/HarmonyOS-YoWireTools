@@ -1,25 +1,15 @@
 import { Subscription } from 'common_core';
-import { MdnsDataSource } from '../../data/datasource/MdnsDataSource';
-import { SsdpDiscoveryDataSource } from '../../data/datasource/SsdpDiscoveryDataSource';
-import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
 import { DiscoveredNetworkService } from '../model/MqttModels';
+import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 
 /**
  * Thin facade for LAN discovery cancellation and service observation.
  */
 export class LanDiscoveryFacade {
-  private readonly repository: WifiNetworkRepository;
-  private readonly mdnsDataSource: MdnsDataSource;
-  private readonly ssdpDataSource: SsdpDiscoveryDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
 
-  constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
-    mdnsDataSource: MdnsDataSource = MdnsDataSource.getInstance(),
-    ssdpDataSource: SsdpDiscoveryDataSource = SsdpDiscoveryDataSource.getInstance()
-  ) {
+  constructor(repository: WifiNetworkRepositoryContract) {
     this.repository = repository;
-    this.mdnsDataSource = mdnsDataSource;
-    this.ssdpDataSource = ssdpDataSource;
   }
 
   cancelLanDiscovery(): void {
@@ -31,10 +21,10 @@ export class LanDiscoveryFacade {
   }
 
   observeMdnsServices(onChange: (services: DiscoveredNetworkService[]) => void): Subscription {
-    return this.mdnsDataSource.observeServices().subscribe(onChange, true);
+    return this.repository.observeMdnsServices().subscribe(onChange, true);
   }
 
   observeSsdpServices(onChange: () => void): Subscription {
-    return this.ssdpDataSource.observeServices().subscribe(onChange, true);
+    return this.repository.observeSsdpServices().subscribe(onChange, true);
   }
 }

@@ -1,6 +1,5 @@
 ﻿import { CommandRepository, CommandTemplateRecord } from 'common_storage';
-import { AbilityContextRegistry } from 'common_platform';
-import { IdGenerator, Result, ResultError } from 'common_core';
+import { IdGenerator, Observable, Result, ResultError } from 'common_core';
 import {
   AppMode,
   CreateSessionInput,
@@ -12,30 +11,21 @@ import {
   SessionType,
   StartSessionUseCase,
   StopSessionUseCase,
-  TransportSessionRegistry
+  WriteResult
 } from 'debug_core';
-import { MulticastSessionCoordinator } from '../../data/transport/MulticastSessionCoordinator';
-import { MdnsDataSource } from '../../data/datasource/MdnsDataSource';
-import { MulticastSocketDataSource } from '../../data/datasource/MulticastSocketDataSource';
-import { SsdpDiscoveryDataSource } from '../../data/datasource/SsdpDiscoveryDataSource';
-import { UdpSocketDataSource } from '../../data/datasource/UdpSocketDataSource';
-import { WebSocketServerDataSource } from '../../data/datasource/WebSocketServerDataSource';
-import { UdpTransportSession } from '../../data/transport/UdpTransportSession';
-import { WifiNetworkRepository } from '../../data/repository/WifiNetworkRepository';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
+import { WifiNetworkRepositoryContract } from '../repository/WifiNetworkRepositoryContract';
 import { HttpRequestDraft, HttpResponseRecord } from '../model/HttpModels';
 import { MulticastSessionConfig, UdpSessionConfig } from '../model/SocketModels';
 import { DiscoveredNetworkService } from '../model/MqttModels';
-import { WebSocketServerConfigModel } from '../model/WebSocketModels';
+import { WebSocketServerClientRecord, WebSocketServerConfigModel } from '../model/WebSocketModels';
 import { HttpNetworkLogger } from '../service/HttpNetworkLogger';
 import { HttpRequestTemplateCodec } from '../service/HttpRequestTemplateCodec';
 
 export class UdpSessionOpenResult {
   readonly sessionId: string;
-  readonly transport: UdpTransportSession;
-  constructor(sessionId: string, transport: UdpTransportSession) {
+  constructor(sessionId: string) {
     this.sessionId = sessionId;
-    this.transport = transport;
   }
 }
 
@@ -47,23 +37,20 @@ export class MulticastSessionOpenResult {
 }
 
 export class OpenUdpSessionUseCase {
-  private readonly udpDataSource: UdpSocketDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
-  private readonly transportRegistry: TransportSessionRegistry;
   constructor(
-    udpDataSource: UdpSocketDataSource = UdpSocketDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
-    startSession: StartSessionUseCase = new StartSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
-    this.udpDataSource = udpDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
-    this.transportRegistry = transportRegistry;
   }
   async execute(config: UdpSessionConfig): Promise<Result<UdpSessionOpenResult>> {
     const perm = await this.ensurePermission.execute(PermissionScenario.NETWORK_ACCESS);
@@ -82,49 +69,46 @@ export class OpenUdpSessionUseCase {
       return Result.fail(created.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     await this.startSession.execute(created.value.id);
-    const bound = await this.udpDataSource.bind(config.localPort, config.allowBroadcast);
-    if (!bound.success || bound.value === undefined) {
+    const bound = await this.repository.openUdpSession(created.value.id, config);
+    if (!bound.success) {
       return Result.fail(bound.error ?? new ResultError(WifiNetworkErrorCodes.UDP_NOT_BOUND, 'UDP bind failed'));
     }
-    const transport = new UdpTransportSession(created.value.id);
-    transport.bindSocket(bound.value, config.remoteHost, config.remotePort);
-    this.transportRegistry.register(created.value.id, transport);
-    return Result.ok(new UdpSessionOpenResult(created.value.id, transport));
+    return Result.ok(new UdpSessionOpenResult(created.value.id));
+  }
+
+  write(sessionId: string, payload: Uint8Array): Promise<WriteResult> {
+    return this.repository.writeUdpSession(sessionId, payload);
   }
 }
 
 export class CloseUdpSessionUseCase {
-  private readonly transportRegistry: TransportSessionRegistry;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
   constructor(
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
-    this.transportRegistry = transportRegistry;
+    this.repository = repository;
     this.stopSession = stopSession;
   }
   async execute(sessionId: string): Promise<Result<void>> {
-    const transport = this.transportRegistry.get(sessionId);
-    if (transport !== undefined) {
-      await transport.disconnect('close');
-      this.transportRegistry.remove(sessionId);
-    }
+    await this.repository.closeUdpSession(sessionId);
     return this.stopSession.execute(sessionId, 'udp_closed');
   }
 }
 
 export class OpenMulticastSessionUseCase {
-  private readonly multicastDataSource: MulticastSocketDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   constructor(
-    multicastDataSource: MulticastSocketDataSource = MulticastSocketDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
-    this.multicastDataSource = multicastDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
@@ -146,25 +130,30 @@ export class OpenMulticastSessionUseCase {
       return Result.fail(created.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     await this.startSession.execute(created.value.id);
-    const joined = await this.multicastDataSource.bindAndJoin(config.localPort, config.groupAddress);
-    if (!joined.success || joined.value === undefined) {
+    const joined = await this.repository.joinMulticast(created.value.id, config);
+    if (!joined.success) {
       return Result.fail(joined.error ?? new ResultError(WifiNetworkErrorCodes.SOCKET_ERRNO, 'Multicast join failed'));
     }
-    MulticastSessionCoordinator.getInstance().attach(created.value.id, joined.value);
     return Result.ok(new MulticastSessionOpenResult(created.value.id));
   }
-  getDataSource(): MulticastSocketDataSource {
-    return this.multicastDataSource;
+
+  setMessageListener(listener: (text: string) => void): void {
+    this.repository.setMulticastMessageListener(listener);
   }
 }
 
 export class LeaveMulticastSessionUseCase {
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
-  constructor(stopSession: StopSessionUseCase = new StopSessionUseCase()) {
+  constructor(
+    repository: WifiNetworkRepositoryContract,
+    stopSession: StopSessionUseCase = new StopSessionUseCase()
+  ) {
+    this.repository = repository;
     this.stopSession = stopSession;
   }
   async execute(sessionId: string): Promise<Result<void>> {
-    await MulticastSessionCoordinator.getInstance().detach();
+    await this.repository.leaveMulticast();
     if (sessionId.length > 0) {
       return this.stopSession.execute(sessionId, 'multicast_left');
     }
@@ -173,49 +162,57 @@ export class LeaveMulticastSessionUseCase {
 }
 
 export class StartMdnsDiscoveryUseCase {
-  private readonly mdnsDataSource: MdnsDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   constructor(
-    mdnsDataSource: MdnsDataSource = MdnsDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
-    this.mdnsDataSource = mdnsDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
   }
   async execute(serviceType: string): Promise<Result<void>> {
+    if (serviceType.trim().length === 0) {
+      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, '类型为空'));
+    }
     const perm = await this.ensurePermission.execute(PermissionScenario.NETWORK_ACCESS);
     if (!perm.granted) {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
     }
-    const context = AbilityContextRegistry.getInstance().get();
-    if (context === undefined) {
-      return Result.fail(new ResultError(WifiNetworkErrorCodes.SCAN_LIMITED, 'Ability context not bound'));
-    }
-    return this.mdnsDataSource.startDiscovery(context, serviceType);
+    return this.repository.startMdnsDiscovery(serviceType);
   }
-  getDataSource(): MdnsDataSource {
-    return this.mdnsDataSource;
+
+  observeServices(): Observable<DiscoveredNetworkService[]> {
+    return this.repository.observeMdnsServices();
+  }
+
+  async publish(serviceName: string, serviceType: string, port: number): Promise<Result<void>> {
+    return this.repository.publishMdns(serviceName, serviceType, port);
+  }
+
+  async unpublish(serviceName: string, serviceType: string): Promise<Result<void>> {
+    return this.repository.unpublishMdns(serviceName, serviceType);
   }
 }
 
 export class StopMdnsDiscoveryUseCase {
-  private readonly mdnsDataSource: MdnsDataSource;
-  constructor(mdnsDataSource: MdnsDataSource = MdnsDataSource.getInstance()) {
-    this.mdnsDataSource = mdnsDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
+  constructor(repository: WifiNetworkRepositoryContract) {
+    this.repository = repository;
   }
   async execute(): Promise<void> {
-    await this.mdnsDataSource.stopDiscovery();
+    await this.repository.stopMdnsDiscovery();
   }
 }
 
 export class StartSsdpDiscoveryUseCase {
-  private readonly ssdpDataSource: SsdpDiscoveryDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   constructor(
-    ssdpDataSource: SsdpDiscoveryDataSource = SsdpDiscoveryDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
-    this.ssdpDataSource = ssdpDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
   }
   async execute(): Promise<Result<void>> {
@@ -223,35 +220,32 @@ export class StartSsdpDiscoveryUseCase {
     if (!perm.granted) {
       return Result.fail(new ResultError(WifiNetworkErrorCodes.NO_INTERNET, 'INTERNET permission required'));
     }
-    return this.ssdpDataSource.startDiscovery();
-  }
-  getDataSource(): SsdpDiscoveryDataSource {
-    return this.ssdpDataSource;
+    return this.repository.startSsdpDiscovery();
   }
 }
 
 export class StopSsdpDiscoveryUseCase {
-  private readonly ssdpDataSource: SsdpDiscoveryDataSource;
-  constructor(ssdpDataSource: SsdpDiscoveryDataSource = SsdpDiscoveryDataSource.getInstance()) {
-    this.ssdpDataSource = ssdpDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
+  constructor(repository: WifiNetworkRepositoryContract) {
+    this.repository = repository;
   }
   async execute(): Promise<void> {
-    await this.ssdpDataSource.stopDiscovery();
+    await this.repository.stopSsdpDiscovery();
   }
 }
 
 export class OpenWebSocketServerUseCase {
-  private readonly serverDataSource: WebSocketServerDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   constructor(
-    serverDataSource: WebSocketServerDataSource = WebSocketServerDataSource.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
-    this.serverDataSource = serverDataSource;
+    this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
@@ -273,34 +267,35 @@ export class OpenWebSocketServerUseCase {
       return Result.fail(created.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     await this.startSession.execute(created.value.id);
-    const started = await this.serverDataSource.start(config);
+    const started = await this.repository.startWebSocketServer(config);
     if (!started.success) {
       return Result.fail(started.error ?? new ResultError(WifiNetworkErrorCodes.PORT_IN_USE, 'WS server failed'));
     }
     return Result.ok(created.value.id);
   }
-  getDataSource(): WebSocketServerDataSource {
-    return this.serverDataSource;
+
+  observeClients(): Observable<WebSocketServerClientRecord[]> {
+    return this.repository.observeWebSocketServerClients();
   }
 }
 
 export class StopWebSocketServerUseCase {
-  private readonly serverDataSource: WebSocketServerDataSource;
-  constructor(serverDataSource: WebSocketServerDataSource = WebSocketServerDataSource.getInstance()) {
-    this.serverDataSource = serverDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
+  constructor(repository: WifiNetworkRepositoryContract) {
+    this.repository = repository;
   }
   async execute(): Promise<void> {
-    await this.serverDataSource.stop();
+    await this.repository.stopWebSocketServer();
   }
 }
 
 export class ExecuteHttpSessionUseCase {
-  private readonly repository: WifiNetworkRepository;
+  private readonly repository: WifiNetworkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
   constructor(
-    repository: WifiNetworkRepository = WifiNetworkRepository.getInstance(),
+    repository: WifiNetworkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
@@ -386,19 +381,14 @@ export class ExportHttpExchangeUseCase {
 }
 
 export class ListDiscoveredServicesUseCase {
-  private readonly mdnsDataSource: MdnsDataSource;
-  private readonly ssdpDataSource: SsdpDiscoveryDataSource;
-  constructor(
-    mdnsDataSource: MdnsDataSource = MdnsDataSource.getInstance(),
-    ssdpDataSource: SsdpDiscoveryDataSource = SsdpDiscoveryDataSource.getInstance()
-  ) {
-    this.mdnsDataSource = mdnsDataSource;
-    this.ssdpDataSource = ssdpDataSource;
+  private readonly repository: WifiNetworkRepositoryContract;
+  constructor(repository: WifiNetworkRepositoryContract) {
+    this.repository = repository;
   }
   execute(): DiscoveredNetworkService[] {
     const merged: DiscoveredNetworkService[] = [];
-    const mdns = this.mdnsDataSource.getServices();
-    const ssdp = this.ssdpDataSource.getServices();
+    const mdns = this.repository.listMdnsServices();
+    const ssdp = this.repository.listSsdpServices();
     for (let i = 0; i < mdns.length; i++) {
       merged.push(mdns[i]);
     }

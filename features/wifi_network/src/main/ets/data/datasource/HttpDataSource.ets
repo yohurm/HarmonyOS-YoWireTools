@@ -9,8 +9,23 @@ import { NetworkKitEventBridge } from '../kit/NetworkKitEventBridge';
 /**
  * HTTP request wrapper — createHttp/request/destroy in finally per architecture wifi_network/03.
  */
+interface HttpTimingFields {
+  dnsTiming?: number;
+  tcpTiming?: number;
+  tlsTiming?: number;
+  firstReceiveTiming?: number;
+  totalFinishTiming?: number;
+}
+
+interface HttpTimingCarrier {
+  performanceTiming?: HttpTimingFields;
+}
+
 export class HttpDataSource {
   private static instance: HttpDataSource | undefined;
+  private active: http.HttpRequest | undefined;
+  private aborted: boolean = false;
+  private receivedBytes: number = 0;
 
   static getInstance(): HttpDataSource {
     if (HttpDataSource.instance === undefined) {
@@ -46,8 +61,18 @@ export class HttpDataSource {
     return headers;
   }
 
+  abort(): void {
+    this.aborted = true;
+    if (this.active !== undefined) {
+      this.active.destroy();
+      this.active = undefined;
+    }
+  }
+
   async execute(draft: HttpRequestDraft): Promise<Result<HttpResponseRecord>> {
     const client = http.createHttp();
+    this.active = client;
+    this.aborted = false;
     const start = Date.now();
     let headersHandler: ((data: object) => void) | undefined;
     try {
@@ -61,23 +86,39 @@ export class HttpDataSource {
         maxLimit: draft.maxLimitBytes,
         extraData: draft.bodyText.length > 0 ? draft.bodyText : undefined
       };
+      client.on('dataReceiveProgress', (info: http.DataReceiveProgressInfo) => {
+        this.receivedBytes = info.receiveSize;
+      });
       const response = await client.request(url, options);
+      if (this.aborted) {
+        return Result.fail(new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, '已取消'));
+      }
       const latency = Date.now() - start;
       const responseHeaders: Record<string, string> = HttpHeaderSanitizer.sanitize(
         response.header as Record<string, string>
       );
       const bodyText = `${response.result ?? ''}`;
+      const timing = (response as HttpTimingCarrier).performanceTiming;
       return Result.ok(new HttpResponseRecord(
         draft.id,
         response.responseCode,
         responseHeaders,
         bodyText,
         bodyText.length,
-        latency
+        latency,
+        0,
+        '',
+        this.timingCell(timing !== undefined ? timing.dnsTiming : undefined),
+        this.timingCell(timing !== undefined ? timing.tcpTiming : undefined),
+        this.timingCell(timing !== undefined ? timing.tlsTiming : undefined),
+        this.timingCell(timing !== undefined ? timing.firstReceiveTiming : undefined),
+        this.timingCell(timing !== undefined ? timing.totalFinishTiming : undefined)
       ));
     } catch (error) {
+      if (this.aborted) {
+        return Result.fail(new ResultError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, '已取消'));
+      }
       const err = error as BusinessError;
-      const latency = Date.now() - start;
       let appCode: string = WifiNetworkErrorCodes.CONNECT_TIMEOUT;
       if (err.code === 2300006) {
         appCode = WifiNetworkErrorCodes.DNS_FAILED;
@@ -91,7 +132,17 @@ export class HttpDataSource {
       if (headersHandler !== undefined) {
         NetworkKitEventBridge.unsubscribeHttpHeadersReceive(client, headersHandler);
       }
+      if (this.active === client) {
+        this.active = undefined;
+      }
       client.destroy();
     }
+  }
+
+  private timingCell(value: number | undefined): string {
+    if (value === undefined) {
+      return '未返回';
+    }
+    return `${value}`;
   }
 }
