@@ -2,7 +2,11 @@
 import { DeviceFavoriteRecord } from 'common_storage';
 import { Observable, Result, ResultError, Subscription, TimeUtil } from 'common_core';
 import { ITransportSession, IncomingPayload, ModuleType, SessionRuntimeStore } from 'debug_core';
-import { NearLinkManagerDataSource } from '../datasource/platform/NearLinkManagerDataSource';
+import {
+  NearLinkManagerDataSource,
+  NearLinkRadioCode,
+  NearLinkRadioSnapshot
+} from '../datasource/platform/NearLinkManagerDataSource';
 import { NearLinkScanDataSource, NearLinkDiscoveryPayload } from '../datasource/platform/NearLinkScanDataSource';
 import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';
 import { DataTransferDataSource } from '../datasource/platform/DataTransferDataSource';
@@ -140,7 +144,14 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   onAdapterStateChange(listener: (snapshot: NearLinkAdapterSnapshot) => void): void {
-    this.managerDataSource.onStateChange(listener);
+    this.managerDataSource.onStateChange((radio: NearLinkRadioSnapshot) => {
+      listener(new NearLinkAdapterSnapshot(
+        true,
+        radio.code === NearLinkRadioCode.ON,
+        radio.code,
+        `${radio.code}`
+      ));
+    });
   }
 
   offAdapterStateChange(): void {

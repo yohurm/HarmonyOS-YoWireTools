@@ -1,4 +1,6 @@
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { scan } from '@kit.NearLinkKit';
+import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkScanFilter, NearLinkScanMode, NearLinkSystemFilter } from '../../domain/model/NearLinkScanFilter';
 
 /**
@@ -47,7 +49,7 @@ export class NearLinkScanPlatformMapper {
     if (group.manufacturerDataMaskHex.length > 0) {
       platformFilter.manufacturerDataMask = NearLinkScanPlatformMapper.hexToArrayBuffer(group.manufacturerDataMaskHex);
     }
-    if (includeRssi && group.hasRssi) {
+    if (includeRssi && group.hasRssi && deviceInfo.sdkApiVersion >= NearLinkConstants.API_RSSI_FILTER) {
       platformFilter.rssi = group.rssi;
     }
     return platformFilter;

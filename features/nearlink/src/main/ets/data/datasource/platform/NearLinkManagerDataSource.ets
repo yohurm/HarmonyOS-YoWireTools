@@ -213,8 +213,12 @@ export class NearLinkManagerDataSource {
   onConnectionChange(listener: (notice: NearLinkPairingNotice) => void): Result<void> {
     this.offConnectionChange();
     const handler = (param: manager.ConnectionStateParam) => {
-      const reasonMsg = NearLinkManagerDataSource.readReasonMsg(param.reasonMsg);
-      listener(new NearLinkPairingNotice(param.address, 'connection', 'connection', reasonMsg));
+      listener(new NearLinkPairingNotice(
+        param.address,
+        'connection',
+        'connection',
+        NearLinkManagerDataSource.connectionReasonMsg(param)
+      ));
     };
     this.connectionHandler = handler;
     return KitEventSubscription.subscribe(() => {
@@ -242,11 +246,20 @@ export class NearLinkManagerDataSource {
     }
   }
 
-  private static readReasonMsg(reasonMsg: string | undefined): string {
-    if (deviceInfo.sdkApiVersion < NearLinkConstants.API_REASON_MSG) {
-      return '';
+  private static connectionReasonMsg(param: manager.ConnectionStateParam): string {
+    if (deviceInfo.sdkApiVersion >= NearLinkConstants.API_REASON_MSG) {
+      const message = param.reasonMsg;
+      return message ?? '';
     }
-    return reasonMsg ?? '';
+    return '';
+  }
+
+  private static pairingReasonMsg(param: manager.PairingStateParam): string {
+    if (deviceInfo.sdkApiVersion >= NearLinkConstants.API_REASON_MSG) {
+      const message = param.reasonMsg;
+      return message ?? '';
+    }
+    return '';
   }
 
   private static toPairingNotice(param: manager.PairingStateParam): NearLinkPairingNotice {
@@ -257,22 +270,22 @@ export class NearLinkManagerDataSource {
       stateToken = 'pairing';
     }
     let reasonToken = 'failure';
-    if (param.reason === constant.PairingReason.PAIRING_REASON_SUCCESS) {
+    if (param.reason === manager.PairingReason.PAIRING_REASON_SUCCESS) {
       reasonToken = 'success';
-    } else if (param.reason === constant.PairingReason.PAIRING_REASON_PROFILE_UNSUPPORTED) {
+    } else if (param.reason === manager.PairingReason.PAIRING_REASON_PROFILE_UNSUPPORTED) {
       reasonToken = 'profile_unsupported';
-    } else if (param.reason === constant.PairingReason.PAIRING_REASON_EXCEED_ACB_MAX) {
+    } else if (param.reason === manager.PairingReason.PAIRING_REASON_EXCEED_ACB_MAX) {
       reasonToken = 'exceed_acb_max';
-    } else if (param.reason === constant.PairingReason.PAIRING_REASON_REMOTE_CANCELED) {
+    } else if (param.reason === manager.PairingReason.PAIRING_REASON_REMOTE_CANCELED) {
       reasonToken = 'remote_canceled';
-    } else if (param.reason === constant.PairingReason.PAIRING_REASON_LOCAL_CANCELED) {
+    } else if (param.reason === manager.PairingReason.PAIRING_REASON_LOCAL_CANCELED) {
       reasonToken = 'local_canceled';
     }
     return new NearLinkPairingNotice(
       param.address,
       stateToken,
       reasonToken,
-      NearLinkManagerDataSource.readReasonMsg(param.reasonMsg)
+      NearLinkManagerDataSource.pairingReasonMsg(param)
     );
   }
 
