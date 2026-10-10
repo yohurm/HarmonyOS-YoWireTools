@@ -7,7 +7,6 @@ import { UdpSocketDataSource } from '../datasource/UdpSocketDataSource';
 import { MqttClientDataSource } from '../datasource/MqttClientDataSource';
 import { HttpDataSource } from '../datasource/HttpDataSource';
 import { WebSocketDataSource } from '../datasource/WebSocketDataSource';
-import { socket } from '@kit.NetworkKit';
 import { WifiAccessPointSnapshot } from '../../domain/model/WifiAccessPointSnapshot';
 import { WifiLinkedInfoSnapshot } from '../../domain/model/WifiLinkedInfoSnapshot';
 import { WifiOverviewSnapshot } from '../../domain/model/WifiOverviewSnapshot';

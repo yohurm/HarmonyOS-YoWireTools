@@ -6,31 +6,7 @@ import { NearLinkAdvParser } from '../../../domain/service/NearLinkAdvParser';
 import { NearLinkErrorCodes } from '../../../constants/NearLinkErrorCodes';
 import { NearLinkConstants } from '../../../constants/NearLinkConstants';
 import { NearLinkPayloadRules } from '../../../domain/service/NearLinkScanPolicy';
-
-export class SsapServerWriteRecord {
-  readonly requestId: number;
-  readonly address: string;
-  readonly propertyUuid: string;
-  readonly valueHex: string;
-  readonly writeType: string;
-  readonly responded: boolean;
-
-  constructor(
-    requestId: number,
-    address: string,
-    propertyUuid: string,
-    valueHex: string,
-    writeType: string,
-    responded: boolean
-  ) {
-    this.requestId = requestId;
-    this.address = address;
-    this.propertyUuid = propertyUuid;
-    this.valueHex = valueHex;
-    this.writeType = writeType;
-    this.responded = responded;
-  }
-}
+import { SsapServerWriteRecord } from '../../../domain/model/SsapServerWriteRecord';
 
 type WriteListener = (record: SsapServerWriteRecord) => void;
 type ReadListener = (requestId: number, address: string, propertyUuid: string) => void;

@@ -15,7 +15,7 @@ import {
 } from 'youi_kit';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
+import { SaveNearLinkFavoriteUseCase } from '../../domain/usecase/NearLinkExtendedUseCases';
 import { NearLinkDevice } from '../../domain/model/NearLinkDevice';
 import { NearLinkLogEntry } from '../../domain/model/NearLinkLogEntry';
 import { NearLinkScanFilter } from '../../domain/model/NearLinkScanFilter';
@@ -37,7 +37,11 @@ import {
 import { NearLinkPayloadRules } from '../../domain/service/NearLinkScanPolicy';
 import { NearLinkScreenRules } from '../../domain/service/NearLinkScreenRules';
 import { NearLinkScanForm } from '../../domain/service/NearLinkScanForm';
-import { StartNearLinkScanUseCase, StopNearLinkScanUseCase } from '../../domain/usecase/NearLinkUseCases';
+import {
+  ObserveNearLinkDevicesUseCase,
+  StartNearLinkScanUseCase,
+  StopNearLinkScanUseCase
+} from '../../domain/usecase/NearLinkUseCases';
 import { NearLinkSessionUseCases } from '../../domain/usecase/NearLinkSessionUseCases';
 
 @ObservedV2
@@ -134,7 +138,8 @@ export class NearLinkDebugModel {
   @Trace exportFailed: boolean = false;
   @Trace pageState: YoPageState = YoPageState.LOADING;
 
-  private readonly repository: NearLinkRepository = NearLinkRepository.getInstance();
+  private readonly devicesUseCase: ObserveNearLinkDevicesUseCase = new ObserveNearLinkDevicesUseCase();
+  private readonly favoritesUseCase: SaveNearLinkFavoriteUseCase = new SaveNearLinkFavoriteUseCase();
   private readonly session: NearLinkSessionUseCases = new NearLinkSessionUseCases();
   private readonly startScanUseCase: StartNearLinkScanUseCase = new StartNearLinkScanUseCase();
   private readonly stopScanUseCase: StopNearLinkScanUseCase = new StopNearLinkScanUseCase();
@@ -151,14 +156,14 @@ export class NearLinkDebugModel {
   private readonly loggedHex: string[] = [];
 
   async onAppear(): Promise<void> {
-    this.deviceSub = this.repository.observeDevices().subscribe((devices: NearLinkDevice[]) => {
+    this.deviceSub = this.devicesUseCase.execute((devices: NearLinkDevice[]) => {
       this.noteScanHex(devices);
       this.devices = devices;
       if (this.selectedAddress.length > 0) {
         this.refreshDetail();
       }
     });
-    this.treeSub = this.repository.observeSsapTree().subscribe((tree) => {
+    this.treeSub = this.session.observeServices((tree) => {
       this.services = tree.services;
       this.ssapConnected = tree.state === 'connected' || tree.state === 'ready';
     });
@@ -404,7 +409,7 @@ export class NearLinkDebugModel {
     if (device === undefined) {
       return;
     }
-    const saved = await this.repository.saveFavorite(device, device.effectiveName, 'nearlink');
+    const saved = await this.favoritesUseCase.execute(device, device.effectiveName, 'nearlink');
     this.favoriteNote = saved.success ? 'saved' : (saved.error?.code ?? '');
     if (saved.success) {
       this.savedFavoriteAddress = device.randomAddress;
@@ -964,7 +969,7 @@ export class NearLinkDebugModel {
   }
 
   private refreshDetail(): void {
-    const packet = this.repository.getAdvertising(this.selectedAddress);
+    const packet = this.session.advertisingOf(this.selectedAddress);
     if (packet === undefined || packet.isEmpty) {
       this.detailEmpty = true;
       this.detailHex = '';

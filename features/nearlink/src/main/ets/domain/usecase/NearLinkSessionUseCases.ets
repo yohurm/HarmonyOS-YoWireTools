@@ -1,19 +1,13 @@
-import { Result, ResultError } from 'common_core';
+import { Result, ResultError, Subscription } from 'common_core';
 import { NearLinkConstants } from '../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkAdvertisingDataSource } from '../../data/datasource/platform/NearLinkAdvertisingDataSource';
-import { DataTransferDataSource } from '../../data/datasource/platform/DataTransferDataSource';
-import { NearLinkLogExportDataSource } from '../../data/datasource/platform/NearLinkLogExportDataSource';
-import {
-  NearLinkManagerDataSource,
-  NearLinkRadioSnapshot,
-  NearLinkSupportQuery
-} from '../../data/datasource/platform/NearLinkManagerDataSource';
-import { RemoteDeviceDataSource } from '../../data/datasource/platform/RemoteDeviceDataSource';
-import { SsapClientDataSource } from '../../data/datasource/platform/SsapClientDataSource';
-import { SsapServerDataSource, SsapServerWriteRecord } from '../../data/datasource/platform/SsapServerDataSource';
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
+import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
+import { NearLinkAdvertisingPacket } from '../model/NearLinkAdvertisingPacket';
+import { NearLinkPairingNotice, NearLinkRadioSnapshot, NearLinkSupportQuery } from '../model/NearLinkRadio';
 import { NearLinkSecurityState } from '../model/NearLinkSecurityState';
+import { SsapServerWriteRecord } from '../model/SsapServerWriteRecord';
+import { SsapServiceTreeSnapshot } from '../model/SsapServiceTree';
 import { NearLinkSlicePlan } from '../service/NearLinkDebugRules';
 import { NearLinkPayloadRules } from '../service/NearLinkScanPolicy';
 
@@ -30,12 +24,7 @@ export class NearLinkPairedLookup {
 }
 
 export class NearLinkSessionUseCases {
-  private readonly repository: NearLinkRepository;
-  private readonly manager: NearLinkManagerDataSource;
-  private readonly advertising: NearLinkAdvertisingDataSource;
-  private readonly server: SsapServerDataSource;
-  private readonly port: DataTransferDataSource;
-  private readonly remote: RemoteDeviceDataSource;
+  private readonly repository: NearLinkRepositoryContract;
   private ssapAddress: string = '';
   private ssapConnected: boolean = false;
   private notifyEnabled: boolean = false;
@@ -49,59 +38,54 @@ export class NearLinkSessionUseCases {
   private portMtuNegotiated: number = 0;
   private nextWriteAt: number = 0;
 
-  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract = NearLinkRepository.getInstance()) {
     this.repository = repository;
-    this.manager = NearLinkManagerDataSource.getInstance();
-    this.advertising = new NearLinkAdvertisingDataSource();
-    this.server = new SsapServerDataSource();
-    this.port = new DataTransferDataSource();
-    this.remote = new RemoteDeviceDataSource();
   }
 
   currentApi(): number {
-    return this.manager.currentApiVersion();
+    return this.repository.currentApi();
   }
 
   isEmulator(): boolean {
-    return this.manager.isEmulator();
+    return this.repository.isEmulator();
   }
 
   querySupport(): Result<NearLinkSupportQuery> {
-    return this.manager.querySupported();
+    return this.repository.querySupport();
   }
 
   readRadio(): Result<NearLinkRadioSnapshot> {
-    return this.manager.readRadio();
+    return this.repository.readRadio();
   }
 
   onRadio(listener: (code: number) => void): Result<void> {
-    return this.manager.onStateChange((snapshot: NearLinkRadioSnapshot) => {
+    return this.repository.subscribeRadio((snapshot: NearLinkRadioSnapshot) => {
       listener(snapshot.code);
     });
   }
 
   offRadio(): void {
-    this.manager.offStateChange();
+    this.repository.unsubscribeRadio();
   }
 
   onPairing(listener: (address: string, stateToken: string, reasonToken: string, reasonMsg: string) => void): Result<void> {
-    return this.manager.onPairingChange((notice) => {
+    return this.repository.subscribePairing((notice: NearLinkPairingNotice) => {
       listener(notice.address, notice.stateToken, notice.reasonToken, notice.reasonMsg);
     });
   }
 
   offPairing(): void {
-    this.manager.offPairingChange();
+    this.repository.unsubscribePairing();
   }
 
   onConnection(listener: (address: string, reasonMsg: string) => void): Result<void> {
-    return this.manager.onConnectionChange((notice) => {
+    return this.repository.subscribeConnection((notice: NearLinkPairingNotice) => {
       listener(notice.address, notice.reasonMsg);
     });
   }
 
   offConnection(): void {
-    this.manager.offConnectionChange();
+    this.repository.unsubscribeConnection();
   }
 
   systemRssiAvailable(): boolean {
@@ -109,7 +93,7 @@ export class NearLinkSessionUseCases {
   }
 
   readPaired(): Result<NearLinkPairedLookup> {
-    const listed = this.manager.readPairedDevices();
+    const listed = this.repository.readPairedDevices();
     if (!listed.success) {
       if (listed.error?.code === NearLinkErrorCodes.VERSION_UNAVAILABLE) {
         return Result.ok(new NearLinkPairedLookup(true, NearLinkConstants.SINCE_PAIRED_DEVICES, []));
@@ -120,7 +104,15 @@ export class NearLinkSessionUseCases {
   }
 
   readLocalName(): Result<string> {
-    return this.manager.readLocalName();
+    return this.repository.readLocalName();
+  }
+
+  observeServices(listener: (tree: SsapServiceTreeSnapshot) => void): Subscription {
+    return this.repository.observeSsapTree().subscribe(listener);
+  }
+
+  advertisingOf(address: string): NearLinkAdvertisingPacket | undefined {
+    return this.repository.getAdvertising(address);
   }
 
   async startAdvertising(
@@ -129,20 +121,20 @@ export class NearLinkSessionUseCases {
     includeDeviceName: boolean,
     serviceUuids: string[]
   ): Promise<Result<number>> {
-    return this.advertising.start(interval, connectable, includeDeviceName, serviceUuids);
+    return this.repository.startAdvertising(interval, connectable, includeDeviceName, serviceUuids);
   }
 
   async stopAdvertising(): Promise<Result<void>> {
-    return this.advertising.stop(this.advertising.getAdvertisingId());
+    return this.repository.stopAdvertising();
   }
 
   async connectSsap(address: string): Promise<Result<string>> {
     const reused = this.repository.hasSsapClient(address);
-    const created = this.repository.getOrCreateSsapClient(address, address);
-    if (!created.success || created.value === undefined) {
+    const created = this.repository.ensureSsapClient(address, address);
+    if (!created.success) {
       return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.SSAP_CREATE_FAILED, 'api=createClient'));
     }
-    const connected = await created.value.connect();
+    const connected = await this.repository.connectSsapClient(address);
     if (!connected.success) {
       return Result.fail(connected.error ?? new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'api=connect'));
     }
@@ -153,13 +145,12 @@ export class NearLinkSessionUseCases {
   }
 
   async disconnectSsap(): Promise<Result<void>> {
-    const client = this.client();
     this.ssapConnected = false;
     this.notifyEnabled = false;
-    if (client === undefined) {
+    if (this.ssapAddress.length === 0) {
       return Result.ok(undefined);
     }
-    return client.disconnect();
+    return this.repository.disconnectSsapClient(this.ssapAddress);
   }
 
   async discoverSsap(): Promise<Result<void>> {
@@ -181,11 +172,10 @@ export class NearLinkSessionUseCases {
     if (!NearLinkPayloadRules.readable(operation)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.SSAP_READ_FAILED, 'api=readProperty'));
     }
-    const client = this.client();
-    if (client === undefined || !this.ssapConnected) {
+    if (!this.ssapConnected || !this.repository.hasSsapSession(this.ssapAddress)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=readProperty'));
     }
-    return client.readProperty(serviceUuid, propertyUuid);
+    return this.repository.readSsapProperty(this.ssapAddress, serviceUuid, propertyUuid);
   }
 
   async writeProperty(
@@ -199,8 +189,7 @@ export class NearLinkSessionUseCases {
     if (!NearLinkPayloadRules.isEvenHex(hex)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.HEX_INVALID, 'api=writeProperty'));
     }
-    const client = this.client();
-    if (client === undefined || !this.ssapConnected) {
+    if (!this.ssapConnected || !this.repository.hasSsapSession(this.ssapAddress)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=writeProperty'));
     }
     const bytes = NearLinkPayloadRules.hexToBytes(hex);
@@ -211,7 +200,14 @@ export class NearLinkSessionUseCases {
     for (let i = 0; i < plan.value.length; i++) {
       const chunk = plan.value[i];
       const buffer = chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength);
-      const written = await client.writeByOperation(serviceUuid, propertyUuid, buffer, operation, withResponse);
+      const written = await this.repository.writeSsapByOperation(
+        this.ssapAddress,
+        serviceUuid,
+        propertyUuid,
+        buffer,
+        operation,
+        withResponse
+      );
       if (!written.success) {
         return Result.fail(written.error ?? new ResultError(NearLinkErrorCodes.SSAP_WRITE_FAILED, 'api=writeProperty'));
       }
@@ -226,14 +222,17 @@ export class NearLinkSessionUseCases {
     operation: number,
     hasClientConfig: boolean
   ): Promise<Result<void>> {
-    if (!this.ssapConnected) {
+    if (!this.ssapConnected || !this.repository.hasSsapSession(this.ssapAddress)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=setPropertyNotification'));
     }
-    const client = this.client();
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=setPropertyNotification'));
-    }
-    const result = await client.notifyByOperation(serviceUuid, propertyUuid, enable, operation, hasClientConfig);
+    const result = await this.repository.notifySsap(
+      this.ssapAddress,
+      serviceUuid,
+      propertyUuid,
+      enable,
+      operation,
+      hasClientConfig
+    );
     if (result.success) {
       this.notifyEnabled = enable;
     }
@@ -248,11 +247,10 @@ export class NearLinkSessionUseCases {
     if (!range.success) {
       return Result.fail(range.error ?? new ResultError(NearLinkErrorCodes.SSAP_MTU_RANGE, 'api=requestMtuSize'));
     }
-    const client = this.client();
-    if (client === undefined) {
+    if (!this.repository.hasSsapSession(this.ssapAddress)) {
       return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=requestMtuSize'));
     }
-    return client.requestMtuSize(mtu);
+    return this.repository.requestSsapMtu(this.ssapAddress, mtu);
   }
 
   notifyArmed(): boolean {
@@ -260,40 +258,38 @@ export class NearLinkSessionUseCases {
   }
 
   mtu(): number {
-    const client = this.client();
-    return client === undefined ? NearLinkConstants.DEFAULT_MTU : client.getMtu();
+    return this.repository.ssapMtu(this.ssapAddress);
   }
 
   openServer(): Result<void> {
-    return this.server.open();
+    return this.repository.openServer();
   }
 
   addServerService(serviceUuid: string, propertyUuid: string, operation: number): Result<void> {
-    return this.server.addPlainService(serviceUuid, propertyUuid, operation);
+    return this.repository.addServerService(serviceUuid, propertyUuid, operation);
   }
 
   closeServer(): Result<void> {
-    return this.server.close();
+    return this.repository.closeServer();
   }
 
   removeServerService(serviceUuid: string): Result<void> {
-    return this.server.removeService(serviceUuid);
+    return this.repository.removeServerService(serviceUuid);
   }
 
   serverServices(): string[] {
-    return this.server.listServices();
+    return this.repository.serverServices();
   }
 
   watchServer(
     onWrite: (record: SsapServerWriteRecord) => void,
     onRead: (requestId: number, address: string, propertyUuid: string) => void
   ): void {
-    this.server.onWrite(onWrite);
-    this.server.onRead(onRead);
+    this.repository.watchServer(onWrite, onRead);
   }
 
   createPort(uuid: string): Result<void> {
-    const created = this.port.createPort(uuid);
+    const created = this.repository.createPort(uuid);
     if (created.success) {
       this.portUuid = uuid;
     }
@@ -313,7 +309,7 @@ export class NearLinkSessionUseCases {
     if (!mtu.success || mtu.value === undefined) {
       return Result.fail(mtu.error ?? new ResultError(NearLinkErrorCodes.DT_INVALID_PARAMS, 'api=connect'));
     }
-    const connected = await this.port.connect(address, this.portUuid, mtu.value, reliable);
+    const connected = await this.repository.connectPort(address, this.portUuid, mtu.value, reliable);
     if (connected.success) {
       this.portAddress = address;
       this.security = NearLinkSecurityState.UNKNOWN;
@@ -352,15 +348,15 @@ export class NearLinkSessionUseCases {
     onState: (address: string, uuid: string, mtu: number, state: number) => void,
     onRead: (address: string, uuid: string, hex: string, byteLength: number) => void
   ): Result<void> {
-    const linked = this.port.watchLink(onState);
+    const linked = this.repository.watchPortLink(onState);
     if (!linked.success) {
       return linked;
     }
-    return this.port.watchRead(onRead);
+    return this.repository.watchPortRead(onRead);
   }
 
   unwatchPortRead(): void {
-    this.port.offReadData();
+    this.repository.unwatchPortRead();
   }
 
   async respondServerRead(requestId: number, address: string, hex: string): Promise<Result<void>> {
@@ -369,16 +365,22 @@ export class NearLinkSessionUseCases {
     }
     const bytes = hex.length === 0 ? new Uint8Array(0) : NearLinkPayloadRules.hexToBytes(hex);
     const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    return this.server.respondRead(requestId, address, buffer);
+    return this.repository.respondServerRead(requestId, address, buffer);
   }
 
-  notifyServer(address: string, serviceUuid: string, propertyUuid: string, operation: number, hex: string): Promise<Result<void>> {
+  notifyServer(
+    address: string,
+    serviceUuid: string,
+    propertyUuid: string,
+    operation: number,
+    hex: string
+  ): Promise<Result<void>> {
     if (hex.length > 0 && !NearLinkPayloadRules.isEvenHex(hex)) {
       return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.HEX_INVALID, 'api=notifyPropertyChanged')));
     }
     const bytes = hex.length === 0 ? new Uint8Array(0) : NearLinkPayloadRules.hexToBytes(hex);
     const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    return this.server.notifyPlain(address, serviceUuid, propertyUuid, operation, buffer);
+    return this.repository.notifyServer(address, serviceUuid, propertyUuid, operation, buffer);
   }
 
   appTx(): number {
@@ -403,12 +405,12 @@ export class NearLinkSessionUseCases {
   }
 
   async disconnectPort(): Promise<Result<void>> {
-    this.port.offReadData();
-    return this.port.disconnect(this.portAddress, this.portUuid);
+    this.repository.unwatchPortRead();
+    return this.repository.disconnectPort(this.portAddress, this.portUuid);
   }
 
   destroyPort(): Result<void> {
-    const destroyed = this.port.destroyPort(this.portUuid);
+    const destroyed = this.repository.destroyPort(this.portUuid);
     if (destroyed.success) {
       this.portUuid = '';
     }
@@ -422,15 +424,15 @@ export class NearLinkSessionUseCases {
         `api=getAcbState;since=${NearLinkConstants.SINCE_PAIRING}`
       ));
     }
-    const created = this.remote.createRemoteDevice(address);
+    const created = this.repository.prepareRemote(address);
     if (!created.success) {
       return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'api=createRemoteDevice'));
     }
-    const state = this.remote.getAcbState();
+    const state = this.repository.remoteSecurity();
     if (!state.success || state.value === undefined) {
       return Result.fail(state.error ?? new ResultError(NearLinkErrorCodes.VERSION_UNAVAILABLE, 'api=getAcbState'));
     }
-    this.security = this.remote.resolveSecurityState(state.value);
+    this.security = state.value;
     return Result.ok(this.security);
   }
 
@@ -441,15 +443,15 @@ export class NearLinkSessionUseCases {
         `api=startPairing;since=${NearLinkConstants.SINCE_PAIRING}`
       ));
     }
-    const created = this.remote.createRemoteDevice(address);
+    const created = this.repository.prepareRemote(address);
     if (!created.success) {
       return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'api=createRemoteDevice'));
     }
-    const paired = this.remote.isPaired();
+    const paired = this.repository.remoteIsPaired();
     if (paired.success && paired.value === true) {
       return Result.ok('already_paired');
     }
-    const started = await this.remote.startPairing();
+    const started = await this.repository.remoteStartPairing();
     if (!started.success) {
       if (started.error?.code === NearLinkErrorCodes.ALREADY_PAIRED) {
         return Result.ok('already_paired');
@@ -467,17 +469,24 @@ export class NearLinkSessionUseCases {
     if (text.length === 0) {
       return Result.fail(new ResultError(NearLinkErrorCodes.VALIDATION, 'api=export'));
     }
-    return NearLinkLogExportDataSource.copyText(text);
+    return this.repository.exportText(text);
   }
 
-  private async writePortBytes(bytes: Uint8Array, blockUnlessEncrypted: boolean, sliceConfirmed: boolean): Promise<Result<void>> {
+  private async writePortBytes(
+    bytes: Uint8Array,
+    blockUnlessEncrypted: boolean,
+    sliceConfirmed: boolean
+  ): Promise<Result<void>> {
     if (blockUnlessEncrypted && this.security !== NearLinkSecurityState.ENCRYPTED) {
       return Result.fail(new ResultError(NearLinkErrorCodes.BLOCKED_UNENCRYPTED, 'api=writeData'));
     }
     if (this.portMtuNegotiated > 0 &&
       NearLinkPayloadRules.exceedsMtu(bytes.length, this.portMtuNegotiated) &&
       !sliceConfirmed) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.VALIDATION, `api=writeData;slice=required;mtu=${this.portMtuNegotiated}`));
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.VALIDATION,
+        `api=writeData;slice=required;mtu=${this.portMtuNegotiated}`
+      ));
     }
     const now = Date.now();
     if (now < this.nextWriteAt) {
@@ -492,7 +501,7 @@ export class NearLinkSessionUseCases {
       }
       const payload = chunks[i];
       const buffer = payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength);
-      const written = await this.port.writeData(this.portAddress, this.portUuid, buffer);
+      const written = await this.repository.writePortData(this.portAddress, this.portUuid, buffer);
       if (!written.success && written.error?.code === NearLinkErrorCodes.DT_WRITE_CONGESTED) {
         this.nextWriteAt = Date.now() + NearLinkConstants.CONGESTION_MIN_GAP_MS;
         return written;
@@ -512,12 +521,5 @@ export class NearLinkSessionUseCases {
         resolve();
       }, ms);
     });
-  }
-
-  private client(): SsapClientDataSource | undefined {
-    if (this.ssapAddress.length === 0) {
-      return undefined;
-    }
-    return this.repository.getSsapClient(this.ssapAddress);
   }
 }
