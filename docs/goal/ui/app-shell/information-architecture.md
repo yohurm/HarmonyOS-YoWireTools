@@ -52,7 +52,7 @@ PRD《01-产品信息架构与模式PRD》把日志中心、命令面板、设�
 
 `main` 的 `git ls-tree origin/main docs` 为空。BT / NL / WN 的清单、架构和总表路径写在 [质量门禁](../QUALITY-GATE.md) 的对接点，不在这里再抄一份编号表。在那些文档进入 `main` 之前，这仍是阻塞项，不是授权本设计另写一套 Repository。
 
-跨模块会话日志的读路径写在 PR #20 的 `docs/goal/architecture/log/LOG-003.md`：页面只读页面状态，终点是 `LogRepository` 的 `debug_log_index`。`LOG-008.md` 写明会话列表不读 `YoLog` 或 hilog。该 PR 未进 `main`。日志中心不新命名查询函数。见 [日志中心](../log/center.md)。
+跨模块会话日志只允许一条读路径，写在 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61` 的 `docs/goal/architecture/log/LOG-003.md`：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。该条判定仍是「缺口」：`LoadSessionLogPreviewUseCase` 直连 `LogRepository`，页面侧还没接上。`LOG-008.md` 禁止第二日志库，会话列表不读 `YoLog` 或 hilog。该 PR 未进 `main`。见 [日志中心](../log/center.md)。
 
 ## 模块内屏幕
 

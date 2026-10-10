@@ -30,8 +30,8 @@ related:
 | 8. Design Token 不新造资源名 | 通过 | `docs/goal/ui/app-shell/design-tokens.md` 只引用 `common/youi_kit/Index.ets` 已导出的 Token。`base/element/color.json` 与 `dark/element/color.json` 各 40 个同名 `youi_*` |
 | 9. 浅色成功/警告胶囊的设计目标达到辅助文本大于 3:1，深色同样核过 | 通过 | 目标色与算式在 `docs/goal/ui/app-shell/design-tokens.md`。浅色成功目标 3.12，警告目标 3.15。深色沿用当前 Kit，成功 5.18，警告 4.57，且低于 15.7:1。当前浅色 Kit 约 2.00 与 2.48 标为待替换。屏幕仍只用 `YoStatusPill`。替换 `color.json` 不在本 PR。依据 `设计/设计指南/系统特性&能力/系统特性/深色模式.md` |
 | 10. BT / NL / WN 编号只对接功能文档，不在本规范另编 | 阻塞 | `git ls-tree origin/main docs` 仍为空。路径与 PR 见下方，[PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) 的 `docs/goal/citation.md` 索引的是同一套编号。文件未进 `main`，不因 PR 存在而改成通过 |
-| 11. 工作台、命令面板、日志、设置的 WB- / LOG- / SET- 编号 | 阻塞 | 对接 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `9846ab62`。清单与架构路径见下方，均在该 head 上。未进 `main` |
-| 12. 跨模块日志有一条已写明的读模型 | 阻塞 | 读路径写在 PR #20 的 `docs/goal/architecture/log/LOG-003.md`，禁止把 `YoLog` / hilog 当会话列表写在 `LOG-008.md`。未进 `main`。日志中心不另造查询函数 |
+| 11. 工作台、命令面板、日志、设置的 WB- / LOG- / SET- 编号 | 阻塞 | 范围没变。索引用 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61` 的 `docs/goal/citation.md`。清单与架构路径见下方，该 head 上仍在。未进 `main` |
+| 12. 跨模块日志有一条已写明的读模型 | 阻塞 | 唯一允许路径写在 PR #20 `docs/goal/architecture/log/LOG-003.md`：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。该条判定仍是「缺口」：`LoadSessionLogPreviewUseCase` 直连 `LogRepository`，页面侧还没接上，不是读模型已经接通。`LOG-008.md` 禁止第二日志库，会话列表不读 `YoLog` 或 hilog。未进 `main` |
 | 13. 官方样例引用到具体目录，而不是只贴首页 | 通过 | 见下方样例。华为工具库目录页在本环境抓取结果为空，因此没有把该首页当成案例证据 |
 
 第 9 项按设计目标通过。第 10、11、12 项的对接文件已经在未合并的 PR 上，但都还没进入 `main`，所以保持阻塞。文首结论仍是不可进入大规模页面实现。
@@ -44,12 +44,12 @@ related:
 
 | 项 | 阻塞原因 | 对接 | 合入前 UI 怎么引用 |
 | --- | --- | --- | --- |
-| 10. 蓝牙 BT-001–BT-098 | `main` 没有 `docs/goal/` | 清单 `docs/goal/checklist/bluetooth.md`（[PR #3](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/3)）。架构 `docs/goal/architecture/bluetooth/`（[PR #8](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8)，`BT-001.md` 与 `BT-098.md`）。[PR #13](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/13) 当前 head `fba7e5d6` 上也有这两处。同一路径还在 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `9846ab62` | 屏幕表只标已有编号区间。不另列一份 BT 清单 |
-| 10. 星闪 NL-001–NL-120 | 同上 | 清单 `docs/goal/checklist/nearlink.md`（[PR #2](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/2)）。架构 `docs/goal/architecture/nearlink/`（[PR #6](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6)，`NL-001.md` 与 `NL-120.md`）。[PR #14](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/14) 当前 head `d58de1c9` 上也有这两处。同一路径还在 PR #20 | 屏幕表只标已有编号区间。不另列一份 NL 清单 |
-| 10. Wi-Fi / 网络 WN-001–WN-132 | 同上 | 清单 `docs/goal/checklist/wifi-network.md`（[PR #4](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/4)）。架构 `docs/goal/architecture/wifi-network/`（[PR #7](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7)，`WN-001.md` 与 `WN-132.md`）。[PR #12](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/12) 当前 head `7295d177` 上也有这两处。同一路径还在 PR #20 | 屏幕表只标已有编号区间。不另列一份 WN 清单 |
-| 10. 总表 | 同上 | `docs/goal/checklist/master.md`（[PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5)）。PR #20 的 head 上也有该文件，索引在 `docs/goal/citation.md` | 不把总表抄进 UI 目录 |
-| 11. WB- / LOG- / SET- | 文件在 PR #20，未进 `main` | 均在 PR #20 head `9846ab62`：`docs/goal/checklist/workbench.md`（WB-001–WB-012；工作台到 WB-007，命令面板 WB-008–WB-012）、`docs/goal/architecture/workbench/WB-001.md` 至 `WB-012.md`；`docs/goal/checklist/log.md`（LOG-001–LOG-008）、`docs/goal/architecture/log/LOG-001.md` 至 `LOG-008.md`；`docs/goal/checklist/settings.md`（SET-001–SET-006）、`docs/goal/architecture/settings/SET-001.md` 至 `SET-006.md`。索引入口 `docs/goal/citation.md` | 屏幕继续用设计屏号，并指向这些路径。不在 UI 目录再编一套编号 |
-| 12. 跨模块日志读模型 | 读路径已写在 PR #20，未进 `main` | `docs/goal/architecture/log/LOG-003.md`：UI → 页面状态 → 用例 → 仓库契约 → 数据源 → `LogRepository` 的 `debug_log_index`。`docs/goal/architecture/log/LOG-008.md`：会话列表不读 `YoLog` 或 hilog。`DebugLogRecord` 在该文里只是写入这条库的领域模型。清单见 `docs/goal/checklist/log.md` | 日志中心只渲染页面状态给出的行，不新命名查询函数 |
+| 10. 蓝牙 BT-001–BT-098 | `main` 没有 `docs/goal/` | 编号范围没变。清单 `docs/goal/checklist/bluetooth.md`（[PR #3](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/3)）。架构 `docs/goal/architecture/bluetooth/`（[PR #8](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8)）。[PR #13](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/13) head `fba7e5d6` 上也有这两处。索引改为 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61` 的 `docs/goal/citation.md` | 屏幕表只标已有编号区间。不另列一份 BT 清单 |
+| 10. 星闪 NL-001–NL-120 | 同上 | 编号范围没变。清单 `docs/goal/checklist/nearlink.md`（[PR #2](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/2)）。架构 `docs/goal/architecture/nearlink/`（[PR #6](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6)）。[PR #14](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/14) head `d58de1c9` 上也有这两处；`citation.md` 写明 #20 从这棵星闪树复制。索引同上 | 屏幕表只标已有编号区间。不另列一份 NL 清单 |
+| 10. Wi-Fi / 网络 WN-001–WN-132 | 同上 | 编号范围没变。清单 `docs/goal/checklist/wifi-network.md`（[PR #4](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/4)）。架构 `docs/goal/architecture/wifi-network/`（[PR #7](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7)）。[PR #12](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/12) head `7295d177` 上也有这两处。索引同上 | 屏幕表只标已有编号区间。不另列一份 WN 清单 |
+| 10. 总表 | 同上 | `docs/goal/checklist/master.md`（[PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5)）。#20 的 `docs/goal/citation.md` 指向同一文件 | 不把总表抄进 UI 目录 |
+| 11. WB- / LOG- / SET- | 文件在 PR #20，未进 `main` | 范围没变，索引是 #20 head `139ddc61` 的 `docs/goal/citation.md`。该 head 上仍有：`docs/goal/checklist/workbench.md`（WB-001–WB-012；工作台 WB-001–WB-007，命令面板 WB-008–WB-012）与 `docs/goal/architecture/workbench/WB-001.md` 至 `WB-012.md`；`docs/goal/checklist/log.md`（LOG-001–LOG-008）与 `docs/goal/architecture/log/LOG-001.md` 至 `LOG-008.md`；`docs/goal/checklist/settings.md`（SET-001–SET-006）与 `docs/goal/architecture/settings/SET-001.md` 至 `SET-006.md` | 屏幕继续用设计屏号，并指向这些路径。不在 UI 目录再编一套编号 |
+| 12. 跨模块日志读模型 | 允许路径已写明，页面未接通，且未进 `main` | 唯一允许路径，见 #20 `docs/goal/architecture/log/LOG-003.md` 与 `docs/goal/citation.md`：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。LOG-003 判定仍是「缺口」：现有 `LoadSessionLogPreviewUseCase` 直连 `LogRepository.getInstance().list`，中间没有页面、页面状态、RepositoryContract、DataSource。不要写成读模型已经接通。`docs/goal/architecture/log/LOG-008.md` 禁止第二日志库，会话列表不读 `YoLog` 或 hilog | 日志中心只渲染页面状态给出的行，不新命名查询函数，也不把直连用例当成已接通 |
 
 ## 样例
 
@@ -71,4 +71,4 @@ related:
 - PR #1 的工作台实现未合并。本设计不引用它的用例签名。
 - `main` 上工作台与更多仍是空的 `YoPageShell`。
 - 浅色成功、警告的目标色已写在 `design-tokens.md`。替换 `common/youi_kit` 的 `color.json` 留给实现阶段，不在本 PR。
-- WB- / LOG- / SET- 与跨模块日志读路径在 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20)，尚未进入 `main`。在此之前不开始按这些屏铺数据。
+- WB- / LOG- / SET- 与跨模块日志读路径在 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61`，索引 `docs/goal/citation.md`。LOG-003 仍是缺口，尚未进入 `main`。在此之前不开始按这些屏铺数据。

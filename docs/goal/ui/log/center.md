@@ -17,9 +17,9 @@ related:
 
 ## 读模型
 
-单一读路径在未合并的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20)，文件是 `docs/goal/architecture/log/LOG-003.md`：UI → 页面状态 → 用例 → 仓库契约 → 数据源 → `LogRepository`（表 `debug_log_index`）。`docs/goal/architecture/log/LOG-008.md` 写明会话列表不读 `YoLog` 或 hilog。清单是 `docs/goal/checklist/log.md`（LOG-001–LOG-008）。这些文件不在 `main` 上。
+唯一允许的读路径在未合并的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) head `139ddc61`，索引是 `docs/goal/citation.md`，正文是 `docs/goal/architecture/log/LOG-003.md`：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。LOG-003 判定仍是「缺口」：现有 `LoadSessionLogPreviewUseCase` 直连 `LogRepository`，页面侧还没接上。这不是读模型已经接通。`docs/goal/architecture/log/LOG-008.md` 禁止第二日志库，会话列表不读 `YoLog` 或 hilog。清单是 `docs/goal/checklist/log.md`（LOG-001–LOG-008）。这些文件不在 `main` 上。
 
-本屏不新命名查询函数。页面只渲染页面状态给出的行。模块会话页仍各看各的 BT / NL / WN 编号，不把本屏说成那些编号的替身。
+本屏不新命名查询函数，也不把直连用例当成已接通。页面只渲染页面状态给出的行。模块会话页仍各看各的 BT / NL / WN 编号，不把本屏说成那些编号的替身。
 
 ## 布局
 
