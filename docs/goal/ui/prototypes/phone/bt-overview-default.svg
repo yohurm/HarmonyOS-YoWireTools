@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="294" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M289 18 A6 6 0 0 1 299 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M285.5 14 A11 11 0 0 1 302.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="318" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="337" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="320" y="14" width="11" height="5" rx="1" fill="#1A1A1A"/>
+<text x="16" y="66" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">蓝牙</text>
+<rect x="16" y="96" width="328" height="56" rx="16" fill="#FFFFFF"/>
+<text x="32" y="130" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">蓝牙</text>
+<rect x="250" y="114" width="52" height="20" rx="4" fill="#E7F6E4"/>
+<text x="276.0" y="129" fill="#64BB5C" font-size="12" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已开启</text>
+<rect x="16" y="168" width="328" height="64" rx="16" fill="#FFFFFF"/>
+<text x="32" y="196" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">经典蓝牙</text>
+<text x="32" y="218" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">SPP 与已配对设备</text>
+<path d="M316 194 L322 200 L316 206" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16" y="244" width="328" height="64" rx="16" fill="#FFFFFF"/>
+<text x="32" y="272" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">低功耗</text>
+<text x="32" y="294" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">扫描、GATT、通知</text>
+<path d="M316 270 L322 276 L316 282" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="0" y="728" width="360" height="72" rx="0" fill="#F1F3F5"/>
+<line x1="0" y1="728" x2="360" y2="728" stroke="#E6E8EC" stroke-width="1"/>
+<path d="M27.0 747 L36.0 740 L45.0 747 V756 H38.0 V750 H34.0 V756 H27.0 Z" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="36.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">工作台</text>
+<path d="M108.0 739 V757 M108.0 739 L114.0 744 L108.0 748 L114.0 752 L108.0 757 M108.0 748 L103.0 744 M108.0 748 L103.0 752" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="108.0" y="772" fill="#0A59F7" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">蓝牙</text>
+<circle cx="180.0" cy="754" r="1.5" fill="#666666"/>
+<path d="M175.0 750 A6 6 0 0 1 185.0 750" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M171.5 746 A11 11 0 0 1 188.5 746" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络</text>
+<path d="M252.0 739 L254.0 746 L261.0 748 L254.0 750 L252.0 757 L250.0 750 L243.0 748 L250.0 746 Z" fill="#666666"/>
+<text x="252.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
+<circle cx="318.0" cy="748" r="1.6" fill="#666666"/>
+<circle cx="324.0" cy="748" r="1.6" fill="#666666"/>
+<circle cx="330.0" cy="748" r="1.6" fill="#666666"/>
+<text x="324.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">更多</text>
+<rect x="132.0" y="790" width="96" height="4" rx="2" fill="#D0D3D8"/>
+</svg>

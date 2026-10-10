@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640">
+<rect width="900" height="640" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="834" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M829 18 A6 6 0 0 1 839 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M825.5 14 A11 11 0 0 1 842.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="858" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="877" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="860" y="14" width="11" height="5" rx="1" fill="#1A1A1A"/>
+<rect x="0" y="32" width="96" height="608" rx="0" fill="#FFFFFF"/>
+<line x1="96" y1="32" x2="96" y2="640" stroke="#CCCCCC" stroke-width="1"/>
+<path d="M39 83 L48 76 L57 83 V92 H50 V86 H46 V92 H39 Z" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48 147 V165 M48 147 L54 152 L48 156 L54 160 L48 165 M48 156 L43 152 M48 156 L43 160" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="48" cy="234" r="1.5" fill="#0A59F7"/>
+<path d="M43 230 A6 6 0 0 1 53 230" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39.5 226 A11 11 0 0 1 56.5 226" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48 291 L50 298 L57 300 L50 302 L48 309 L46 302 L39 300 L46 298 Z" fill="#666666"/>
+<circle cx="42" cy="372" r="1.6" fill="#666666"/>
+<circle cx="48" cy="372" r="1.6" fill="#666666"/>
+<circle cx="54" cy="372" r="1.6" fill="#666666"/>
+<text x="116" y="64" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">扫描</text>
+<rect x="112" y="84" width="280" height="64" rx="12" fill="#CEDFFD"/>
+<text x="128" y="110" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">wlanaccessv2.0</text>
+<text x="128" y="132" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">加密</text>
+<rect x="112" y="160" width="280" height="64" rx="12" fill="#FFFFFF"/>
+<text x="128" y="186" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Huawei-Employee</text>
+<text x="128" y="208" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">加密</text>
+<rect x="112" y="236" width="280" height="64" rx="12" fill="#FFFFFF"/>
+<text x="128" y="262" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">DIRECT-LM-B5</text>
+<text x="128" y="284" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">开放</text>
+<text x="430" y="64" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">wlanaccessv2.0</text>
+<rect x="420" y="84" width="460" height="288" rx="16" fill="#FFFFFF"/>
+<text x="436" y="106" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">MAC</text>
+<text x="436" y="128" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">28:6e:d4:01:22:ab</text>
+<line x1="436" y1="140" x2="864" y2="140" stroke="#CCCCCC" stroke-width="1"/>
+<text x="436" y="162" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">IP</text>
+<text x="436" y="184" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">192.168.1.23</text>
+<line x1="436" y1="196" x2="864" y2="196" stroke="#CCCCCC" stroke-width="1"/>
+<text x="436" y="218" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">掩码</text>
+<text x="436" y="240" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">255.255.255.0</text>
+<line x1="436" y1="252" x2="864" y2="252" stroke="#CCCCCC" stroke-width="1"/>
+<text x="436" y="274" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网关</text>
+<text x="436" y="296" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">192.168.1.1</text>
+<line x1="436" y1="308" x2="864" y2="308" stroke="#CCCCCC" stroke-width="1"/>
+<text x="436" y="330" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">DNS</text>
+<text x="436" y="352" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">192.168.1.1</text>
+</svg>
