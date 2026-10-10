@@ -19,9 +19,9 @@ related:
 
 给 UI Goal 引用。本文件只列清单路径和编号范围。条目正文以各清单为准，架构正文以同编号的架构文件为准。
 
-视觉待新 UI 规范 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
 
-`WB-` 覆盖工作台和命令面板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖设置。视觉待新 UI 规范 PR。
+`WB-` 覆盖工作台和命令面板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖设置。视觉规格见 [PR #26](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/26)。视觉落地不在本 PR。
 
 ## 清单
 
