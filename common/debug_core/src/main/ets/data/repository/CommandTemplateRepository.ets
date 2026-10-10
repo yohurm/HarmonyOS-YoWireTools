@@ -22,8 +22,8 @@ export class CommandTemplateRepository implements CommandRepositoryContract {
     this.store = store;
   }
 
-  async listTemplates(offset: number, limit: number): Promise<Result<PageResult<CommandTemplate>>> {
-    const listed = await this.store.listTemplates(offset, limit);
+  async listTemplates(module: ModuleType, offset: number, limit: number): Promise<Result<PageResult<CommandTemplate>>> {
+    const listed = await this.store.listTemplatesByModule(`${module}`, offset, limit);
     if (!listed.success || listed.value === undefined) {
       return Result.fail(listed.error ?? new ResultError(StoreErrorCodes.RDB_READ_FAILED, 'List templates failed'));
     }

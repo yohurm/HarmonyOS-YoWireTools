@@ -71,38 +71,6 @@ export class SettingsViewModel {
     await this.refresh();
   }
 
-  async toggleRepeat(): Promise<void> {
-    const current = this.snapshot !== undefined ? this.snapshot.allowRepeatCommand : false;
-    await this.updateSetting.saveRepeatAllowed(!current);
-    await this.refresh();
-  }
-
-  async cycleLineEnding(): Promise<void> {
-    const current = this.snapshot !== undefined ? this.snapshot.commandLineEnding : 'lf';
-    const next = current === 'lf' ? 'cr' : (current === 'cr' ? 'crlf' : (current === 'crlf' ? 'none' : 'lf'));
-    await this.updateSetting.saveLineEnding(next);
-    await this.refresh();
-  }
-
-  async toggleBluetooth(): Promise<void> {
-    const current = this.snapshot !== undefined ? this.snapshot.bluetoothAutoStopDiscovery : true;
-    await this.updateSetting.saveBluetoothAutoStop(!current);
-    await this.refresh();
-  }
-
-  async cycleCooldown(): Promise<void> {
-    const current = this.snapshot !== undefined ? this.snapshot.wifiScanCooldownMs : 3000;
-    const next = current === 3000 ? 5000 : (current === 5000 ? 10000 : 3000);
-    await this.updateSetting.saveWifiScanCooldown(next);
-    await this.refresh();
-  }
-
-  async toggleNearLink(): Promise<void> {
-    const current = this.snapshot !== undefined ? this.snapshot.nearlinkRequireFilter : true;
-    await this.updateSetting.saveNearLinkRequireFilter(!current);
-    await this.refresh();
-  }
-
   async toggleMaskAddress(): Promise<void> {
     const current = this.snapshot !== undefined ? this.snapshot.maskAddress : false;
     await this.updateSetting.saveMaskAddress(!current);

@@ -21,7 +21,7 @@ related:
 
 这些编号是整机层，不计入三模块 350，也不改写壳清单 WB / LOG / SET。壳的屏幕行为仍以 [139ddc61d1f82e3d8f5c92980d420f19230bffec](https://github.com/yohurm/HarmonyOS-YoWireTools/commit/139ddc61d1f82e3d8f5c92980d420f19230bffec)（PR #20）为准。缺的屏幕保持缺口。
 
-视觉不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉不在本 PR。五个主路由：`/home/dashboard`、`/bluetooth/overview`、`/nearlink/overview`、`/wifi/overview`、`/settings/app`。没有第六个主页面。
 
 分层见 `开发/最佳实践/架构设计/应用架构/分层架构设计.md`：产品定制层、基础特性层、公共能力层。安装包见 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAP.md` 与 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAR.md`。HAR 不能单独安装。单 UIAbility 场景官方优先一个 entry HAP。
 
@@ -59,7 +59,7 @@ related:
 - **屏幕：** 无单独屏幕。入口是各 feature 的 `Index.ets`
 - **Given** 壳只构造页面和蓝牙页已经用到的视图模型
 - **When** 看四个 feature 的包入口
-- **Then** `feature_nearlink` 导出 `NearLinkFeaturePage` 与 `ReadNearLinkSwitchUseCase`。`feature_wifi_network` 导出 `WifiFeaturePage` 与 `ReadWifiSwitchUseCase`。`feature_home` 只导出 `HomeFeaturePage`、`LogCenterPage`、`LogDetailPage`、`CommandPanelPage`、`SettingsHubPage`、`LogDetailNavParams`。`feature_bluetooth` 只导出 `product/phone` 已 import 的页面与视图模型。蓝牙开关用例是 `yobluetooth` 的 `ReadBluetoothSwitchUseCase`。仓库、传输、探测类不在 feature 入口
+- **Then** `feature_nearlink` 导出 `NearLinkFeaturePage`、`NearLinkSettingsPage` 与 `ReadNearLinkSwitchUseCase`。`feature_wifi_network` 导出 `WifiFeaturePage`、`WifiSettingsPage` 与 `ReadWifiSwitchUseCase`。`feature_home` 导出 `HomeFeaturePage`、`LogCenterPage`、`LogDetailPage`、`CommandPanelTemplate`、`BluetoothCommandPage`、`NearLinkCommandPage`、`WifiCommandPage`、`SettingsHubPage`、`LogDetailNavParams`。`feature_bluetooth` 导出 `product/phone` 已 import 的页面与视图模型，另加 `BluetoothSettingsPage`。蓝牙开关用例是 `yobluetooth` 的 `ReadBluetoothSwitchUseCase`。仓库、传输、探测类不在 feature 入口
 - **证据：** 四个 `Index.ets`。契约在 `common/debug_core`，名单见 [APP-003](../architecture/app/APP-003.md)
 
 ### APP-004 一条数据路径
@@ -89,13 +89,22 @@ related:
 - **Then** 不存在这种 product，当前分支也不是这三棵树拼起来的目录。本条只确认工程形态。它不证明射频页面已在真机通过，射频仍是待真机
 - **证据：** `product/` 下只有 `phone` 有 `module.json5`。三个提交只在清单和架构里当行为证据引用。本清单不改 ets
 
+### APP-007 只有五个主页面
+
+- **判定：** 支持
+- **屏幕：** 无单独屏幕。底栏五个槽位
+- **Given** `MainTabContainer` 的 `tabContent0` 到 `tabContent4`
+- **When** 数主页面和主路由
+- **Then** 槽位 0 首页看板 `/home/dashboard`，1 蓝牙 `/bluetooth/overview`，2 星闪 `/nearlink/overview`，3 WiFi `/wifi/overview`，4 设置 `/settings/app`。没有第六个主页面，也没有「更多」槽位。日志中心、日志详情、三个模块设置、三个命令页都是同一棵 `NavPathStack` 上的压栈页
+- **证据：** `AppRoutes.ets`；`MainTabContainer.ets`；`Index.ets`。说明见 [APP-007](../architecture/app/APP-007.md)
+
 ## 覆盖统计
 
-合计 **6** 条（APP-001–APP-006）。编号连续。支持与缺口相加等于合计。
+合计 **7** 条（APP-001–APP-007）。编号连续。支持与缺口相加等于合计。
 
 | 判定 | 条数 | 编号 |
 | --- | --- | --- |
-| 支持 | 6 | APP-001、APP-002、APP-003、APP-004、APP-005、APP-006 |
+| 支持 | 7 | APP-001、APP-002、APP-003、APP-004、APP-005、APP-006、APP-007 |
 | 缺口 | 0 | 无 |
 
-工作台缺口是 WB-004、WB-006。WB-003 的三枚能力读数和 WB-005 的三个计数已在 `WorkbenchViewModel`。射频仍是待真机。
+首页看板缺口是 WB-004、WB-006。射频仍是待真机。

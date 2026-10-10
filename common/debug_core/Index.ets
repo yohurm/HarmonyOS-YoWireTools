@@ -85,11 +85,43 @@ export {
   ClearLocalDataUseCase
 } from './src/main/ets/usecase/SettingsUseCases';
 export {
-  ListCommandTemplatesUseCase,
-  SaveCommandTemplateUseCase,
-  ExecuteSavedCommandUseCase,
-  RepeatSavedCommandUseCase,
+  ListModuleCommandTemplatesUseCase,
+  SaveModuleCommandTemplateUseCase,
+  ExecuteModuleCommandUseCase,
+  RepeatModuleCommandUseCase,
+  ReadCommandRepeatPolicyUseCase,
+  SaveCommandRepeatPolicyUseCase,
   ShellCommandCodes
 } from './src/main/ets/usecase/CommandPanelUseCases';
+export {
+  ListBluetoothCommandTemplatesUseCase,
+  SaveBluetoothCommandTemplateUseCase,
+  ExecuteBluetoothCommandUseCase,
+  RepeatBluetoothCommandUseCase
+} from './src/main/ets/usecase/BluetoothCommandUseCases';
+export {
+  ListNearLinkCommandTemplatesUseCase,
+  SaveNearLinkCommandTemplateUseCase,
+  ExecuteNearLinkCommandUseCase,
+  RepeatNearLinkCommandUseCase
+} from './src/main/ets/usecase/NearLinkCommandUseCases';
+export {
+  ListWifiCommandTemplatesUseCase,
+  SaveWifiCommandTemplateUseCase,
+  ExecuteWifiCommandUseCase,
+  RepeatWifiCommandUseCase
+} from './src/main/ets/usecase/WifiCommandUseCases';
+export {
+  LoadBluetoothModuleSettingsUseCase,
+  SaveBluetoothAutoStopUseCase
+} from './src/main/ets/usecase/BluetoothModuleSettingsUseCases';
+export {
+  LoadNearLinkModuleSettingsUseCase,
+  SaveNearLinkRequireFilterUseCase
+} from './src/main/ets/usecase/NearLinkModuleSettingsUseCases';
+export {
+  LoadWifiModuleSettingsUseCase,
+  SaveWifiScanCooldownUseCase
+} from './src/main/ets/usecase/WifiModuleSettingsUseCases';
 export { DebugCoreBootstrap } from './src/main/ets/DebugCoreBootstrap';
 export { SessionUiFormat } from './src/main/ets/ui/SessionUiFormat';

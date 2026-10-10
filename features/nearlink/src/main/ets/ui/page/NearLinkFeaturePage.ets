@@ -9,6 +9,10 @@ import { NearLinkOverviewViewModel } from '../../viewmodel/NearLinkOverviewViewM
 
 @ComponentV2
 export struct NearLinkFeaturePage {
+  @Event onOpenModuleSettings: () => void = () => {
+  };
+  @Event onOpenCommand: () => void = () => {
+  };
   @Local private vm: NearLinkOverviewViewModel = new NearLinkOverviewViewModel();
 
   aboutToAppear(): void {
@@ -41,6 +45,22 @@ export struct NearLinkFeaturePage {
           .fontColor(YoColor.TEXT_SECONDARY)
           .width('100%')
       }
+      Button($r('app.string.nl_open_module_settings'), {
+        type: ButtonType.Normal,
+        buttonStyle: ButtonStyleMode.TEXTUAL,
+        role: ButtonRole.NORMAL
+      })
+        .onClick(() => {
+          this.onOpenModuleSettings();
+        })
+      Button($r('app.string.nl_open_command'), {
+        type: ButtonType.Normal,
+        buttonStyle: ButtonStyleMode.TEXTUAL,
+        role: ButtonRole.NORMAL
+      })
+        .onClick(() => {
+          this.onOpenCommand();
+        })
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)

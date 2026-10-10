@@ -5,6 +5,34 @@
       "value": "蓝牙"
     },
     {
+      "name": "bt_open_module_settings",
+      "value": "蓝牙设置"
+    },
+    {
+      "name": "bt_open_command",
+      "value": "命令"
+    },
+    {
+      "name": "bt_settings_title",
+      "value": "蓝牙设置"
+    },
+    {
+      "name": "bt_settings_autostop",
+      "value": "发现后自动停止"
+    },
+    {
+      "name": "bt_settings_on",
+      "value": "开"
+    },
+    {
+      "name": "bt_settings_off",
+      "value": "关"
+    },
+    {
+      "name": "bt_settings_unread",
+      "value": "未读取"
+    },
+    {
       "name": "bt_status_adapter",
       "value": "蓝牙开关"
     },

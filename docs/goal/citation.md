@@ -19,9 +19,9 @@ related:
 
 给 UI Goal 引用。本文件只列清单路径和编号范围。条目正文以各清单为准，架构正文以同编号的架构文件为准。
 
-视觉不在本 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉不在本 PR。五个主页面：首页看板 `screen.home.dashboard`，蓝牙，星闪，WiFi，应用设置 `screen.settings.app`。命令模板按射频分开。日志中心 `screen.log.center` 与日志详情 `screen.log.detail` 是压栈页，不是第六个主页面。
 
-`WB-` 覆盖工作台和命令面板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖设置。视觉不在本 PR。
+`WB-` 覆盖首页看板和命令模板。`LOG-` 覆盖日志中心和日志详情。`SET-` 覆盖应用设置与三个模块设置。视觉不在本 PR。
 
 ## 清单
 
@@ -33,7 +33,7 @@ related:
 | [docs/goal/checklist/workbench.md](checklist/workbench.md) | WB-001–WB-012 | 本 PR 新写。工作台 WB-001–WB-007，命令面板 WB-008–WB-012 |
 | [docs/goal/checklist/log.md](checklist/log.md) | LOG-001–LOG-008 | 本 PR 新写。日志中心与日志详情 |
 | [docs/goal/checklist/settings.md](checklist/settings.md) | SET-001–SET-006 | 本 PR 新写 |
-| [docs/goal/checklist/app.md](checklist/app.md) | APP-001–APP-006 | 整机架构。不计入 350，也不改写 WB / LOG / SET。壳行为仍以 `139ddc61d1f82e3d8f5c92980d420f19230bffec` 为准 |
+| [docs/goal/checklist/app.md](checklist/app.md) | APP-001–APP-007 | 整机架构。不计入 350，也不改写 WB / LOG / SET。五个主页面见 APP-007 |
 | [docs/goal/checklist/master.md](checklist/master.md) | 索引，不是条目 | 从 [PR #5](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/5) 的 `95c4f93d1b316f76f098a15da20d5b1fecbd9b7d` 复制。三模块合计仍以该文件的 350 为准。WB / LOG / SET / APP 不计入那 350 |
 
 研究笔记与本 PR 一起复制，仍留在未合并的模块 PR 上：
@@ -58,10 +58,10 @@ Phase A 清单原文还在未合并的 [PR #3](https://github.com/yohurm/Harmony
 | `docs/goal/architecture/workbench/` | WB-001–WB-012 |
 | `docs/goal/architecture/log/` | LOG-001–LOG-008 |
 | `docs/goal/architecture/settings/` | SET-001–SET-006 |
-| `docs/goal/architecture/app/` | APP-001–APP-006 |
+| `docs/goal/architecture/app/` | APP-001–APP-007 |
 
 ## 跨模块日志
 
 读路径只有一条：UI → ViewModel/State → UseCase → RepositoryContract → DataSource → 表 `debug_log_index`。
 
-终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003）。工作台不读这张表。命令面板走命令契约（WB-008–WB-012）。工作台三枚能力读数走各模块仓库的开关读取（WB-003）。会话摘要计数在 `WorkbenchViewModel`（WB-005）。WB-004、WB-006 仍是缺口。射频仍是待真机。
+终点是已有日志库 `LogRepository` 的这张表，不是 Kit，也不是 hilog。蓝牙、星闪、Wi-Fi 共用这一条。说明在 [LOG-003](architecture/log/LOG-003.md)。第二日志库算违规的位置写在 [LOG-008](architecture/log/LOG-008.md)。日志中心与日志详情已接到这条读路径（LOG-001、LOG-002、LOG-003），并且不是主页面。命令模板按射频扩展（WB-008–WB-012）。首页看板三枚能力读数走各模块仓库的开关读取（WB-003）。会话摘要计数在 `WorkbenchViewModel`（WB-005）。WB-004、WB-006 仍是缺口。射频仍是待真机。

@@ -1,12 +1,12 @@
-﻿import { SettingsHubPage } from 'feature_home';
+import { SettingsHubPage } from 'feature_home';
 import {
   YoNavDestinationKind,
   YoPageShell
 } from 'youi_kit';
 
-/** More root tab hosts the settings groups. Title stays 「更多」. */
+/** App settings tab. Same page the home dashboard opens. Not a feature settings page. */
 @ComponentV2
-export struct MoreFeaturePage {
+export struct AppSettingsPage {
   @LocalBuilder
   pageContent() {
     SettingsHubPage()
@@ -14,9 +14,9 @@ export struct MoreFeaturePage {
 
   build() {
     YoPageShell({
-      title: $r('app.string.more_hub_title'),
+      title: $r('app.string.settings_app_title'),
       destinationKind: YoNavDestinationKind.ROOT_TAB,
-      scrollable: false,
+      scrollable: true,
       content: this.pageContent
     })
   }

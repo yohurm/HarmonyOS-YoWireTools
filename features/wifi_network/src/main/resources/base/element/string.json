@@ -2,7 +2,27 @@
   "string": [
     {
       "name": "wifi_title_overview",
-      "value": "网络"
+      "value": "WiFi"
+    },
+    {
+      "name": "wifi_open_module_settings",
+      "value": "WiFi设置"
+    },
+    {
+      "name": "wifi_open_command",
+      "value": "命令"
+    },
+    {
+      "name": "wifi_settings_title",
+      "value": "WiFi设置"
+    },
+    {
+      "name": "wifi_settings_cooldown",
+      "value": "扫描冷却"
+    },
+    {
+      "name": "wifi_settings_unread",
+      "value": "未读取"
     }
   ]
 }

@@ -8,7 +8,7 @@ import {
 } from 'youi_kit';
 import { SettingsViewModel } from '../../viewmodel/SettingsViewModel';
 
-/** Settings groups hosted by the More tab. This page does not request radio permissions. */
+/** Whole-app settings: theme and global preferences. Radio and command settings are not on this page. */
 @ComponentV2
 export struct SettingsHubPage {
   @Local vm: SettingsViewModel = new SettingsViewModel();
@@ -28,10 +28,6 @@ export struct SettingsHubPage {
         this.groupDisplay()
         this.groupLog()
         this.groupBackground()
-        this.groupCommand()
-        this.groupBluetooth()
-        this.groupWifi()
-        this.groupNearLink()
         this.groupSecurity()
       }
     }
@@ -110,57 +106,6 @@ export struct SettingsHubPage {
       this.groupTitle($r('app.string.settings_group_background'))
       this.settingRow($r('app.string.settings_bg_connection'), this.switchLabel(this.shown().allowBackgroundConnection), () => {
         void this.vm.toggleBackgroundConnection();
-      })
-      this.settingRow($r('app.string.settings_bg_repeat'), this.switchLabel(this.shown().allowRepeatCommand), () => {
-        void this.vm.toggleRepeat();
-      })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  groupCommand() {
-    Column({ space: YoSpace.S }) {
-      this.groupTitle($r('app.string.settings_group_command'))
-      this.settingRow($r('app.string.settings_line_ending'), this.shown().commandLineEnding, () => {
-        void this.vm.cycleLineEnding();
-      })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  groupBluetooth() {
-    Column({ space: YoSpace.S }) {
-      this.groupTitle($r('app.string.settings_group_bluetooth'))
-      this.settingRow($r('app.string.settings_bt_autostop'), this.switchLabel(this.shown().bluetoothAutoStopDiscovery), () => {
-        void this.vm.toggleBluetooth();
-      })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  groupWifi() {
-    Column({ space: YoSpace.S }) {
-      this.groupTitle($r('app.string.settings_group_wifi'))
-      this.settingRow($r('app.string.settings_wifi_cooldown'), `${this.shown().wifiScanCooldownMs}`, () => {
-        void this.vm.cycleCooldown();
-      })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  groupNearLink() {
-    Column({ space: YoSpace.S }) {
-      this.groupTitle($r('app.string.settings_group_nearlink'))
-      this.settingRow($r('app.string.settings_nl_filter'), this.switchLabel(this.shown().nearlinkRequireFilter), () => {
-        void this.vm.toggleNearLink();
       })
     }
     .width('100%')

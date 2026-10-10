@@ -133,21 +133,21 @@ related:
 
 ## 壳与跨模块
 
-下面每一条都在壳清单和同编号架构文件里。判定与清单相同。这些编号不计入上面的 350。工作台缺口是 WB-004、WB-006。射频仍是待真机。
+下面每一条都在壳清单和同编号架构文件里。判定与清单相同。这些编号不计入上面的 350。首页看板缺口是 WB-004、WB-006。射频仍是待真机。
 
 | 编号 | 判定 | 标题 | 清单 |
 | --- | --- | --- | --- |
-| WB-001 | 支持 | 工作台是根 Tab，标题为「工作台」 | [workbench.md](./workbench.md) |
+| WB-001 | 支持 | 首页看板是根 Tab，标题为「首页看板」 | [workbench.md](./workbench.md) |
 | WB-002 | 支持 | 一条 Navigation、一个 NavPathStack、Stack 模式 | [workbench.md](./workbench.md) |
 | WB-003 | 支持 | 工作台显示蓝牙、WLAN、星闪状态胶囊 | [workbench.md](./workbench.md) |
 | WB-004 | 缺口 | 工作台下钻只进入已有功能栈 | [workbench.md](./workbench.md) |
 | WB-005 | 支持 | 工作台汇总会话摘要统计 | [workbench.md](./workbench.md) |
 | WB-006 | 缺口 | 工作台聚合模块概览计数 | [workbench.md](./workbench.md) |
 | WB-007 | 支持 | 工作台不弹出射频或网络授权 | [workbench.md](./workbench.md) |
-| WB-008 | 支持 | 命令面板有页面和路由 | [workbench.md](./workbench.md) |
-| WB-009 | 支持 | 命令面板有收藏列表和只读参数 | [workbench.md](./workbench.md) |
-| WB-010 | 支持 | 命令面板可以执行一次 | [workbench.md](./workbench.md) |
-| WB-011 | 支持 | 命令面板可以周期发送或说明原因 | [workbench.md](./workbench.md) |
+| WB-008 | 支持 | 命令模板由三个射频各自扩展 | [workbench.md](./workbench.md) |
+| WB-009 | 支持 | 命令模板有收藏列表和只读参数 | [workbench.md](./workbench.md) |
+| WB-010 | 支持 | 命令模板可以执行一次 | [workbench.md](./workbench.md) |
+| WB-011 | 支持 | 命令模板可以周期发送或说明原因 | [workbench.md](./workbench.md) |
 | WB-012 | 支持 | 新建命令有成功态 | [workbench.md](./workbench.md) |
 | LOG-001 | 支持 | 日志中心有页面 | [log.md](./log.md) |
 | LOG-002 | 支持 | 日志详情有页面 | [log.md](./log.md) |
@@ -157,7 +157,7 @@ related:
 | LOG-006 | 支持 | 预览行带模块和协议 | [log.md](./log.md) |
 | LOG-007 | 支持 | 日志中心可以导出和清空 | [log.md](./log.md) |
 | LOG-008 | 支持 | 没有任何界面把 YoLog 或 hilog 当成会话列表 | [log.md](./log.md) |
-| SET-001 | 支持 | 设置八组出现在更多页 | [settings.md](./settings.md) |
+| SET-001 | 支持 | 应用设置与三个模块设置分开 | [settings.md](./settings.md) |
 | SET-002 | 支持 | 设置页和启动主题走同一用例 | [settings.md](./settings.md) |
 | SET-003 | 支持 | 设置页不申请蓝牙、星闪或 WLAN 权限 | [settings.md](./settings.md) |
 | SET-004 | 支持 | 主题走 app_setting，其余走 preferences | [settings.md](./settings.md) |
@@ -178,5 +178,6 @@ related:
 | APP-004 | 支持 | 一条数据路径 | [app.md](./app.md) |
 | APP-005 | 支持 | 壳接到唯一读模型 | [app.md](./app.md) |
 | APP-006 | 支持 | 没有按射频拆开的产品模块 | [app.md](./app.md) |
+| APP-007 | 支持 | 只有五个主页面 | [app.md](./app.md) |
 
 本段与整机清单不一致时，以 [app.md](./app.md) 为准。

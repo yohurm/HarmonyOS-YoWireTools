@@ -5,48 +5,43 @@ import { NearLinkFeaturePage } from 'feature_nearlink';
 import { WifiFeaturePage } from 'feature_wifi_network';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { BluetoothOverviewPage } from '../pages/bluetooth/BluetoothOverviewPage';
-import { MoreFeaturePage } from './MoreFeaturePage';
+import { AppSettingsPage } from './AppSettingsPage';
 import { WorkbenchRadioState } from './WorkbenchRadioState';
-
-@Builder
-function networkTab() {
-  WifiFeaturePage()
-}
-
-@Builder
-function nearlinkTab() {
-  NearLinkFeaturePage()
-}
-
-@Builder
-function moreTab() {
-  MoreFeaturePage()
-}
 
 @ComponentV2
 export struct MainTabContainer {
-  @Param currentTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
+  @Param currentTabIndex: number = AppRoutes.TAB_INDEX_HOME;
   @Event onTabChange: (index: number) => void = (_index: number) => {
   };
   @Event onOpenBluetoothSpp: () => void = () => {
   };
   @Event onOpenBluetoothBle: () => void = () => {
   };
-  @Event onOpenLog: () => void = () => {
+  @Event onOpenBluetoothSettings: () => void = () => {
   };
-  @Event onOpenCommand: () => void = () => {
+  @Event onOpenBluetoothCommand: () => void = () => {
+  };
+  @Event onOpenNearLinkSettings: () => void = () => {
+  };
+  @Event onOpenNearLinkCommand: () => void = () => {
+  };
+  @Event onOpenWifiSettings: () => void = () => {
+  };
+  @Event onOpenWifiCommand: () => void = () => {
+  };
+  @Event onOpenLog: () => void = () => {
   };
   @Local radio: WorkbenchRadioState = new WorkbenchRadioState();
   private readonly tabItems: YoSideNavItem[] = [
     { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
     { index: 1, label: $r('app.string.tab_bluetooth'), symbol: $r('sys.symbol.trunk') },
-    { index: 2, label: $r('app.string.tab_network'), symbol: $r('sys.symbol.ohos_wifi') },
-    { index: 3, label: $r('app.string.tab_nearlink'), symbol: $r('sys.symbol.card_writer') },
-    { index: 4, label: $r('app.string.tab_more'), symbol: $r('sys.symbol.more') }
+    { index: 2, label: $r('app.string.tab_nearlink'), symbol: $r('sys.symbol.card_writer') },
+    { index: 3, label: $r('app.string.tab_network'), symbol: $r('sys.symbol.ohos_wifi') },
+    { index: 4, label: $r('app.string.tab_settings'), symbol: $r('sys.symbol.gear') }
   ];
 
   @LocalBuilder
-  workbenchTab() {
+  homeTab() {
     HomeFeaturePage({
       bluetoothReading: this.radio.bluetooth,
       wlanReading: this.radio.wlan,
@@ -54,11 +49,11 @@ export struct MainTabContainer {
       onOpenModule: (moduleId: string) => {
         this.openModule(moduleId);
       },
+      onOpenAppSettings: () => {
+        this.onTabChange(AppRoutes.TAB_INDEX_SETTINGS);
+      },
       onOpenLog: () => {
         this.onOpenLog();
-      },
-      onOpenCommand: () => {
-        this.onOpenCommand();
       }
     })
   }
@@ -72,12 +67,12 @@ export struct MainTabContainer {
       this.onTabChange(AppRoutes.TAB_INDEX_BLUETOOTH);
       return;
     }
-    if (moduleId === FeatureModuleId.WIFI) {
-      this.onTabChange(AppRoutes.TAB_INDEX_NETWORK);
-      return;
-    }
     if (moduleId === FeatureModuleId.NEARLINK) {
       this.onTabChange(AppRoutes.TAB_INDEX_NEARLINK);
+      return;
+    }
+    if (moduleId === FeatureModuleId.WIFI) {
+      this.onTabChange(AppRoutes.TAB_INDEX_WIFI);
     }
   }
 
@@ -85,8 +80,31 @@ export struct MainTabContainer {
   bluetoothTab() {
     BluetoothOverviewPage({
       onOpenSpp: this.onOpenBluetoothSpp,
-      onOpenBle: this.onOpenBluetoothBle
+      onOpenBle: this.onOpenBluetoothBle,
+      onOpenModuleSettings: this.onOpenBluetoothSettings,
+      onOpenCommand: this.onOpenBluetoothCommand
     })
+  }
+
+  @LocalBuilder
+  nearlinkTab() {
+    NearLinkFeaturePage({
+      onOpenModuleSettings: this.onOpenNearLinkSettings,
+      onOpenCommand: this.onOpenNearLinkCommand
+    })
+  }
+
+  @LocalBuilder
+  wifiTab() {
+    WifiFeaturePage({
+      onOpenModuleSettings: this.onOpenWifiSettings,
+      onOpenCommand: this.onOpenWifiCommand
+    })
+  }
+
+  @LocalBuilder
+  settingsTab() {
+    AppSettingsPage()
   }
 
   build() {
@@ -95,15 +113,15 @@ export struct MainTabContainer {
       items: this.tabItems,
       onTabChange: (index: number) => {
         this.onTabChange(index);
-        if (index === AppRoutes.TAB_INDEX_WORKBENCH) {
+        if (index === AppRoutes.TAB_INDEX_HOME) {
           this.radio.refresh();
         }
       },
-      tabContent0: this.workbenchTab,
+      tabContent0: this.homeTab,
       tabContent1: this.bluetoothTab,
-      tabContent2: networkTab,
-      tabContent3: nearlinkTab,
-      tabContent4: moreTab
+      tabContent2: this.nearlinkTab,
+      tabContent3: this.wifiTab,
+      tabContent4: this.settingsTab
     })
   }
 }

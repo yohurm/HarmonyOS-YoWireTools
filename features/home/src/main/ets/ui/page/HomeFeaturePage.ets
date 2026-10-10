@@ -14,9 +14,9 @@ import { WorkbenchViewModel } from '../../viewmodel/WorkbenchViewModel';
 export struct HomeFeaturePage {
   @Event onOpenModule: (moduleId: string) => void = (_moduleId: string) => {
   };
-  @Event onOpenLog: () => void = () => {
+  @Event onOpenAppSettings: () => void = () => {
   };
-  @Event onOpenCommand: () => void = () => {
+  @Event onOpenLog: () => void = () => {
   };
   @Param bluetoothReading: string = RadioSwitchReading.UNREAD;
   @Param wlanReading: string = RadioSwitchReading.UNREAD;
@@ -51,6 +51,14 @@ export struct HomeFeaturePage {
         })
       }
       .width('100%')
+      Button($r('app.string.home_open_settings'), {
+        type: ButtonType.Normal,
+        buttonStyle: ButtonStyleMode.TEXTUAL,
+        role: ButtonRole.NORMAL
+      })
+        .onClick(() => {
+          this.onOpenAppSettings();
+        })
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)

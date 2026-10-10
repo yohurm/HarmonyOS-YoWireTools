@@ -13,19 +13,45 @@ import {
 } from 'youi_kit';
 import { CommandPanelViewModel } from '../../viewmodel/CommandPanelViewModel';
 
+/** Shared command shell. Each radio page supplies its own view model. */
 @ComponentV2
-export struct CommandPanelPage {
+export struct CommandPanelTemplate {
+  @Param @Require vm: CommandPanelViewModel;
+  @Param title: ResourceStr = '';
   @Event onBack: () => void = () => {
   };
-  @Local vm: CommandPanelViewModel = new CommandPanelViewModel();
 
   aboutToAppear(): void {
     void this.vm.refresh();
   }
 
+  @Builder
+  policyRow(label: ResourceStr, value: ResourceStr, onTap: () => void) {
+    Row() {
+      Text(label)
+        .fontSize(YoTypeStyle.BODY_M.size)
+        .fontColor(YoColor.TEXT_PRIMARY)
+        .layoutWeight(1)
+      YoActionButton({
+        label: value,
+        kind: YoActionButtonKind.SECONDARY,
+        fullWidth: false,
+        compact: true,
+        onTap: onTap
+      })
+    }
+    .width('100%')
+    .alignItems(VerticalAlign.Center)
+  }
+
   @LocalBuilder
   pageContent() {
     Column({ space: YoSpace.L }) {
+      this.policyRow($r('app.string.command_repeat_allow'),
+        this.vm.repeatAllowed ? $r('app.string.settings_on') : $r('app.string.settings_off'), () => {
+          void this.vm.toggleRepeat();
+        })
+
       if (this.vm.favorites().length === 0 && !this.vm.creating) {
         YoEmpty({
           model: new YoEmptyStateModel(
@@ -78,6 +104,9 @@ export struct CommandPanelPage {
             .onChange((value: string) => {
               this.vm.draftPayload = value;
             })
+          this.policyRow($r('app.string.command_line_ending'), this.vm.draftLineEnding, () => {
+            this.vm.cycleLineEnding();
+          })
           YoActionButton({
             label: $r('app.string.command_save'),
             onTap: () => {
@@ -189,7 +218,7 @@ export struct CommandPanelPage {
 
   build() {
     YoPageShell({
-      title: $r('app.string.command_panel_title'),
+      title: this.title,
       destinationKind: YoNavDestinationKind.MODULE,
       showBack: true,
       scrollable: true,

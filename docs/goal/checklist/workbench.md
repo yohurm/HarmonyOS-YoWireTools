@@ -8,29 +8,29 @@ related:
   - docs/goal/citation.md
 ---
 
-# 工作台与命令面板
+# 首页看板与命令模板
 
 每条只钉一个可观察结果。判定只有「支持」和「缺口」。
 
 - **支持**：在 Wi-Fi 分支上述提交的现有代码里，这个结果已经能被代码路径或界面证实。
 - **缺口**：界面或读链路没有这个结果。不得把已有类、表或用例写成已经成功。
 
-工作台用 WB-001–WB-007，命令面板用 WB-008–WB-012。前缀是 `WB-`。视觉不在本 PR。
+首页看板用 WB-001–WB-007，命令模板用 WB-008–WB-012。前缀是 `WB-`。视觉不在本 PR。
 
-屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+主页面只有五个：首页看板、蓝牙、星闪、WiFi、设置。命令不是主页面。屏名：首页看板 `screen.home.dashboard`，蓝牙命令 `screen.bluetooth.command`，星闪命令 `screen.nearlink.command`，WiFi 命令 `screen.wifi.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，应用设置 `screen.settings.app`。
 
 导航见 `开发/指南/开发/应用框架/ArkUI（方舟UI框架）/UI开发 (ArkTS声明式开发范式)/设置组件导航和页面路由/组件导航(Navigation) (推荐)/Navigation基础架构介绍.md`：一个 Navigation 绑定一个 NavPathStack，显示模式含 Stack、Split、Auto。状态见 `开发/指南/开发/应用框架/ArkUI（方舟UI框架）/UI开发 (ArkTS声明式开发范式)/学习UI范式状态管理/MVVM模式（V2）.md`。关系型库见 `开发/指南/开发/应用框架/ArkData（方舟数据管理）/应用数据持久化/通过关系型数据库实现数据持久化 (ArkTS).md`。用户首选项见 `开发/指南/开发/应用框架/ArkData（方舟数据管理）/应用数据持久化/通过用户首选项实现数据持久化 (ArkTS).md`。进程日志见 `开发/API参考/系统/调测调优/Performance Analysis Kit（性能分析服务）/ArkTS API/ohos.hilog HiLog日志打印.md`。hilog 不是会话读模型。
 
 ## 工作台
 
-### WB-001 工作台是根 Tab，标题为「工作台」
+### WB-001 首页看板是根 Tab，标题为「首页看板」
 
 - **判定：** 支持
-- **屏幕：** 工作台（`screen.workbench.home`）
-- **Given** 应用冷启动，槽位为 `AppRoutes.TAB_INDEX_WORKBENCH`（0）
-- **When** 显示工作台
-- **Then** `HomeFeaturePage` 用 `YoPageShell`，`destinationKind` 为 `ROOT_TAB`，标题资源 `home_title` 为「工作台」。底栏标签 `tab_workbench` 也是「工作台」
-- **证据：** `features/home/src/main/ets/ui/page/HomeFeaturePage.ets`；`features/home/src/main/resources/base/element/string.json`；`product/phone/src/main/ets/shell/MainTabContainer.ets`；`product/phone/src/main/resources/base/element/string.json`。行为对照 Wi-Fi 分支 `cursor/wifi-network-phase-d-4072` 的 `7295d1771288a0fb957021bd0e948073f435d96c`。本清单不改 ets。
+- **屏幕：** 首页看板（`screen.home.dashboard`）
+- **Given** 应用冷启动，槽位为 `AppRoutes.TAB_INDEX_HOME`（0）
+- **When** 显示首页看板
+- **Then** `HomeFeaturePage` 用 `YoPageShell`，`destinationKind` 为 `ROOT_TAB`，标题资源 `home_title` 为「首页看板」。底栏标签 `tab_workbench` 也是「首页看板」
+- **证据：** `HomeFeaturePage.ets`；`features/home` 的 `string.json`；`MainTabContainer.ets`；`product/phone` 的 `string.json`
 
 ### WB-002 一条 Navigation、一个 NavPathStack、Stack 模式
 
@@ -88,50 +88,50 @@ related:
 
 ## 命令面板
 
-### WB-008 命令面板有页面和路由
+### WB-008 命令模板由三个射频各自扩展
 
 - **判定：** 支持
-- **屏幕：** 命令面板（`screen.workbench.command`）
+- **屏幕：** 蓝牙命令（`screen.bluetooth.command`）、星闪命令（`screen.nearlink.command`）、WiFi 命令（`screen.wifi.command`）
 - **Given** 应用已启动
-- **When** 从工作台或路由表查找命令面板
-- **Then** `CommandPanelPage` 存在，路由 `command/panel` 在 `navDestination` 中
-- **证据：** `CommandPanelPage.ets`；`AppRoutes.ets`；`Index.ets`
+- **When** 从路由表查找命令
+- **Then** 壳是 `CommandPanelTemplate`，契约是 `CommandRepositoryContract.listTemplates(module, offset, limit)`。`BluetoothCommandPage`、`NearLinkCommandPage`、`WifiCommandPage` 各自持有自己的视图模型，并分别调用 `ExecuteBluetoothCommandUseCase`、`ExecuteNearLinkCommandUseCase`、`ExecuteWifiCommandUseCase`。路由是 `/bluetooth/command`、`/nearlink/command`、`/wifi/command`。没有一条把三个射频写在同一个实现里的 `command/panel`。首页看板不打开命令
+- **证据：** `CommandPanelTemplate.ets`；`BluetoothCommandPage.ets`；`NearLinkCommandPage.ets`；`WifiCommandPage.ets`；`BluetoothCommandUseCases.ets`；`NearLinkCommandUseCases.ets`；`WifiCommandUseCases.ets`；`AppRoutes.ets`；`Index.ets`
 
-### WB-009 命令面板有收藏列表和只读参数
+### WB-009 命令模板有收藏列表和只读参数
 
 - **判定：** 支持
-- **屏幕：** 命令面板（`screen.workbench.command`）
-- **Given** `command_template` 里可能已有行
+- **屏幕：** 蓝牙命令（`screen.bluetooth.command`）
+- **Given** `command_template` 里可能已有该模块的行
 - **When** 查看收藏与参数区
-- **Then** 收藏列表读 `CommandTemplate.favorite`。选中行的 payload 只读。页面不读 `tags`
+- **Then** 收藏列表读 `CommandTemplate.favorite`，且列表按该页的 `ModuleType` 过滤。选中行的 payload 只读。页面不读 `tags`
 - **证据：** `CommandPanelViewModel.ets`；`CommandTemplateRepository.ets`
 
-### WB-010 命令面板可以执行一次
+### WB-010 命令模板可以执行一次
 
 - **判定：** 支持
-- **屏幕：** 命令面板（`screen.workbench.command`）
-- **Given** 没有命令面板
+- **屏幕：** 蓝牙命令（`screen.bluetooth.command`）
+- **Given** 当前射频命令页已打开
 - **When** 查找「执行一次」
-- **Then** 「执行一次」调用 `ExecuteSavedCommandUseCase`。没有传输会话时显示「没有进行中的会话」，不显示假成功
-- **证据：** `CommandPanelPage.ets`；`CommandPanelUseCases.ets`
+- **Then** 「执行一次」调用该射频自己的执行用例。没有传输会话时显示「没有进行中的会话」，不显示假成功。模板的 `module` 与用例模块不一致时不发送
+- **证据：** `CommandPanelTemplate.ets`；`ExecuteModuleCommandUseCase`
 
-### WB-011 命令面板可以周期发送或说明原因
+### WB-011 命令模板可以周期发送或说明原因
 
 - **判定：** 支持
-- **屏幕：** 命令面板（`screen.workbench.command`）
-- **Given** 没有命令面板，设置页也没有「允许周期」开关
+- **屏幕：** 蓝牙命令（`screen.bluetooth.command`）
+- **Given** 周期开关不在应用设置页
 - **When** 查找周期发送
-- **Then** 设置不允许时「周期发送」不可用，并显示「设置里未允许周期发送」。停止前要确认
-- **证据：** `CommandPanelPage.ets`；`RepeatSavedCommandUseCase`
+- **Then** 命令页用 `ReadCommandRepeatPolicyUseCase` 与 `SaveCommandRepeatPolicyUseCase`，不调用 `LoadSettingsUseCase`。未允许时「周期发送」不可用，并显示「未允许周期发送」。停止前要确认
+- **证据：** `CommandPanelTemplate.ets`；`RepeatModuleCommandUseCase`；`ReadCommandRepeatPolicyUseCase`
 
 ### WB-012 新建命令有成功态
 
 - **判定：** 支持
-- **屏幕：** 命令面板（`screen.workbench.command`）
-- **Given** 命令面板不存在
+- **屏幕：** 蓝牙命令（`screen.bluetooth.command`）
+- **Given** 当前射频命令页已打开
 - **When** 查找新建命令
-- **Then** 空列表有「新建命令」。保存成功显示「已保存」
-- **证据：** `CommandPanelPage.ets`；`SaveCommandTemplateUseCase`
+- **Then** 空列表有「新建命令」。保存成功显示「已保存」。保存写入该射频的 `ModuleType`，换行写在模板上，不写进应用设置页
+- **证据：** `CommandPanelTemplate.ets`；`SaveModuleCommandTemplateUseCase`
 
 ## 覆盖统计
 
@@ -142,4 +142,4 @@ related:
 | 支持 | 10 | WB-001、WB-002、WB-003、WB-005、WB-007、WB-008、WB-009、WB-010、WB-011、WB-012 |
 | 缺口 | 2 | WB-004、WB-006 |
 
-命令面板已有页面，但不从工作台首页启动。WB-004 下钻和 WB-006 模块概览计数仍是缺口。射频仍是待真机。
+命令模板已按蓝牙、星闪、WiFi 分开，不从首页看板启动。WB-004 下钻和 WB-006 模块概览计数仍是缺口。射频仍是待真机。

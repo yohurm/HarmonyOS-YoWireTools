@@ -1,6 +1,7 @@
 ﻿import { UIContextRegistry } from 'common_platform';
 import { YoColor } from 'youi_kit';
 import {
+  BluetoothSettingsPage,
   ClassicDeviceListItem,
   PairingGuideDialog,
   SppConnectDialog,
@@ -8,11 +9,15 @@ import {
   SppTerminalPage
 } from 'feature_bluetooth';
 import {
-  CommandPanelPage,
+  BluetoothCommandPage,
   LogCenterPage,
   LogDetailNavParams,
-  LogDetailPage
+  LogDetailPage,
+  NearLinkCommandPage,
+  WifiCommandPage
 } from 'feature_home';
+import { NearLinkSettingsPage } from 'feature_nearlink';
+import { WifiSettingsPage } from 'feature_wifi_network';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { MainTabContainer } from '../shell/MainTabContainer';
 import { BleMainPage } from './bluetooth/BleMainPage';
@@ -21,7 +26,7 @@ import { SppMainPage } from './bluetooth/SppMainPage';
 @Entry
 @ComponentV2
 struct Index {
-  @Local activeTabIndex: number = AppRoutes.TAB_INDEX_WORKBENCH;
+  @Local activeTabIndex: number = AppRoutes.TAB_INDEX_HOME;
   private rootNavStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
@@ -141,9 +146,54 @@ struct Index {
         })
       }
       .hideTitleBar(true, false)
-    } else if (name === AppRoutes.COMMAND_PANEL) {
+    } else if (name === AppRoutes.BLUETOOTH_SETTINGS) {
       NavDestination() {
-        CommandPanelPage({
+        BluetoothSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.BLUETOOTH_COMMAND) {
+      NavDestination() {
+        BluetoothCommandPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.NEARLINK_SETTINGS) {
+      NavDestination() {
+        NearLinkSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.NEARLINK_COMMAND) {
+      NavDestination() {
+        NearLinkCommandPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.WIFI_SETTINGS) {
+      NavDestination() {
+        WifiSettingsPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.WIFI_COMMAND) {
+      NavDestination() {
+        WifiCommandPage({
           onBack: () => {
             this.rootNavStack.pop();
           }
@@ -169,11 +219,32 @@ struct Index {
             this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
             this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
           },
+          onOpenBluetoothSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_SETTINGS });
+          },
+          onOpenBluetoothCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+            this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_COMMAND });
+          },
+          onOpenNearLinkSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_NEARLINK;
+            this.rootNavStack.pushPath({ name: AppRoutes.NEARLINK_SETTINGS });
+          },
+          onOpenNearLinkCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_NEARLINK;
+            this.rootNavStack.pushPath({ name: AppRoutes.NEARLINK_COMMAND });
+          },
+          onOpenWifiSettings: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_WIFI;
+            this.rootNavStack.pushPath({ name: AppRoutes.WIFI_SETTINGS });
+          },
+          onOpenWifiCommand: () => {
+            this.activeTabIndex = AppRoutes.TAB_INDEX_WIFI;
+            this.rootNavStack.pushPath({ name: AppRoutes.WIFI_COMMAND });
+          },
           onOpenLog: () => {
             this.rootNavStack.pushPath({ name: AppRoutes.LOG_CENTER });
-          },
-          onOpenCommand: () => {
-            this.rootNavStack.pushPath({ name: AppRoutes.COMMAND_PANEL });
           }
         })
       }

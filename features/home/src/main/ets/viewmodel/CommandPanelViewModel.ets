@@ -1,10 +1,12 @@
 import {
   CommandTemplate,
-  ExecuteSavedCommandUseCase,
-  ListCommandTemplatesUseCase,
-  LoadSettingsUseCase,
-  RepeatSavedCommandUseCase,
-  SaveCommandTemplateUseCase,
+  ExecuteModuleCommandUseCase,
+  LineEndingMode,
+  ListModuleCommandTemplatesUseCase,
+  ReadCommandRepeatPolicyUseCase,
+  RepeatModuleCommandUseCase,
+  SaveCommandRepeatPolicyUseCase,
+  SaveModuleCommandTemplateUseCase,
   ShellCommandCodes
 } from 'debug_core';
 
@@ -16,34 +18,38 @@ export class CommandPanelViewModel {
   @Trace creating: boolean = false;
   @Trace draftName: string = '';
   @Trace draftPayload: string = '';
+  @Trace draftLineEnding: string = LineEndingMode.LF;
   @Trace saved: boolean = false;
   @Trace ran: boolean = false;
   @Trace failedCode: string = '';
   @Trace confirmingStop: boolean = false;
   @Trace repeating: boolean = false;
-  private readonly listTemplates: ListCommandTemplatesUseCase;
-  private readonly saveTemplate: SaveCommandTemplateUseCase;
-  private readonly executeOnce: ExecuteSavedCommandUseCase;
-  private readonly repeatCommand: RepeatSavedCommandUseCase;
-  private readonly loadSettings: LoadSettingsUseCase;
+  private readonly listTemplates: ListModuleCommandTemplatesUseCase;
+  private readonly saveTemplate: SaveModuleCommandTemplateUseCase;
+  private readonly executeOnce: ExecuteModuleCommandUseCase;
+  private readonly repeatCommand: RepeatModuleCommandUseCase;
+  private readonly readRepeat: ReadCommandRepeatPolicyUseCase;
+  private readonly saveRepeat: SaveCommandRepeatPolicyUseCase;
 
   constructor(
-    listTemplates: ListCommandTemplatesUseCase = new ListCommandTemplatesUseCase(),
-    saveTemplate: SaveCommandTemplateUseCase = new SaveCommandTemplateUseCase(),
-    executeOnce: ExecuteSavedCommandUseCase = new ExecuteSavedCommandUseCase(),
-    repeatCommand: RepeatSavedCommandUseCase = new RepeatSavedCommandUseCase(),
-    loadSettings: LoadSettingsUseCase = new LoadSettingsUseCase()
+    listTemplates: ListModuleCommandTemplatesUseCase,
+    saveTemplate: SaveModuleCommandTemplateUseCase,
+    executeOnce: ExecuteModuleCommandUseCase,
+    repeatCommand: RepeatModuleCommandUseCase,
+    readRepeat: ReadCommandRepeatPolicyUseCase = new ReadCommandRepeatPolicyUseCase(),
+    saveRepeat: SaveCommandRepeatPolicyUseCase = new SaveCommandRepeatPolicyUseCase()
   ) {
     this.listTemplates = listTemplates;
     this.saveTemplate = saveTemplate;
     this.executeOnce = executeOnce;
     this.repeatCommand = repeatCommand;
-    this.loadSettings = loadSettings;
+    this.readRepeat = readRepeat;
+    this.saveRepeat = saveRepeat;
   }
 
   async refresh(): Promise<void> {
-    const loaded = await this.loadSettings.execute();
-    this.repeatAllowed = loaded.success && loaded.value !== undefined && loaded.value.allowRepeatCommand;
+    const policy = await this.readRepeat.execute();
+    this.repeatAllowed = policy.success && policy.value === true;
     const listed = await this.listTemplates.execute();
     if (!listed.success || listed.value === undefined) {
       this.templates = [];
@@ -92,8 +98,48 @@ export class CommandPanelViewModel {
     this.saved = false;
   }
 
+  cycleLineEnding(): void {
+    const current = this.draftLineEnding;
+    if (current === LineEndingMode.LF) {
+      this.draftLineEnding = LineEndingMode.CR;
+      return;
+    }
+    if (current === LineEndingMode.CR) {
+      this.draftLineEnding = LineEndingMode.CRLF;
+      return;
+    }
+    if (current === LineEndingMode.CRLF) {
+      this.draftLineEnding = LineEndingMode.NONE;
+      return;
+    }
+    this.draftLineEnding = LineEndingMode.LF;
+  }
+
+  lineEndingMode(): LineEndingMode {
+    if (this.draftLineEnding === LineEndingMode.CR) {
+      return LineEndingMode.CR;
+    }
+    if (this.draftLineEnding === LineEndingMode.CRLF) {
+      return LineEndingMode.CRLF;
+    }
+    if (this.draftLineEnding === LineEndingMode.NONE) {
+      return LineEndingMode.NONE;
+    }
+    return LineEndingMode.LF;
+  }
+
+  async toggleRepeat(): Promise<void> {
+    const saved = await this.saveRepeat.execute(!this.repeatAllowed);
+    if (!saved.success) {
+      this.failedCode = 'YW-CMD-1003';
+      return;
+    }
+    this.failedCode = '';
+    await this.refresh();
+  }
+
   async saveDraft(favorite: boolean): Promise<void> {
-    const saved = await this.saveTemplate.execute(this.draftName, this.draftPayload, favorite);
+    const saved = await this.saveTemplate.execute(this.draftName, this.draftPayload, favorite, this.lineEndingMode());
     if (!saved.success || saved.value === undefined) {
       this.failedCode = 'YW-CMD-1003';
       this.saved = false;
@@ -103,6 +149,7 @@ export class CommandPanelViewModel {
     this.creating = false;
     this.draftName = '';
     this.draftPayload = '';
+    this.draftLineEnding = LineEndingMode.LF;
     this.failedCode = '';
     await this.refresh();
     this.select(saved.value.id);

@@ -34,32 +34,12 @@ export class UpdateSettingUseCase {
     return this.repository.saveLogRetentionDays(days);
   }
 
-  saveRepeatAllowed(allowed: boolean): Promise<Result<void>> {
-    return this.repository.saveRepeatAllowed(allowed);
-  }
-
   saveBackgroundConnection(allowed: boolean): Promise<Result<void>> {
     return this.repository.saveBackgroundConnection(allowed);
   }
 
-  saveLineEnding(value: string): Promise<Result<void>> {
-    return this.repository.saveLineEnding(value);
-  }
-
   saveLogDisplay(value: string): Promise<Result<void>> {
     return this.repository.saveLogDisplay(value);
-  }
-
-  saveBluetoothAutoStop(enabled: boolean): Promise<Result<void>> {
-    return this.repository.saveBluetoothAutoStop(enabled);
-  }
-
-  saveWifiScanCooldown(ms: number): Promise<Result<void>> {
-    return this.repository.saveWifiScanCooldown(ms);
-  }
-
-  saveNearLinkRequireFilter(enabled: boolean): Promise<Result<void>> {
-    return this.repository.saveNearLinkRequireFilter(enabled);
   }
 
   saveMaskAddress(enabled: boolean): Promise<Result<void>> {

@@ -12,28 +12,69 @@ import { SendCommandInput, SendCommandUseCase } from './CommandUseCases';
 export class ShellCommandCodes {
   static readonly NO_TRANSPORT: string = 'YW-CMD-2004';
   static readonly REPEAT_DISABLED: string = 'YW-CMD-2003';
+  static readonly MODULE_MISMATCH: string = 'YW-CMD-2005';
 }
 
-export class ListCommandTemplatesUseCase {
+/** Reads the command repeat switch. Not the app-settings load use case. */
+export class ReadCommandRepeatPolicyUseCase {
+  private readonly repository: SettingsRepositoryContract;
+
+  constructor(repository: SettingsRepositoryContract = new SettingsRepository()) {
+    this.repository = repository;
+  }
+
+  async execute(): Promise<Result<boolean>> {
+    const loaded = await this.repository.load();
+    if (!loaded.success || loaded.value === undefined) {
+      return Result.fail(loaded.error ?? new ResultError('YW-CMD-1001', 'Repeat policy unread'));
+    }
+    return Result.ok(loaded.value.allowRepeatCommand);
+  }
+}
+
+/** Writes the command repeat switch. App settings does not call this. */
+export class SaveCommandRepeatPolicyUseCase {
+  private readonly repository: SettingsRepositoryContract;
+
+  constructor(repository: SettingsRepositoryContract = new SettingsRepository()) {
+    this.repository = repository;
+  }
+
+  execute(allowed: boolean): Promise<Result<void>> {
+    return this.repository.saveRepeatAllowed(allowed);
+  }
+}
+
+export class ListModuleCommandTemplatesUseCase {
+  private readonly module: ModuleType;
   private readonly repository: CommandRepositoryContract;
 
-  constructor(repository: CommandRepositoryContract = new CommandTemplateRepository()) {
+  constructor(module: ModuleType, repository: CommandRepositoryContract = new CommandTemplateRepository()) {
+    this.module = module;
     this.repository = repository;
   }
 
   execute(offset: number = 0, limit: number = 50): Promise<Result<PageResult<CommandTemplate>>> {
-    return this.repository.listTemplates(offset, limit);
+    return this.repository.listTemplates(this.module, offset, limit);
   }
 }
 
-export class SaveCommandTemplateUseCase {
+export class SaveModuleCommandTemplateUseCase {
+  private readonly module: ModuleType;
+  private readonly protocol: ProtocolType;
   private readonly repository: CommandRepositoryContract;
 
-  constructor(repository: CommandRepositoryContract = new CommandTemplateRepository()) {
+  constructor(
+    module: ModuleType,
+    protocol: ProtocolType,
+    repository: CommandRepositoryContract = new CommandTemplateRepository()
+  ) {
+    this.module = module;
+    this.protocol = protocol;
     this.repository = repository;
   }
 
-  execute(name: string, payload: string, favorite: boolean): Promise<Result<CommandTemplate>> {
+  execute(name: string, payload: string, favorite: boolean, lineEnding: LineEndingMode): Promise<Result<CommandTemplate>> {
     const trimmed = name.trim();
     if (trimmed.length === 0 || payload.length === 0) {
       return Promise.resolve(Result.fail(new ResultError('YW-CMD-1003', 'Name and payload required')));
@@ -43,11 +84,11 @@ export class SaveCommandTemplateUseCase {
       trimmed,
       payload,
       PayloadEncoding.TEXT,
-      LineEndingMode.LF,
+      lineEnding,
       WriteMode.ONCE,
       5000,
-      ModuleType.SYSTEM,
-      ProtocolType.NONE,
+      this.module,
+      this.protocol,
       undefined,
       [],
       [],
@@ -64,19 +105,25 @@ export class SaveCommandTemplateUseCase {
   }
 }
 
-export class ExecuteSavedCommandUseCase {
+export class ExecuteModuleCommandUseCase {
+  private readonly module: ModuleType;
   private readonly sendCommand: SendCommandUseCase;
   private readonly transports: TransportSessionRegistry;
 
   constructor(
+    module: ModuleType,
     sendCommand: SendCommandUseCase = new SendCommandUseCase(),
     transports: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
+    this.module = module;
     this.sendCommand = sendCommand;
     this.transports = transports;
   }
 
   async execute(template: CommandTemplate): Promise<Result<void>> {
+    if (template.module !== this.module) {
+      return Result.fail(new ResultError(ShellCommandCodes.MODULE_MISMATCH, 'Command module mismatch'));
+    }
     const ids = this.transports.listSessionIds();
     if (ids.length === 0) {
       return Result.fail(new ResultError(ShellCommandCodes.NO_TRANSPORT, 'No active transport'));
@@ -99,22 +146,28 @@ export class ExecuteSavedCommandUseCase {
   }
 }
 
-export class RepeatSavedCommandUseCase {
+export class RepeatModuleCommandUseCase {
+  private readonly module: ModuleType;
   private readonly settings: SettingsRepositoryContract;
   private readonly repeats: RepeatCommandCoordinator;
   private readonly transports: TransportSessionRegistry;
 
   constructor(
+    module: ModuleType,
     settings: SettingsRepositoryContract = new SettingsRepository(),
     repeats: RepeatCommandCoordinator = RepeatCommandCoordinator.getInstance(),
     transports: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
+    this.module = module;
     this.settings = settings;
     this.repeats = repeats;
     this.transports = transports;
   }
 
   async start(template: CommandTemplate, intervalMs: number): Promise<Result<void>> {
+    if (template.module !== this.module) {
+      return Result.fail(new ResultError(ShellCommandCodes.MODULE_MISMATCH, 'Command module mismatch'));
+    }
     const loaded = await this.settings.load();
     if (!loaded.success || loaded.value === undefined || !loaded.value.allowRepeatCommand) {
       return Result.fail(new ResultError(ShellCommandCodes.REPEAT_DISABLED, 'Repeat disabled'));

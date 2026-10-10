@@ -15,6 +15,34 @@
     {
       "name": "nl_cdsm_unsupported",
       "value": "本设备不支持合作设备集。扫描和 SSAP 不以此为前提，仍按各自条件使用。"
+    },
+    {
+      "name": "nl_open_module_settings",
+      "value": "星闪设置"
+    },
+    {
+      "name": "nl_open_command",
+      "value": "命令"
+    },
+    {
+      "name": "nl_settings_title",
+      "value": "星闪设置"
+    },
+    {
+      "name": "nl_settings_filter",
+      "value": "扫描需要过滤"
+    },
+    {
+      "name": "nl_settings_on",
+      "value": "开"
+    },
+    {
+      "name": "nl_settings_off",
+      "value": "关"
+    },
+    {
+      "name": "nl_settings_unread",
+      "value": "未读取"
     }
   ]
 }
