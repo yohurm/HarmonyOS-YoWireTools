@@ -574,6 +574,14 @@ export struct WifiInspectPage {
         kind: YoActionButtonKind.TEXT,
         onTap: () => this.vm.abortHttp()
       })
+      YoActionButton({
+        label: this.vm.httpBodyOpen ? '收起响应体' : '展开响应体',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => this.vm.toggleHttpBody()
+      })
+      if (this.vm.httpBodyOpen) {
+        WifiFactText({ text: this.vm.httpBody.length > 0 ? this.vm.httpBody : '系统未返回' })
+      }
       WifiFactText({ text: this.vm.proxyLine })
       YoActionButton({
         label: '读取代理',
@@ -803,6 +811,13 @@ export struct WifiLanPage {
         kind: YoActionButtonKind.SECONDARY,
         onTap: () => {
           void this.vm.publishLan(this.vm.ssidInput, this.vm.portInput);
+        }
+      })
+      YoActionButton({
+        label: '移除本地服务',
+        kind: YoActionButtonKind.TEXT,
+        onTap: () => {
+          void this.vm.removeLan(this.vm.ssidInput);
         }
       })
     }

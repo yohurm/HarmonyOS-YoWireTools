@@ -161,6 +161,8 @@ export class WifiDebugViewModel {
   @Trace tlsMark: string = '';
   @Trace wsSendEnabled: boolean = false;
   @Trace wsServerLine: string = '未启动';
+  @Trace httpBody: string = '';
+  @Trace httpBodyOpen: boolean = false;
 
   private readonly repository: WifiNetworkRepository = WifiNetworkRepository.getInstance();
   private readonly debugCases: WifiDebugUseCases = new WifiDebugUseCases(this.repository);
@@ -192,6 +194,8 @@ export class WifiDebugViewModel {
   private wsServerSub: Subscription | undefined;
   private wsSeen: string[] = [];
   private multicastSessionId: string = '';
+  private probeToken: number = 0;
+  private probeRunning: boolean = false;
   private peersMacGranted: boolean = false;
   private cacheReadAtMs: number = 0;
   private backgroundBlocked: boolean = false;
@@ -510,7 +514,12 @@ export class WifiDebugViewModel {
     const result = await this.debugCases.connectCandidate(draft);
     if (!result.success) {
       const code = result.error !== undefined ? result.error.nativeCode : '';
-      this.connectMessage = result.error !== undefined ? result.error.message : '连接失败';
+      const raw = result.error !== undefined ? result.error.message : '连接失败';
+      let sentence = WifiFieldLabels.errorSentence(code, raw);
+      if (!this.useUserAction && (sentence.indexOf('用户已允许') >= 0 || sentence.indexOf('用户已拒绝') >= 0)) {
+        sentence = '连接失败';
+      }
+      this.connectMessage = sentence;
       this.connectCode = code;
       this.appendLog('connectCandidate', this.connectMessage, code);
       return;
@@ -666,11 +675,12 @@ export class WifiDebugViewModel {
       `首字节 ${record.firstByteMs} 毫秒`,
       `总完成 ${record.totalFinishMs} 毫秒`
     ];
+    this.httpBody = record.bodyText;
+    this.httpBodyOpen = false;
     this.httpLines = [
       `${method} ${url}`,
       `状态码 ${record.responseCode}`,
-      `耗时 ${record.latencyMs} 毫秒`,
-      record.bodyText
+      `耗时 ${record.latencyMs} 毫秒`
     ];
     this.appendLog('httpExchange', `${record.responseCode}`, '');
   }
@@ -763,6 +773,12 @@ export class WifiDebugViewModel {
     const published = await this.mdnsCase.publish(name, '_http._tcp', isNaN(port) ? 80 : port);
     this.lanError = published.success ? '' : (published.error !== undefined ? published.error.message : '发布失败');
     this.appendLog('mdnsPublish', published.success ? 'published' : this.lanError, '');
+  }
+
+  async removeLan(name: string): Promise<void> {
+    const removed = await this.mdnsCase.unpublish(name, '_http._tcp');
+    this.lanError = removed.success ? '' : (removed.error !== undefined ? removed.error.message : '移除失败');
+    this.appendLog('mdnsRemove', removed.success ? 'removed' : this.lanError, '');
   }
 
   openSettings(): void {
@@ -994,7 +1010,14 @@ export class WifiDebugViewModel {
   }
 
   async runProbe(): Promise<void> {
+    const token = this.probeToken + 1;
+    this.probeToken = token;
+    this.probeRunning = true;
     const result = await this.repository.queryProbe(this.hostInput);
+    if (token !== this.probeToken) {
+      return;
+    }
+    this.probeRunning = false;
     if (!result.success || result.value === undefined) {
       this.addressLines = [result.error !== undefined ? result.error.message : '探测失败'];
       this.appendLog('probe', this.addressLines[0], '');
@@ -1006,6 +1029,10 @@ export class WifiDebugViewModel {
       `RTT ${result.value.rttText}`
     ];
     this.appendLog('probe', result.value.methodLabel, '');
+  }
+
+  toggleHttpBody(): void {
+    this.httpBodyOpen = !this.httpBodyOpen;
   }
 
   async readTraffic(olderThan31Days: boolean): Promise<void> {
@@ -1459,7 +1486,20 @@ export class WifiDebugViewModel {
     return bytes;
   }
 
+  private endProbeOnNetLoss(): void {
+    if (!this.probeRunning) {
+      return;
+    }
+    this.probeToken = this.probeToken + 1;
+    this.probeRunning = false;
+    this.addressLines = ['探测失败'];
+    this.appendLog('probe', 'failed', '');
+  }
+
   private noteNetEvent(name: string, detail: string): void {
+    if (name === 'netLost' || name === 'netUnavailable') {
+      this.endProbeOnNetLoss();
+    }
     this.appendLog(name, detail, '');
     const next: string[] = [];
     for (let i = 0; i < this.netEventLines.length; i++) {

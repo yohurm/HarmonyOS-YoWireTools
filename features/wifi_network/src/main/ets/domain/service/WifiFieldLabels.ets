@@ -1,3 +1,5 @@
+import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
+
 export class WifiFieldLabels {
   static security(type: number): string {
     switch (type) {
@@ -139,6 +141,17 @@ export class WifiFieldLabels {
       return '随机地址';
     }
     return '真实地址';
+  }
+
+  static ipv4Text(value: number): string {
+    if (value === 0) {
+      return WifiNetworkConstants.NOT_OBTAINED;
+    }
+    const a = value & 0xff;
+    const b = (value >> 8) & 0xff;
+    const c = (value >> 16) & 0xff;
+    const d = (value >> 24) & 0xff;
+    return `${a}.${b}.${c}.${d}`;
   }
 
   static errorSentence(nativeCode: string, message: string): string {

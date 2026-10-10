@@ -587,14 +587,7 @@ export class WifiInfoDataSource {
   }
 
   private formatIpv4(value: number): string {
-    if (value === 0) {
-      return WifiNetworkConstants.NOT_OBTAINED;
-    }
-    const a = value & 0xff;
-    const b = (value >> 8) & 0xff;
-    const c = (value >> 16) & 0xff;
-    const d = (value >> 24) & 0xff;
-    return `${a}.${b}.${c}.${d}`;
+    return WifiFieldLabels.ipv4Text(value);
   }
 
   private presentText(value: string): string {
