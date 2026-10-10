@@ -9,11 +9,10 @@ import {
 } from 'debug_core';
 import { NearLinkManagerDataSource } from '../datasource/platform/NearLinkManagerDataSource';
 import { NearLinkScanDataSource, NearLinkDiscoveryPayload } from '../datasource/platform/NearLinkScanDataSource';
-import { SsapClientDataSource } from '../datasource/platform/SsapClientDataSource';
 import { DataTransferDataSource } from '../datasource/platform/DataTransferDataSource';
 import { NearLinkIdentityDataSource } from '../datasource/platform/NearLinkIdentityDataSource';
 import { NearLinkAdvertisingDataSource } from '../datasource/platform/NearLinkAdvertisingDataSource';
-import { SsapServerDataSource } from '../datasource/platform/SsapServerDataSource';
+import { SsapSessionDataSource } from '../datasource/platform/SsapSessionDataSource';
 import { RemoteDeviceDataSource } from '../datasource/platform/RemoteDeviceDataSource';
 import { NearLinkLogExportDataSource } from '../datasource/platform/NearLinkLogExportDataSource';
 import { NearLinkDeviceMapper } from '../mapper/NearLinkDeviceMapper';
@@ -29,8 +28,7 @@ import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 import { NearLinkAdvertisingPacket } from '../../domain/model/NearLinkAdvertisingPacket';
 import { NearLinkRecentConnection } from '../../domain/model/NearLinkRecentConnection';
 import { NearLinkRepositoryContract } from '../../domain/repository/NearLinkRepositoryContract';
-import { SsapClientState, SsapServiceTreeSnapshot } from '../../domain/model/SsapServiceTree';
-import { NearLinkConstants } from '../../constants/NearLinkConstants';
+import { SsapServiceTreeSnapshot } from '../../domain/model/SsapServiceTree';
 import {
   NearLinkPairingNotice,
   NearLinkRadioCode,
@@ -42,12 +40,9 @@ import { SsapServerWriteRecord } from '../../domain/model/SsapServerWriteRecord'
 import { NearLinkAdvParser } from '../../domain/service/NearLinkAdvParser';
 import { NearLinkScanPolicy } from '../../domain/service/NearLinkScanPolicy';
 import { NearLinkEventLogger } from '../../domain/service/NearLinkEventLogger';
-import { SsapPropertyChangeDispatcher } from '../service/SsapPropertyChangeDispatcher';
-import { SsapPlatformMapper } from '../mapper/SsapPlatformMapper';
 import { SsapPropertyNotifyPayload } from '../../domain/model/SsapPropertyNotifyPayload';
 import { DataTransferPacket } from '../../domain/model/DataTransferPortConfig';
 import { NearLinkDataTransferSession } from '../transport/NearLinkDataTransferSession';
-import { SsapTransportSession } from '../transport/SsapTransportSession';
 import { CongestionPolicy } from '../../domain/model/DataTransferPortConfig';
 
 export class NearLinkRepository implements NearLinkRepositoryContract {
@@ -56,24 +51,18 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   private readonly scanDataSource: NearLinkScanDataSource;
   private readonly identityDataSource: NearLinkIdentityDataSource;
   private readonly merger: ScanResultMerger = new ScanResultMerger();
-  private readonly ssapClients: Map<string, SsapClientDataSource> = new Map();
   private readonly dataTransferSources: Map<string, DataTransferDataSource> = new Map();
-  private readonly ssapDispatchers: Map<string, SsapPropertyChangeDispatcher> = new Map();
   private readonly advertisingMap: Map<string, NearLinkAdvertisingPacket> = new Map();
   private activeFilter: NearLinkScanFilter | undefined;
   private readonly devicesObservable: Observable<NearLinkDevice[]>;
-  private readonly ssapTreeObservable: Observable<SsapServiceTreeSnapshot>;
   private readonly dataTransferPacketObservable: Observable<DataTransferPacket>;
   private readonly dataTransferIncomingSubscriptions: Map<string, Subscription> = new Map();
   private scanPhase: NearLinkScanPhase = NearLinkScanPhase.IDLE;
   private scanStarting: boolean = false;
-  private readonly ssapClientAddress: Map<string, string> = new Map();
-  private readonly ssapByAddress: Map<string, SsapClientDataSource> = new Map();
   private readonly advertisingSource: NearLinkAdvertisingDataSource;
-  private readonly serverSource: SsapServerDataSource;
+  private readonly ssapSessions: SsapSessionDataSource;
   private readonly portSource: DataTransferDataSource;
   private readonly remoteSource: RemoteDeviceDataSource;
-  private readonly ssapTransports: Map<string, SsapTransportSession> = new Map();
   private readonly transferTransports: Map<string, NearLinkDataTransferSession> = new Map();
   private activeScanSessionId: string = '';
   private favoritesCache: DeviceFavoriteRecord[] = [];
@@ -87,13 +76,10 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     this.scanDataSource = scanDataSource;
     this.identityDataSource = identityDataSource;
     this.advertisingSource = new NearLinkAdvertisingDataSource();
-    this.serverSource = new SsapServerDataSource();
+    this.ssapSessions = new SsapSessionDataSource();
     this.portSource = new DataTransferDataSource();
     this.remoteSource = new RemoteDeviceDataSource();
     this.devicesObservable = new Observable<NearLinkDevice[]>([]);
-    this.ssapTreeObservable = new Observable<SsapServiceTreeSnapshot>(
-      new SsapServiceTreeSnapshot('', '', NearLinkConstants.DEFAULT_MTU, [], SsapClientState.IDLE)
-    );
     this.dataTransferPacketObservable = new Observable<DataTransferPacket>(
       new DataTransferPacket('in', '', TimeUtil.nowMs())
     );
@@ -115,11 +101,11 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   observeSsapTree(): Observable<SsapServiceTreeSnapshot> {
-    return this.ssapTreeObservable;
+    return this.ssapSessions.observeTree();
   }
 
   observeSsapPropertyNotify(sessionId: string): Observable<SsapPropertyNotifyPayload> {
-    return this.getOrCreateSsapDispatcher(sessionId).observeNotify();
+    return this.ssapSessions.observePropertyNotify(sessionId);
   }
 
   observeDataTransferPackets(): Observable<DataTransferPacket> {
@@ -217,7 +203,7 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   hasSsapClient(address: string): boolean {
-    return this.findSsapClient(address) !== undefined;
+    return this.ssapSessions.hasClient(address);
   }
 
   async startScan(sessionId: string, filter: NearLinkScanFilter): Promise<Result<void>> {
@@ -290,10 +276,6 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     return saved;
   }
 
-  getSsapClient(sessionId: string): SsapClientDataSource | undefined {
-    return this.ssapClients.get(sessionId);
-  }
-
   getOrCreateDataTransferSource(sessionId: string): DataTransferDataSource {
     let source = this.dataTransferSources.get(sessionId);
     if (source === undefined) {
@@ -315,137 +297,16 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     return new NearLinkDataTransferSession(sessionId, source, policy);
   }
 
-  createSsapTransport(sessionId: string): SsapTransportSession | undefined {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return undefined;
-    }
-    return new SsapTransportSession(sessionId, client);
-  }
-
-  getOrCreateSsapDispatcher(sessionId: string): SsapPropertyChangeDispatcher {
-    let dispatcher = this.ssapDispatchers.get(sessionId);
-    if (dispatcher === undefined) {
-      dispatcher = new SsapPropertyChangeDispatcher();
-      this.ssapDispatchers.set(sessionId, dispatcher);
-    }
-    return dispatcher;
-  }
-
-  getLatestSsapTree(): SsapServiceTreeSnapshot {
-    return this.ssapTreeObservable.snapshot;
-  }
-
-  getOrCreateSsapClient(sessionId: string, address: string): Result<SsapClientDataSource> {
-    const bound = this.findSsapClient(address);
-    if (bound !== undefined) {
-      this.ssapClients.set(sessionId, bound);
-      this.ssapClientAddress.set(sessionId, address);
-      this.ssapByAddress.set(address, bound);
-      return Result.ok(bound);
-    }
-    let client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      client = new SsapClientDataSource();
-      const created = client.createClient(address);
-      if (!created.success) {
-        return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.SSAP_CREATE_FAILED, 'create failed'));
-      }
-      this.ssapClients.set(sessionId, client);
-    }
-    this.ssapClientAddress.set(sessionId, address);
-    this.ssapByAddress.set(address, client);
-    return Result.ok(client);
-  }
-
-  private findSsapClient(address: string): SsapClientDataSource | undefined {
-    return this.ssapByAddress.get(address);
-  }
-
-  async discoverSsapServices(sessionId: string, address: string, mtu: number): Promise<Result<SsapServiceTreeSnapshot>> {
-    const clientResult = this.getOrCreateSsapClient(sessionId, address);
-    if (!clientResult.success || clientResult.value === undefined) {
-      return Result.fail(clientResult.error ?? new ResultError(NearLinkErrorCodes.SSAP_DISCOVER_FAILED, 'no client'));
-    }
-    const client = clientResult.value;
-    const servicesResult = await client.getServices();
-    if (!servicesResult.success || servicesResult.value === undefined) {
-      return Result.fail(servicesResult.error ?? new ResultError(NearLinkErrorCodes.SSAP_DISCOVER_FAILED, 'discover failed'));
-    }
-    const tree = SsapPlatformMapper.toServiceTree(
-      sessionId,
-      address,
-      servicesResult.value,
-      mtu,
-      SsapClientState.READY
-    );
-    this.ssapTreeObservable.next(tree);
-    return Result.ok(tree);
-  }
-
-  emitSsapTree(tree: SsapServiceTreeSnapshot): void {
-    this.ssapTreeObservable.next(tree);
+  discoverSsapServices(sessionId: string, address: string, mtu: number): Promise<Result<SsapServiceTreeSnapshot>> {
+    return this.ssapSessions.discover(sessionId, address, mtu);
   }
 
   wireSsapClientSession(sessionId: string, deviceId: string): Result<void> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP client not created'));
-    }
-    const dispatcher = this.getOrCreateSsapDispatcher(sessionId);
-    const connectionSubscribed = client.onConnectionStateChange((state) => {
-      void NearLinkEventLogger.logSsapState(sessionId, `connectionState=${state.state}`);
-      const mapped = SsapPlatformMapper.mapConnectionState(state.state);
-      const tree = new SsapServiceTreeSnapshot(
-        sessionId,
-        deviceId,
-        client.getMtu(),
-        this.getLatestSsapTree().services,
-        mapped
-      );
-      this.emitSsapTree(tree);
-    });
-    if (!connectionSubscribed.success) {
-      return connectionSubscribed;
-    }
-    const mtuSubscribed = client.onMtuChange((mtu: number) => {
-      void NearLinkEventLogger.logSsapMtu(sessionId, mtu);
-      const tree = new SsapServiceTreeSnapshot(
-        sessionId,
-        deviceId,
-        mtu,
-        this.getLatestSsapTree().services,
-        SsapClientState.CONNECTED
-      );
-      this.emitSsapTree(tree);
-    });
-    if (!mtuSubscribed.success) {
-      return mtuSubscribed;
-    }
-    const propertySubscribed = client.onPropertyChange((property) => {
-      const snapshot = SsapPlatformMapper.toPropertySnapshot(property);
-      if (snapshot === undefined) {
-        return;
-      }
-      dispatcher.handlePropertyChange(sessionId, snapshot, this.getLatestSsapTree());
-      this.emitSsapTree(this.getLatestSsapTree());
-    });
-    return propertySubscribed;
+    return this.ssapSessions.wire(sessionId, deviceId);
   }
 
   releaseSsapClient(sessionId: string): void {
-    const client = this.ssapClients.get(sessionId);
-    if (client !== undefined) {
-      client.release();
-      this.ssapClients.delete(sessionId);
-    }
-    const boundAddress = this.ssapClientAddress.get(sessionId);
-    if (boundAddress !== undefined) {
-      this.ssapByAddress.delete(boundAddress);
-    }
-    this.ssapClientAddress.delete(sessionId);
-    this.ssapDispatchers.delete(sessionId);
-    this.ssapTransports.delete(sessionId);
+    this.ssapSessions.release(sessionId);
   }
 
   releaseDataTransferSource(sessionId: string, uuid: string): void {
@@ -571,39 +432,23 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   }
 
   hasSsapSession(sessionId: string): boolean {
-    return this.ssapClients.has(sessionId);
+    return this.ssapSessions.hasSession(sessionId);
   }
 
   ensureSsapClient(sessionId: string, address: string): Result<void> {
-    const created = this.getOrCreateSsapClient(sessionId, address);
-    if (!created.success) {
-      return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.SSAP_CREATE_FAILED, 'create failed'));
-    }
-    return Result.ok(undefined);
+    return this.ssapSessions.ensureClient(sessionId, address);
   }
 
   connectSsapClient(sessionId: string): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'api=connect')));
-    }
-    return client.connect();
+    return this.ssapSessions.connect(sessionId);
   }
 
   disconnectSsapClient(sessionId: string): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.ok(undefined));
-    }
-    return client.disconnect();
+    return this.ssapSessions.disconnect(sessionId);
   }
 
   readSsapProperty(sessionId: string, serviceUuid: string, propertyUuid: string): Promise<Result<string>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected')));
-    }
-    return client.readProperty(serviceUuid, propertyUuid);
+    return this.ssapSessions.readProperty(sessionId, serviceUuid, propertyUuid);
   }
 
   writeSsapProperty(
@@ -612,11 +457,7 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     propertyUuid: string,
     data: ArrayBuffer
   ): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected')));
-    }
-    return client.writeProperty(serviceUuid, propertyUuid, data);
+    return this.ssapSessions.writeProperty(sessionId, serviceUuid, propertyUuid, data);
   }
 
   writeSsapByOperation(
@@ -627,11 +468,14 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     operation: number,
     withResponse: boolean
   ): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=writeProperty')));
-    }
-    return client.writeByOperation(serviceUuid, propertyUuid, data, operation, withResponse);
+    return this.ssapSessions.writeByOperation(
+      sessionId,
+      serviceUuid,
+      propertyUuid,
+      data,
+      operation,
+      withResponse
+    );
   }
 
   notifySsap(
@@ -642,11 +486,14 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     operation: number,
     hasClientConfig: boolean
   ): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=setPropertyNotification')));
-    }
-    return client.notifyByOperation(serviceUuid, propertyUuid, enable, operation, hasClientConfig);
+    return this.ssapSessions.notifyByOperation(
+      sessionId,
+      serviceUuid,
+      propertyUuid,
+      enable,
+      operation,
+      hasClientConfig
+    );
   }
 
   setSsapNotification(
@@ -655,76 +502,54 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     propertyUuid: string,
     enable: boolean
   ): Promise<Result<void>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected')));
-    }
-    return client.setPropertyNotification(serviceUuid, propertyUuid, enable);
+    return this.ssapSessions.setNotification(sessionId, serviceUuid, propertyUuid, enable);
   }
 
   requestSsapMtu(sessionId: string, mtu: number): Promise<Result<number>> {
-    const client = this.ssapClients.get(sessionId);
-    if (client === undefined) {
-      return Promise.resolve(Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'api=requestMtuSize')));
-    }
-    return client.requestMtuSize(mtu);
+    return this.ssapSessions.requestMtu(sessionId, mtu);
   }
 
   ssapMtu(sessionId: string): number {
-    const client = this.ssapClients.get(sessionId);
-    return client === undefined ? NearLinkConstants.DEFAULT_MTU : client.getMtu();
+    return this.ssapSessions.mtu(sessionId);
   }
 
-  async attachSsapTransport(sessionId: string): Promise<Result<void>> {
-    const transport = this.createSsapTransport(sessionId);
-    if (transport === undefined) {
-      return Result.ok(undefined);
-    }
-    const attachParams: Record<string, string | number | boolean> = {};
-    await transport.connect(attachParams);
-    this.ssapTransports.set(sessionId, transport);
-    TransportSessionRegistry.getInstance().register(sessionId, transport);
-    return Result.ok(undefined);
+  attachSsapTransport(sessionId: string): Promise<Result<void>> {
+    return this.ssapSessions.attachTransport(sessionId);
   }
 
   bindSsapEndpoints(sessionId: string, serviceUuid: string, propertyUuid: string): Result<void> {
-    const transport = this.ssapTransports.get(sessionId);
-    if (transport === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP transport not registered'));
-    }
-    return transport.bindEndpoints(serviceUuid, propertyUuid);
+    return this.ssapSessions.bindEndpoints(sessionId, serviceUuid, propertyUuid);
   }
 
   openServer(): Result<void> {
-    return this.serverSource.open();
+    return this.ssapSessions.openServer();
   }
 
   addServerService(serviceUuid: string, propertyUuid: string, operation: number): Result<void> {
-    return this.serverSource.addPlainService(serviceUuid, propertyUuid, operation);
+    return this.ssapSessions.addServerService(serviceUuid, propertyUuid, operation);
   }
 
   closeServer(): Result<void> {
-    return this.serverSource.close();
+    return this.ssapSessions.closeServer();
   }
 
   removeServerService(serviceUuid: string): Result<void> {
-    return this.serverSource.removeService(serviceUuid);
+    return this.ssapSessions.removeServerService(serviceUuid);
   }
 
   serverServices(): string[] {
-    return this.serverSource.listServices();
+    return this.ssapSessions.serverServices();
   }
 
   watchServer(
     onWrite: (record: SsapServerWriteRecord) => void,
     onRead: (requestId: number, address: string, propertyUuid: string) => void
   ): void {
-    this.serverSource.onWrite(onWrite);
-    this.serverSource.onRead(onRead);
+    this.ssapSessions.watchServer(onWrite, onRead);
   }
 
   respondServerRead(requestId: number, address: string, value: ArrayBuffer): Result<void> {
-    return this.serverSource.respondRead(requestId, address, value);
+    return this.ssapSessions.respondServerRead(requestId, address, value);
   }
 
   notifyServer(
@@ -734,7 +559,7 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     operation: number,
     value: ArrayBuffer
   ): Promise<Result<void>> {
-    return this.serverSource.notifyPlain(address, serviceUuid, propertyUuid, operation, value);
+    return this.ssapSessions.notifyServer(address, serviceUuid, propertyUuid, operation, value);
   }
 
   createPort(uuid: string): Result<void> {
