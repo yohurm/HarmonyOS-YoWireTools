@@ -14,41 +14,34 @@
 <rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
 <text x="16" y="64" fill="#1A1A1A" font-size="24" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">首页</text>
 <text x="344" y="62" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">专家模式</text>
-<text x="16" y="92" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">当前能力</text>
-<rect x="16" y="112" width="328" height="216" rx="16" fill="#FFFFFF"/>
-<rect x="32" y="132.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 139.0 V157.0 M48 139.0 L54 144.0 L48 148.0 L54 152.0 L48 157.0 M48 148.0 L43 144.0 M48 148.0 L43 152.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="142" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">蓝牙</text>
-<text x="76" y="162" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已开启</text>
-<text x="328" y="144" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">可用</text>
-<line x1="76" y1="184" x2="332" y2="184" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="204.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<circle cx="48" cy="226.0" r="1.5" fill="#0A59F7"/>
-<path d="M43 222.0 A6 6 0 0 1 53 222.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M39.5 218.0 A11 11 0 0 1 56.5 218.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M37 214.0 A15 15 0 0 1 59 214.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="214" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Wi-Fi</text>
-<text x="76" y="234" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">wlanaccessv2.0</text>
-<text x="328" y="216" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">-42 dBm</text>
-<line x1="76" y1="256" x2="332" y2="256" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="276.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 282.0 L50 290.0 L58 292.0 L50 294.0 L48 302.0 L46 294.0 L38 292.0 L46 290.0 Z" fill="#0A59F7"/>
-<text x="76" y="286" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪</text>
-<text x="76" y="306" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">真机支持</text>
-<text x="328" y="288" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">可用</text>
-<text x="16" y="348" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">最近会话</text>
-<rect x="16" y="368" width="328" height="144" rx="16" fill="#FFFFFF"/>
-<rect x="32" y="388.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 395.0 V413.0 M48 395.0 L54 400.0 L48 404.0 L54 408.0 L48 413.0 M48 404.0 L43 400.0 M48 404.0 L43 408.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="398" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A</text>
-<text x="76" y="418" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">经典蓝牙 · SPP · 今天 08:12</text>
-<text x="328" y="400" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">继续</text>
-<line x1="76" y1="440" x2="332" y2="440" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="460.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 466.0 L50 474.0 L58 476.0 L50 478.0 L48 486.0 L46 478.0 L38 476.0 L46 474.0 Z" fill="#0A59F7"/>
-<text x="76" y="470" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">NL-Sensor</text>
-<text x="76" y="490" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪 dataTransfer · 昨天</text>
-<text x="328" y="472" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">继续</text>
+<rect x="16" y="84" width="168" height="36" rx="18" fill="#FFFFFF"/>
+<text x="32" y="108" fill="#1A1A1A" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">默认打开: 全部</text>
+<path d="M158 96 L164 102 L158 108" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16" y="136" width="328" height="80" rx="16" fill="#FFFFFF"/>
+<rect x="32" y="156" width="40" height="40" rx="20" fill="#E7EFFE"/>
+<path d="M52 167 V185 M52 167 L58 172 L52 176 L58 180 L52 185 M52 176 L47 172 M52 176 L47 180" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="84" y="170" fill="#1A1A1A" font-size="16" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A</text>
+<text x="84" y="192" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已配对 · SPP · 今天 08:12</text>
+<rect x="16" y="228" width="328" height="72" rx="16" fill="#FFFFFF"/>
+<text x="32" y="258" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">开始调试</text>
+<text x="32" y="280" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">选择 Wi-Fi、蓝牙或星闪</text>
+<circle cx="300" cy="264" r="14" fill="#E7EFFE"/>
+<text x="300" y="270" fill="#0A59F7" font-size="18" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">+</text>
+<rect x="16.0" y="316" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="48.66666666666666" y="332" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<circle cx="66.66666666666666" cy="356" r="1.5" fill="#0A59F7"/>
+<path d="M61.66666666666666 352 A6 6 0 0 1 71.66666666666666 352" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M58.16666666666666 348 A11 11 0 0 1 75.16666666666666 348" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M55.66666666666666 344 A15 15 0 0 1 77.66666666666666 344" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="66.66666666666666" y="392" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">Wi-Fi</text>
+<rect x="129.33333333333331" y="316" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="161.99999999999997" y="332" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M179.99999999999997 341 V359 M179.99999999999997 341 L185.99999999999997 346 L179.99999999999997 350 L185.99999999999997 354 L179.99999999999997 359 M179.99999999999997 350 L174.99999999999997 346 M179.99999999999997 350 L174.99999999999997 354" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="179.99999999999997" y="392" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">蓝牙</text>
+<rect x="242.66666666666666" y="316" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="275.3333333333333" y="332" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M293.3333333333333 340 L295.3333333333333 348 L303.3333333333333 350 L295.3333333333333 352 L293.3333333333333 360 L291.3333333333333 352 L283.3333333333333 350 L291.3333333333333 348 Z" fill="#0A59F7"/>
+<text x="293.3333333333333" y="392" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
 <rect x="0" y="736" width="360" height="64" rx="0" fill="#F1F3F5"/>
 <line x1="0" y1="736" x2="360" y2="736" stroke="#E6E8EC" stroke-width="1"/>
 <path d="M36.0 755 L45.0 748 L54.0 755 V764 H47.0 V758 H43.0 V764 H36.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>

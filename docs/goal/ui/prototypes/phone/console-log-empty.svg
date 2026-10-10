@@ -18,15 +18,22 @@
 <text x="180.0" y="102" fill="#666666" font-size="15" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络</text>
 <text x="289.3333333333333" y="102" fill="#666666" font-size="15" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">命令</text>
 <line x1="16" y1="120" x2="344" y2="120" stroke="#E5E6EB" stroke-width="1"/>
-<circle cx="180.0" cy="278" r="28" fill="#E7EFFE"/>
-<circle cx="180.0" cy="278" r="28" fill="none" stroke="#0A59F7" stroke-width="1.5" opacity="0.35"/>
-<path d="M172.0 272 H188.0 V284 H172.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M175.0 277 L178.0 280 L175.0 283" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="180.0" y1="283" x2="185.0" y2="283" stroke="#0A59F7" stroke-width="1.6"/>
-<text x="180.0" y="334" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">还没有会话日志</text>
-<text x="180.0" y="362" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">开始一次扫描或连接后会出现在这里</text>
-<rect x="48" y="390" width="264" height="40" rx="20" fill="#0A59F7"/>
-<text x="180.0" y="416" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">去调试</text>
+<rect x="16" y="128" width="70" height="32" rx="16" fill="#E8EAEE"/>
+<text x="51.0" y="149" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">加载中</text>
+<rect x="94" y="128" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#0A59F7" stroke-width="1.2"/>
+<text x="136.0" y="149" fill="#0A59F7" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">没有日志</text>
+<rect x="186" y="128" width="84" height="32" rx="16" fill="#E8EAEE"/>
+<text x="228.0" y="149" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">写不进去</text>
+<circle cx="180.0" cy="224" r="26" fill="#E6EAF0"/>
+<ellipse cx="180.0" cy="224" rx="42" ry="14" fill="none" stroke="#0A59F7" stroke-width="1.6" opacity="0.55" transform="rotate(-20 180.0 224)"/>
+<path d="M172.0 218 H188.0 V230 H172.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175.0 223 L178.0 226 L175.0 229" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="180.0" y1="229" x2="185.0" y2="229" stroke="#0A59F7" stroke-width="1.6"/>
+<text x="180.0" y="286" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">还没有会话日志</text>
+<text x="180.0" y="310" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">开始一次扫描或连接后会出现在这里</text>
+<text x="180.0" y="336" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">查看帮助</text>
+<rect x="40" y="668" width="280" height="44" rx="22" fill="#FFFFFF"/>
+<text x="180.0" y="696" fill="#0A59F7" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">去调试</text>
 <rect x="0" y="736" width="360" height="64" rx="0" fill="#F1F3F5"/>
 <line x1="0" y1="736" x2="360" y2="736" stroke="#E6E8EC" stroke-width="1"/>
 <path d="M36.0 755 L45.0 748 L54.0 755 V764 H47.0 V758 H43.0 V764 H36.0 Z" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>

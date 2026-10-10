@@ -14,43 +14,25 @@
 <rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
 <path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">BLE 扫描</text>
-<text x="344" y="64" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">扫描</text>
 <line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="16" y="100" width="44" height="28" rx="14" fill="#FFFFFF"/>
-<text x="38.0" y="119" fill="#666666" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">全部</text>
-<rect x="68" y="100" width="58" height="28" rx="14" fill="#E7EFFE"/>
-<text x="97.0" y="119" fill="#0A59F7" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">可连接</text>
-<rect x="134" y="100" width="58" height="28" rx="14" fill="#FFFFFF"/>
-<text x="163.0" y="119" fill="#666666" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">有名称</text>
-<text x="16" y="144" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">设备</text>
-<rect x="16" y="164" width="328" height="216" rx="16" fill="#FFFFFF"/>
-<rect x="32" y="184.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 191.0 V209.0 M48 191.0 L54 196.0 L48 200.0 L54 204.0 L48 209.0 M48 200.0 L43 196.0 M48 200.0 L43 204.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="194" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01</text>
-<text x="76" y="214" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">可连接 · -48 dBm · 随机地址</text>
-<rect x="266" y="204.0" width="3" height="4" rx="1" fill="#0A59F7"/>
-<rect x="271" y="201.0" width="3" height="7" rx="1" fill="#0A59F7"/>
-<rect x="276" y="198.0" width="3" height="10" rx="1" fill="#0A59F7"/>
-<rect x="281" y="195.0" width="3" height="13" rx="1" fill="#0A59F7"/>
-<path d="M322 194.0 L328 200.0 L322 206.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="76" y1="236" x2="332" y2="236" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="256.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 263.0 V281.0 M48 263.0 L54 268.0 L48 272.0 L54 276.0 L48 281.0 M48 272.0 L43 268.0 M48 272.0 L43 276.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="266" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Sensor-BLE</text>
-<text x="76" y="286" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">可连接 · -63 dBm</text>
-<rect x="266" y="276.0" width="3" height="4" rx="1" fill="#0A59F7"/>
-<rect x="271" y="273.0" width="3" height="7" rx="1" fill="#0A59F7"/>
-<rect x="276" y="270.0" width="3" height="10" rx="1" fill="#0A59F7"/>
-<rect x="281" y="267.0" width="3" height="13" rx="1" fill="#D5D8DE"/>
-<path d="M322 266.0 L328 272.0 L322 278.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="76" y1="308" x2="332" y2="308" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="328.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 335.0 V353.0 M48 335.0 L54 340.0 L48 344.0 L54 348.0 L48 353.0 M48 344.0 L43 340.0 M48 344.0 L43 348.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="338" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">未知设备</text>
-<text x="76" y="358" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">不可连接 · 仅广播</text>
-<rect x="266" y="348.0" width="3" height="4" rx="1" fill="#0A59F7"/>
-<rect x="271" y="345.0" width="3" height="7" rx="1" fill="#D5D8DE"/>
-<rect x="276" y="342.0" width="3" height="10" rx="1" fill="#D5D8DE"/>
-<rect x="281" y="339.0" width="3" height="13" rx="1" fill="#D5D8DE"/>
-<path d="M322 338.0 L328 344.0 L322 350.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16" y="100" width="56" height="32" rx="16" fill="#E8EAEE"/>
+<text x="44.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">全部</text>
+<rect x="80" y="100" width="70" height="32" rx="16" fill="#FFFFFF" stroke="#0A59F7" stroke-width="1.2"/>
+<text x="115.0" y="121" fill="#0A59F7" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">可连接</text>
+<rect x="158" y="100" width="70" height="32" rx="16" fill="#E8EAEE"/>
+<text x="193.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">有名称</text>
+<text x="16" y="144" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">搜索成功</text>
+<text x="16" y="168" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已搜索到周边设备</text>
+<rect x="16" y="184" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="216" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01</text>
+<text x="32" y="238" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">4C:27:EF:F2:E7:44 · -48 dBm</text>
+<rect x="252" y="206" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="227" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="16" y="272" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="304" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Sensor-BLE</text>
+<text x="32" y="326" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">6F:6F:E9:1A:A2:40 · -63 dBm</text>
+<rect x="252" y="294" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="315" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="100" y="708" width="160" height="40" rx="20" fill="#0A59F7"/>
+<text x="180.0" y="734" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">搜索设备</text>
 </svg>

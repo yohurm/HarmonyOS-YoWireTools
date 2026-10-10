@@ -13,38 +13,60 @@
 <rect x="343" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
 <rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
 <text x="16" y="64" fill="#1A1A1A" font-size="24" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">调试</text>
-<text x="16" y="90" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">三种无线能力走同一条导航栈</text>
-<text x="16" y="112" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">模块</text>
-<rect x="16" y="132" width="328" height="216" rx="16" fill="#FFFFFF"/>
-<rect x="32" y="152.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<circle cx="48" cy="174.0" r="1.5" fill="#0A59F7"/>
-<path d="M43 170.0 A6 6 0 0 1 53 170.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M39.5 166.0 A11 11 0 0 1 56.5 166.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M37 162.0 A15 15 0 0 1 59 162.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="162" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Wi-Fi</text>
-<text x="76" y="182" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">环境、诊断、协议、局域网</text>
-<path d="M322 162.0 L328 168.0 L322 174.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="76" y1="204" x2="332" y2="204" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="224.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 231.0 V249.0 M48 231.0 L54 236.0 L48 240.0 L54 244.0 L48 249.0 M48 240.0 L43 236.0 M48 240.0 L43 244.0" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="76" y="234" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">蓝牙</text>
-<text x="76" y="254" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">经典 SPP 与 BLE GATT</text>
-<path d="M322 234.0 L328 240.0 L322 246.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="76" y1="276" x2="332" y2="276" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="296.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 302.0 L50 310.0 L58 312.0 L50 314.0 L48 322.0 L46 314.0 L38 312.0 L46 310.0 Z" fill="#0A59F7"/>
-<text x="76" y="306" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪</text>
-<text x="76" y="326" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">扫描、SSAP、dataTransfer</text>
-<path d="M322 306.0 L328 312.0 L322 318.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="16" y="368" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">最近目标</text>
-<rect x="16" y="388" width="328" height="144" rx="16" fill="#FFFFFF"/>
-<text x="32" y="418" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">192.168.1.8:8080</text>
-<text x="32" y="438" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">TCP · 今天 07:40</text>
-<path d="M322 418.0 L328 424.0 L322 430.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="32" y1="460" x2="332" y2="460" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="490" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01</text>
-<text x="32" y="510" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">BLE · Nordic UART</text>
-<path d="M322 490.0 L328 496.0 L322 502.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16" y="84" width="168" height="36" rx="18" fill="#FFFFFF"/>
+<text x="32" y="108" fill="#1A1A1A" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">默认打开: 全部</text>
+<path d="M158 96 L164 102 L158 108" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="136" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="48.66666666666666" y="152" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<circle cx="66.66666666666666" cy="176" r="1.5" fill="#0A59F7"/>
+<path d="M61.66666666666666 172 A6 6 0 0 1 71.66666666666666 172" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M58.16666666666666 168 A11 11 0 0 1 75.16666666666666 168" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M55.66666666666666 164 A15 15 0 0 1 77.66666666666666 164" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="66.66666666666666" y="212" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">环境分析</text>
+<rect x="129.33333333333331" y="136" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="161.99999999999997" y="152" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<circle cx="179.99999999999997" cy="176" r="1.5" fill="#0A59F7"/>
+<path d="M174.99999999999997 172 A6 6 0 0 1 184.99999999999997 172" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M171.49999999999997 168 A11 11 0 0 1 188.49999999999997 168" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M168.99999999999997 164 A15 15 0 0 1 190.99999999999997 164" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="179.99999999999997" y="212" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络诊断</text>
+<rect x="242.66666666666666" y="136" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="275.3333333333333" y="152" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<circle cx="293.3333333333333" cy="171" r="1.7" fill="#0A59F7"/>
+<path d="M288.3333333333333 167 A6 6 0 0 1 298.3333333333333 167" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M285.3333333333333 164 A10 10 0 0 1 301.3333333333333 164" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M288.3333333333333 175 A6 6 0 0 0 298.3333333333333 175" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="293.3333333333333" y="212" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">协议调试</text>
+<rect x="16.0" y="248" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="48.66666666666666" y="264" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M66.66666666666666 273 V291 M66.66666666666666 273 L72.66666666666666 278 L66.66666666666666 282 L72.66666666666666 286 L66.66666666666666 291 M66.66666666666666 282 L61.66666666666666 278 M66.66666666666666 282 L61.66666666666666 286" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="66.66666666666666" y="324" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">经典蓝牙</text>
+<rect x="129.33333333333331" y="248" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="161.99999999999997" y="264" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M179.99999999999997 273 V291 M179.99999999999997 273 L185.99999999999997 278 L179.99999999999997 282 L185.99999999999997 286 L179.99999999999997 291 M179.99999999999997 282 L174.99999999999997 278 M179.99999999999997 282 L174.99999999999997 286" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="179.99999999999997" y="324" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">BLE</text>
+<rect x="242.66666666666666" y="248" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="275.3333333333333" y="264" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M293.3333333333333 272 L295.3333333333333 280 L303.3333333333333 282 L295.3333333333333 284 L293.3333333333333 292 L291.3333333333333 284 L283.3333333333333 282 L291.3333333333333 280 Z" fill="#0A59F7"/>
+<text x="293.3333333333333" y="324" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
+<rect x="16.0" y="360" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="48.66666666666666" y="376" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M58.66666666666666 388 H74.66666666666666 V400 H58.66666666666666 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M61.66666666666666 393 L64.66666666666666 396 L61.66666666666666 399" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="66.66666666666666" y1="399" x2="71.66666666666666" y2="399" stroke="#0A59F7" stroke-width="1.6"/>
+<text x="66.66666666666666" y="436" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">日志</text>
+<rect x="129.33333333333331" y="360" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="161.99999999999997" y="376" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<path d="M171.99999999999997 388 H187.99999999999997 V400 H171.99999999999997 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M174.99999999999997 393 L177.99999999999997 396 L174.99999999999997 399" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="179.99999999999997" y1="399" x2="184.99999999999997" y2="399" stroke="#0A59F7" stroke-width="1.6"/>
+<text x="179.99999999999997" y="436" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">命令</text>
+<rect x="242.66666666666666" y="360" width="101.33333333333333" height="100" rx="16" fill="#FFFFFF"/>
+<rect x="275.3333333333333" y="376" width="36" height="36" rx="12" fill="#E7EFFE"/>
+<circle cx="293.3333333333333" cy="394" r="3" fill="none"/>
+<circle cx="293.3333333333333" cy="394" r="3" fill="none" stroke="#0A59F7" stroke-width="1.6"/>
+<path d="M293.3333333333333 385 V388 M293.3333333333333 400 V403 M284.3333333333333 394 H287.3333333333333 M299.3333333333333 394 H302.3333333333333 M286.5333333333333 387.2 L288.6333333333333 389.3 M298.0333333333333 398.7 L300.1333333333333 400.8 M300.1333333333333 387.2 L298.0333333333333 389.3 M288.6333333333333 398.7 L286.5333333333333 400.8" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="293.3333333333333" y="436" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">设置</text>
 <rect x="0" y="736" width="360" height="64" rx="0" fill="#F1F3F5"/>
 <line x1="0" y1="736" x2="360" y2="736" stroke="#E6E8EC" stroke-width="1"/>
 <path d="M36.0 755 L45.0 748 L54.0 755 V764 H47.0 V758 H43.0 V764 H36.0 Z" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>

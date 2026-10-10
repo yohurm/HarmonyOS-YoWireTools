@@ -18,13 +18,14 @@
 <line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
 <rect x="16" y="100" width="328" height="32" rx="10" fill="#FFFFFF"/>
 <text x="28" y="121" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">SPP · 已连接</text>
-<circle cx="180.0" cy="198" r="28" fill="#E7EFFE"/>
-<circle cx="180.0" cy="198" r="28" fill="none" stroke="#0A59F7" stroke-width="1.5" opacity="0.35"/>
-<path d="M172.0 192 H188.0 V204 H172.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M175.0 197 L178.0 200 L175.0 203" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="180.0" y1="203" x2="185.0" y2="203" stroke="#0A59F7" stroke-width="1.6"/>
-<text x="180.0" y="254" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">还没有收发</text>
-<text x="180.0" y="282" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">发送一条指令，或从命令面板取回</text>
-<rect x="48" y="310" width="264" height="40" rx="20" fill="#0A59F7"/>
-<text x="180.0" y="336" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">打开命令</text>
+<circle cx="180.0" cy="206" r="26" fill="#E6EAF0"/>
+<ellipse cx="180.0" cy="206" rx="42" ry="14" fill="none" stroke="#0A59F7" stroke-width="1.6" opacity="0.55" transform="rotate(-20 180.0 206)"/>
+<path d="M172.0 200 H188.0 V212 H172.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175.0 205 L178.0 208 L175.0 211" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="180.0" y1="211" x2="185.0" y2="211" stroke="#0A59F7" stroke-width="1.6"/>
+<text x="180.0" y="268" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">还没有收发</text>
+<text x="180.0" y="292" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">发送一条指令，或从命令面板取回</text>
+<text x="180.0" y="318" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">查看帮助</text>
+<rect x="40" y="668" width="280" height="44" rx="22" fill="#FFFFFF"/>
+<text x="180.0" y="696" fill="#0A59F7" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">打开命令</text>
 </svg>

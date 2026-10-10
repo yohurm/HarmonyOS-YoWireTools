@@ -15,25 +15,28 @@
 <path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络诊断</text>
 <line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="16" y="100" width="328" height="288" rx="16" fill="#FFFFFF"/>
-<text x="32" y="130" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网络类型</text>
-<text x="328" y="130" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">WLAN</text>
-<line x1="32" y1="148" x2="328" y2="148" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="178" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">IP 地址</text>
-<text x="328" y="178" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.23</text>
-<line x1="32" y1="196" x2="328" y2="196" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="226" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网关</text>
-<text x="328" y="226" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
-<line x1="32" y1="244" x2="328" y2="244" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="274" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">DNS</text>
-<text x="328" y="274" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
-<line x1="32" y1="292" x2="328" y2="292" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="322" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">代理</text>
-<text x="328" y="322" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">无</text>
-<line x1="32" y1="340" x2="328" y2="340" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="370" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">信号</text>
-<text x="328" y="370" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">-42 dBm</text>
-<text x="16" y="416" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">检测约 10 秒，只访问当前网络</text>
-<rect x="16" y="436" width="328" height="40" rx="20" fill="#0A59F7"/>
-<text x="180.0" y="462" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">开始检测</text>
+<path d="M 99.2 180.6 A 86 86 0 1 1 260.8 180.6" fill="none" stroke="#E3E6EC" stroke-width="12" stroke-linecap="round"/>
+<path d="M 99.2 180.6 A 86 86 0 0 1 137.0 284.5" fill="none" stroke="#0A59F7" stroke-width="12" stroke-linecap="round"/>
+<line x1="180" y1="218" x2="137.00000000000003" y2="284.47818472546174" stroke="#0A59F7" stroke-width="3"/>
+<circle cx="180" cy="218" r="6" fill="#0A59F7"/>
+<text x="180" y="246" fill="#1A1A1A" font-size="32" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">18.6</text>
+<text x="180" y="268" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">Mbps</text>
+<text x="180" y="300" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">WLAN · 192.168.1.23</text>
+<text x="60" y="348" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">12</text>
+<text x="60" y="370" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">时延 ms</text>
+<text x="180" y="348" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">18.6</text>
+<text x="180" y="370" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">下载 Mbps</text>
+<text x="300" y="348" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">4.2</text>
+<text x="300" y="370" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">上传 Mbps</text>
+<rect x="16" y="396" width="328" height="144" rx="16" fill="#FFFFFF"/>
+<text x="32" y="426" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网关</text>
+<text x="328" y="426" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
+<line x1="32" y1="444" x2="328" y2="444" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="474" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">DNS</text>
+<text x="328" y="474" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">192.168.1.1</text>
+<line x1="32" y1="492" x2="328" y2="492" stroke="#E5E6EB" stroke-width="1"/>
+<text x="32" y="522" fill="#1A1A1A" font-size="15" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">信号</text>
+<text x="328" y="522" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">-42 dBm</text>
+<rect x="40" y="568" width="280" height="44" rx="22" fill="#FFFFFF"/>
+<text x="180.0" y="596" fill="#0A59F7" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">重新检测</text>
 </svg>

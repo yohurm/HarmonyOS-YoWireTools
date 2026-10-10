@@ -15,37 +15,18 @@
 <path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪扫描</text>
 <line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
-<text x="16" y="108" fill="#1A1A1A" font-size="28" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">搜索成功</text>
-<text x="16" y="140" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已搜索到周边设备</text>
-<rect x="158" y="184" width="44" height="92" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.6"/>
-<rect x="172" y="194" width="16" height="3" rx="1" fill="#E5E6EB"/>
-<rect x="170" y="264" width="20" height="3" rx="1" fill="#E5E6EB"/>
-<path d="M 204 214.7 Q 227.8 230 204 245.3" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
-<path d="M 156 214.7 Q 132.2 230 156 245.3" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
-<path d="M 204 206.6 Q 240.4 230 204 253.4" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-<path d="M 156 206.6 Q 119.6 230 156 253.4" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-<path d="M 204 198.5 Q 253.0 230 204 261.5" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.25000000000000006"/>
-<path d="M 156 198.5 Q 107.0 230 156 261.5" fill="none" stroke="#0A59F7" stroke-width="3" stroke-linecap="round" opacity="0.25000000000000006"/>
-<text x="180.0" y="336" fill="#0A59F7" font-size="15" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">重新搜索</text>
-<text x="16" y="360" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已搜索到设备</text>
-<rect x="16" y="380" width="328" height="144" rx="16" fill="#FFFFFF"/>
-<rect x="32" y="400.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 406.0 L50 414.0 L58 416.0 L50 418.0 L48 426.0 L46 418.0 L38 416.0 L46 414.0 Z" fill="#0A59F7"/>
-<text x="76" y="410" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">NL-Sensor</text>
-<text x="76" y="430" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">地址 0A:11:22:33:44:55</text>
-<rect x="266" y="420.0" width="3" height="4" rx="1" fill="#0A59F7"/>
-<rect x="271" y="417.0" width="3" height="7" rx="1" fill="#0A59F7"/>
-<rect x="276" y="414.0" width="3" height="10" rx="1" fill="#0A59F7"/>
-<rect x="281" y="411.0" width="3" height="13" rx="1" fill="#D5D8DE"/>
-<path d="M322 410.0 L328 416.0 L322 422.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="76" y1="452" x2="332" y2="452" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="32" y="472.0" width="32" height="32" rx="10" fill="#E7EFFE"/>
-<path d="M48 478.0 L50 486.0 L58 488.0 L50 490.0 L48 498.0 L46 490.0 L38 488.0 L46 486.0 Z" fill="#0A59F7"/>
-<text x="76" y="482" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪工装</text>
-<text x="76" y="502" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">地址 0A:66:77:88:99:AA</text>
-<rect x="266" y="492.0" width="3" height="4" rx="1" fill="#0A59F7"/>
-<rect x="271" y="489.0" width="3" height="7" rx="1" fill="#0A59F7"/>
-<rect x="276" y="486.0" width="3" height="10" rx="1" fill="#D5D8DE"/>
-<rect x="281" y="483.0" width="3" height="13" rx="1" fill="#D5D8DE"/>
-<path d="M322 482.0 L328 488.0 L322 494.0" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="16" y="104" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">搜索成功</text>
+<text x="16" y="128" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已搜索到周边设备</text>
+<rect x="16" y="144" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="176" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">NL-Sensor</text>
+<text x="32" y="198" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">0A:11:22:33:44:55</text>
+<rect x="252" y="166" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="187" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="16" y="232" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="264" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪工装</text>
+<text x="32" y="286" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">0A:66:77:88:99:AA</text>
+<rect x="252" y="254" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="275" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="100" y="708" width="160" height="40" rx="20" fill="#0A59F7"/>
+<text x="180.0" y="734" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">搜索设备</text>
 </svg>

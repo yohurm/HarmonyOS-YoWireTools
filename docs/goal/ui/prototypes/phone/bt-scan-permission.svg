@@ -15,11 +15,18 @@
 <path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">经典蓝牙</text>
 <line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
-<circle cx="180.0" cy="268" r="28" fill="#E7EFFE"/>
-<circle cx="180.0" cy="268" r="28" fill="none" stroke="#0A59F7" stroke-width="1.5" opacity="0.35"/>
-<path d="M180.0 259 V277 M180.0 259 L186.0 264 L180.0 268 L186.0 272 L180.0 277 M180.0 268 L175.0 264 M180.0 268 L175.0 272" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="180.0" y="324" fill="#1A1A1A" font-size="18" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">缺少蓝牙权限</text>
-<text x="180.0" y="352" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">发现经典设备需要蓝牙权限</text>
-<rect x="48" y="380" width="264" height="40" rx="20" fill="#0A59F7"/>
-<text x="180.0" y="406" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">去授权</text>
+<rect x="16" y="100" width="70" height="32" rx="16" fill="#E8EAEE"/>
+<text x="51.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">搜索中</text>
+<rect x="94" y="100" width="70" height="32" rx="16" fill="#FFFFFF" stroke="#0A59F7" stroke-width="1.2"/>
+<text x="129.0" y="121" fill="#0A59F7" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">未发现</text>
+<rect x="172" y="100" width="70" height="32" rx="16" fill="#E8EAEE"/>
+<text x="207.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">未开启</text>
+<circle cx="180.0" cy="196" r="26" fill="#E6EAF0"/>
+<ellipse cx="180.0" cy="196" rx="42" ry="14" fill="none" stroke="#0A59F7" stroke-width="1.6" opacity="0.55" transform="rotate(-20 180.0 196)"/>
+<path d="M180.0 187 V205 M180.0 187 L186.0 192 L180.0 196 L186.0 200 L180.0 205 M180.0 196 L175.0 192 M180.0 196 L175.0 200" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="258" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">缺少蓝牙权限</text>
+<text x="180.0" y="282" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">发现经典设备需要蓝牙权限</text>
+<text x="180.0" y="308" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">查看帮助</text>
+<rect x="40" y="668" width="280" height="44" rx="22" fill="#FFFFFF"/>
+<text x="180.0" y="696" fill="#0A59F7" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">去授权</text>
 </svg>

@@ -18,22 +18,26 @@
 <text x="289.3333333333333" y="102" fill="#0A59F7" font-size="15" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">命令</text>
 <rect x="271.3333333333333" y="110" width="36" height="3" rx="1.5" fill="#0A59F7"/>
 <line x1="16" y1="120" x2="344" y2="120" stroke="#E5E6EB" stroke-width="1"/>
-<rect x="16" y="140" width="328" height="40" rx="20" fill="#FFFFFF"/>
-<circle cx="38" cy="160" r="5" fill="none" stroke="#666666" stroke-width="1.6"/>
-<line x1="42" y1="164" x2="46" y2="168" stroke="#666666" stroke-width="1.6"/>
-<text x="56" y="166" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">搜索命令</text>
-<rect x="16" y="192" width="328" height="216" rx="16" fill="#FFFFFF"/>
-<text x="32" y="222" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">连接上次 SPP</text>
-<text x="32" y="242" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A · 适合轻量模式</text>
-<text x="328" y="224" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
-<line x1="32" y1="264" x2="332" y2="264" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="294" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Ping 网关</text>
-<text x="32" y="314" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">当前 WLAN</text>
-<text x="328" y="296" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
-<line x1="32" y1="336" x2="332" y2="336" stroke="#E5E6EB" stroke-width="1"/>
-<text x="32" y="366" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">读取 GATT 名称</text>
-<text x="32" y="386" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01 · Device Name</text>
-<text x="328" y="368" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
+<rect x="16" y="136" width="84" height="32" rx="16" fill="#0A59F7"/>
+<text x="58.0" y="157" fill="#FFFFFF" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">收藏命令</text>
+<text x="116" y="157" fill="#666666" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">最近</text>
+<circle cx="152" cy="146" r="4" fill="#E84026"/>
+<text x="164" y="157" fill="#666666" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">全部</text>
+<rect x="16" y="180" width="328" height="108" rx="16" fill="#FFFFFF"/>
+<text x="32" y="208" fill="#1A1A1A" font-size="16" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">连接上次 SPP</text>
+<text x="312" y="208" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
+<text x="32" y="232" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A · 经典蓝牙</text>
+<text x="32" y="258" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">适合轻量模式，一键恢复上次串口</text>
+<rect x="16" y="300" width="328" height="108" rx="16" fill="#FFFFFF"/>
+<text x="32" y="328" fill="#1A1A1A" font-size="16" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Ping 网关</text>
+<text x="312" y="328" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
+<text x="32" y="352" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">当前 WLAN · 192.168.1.1</text>
+<text x="32" y="378" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">诊断会话里重复发送</text>
+<rect x="16" y="420" width="328" height="108" rx="16" fill="#FFFFFF"/>
+<text x="32" y="448" fill="#1A1A1A" font-size="16" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">读取 GATT 名称</text>
+<text x="312" y="448" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">执行</text>
+<text x="32" y="472" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01 · Device Name</text>
+<text x="32" y="498" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">只读，不写特征值</text>
 <rect x="0" y="736" width="360" height="64" rx="0" fill="#F1F3F5"/>
 <line x1="0" y1="736" x2="360" y2="736" stroke="#E6E8EC" stroke-width="1"/>
 <path d="M36.0 755 L45.0 748 L54.0 755 V764 H47.0 V758 H43.0 V764 H36.0 Z" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
