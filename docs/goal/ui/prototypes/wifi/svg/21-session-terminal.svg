@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<rect x="0" y="0" width="360" height="40" rx="0" fill="#FFFFFF"/>
+<text x="16" y="20" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">9:41</text>
+<rect x="320" y="14" width="18" height="11" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="323" y="17" width="10" height="5" rx="1" fill="#1A1A1A"/>
+<rect x="339" y="17" width="1.6" height="5" rx="0.6" fill="#1A1A1A"/>
+<rect x="298" y="20" width="3" height="4" rx="0.6" fill="#1A1A1A"/>
+<rect x="303" y="17" width="3" height="7" rx="0.6" fill="#1A1A1A"/>
+<rect x="308" y="14" width="3" height="10" rx="0.6" fill="#1A1A1A"/>
+<rect x="0" y="40" width="360" height="56" rx="0" fill="#FFFFFF"/>
+<path d="M26 62 L18 68 L26 74" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke="#1A1A1A" stroke-width="1.8"/>
+<text x="40" y="68" font-size="18" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">TCP 1883</text>
+<text x="344" y="68" font-size="14" fill="#C4311A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">断开</text>
+<line x1="0" y1="96" x2="360" y2="96" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="16" y="112" width="328" height="28" rx="8" fill="#E5F5E3"/>
+<text x="28" y="126" font-size="11" fill="#3D8B37" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">已连接 192.168.1.20:1883 · 本机 :48122</text>
+<rect x="16" y="148" width="328" height="296" rx="14" fill="#FFFFFF"/>
+<text x="28" y="166" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:01</text>
+<text x="96" y="166" font-size="11" fill="#C25512" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">SYS</text>
+<text x="132" y="166" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">连接建立</text>
+<text x="28" y="194" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:01</text>
+<text x="96" y="194" font-size="11" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">TX</text>
+<text x="132" y="194" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">10 4D 51 54 54 04 C0 00</text>
+<text x="28" y="222" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:01</text>
+<text x="96" y="222" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="132" y="222" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">20 02 00 00</text>
+<text x="28" y="250" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:06</text>
+<text x="96" y="250" font-size="11" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">TX</text>
+<text x="132" y="250" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">82 0A 00 08 6C 61 62</text>
+<text x="28" y="278" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:06</text>
+<text x="96" y="278" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="132" y="278" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">90 03 00 01 00</text>
+<text x="28" y="306" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:11</text>
+<text x="96" y="306" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="132" y="306" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">30 12 6C 61 62 2F 74</text>
+<text x="28" y="334" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:18</text>
+<text x="96" y="334" font-size="11" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">TX</text>
+<text x="132" y="334" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">32 07 73 74 61 74 75</text>
+<text x="28" y="362" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:12:18</text>
+<text x="96" y="362" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="132" y="362" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">40 02 00 00</text>
+<text x="28" y="390" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:13:02</text>
+<text x="96" y="390" font-size="11" fill="#C25512" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">SYS</text>
+<text x="132" y="390" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">空闲 44 秒</text>
+<text x="28" y="418" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">09:14:10</text>
+<text x="96" y="418" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="132" y="418" font-size="11" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">31 04 70 69 6E 67</text>
+<rect x="0" y="700" width="360" height="100" rx="0" fill="#FFFFFF"/>
+<line x1="0" y1="700" x2="360" y2="700" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="16" y="712" width="88" height="28" rx="14" fill="#E6E7EB"/>
+<text x="38" y="726" font-size="11" fill="#666666" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">文本</text>
+<rect x="60" y="714" width="40" height="24" rx="12" fill="#FFFFFF"/>
+<text x="80" y="726" font-size="11" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">HEX</text>
+<rect x="112" y="712" width="160" height="28" rx="14" fill="#F1F3F5"/>
+<text x="124" y="726" font-size="12" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">10 4D 51 54 54</text>
+<rect x="280" y="710" width="64" height="40" rx="20" fill="#0A59F7"/>
+<text x="312.0" y="730" font-size="14" fill="#FFFFFF" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">发送</text>
+<rect x="128.0" y="786" width="104" height="4" rx="2" fill="#1A1A1A" fill-opacity="0.28"/>
+</svg>
