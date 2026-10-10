@@ -11,7 +11,6 @@ import {
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
-import { GattTransportSession } from '../../../data/transport/GattTransportSession';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
 import { ConnectGattResult, GattConnectParams } from '../../model/GattConnectParams';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
@@ -21,18 +20,15 @@ export class ConnectGattUseCase {
   private readonly repository: BluetoothRepository;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
-  private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
     repository: BluetoothRepository = BluetoothRepository.getInstance(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap()
   ) {
     this.repository = repository;
     this.guard = guard;
     this.sessionBootstrap = sessionBootstrap;
-    this.transportRegistry = transportRegistry;
   }
 
   async execute(params: GattConnectParams): Promise<Result<ConnectGattResult>> {
@@ -74,18 +70,13 @@ export class ConnectGattUseCase {
       this.repository.releaseBleConnection();
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
-    const transport = new GattTransportSession(session.value.id);
-    try {
-      await transport.connect(params.toConnectRecord());
-    } catch (error) {
-      const err = error as Error;
-      transport.destroy();
+    const opened = await this.repository.connectGattTransport(session.value.id, params.toConnectRecord());
+    if (!opened.success || opened.value === undefined) {
       this.repository.releaseBleConnection();
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err.message, err));
+      return Result.fail(opened.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, 'GATT connect failed'));
     }
-    this.transportRegistry.register(session.value.id, transport);
     this.repository.recordRecentConnection(params.bleDeviceId, params.displayName, 'ble_gatt');
-    return Result.ok(new ConnectGattResult(session.value.id, transport.id));
+    return Result.ok(new ConnectGattResult(session.value.id, opened.value));
   }
 }
 

@@ -7,7 +7,7 @@ import { RecordMapper } from '../main/ets/rdb/RecordMapper';
 import { LogIndexRecord } from '../main/ets/domain/LogIndexRecord';
 import { LogExportFormatter } from '../main/ets/export/LogExportFormatter';
 import { ExportFormat } from '../main/ets/export/ExportFormat';
-import { LogIndexFilterUtil } from '../main/ets/query/LogIndexFilterUtil';
+import { LogQuery } from '../main/ets/query/LogQuery';
 import { StoragePaths } from '../main/ets/file/StoragePaths';
 import { LogCleanupPolicy } from '../main/ets/cleanup/LogCleanupPolicy';
 
@@ -59,14 +59,11 @@ export default function localUnitTest() {
       expect(policy.retentionDays).assertEqual(30);
     });
 
-    it('LogIndexFilterUtil_applyClientFilters', 0, () => {
-      const items: LogIndexRecord[] = [
-        new LogIndexRecord('1', 's1', 'nearlink', 'ssap', 'in', 'payload', 0, 0, 'hello world', ''),
-        new LogIndexRecord('2', 's2', 'wifi', 'tcp', 'out', 'payload', 0, 0, 'other', '')
-      ];
-      const filtered = LogIndexFilterUtil.applyClientFilters(items, 'nearlink', 'ssap', 'hello');
-      expect(filtered.length).assertEqual(1);
-      expect(filtered[0].id).assertEqual('1');
+    it('LogQuery_carries_module_and_keyword', 0, () => {
+      const query = new LogQuery('', 0, 50, '', '', 0, 0, 'nearlink', 'hello', 'ssap');
+      expect(query.module).assertEqual('nearlink');
+      expect(query.keyword).assertEqual('hello');
+      expect(query.protocol).assertEqual('ssap');
     });
   });
 }

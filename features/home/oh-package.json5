@@ -1,11 +1,12 @@
 ﻿{
   "name": "feature_home",
   "version": "1.0.0",
-  "description": "YoWire home workbench tab placeholder",
+  "description": "YoWire home shell: workbench, log center, command panel, settings",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
+    "debug_core": "file:../../common/debug_core",
     "youi_kit": "file:../../common/youi_kit"
   }
 }

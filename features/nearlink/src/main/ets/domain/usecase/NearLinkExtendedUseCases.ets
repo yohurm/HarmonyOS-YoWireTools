@@ -24,15 +24,9 @@ import { DeviceFavoriteRecord } from 'common_storage';
 
 import { PermissionDecision } from 'common_platform';
 
-import { NearLinkConstants } from '../../constants/NearLinkConstants';
-
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
 
 import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
-
-import { SsapTransportSession } from '../../data/transport/SsapTransportSession';
-
-import { RemoteDeviceDataSource } from '../../data/datasource/platform/RemoteDeviceDataSource';
 
 import { SsapOperationQueue } from '../service/SsapOperationQueue';
 
@@ -70,19 +64,16 @@ export class ConnectSsapClientUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
-  private readonly transportRegistry: TransportSessionRegistry;
   constructor(
     repository: NearLinkRepository = NearLinkRepository.getInstance(),
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
-    startSession: StartSessionUseCase = new StartSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
-    this.transportRegistry = transportRegistry;
   }
   async execute(deviceId: string, displayName: string): Promise<Result<string>> {
     const permission: PermissionDecision = await this.ensurePermission.execute(PermissionScenario.NEARLINK_ACCESS);
@@ -107,26 +98,9 @@ export class ConnectSsapClientUseCase {
     if (!started.success) {
       return Result.fail(started.error ?? new ResultError('YW-SESSION-1003', 'Session start failed'));
     }
-    const clientResult = this.repository.getOrCreateSsapClient(sessionId, deviceId);
-    if (!clientResult.success || clientResult.value === undefined) {
-      return Result.fail(clientResult.error ?? new ResultError(NearLinkErrorCodes.SSAP_CREATE_FAILED, 'create failed'));
-    }
-    const client = clientResult.value;
-    const wired = this.repository.wireSsapClientSession(sessionId, deviceId);
-    if (!wired.success) {
-      return Result.fail(wired.error ?? new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'wire failed'));
-    }
-    const connected = await client.connect();
+    const connected = await this.repository.connectPreparedSsap(sessionId, deviceId);
     if (!connected.success) {
       return Result.fail(connected.error ?? new ResultError(NearLinkErrorCodes.SSAP_CONNECT_FAILED, 'connect failed'));
-    }
-    await NearLinkEventLogger.logSsapState(sessionId, 'SSAP connected, discovering services');
-    await this.repository.discoverSsapServices(sessionId, deviceId, NearLinkConstants.DEFAULT_MTU);
-    const transport = this.repository.createSsapTransport(sessionId);
-    if (transport !== undefined) {
-      const attachParams: Record<string, string | number | boolean> = {};
-      await transport.connect(attachParams);
-      this.transportRegistry.register(sessionId, transport);
     }
     this.repository.recordRecentConnection(deviceId, displayName, 'ssap');
     return Result.ok(sessionId);
@@ -157,21 +131,11 @@ export class DisconnectSsapClientUseCase {
 
 export class BindSsapTransportUseCase {
   private readonly repository: NearLinkRepository;
-  private readonly transportRegistry: TransportSessionRegistry;
-  constructor(
-    repository: NearLinkRepository = NearLinkRepository.getInstance(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
-  ) {
+  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
     this.repository = repository;
-    this.transportRegistry = transportRegistry;
   }
   execute(sessionId: string, serviceUuid: string, propertyUuid: string): Result<void> {
-    const transport = this.transportRegistry.get(sessionId);
-    if (transport === undefined || transport.protocol !== ProtocolType.SSAP) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP transport not registered'));
-    }
-    const ssapTransport = transport as SsapTransportSession;
-    return ssapTransport.bindEndpoints(serviceUuid, propertyUuid);
+    return this.repository.bindSsapEndpoints(sessionId, serviceUuid, propertyUuid);
   }
 }
 
@@ -182,11 +146,7 @@ export class ReadSsapPropertyUseCase {
     this.repository = repository;
   }
   async execute(sessionId: string, serviceUuid: string, propertyUuid: string): Promise<Result<string>> {
-    const client = this.repository.getSsapClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
-    }
-    const result = await this.queue.enqueue(() => client.readProperty(serviceUuid, propertyUuid));
+    const result = await this.queue.enqueue(() => this.repository.readSsapProperty(sessionId, serviceUuid, propertyUuid));
     if (!result.success || result.value === undefined) {
       return Result.fail(result.error ?? new ResultError(NearLinkErrorCodes.SSAP_READ_FAILED, 'read failed'));
     }
@@ -203,13 +163,9 @@ export class WriteSsapPropertyUseCase {
     this.repository = repository;
   }
   async execute(sessionId: string, serviceUuid: string, propertyUuid: string, hex: string): Promise<Result<void>> {
-    const client = this.repository.getSsapClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
-    }
     const buffer = NearLinkExtendedUseCases.hexToArrayBuffer(hex);
     const bytes = new Uint8Array(buffer);
-    const result = await this.queue.enqueue(() => client.writeProperty(serviceUuid, propertyUuid, buffer));
+    const result = await this.queue.enqueue(() => this.repository.writeSsapProperty(sessionId, serviceUuid, propertyUuid, buffer));
     if (result.success) {
       void NearLinkEventLogger.logSsapPayload(sessionId, Direction.OUTBOUND, serviceUuid, propertyUuid, bytes);
     }
@@ -234,11 +190,9 @@ export class SetSsapNotificationUseCase {
     propertyUuid: string,
     enable: boolean
   ): Promise<Result<void>> {
-    const client = this.repository.getSsapClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
-    }
-    const result = await this.queue.enqueue(() => client.setPropertyNotification(serviceUuid, propertyUuid, enable));
+    const result = await this.queue.enqueue(() => {
+      return this.repository.setSsapNotification(sessionId, serviceUuid, propertyUuid, enable);
+    });
     if (result.success && enable) {
       this.bindTransport.execute(sessionId, serviceUuid, propertyUuid);
     }
@@ -253,11 +207,7 @@ export class RequestSsapMtuUseCase {
     this.repository = repository;
   }
   async execute(sessionId: string, mtu: number): Promise<Result<number>> {
-    const client = this.repository.getSsapClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.NOT_CONNECTED, 'SSAP not connected'));
-    }
-    return this.queue.enqueue(() => client.requestMtuSize(mtu));
+    return this.queue.enqueue(() => this.repository.requestSsapMtu(sessionId, mtu));
   }
 }
 
@@ -285,19 +235,15 @@ export class ConnectDataTransferUseCase {
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
-  private readonly remoteDeviceSource: RemoteDeviceDataSource = new RemoteDeviceDataSource();
   private readonly repository: NearLinkRepository = NearLinkRepository.getInstance();
-  private readonly transportRegistry: TransportSessionRegistry;
   constructor(
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
-    startSession: StartSessionUseCase = new StartSessionUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    startSession: StartSessionUseCase = new StartSessionUseCase()
   ) {
     this.ensurePermission = ensurePermission;
     this.createSession = createSession;
     this.startSession = startSession;
-    this.transportRegistry = transportRegistry;
   }
   async execute(
     address: string,
@@ -335,21 +281,16 @@ export class ConnectDataTransferUseCase {
     if (!started.success) {
       return Result.fail(started.error ?? new ResultError('YW-SESSION-1003', 'Session start failed'));
     }
-    const transport = this.repository.createDataTransferTransport(sessionId, config.congestionPolicy);
-    const connectParams: Record<string, string | number | boolean> = {
-      'address': address,
-      'uuid': config.uuid,
-      'mtu': config.mtu
-    };
-    try {
-      await transport.connect(connectParams);
-    } catch (error) {
-      const err = error as Error;
-      transport.destroy();
-      return Result.fail(new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, err.message));
+    const opened = await this.repository.openDataTransferSession(
+      sessionId,
+      address,
+      config.uuid,
+      config.mtu,
+      config.congestionPolicy
+    );
+    if (!opened.success) {
+      return Result.fail(opened.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'dataTransfer failed'));
     }
-    this.repository.attachDataTransferIncoming(sessionId, transport);
-    this.transportRegistry.register(sessionId, transport);
     await NearLinkEventLogger.logDataTransferState(sessionId, 'dataTransfer connected');
     if (config.secureRequired) {
       await NearLinkEventLogger.logSecurity(sessionId, `ACB=${securityState}`, NearLinkErrorCodes.ENCRYPTION_UNVERIFIED);
@@ -358,23 +299,14 @@ export class ConnectDataTransferUseCase {
     return Result.ok(new ConnectDataTransferResult(sessionId, securityState));
   }
   async ensureEncrypted(address: string): Promise<Result<NearLinkSecurityState>> {
-    const created = this.remoteDeviceSource.createRemoteDevice(address);
-    if (!created.success) {
-      return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'remote device failed'));
+    const paired = await this.repository.pairRemoteDevice(address);
+    if (!paired.success || paired.value === undefined) {
+      return Result.fail(paired.error ?? new ResultError(NearLinkErrorCodes.ENCRYPTION_UNVERIFIED, NearLinkEncryptionLabel.UNVERIFIED));
     }
-    const pairing = await this.remoteDeviceSource.startPairing();
-    if (!pairing.success) {
-      return Result.fail(pairing.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'pairing failed'));
-    }
-    const acb = this.remoteDeviceSource.getAcbState();
-    if (!acb.success || acb.value === undefined) {
+    if (paired.value !== NearLinkSecurityState.ENCRYPTED) {
       return Result.fail(new ResultError(NearLinkErrorCodes.ENCRYPTION_UNVERIFIED, NearLinkEncryptionLabel.UNVERIFIED));
     }
-    const state = this.remoteDeviceSource.resolveSecurityState(acb.value);
-    if (state !== NearLinkSecurityState.ENCRYPTED) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.ENCRYPTION_UNVERIFIED, NearLinkEncryptionLabel.UNVERIFIED));
-    }
-    return Result.ok(state);
+    return Result.ok(paired.value);
   }
 }
 
@@ -428,21 +360,9 @@ export class DisconnectDataTransferUseCase {
 }
 
 export class PairNearLinkDeviceUseCase {
-  private readonly remoteDeviceSource: RemoteDeviceDataSource = new RemoteDeviceDataSource();
+  private readonly repository: NearLinkRepository = NearLinkRepository.getInstance();
   async execute(address: string): Promise<Result<NearLinkSecurityState>> {
-    const created = this.remoteDeviceSource.createRemoteDevice(address);
-    if (!created.success) {
-      return Result.fail(created.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'remote device failed'));
-    }
-    const pairing = await this.remoteDeviceSource.startPairing();
-    if (!pairing.success) {
-      return Result.fail(pairing.error ?? new ResultError(NearLinkErrorCodes.DT_GENERIC_FAILED, 'pairing failed'));
-    }
-    const acb = this.remoteDeviceSource.getAcbState();
-    if (!acb.success || acb.value === undefined) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.ENCRYPTION_UNVERIFIED, NearLinkEncryptionLabel.UNVERIFIED));
-    }
-    return Result.ok(this.remoteDeviceSource.resolveSecurityState(acb.value));
+    return this.repository.pairRemoteDevice(address);
   }
 }
 

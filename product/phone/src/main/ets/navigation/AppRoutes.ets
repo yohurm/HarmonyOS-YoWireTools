@@ -10,6 +10,9 @@ export class AppRoutes {
   static readonly WIFI: string = '/wifi/overview';
   static readonly NEARLINK: string = '/nearlink/overview';
   static readonly MORE_HUB: string = '/more/hub';
+  static readonly LOG_CENTER: string = 'log/center';
+  static readonly LOG_DETAIL: string = 'log/detail';
+  static readonly COMMAND_PANEL: string = 'command/panel';
 
   static readonly TAB_INDEX_WORKBENCH: number = 0;
   static readonly TAB_INDEX_BLUETOOTH: number = 1;

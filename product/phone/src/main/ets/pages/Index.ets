@@ -7,6 +7,12 @@ import {
   SppTerminalNavParams,
   SppTerminalPage
 } from 'feature_bluetooth';
+import {
+  CommandPanelPage,
+  LogCenterPage,
+  LogDetailNavParams,
+  LogDetailPage
+} from 'feature_home';
 import { AppRoutes } from '../navigation/AppRoutes';
 import { MainTabContainer } from '../shell/MainTabContainer';
 import { BleMainPage } from './bluetooth/BleMainPage';
@@ -56,6 +62,14 @@ struct Index {
     return raw.sessionId !== undefined ? raw.sessionId : '';
   }
 
+  private readLogDetail(param: Object): LogDetailNavParams {
+    const raw = param as LogDetailNavParams;
+    if (raw.recordId === undefined) {
+      return new LogDetailNavParams('', '', '', '', '', 0);
+    }
+    return raw;
+  }
+
   @LocalBuilder
   terminalDestination(param: Object) {
     NavDestination() {
@@ -97,6 +111,45 @@ struct Index {
         })
       }
       .hideTitleBar(true, false)
+    } else if (name === AppRoutes.LOG_CENTER) {
+      NavDestination() {
+        LogCenterPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          },
+          onOpenDetail: (params: LogDetailNavParams) => {
+            this.rootNavStack.pushPath({
+              name: AppRoutes.LOG_DETAIL,
+              param: params
+            });
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.LOG_DETAIL) {
+      NavDestination() {
+        LogDetailPage({
+          recordId: this.readLogDetail(param).recordId,
+          module: this.readLogDetail(param).module,
+          protocol: this.readLogDetail(param).protocol,
+          summary: this.readLogDetail(param).summary,
+          direction: this.readLogDetail(param).direction,
+          timestampMs: this.readLogDetail(param).timestampMs,
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
+    } else if (name === AppRoutes.COMMAND_PANEL) {
+      NavDestination() {
+        CommandPanelPage({
+          onBack: () => {
+            this.rootNavStack.pop();
+          }
+        })
+      }
+      .hideTitleBar(true, false)
     }
   }
 
@@ -115,6 +168,12 @@ struct Index {
           onOpenBluetoothBle: () => {
             this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
             this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
+          },
+          onOpenLog: () => {
+            this.rootNavStack.pushPath({ name: AppRoutes.LOG_CENTER });
+          },
+          onOpenCommand: () => {
+            this.rootNavStack.pushPath({ name: AppRoutes.COMMAND_PANEL });
           }
         })
       }

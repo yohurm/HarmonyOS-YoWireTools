@@ -9,6 +9,9 @@ export class LogQuery {
   readonly recordType: string;
   readonly startMs: number;
   readonly endMs: number;
+  readonly module: string;
+  readonly keyword: string;
+  readonly protocol: string;
 
   constructor(
     sessionId: string = '',
@@ -17,7 +20,10 @@ export class LogQuery {
     direction: string = '',
     recordType: string = '',
     startMs: number = 0,
-    endMs: number = 0
+    endMs: number = 0,
+    module: string = '',
+    keyword: string = '',
+    protocol: string = ''
   ) {
     this.sessionId = sessionId;
     this.offset = offset;
@@ -26,5 +32,8 @@ export class LogQuery {
     this.recordType = recordType;
     this.startMs = startMs;
     this.endMs = endMs;
+    this.module = module;
+    this.keyword = keyword;
+    this.protocol = protocol;
   }
 }

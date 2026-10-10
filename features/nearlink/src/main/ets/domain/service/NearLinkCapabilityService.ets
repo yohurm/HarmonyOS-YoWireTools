@@ -7,13 +7,13 @@ import {
   ICapabilityProbe,
   PlatformModuleType
 } from 'common_platform';
-import { NearLinkManagerDataSource } from '../../data/datasource/platform/NearLinkManagerDataSource';
+import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
 
 class NearLinkSupportedProbe implements ICapabilityProbe {
   readonly capabilityId: string = CapabilityId.NEARLINK_SUPPORTED;
 
   async probe(): Promise<CapabilityResult> {
-    const adapter = await NearLinkManagerDataSource.getInstance().getAdapterState();
+    const adapter = await NearLinkRepository.getInstance().getAdapterState();
     const supported = adapter.success && adapter.value !== undefined && adapter.value.supported;
     return new CapabilityResult(
       this.capabilityId,
@@ -46,7 +46,7 @@ class NearLinkScanProbe implements ICapabilityProbe {
         TimeUtil.nowMs()
       );
     }
-    const adapter = await NearLinkManagerDataSource.getInstance().getAdapterState();
+    const adapter = await NearLinkRepository.getInstance().getAdapterState();
     const enabled = adapter.success && adapter.value !== undefined && adapter.value.enabled;
     return new CapabilityResult(
       this.capabilityId,

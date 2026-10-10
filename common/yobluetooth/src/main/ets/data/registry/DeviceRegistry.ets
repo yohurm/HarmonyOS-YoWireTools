@@ -1,14 +1,14 @@
 import { Result } from 'common_core';
 import { DeviceFavoriteRecord } from 'common_storage';
-import { BluetoothIdentityDataSource } from '../../../data/datasource/platform/BluetoothIdentityDataSource';
-import { BluetoothDevice } from '../../model/BluetoothDevice';
-import { BluetoothRecentConnection } from '../../model/BluetoothRecentConnection';
-import { DeviceIdentity } from '../../model/DeviceIdentity';
-import { AddressPrivacyKind } from '../../model/BluetoothTransportType';
+import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
+import { BluetoothDevice } from '../../domain/model/BluetoothDevice';
+import { BluetoothRecentConnection } from '../../domain/model/BluetoothRecentConnection';
+import { DeviceIdentity } from '../../domain/model/DeviceIdentity';
+import { AddressPrivacyKind } from '../../domain/model/BluetoothTransportType';
 
 /**
- * Device identity registry — favorites, recent, dual-mode links (architecture 06).
- * Domain facade over BluetoothIdentityDataSource; no UI dependency.
+ * Device identity registry — favorites, recent, dual-mode links.
+ * Lives in data so the domain layer does not import a DataSource.
  */
 export class DeviceRegistry {
   private static instance: DeviceRegistry | undefined;

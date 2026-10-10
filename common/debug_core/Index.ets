@@ -67,10 +67,27 @@ export {
   StopRepeatCommandUseCase,
   RepeatCommandCoordinator
 } from './src/main/ets/service/RepeatCommandCoordinator';
+export { FeatureModuleId } from './src/main/ets/domain/model/FeatureModuleId';
+export { SessionLogQuery } from './src/main/ets/domain/model/SessionLogQuery';
+export { SettingsSnapshot } from './src/main/ets/domain/model/SettingsSnapshot';
 export {
   LoadWorkbenchOverviewUseCase,
   LoadSessionLogPreviewUseCase,
+  ExportSessionLogUseCase,
+  ClearSessionLogUseCase,
   WorkbenchLogLine
 } from './src/main/ets/usecase/WorkbenchUseCases';
+export {
+  LoadSettingsUseCase,
+  UpdateSettingUseCase,
+  ClearLocalDataUseCase
+} from './src/main/ets/usecase/SettingsUseCases';
+export {
+  ListCommandTemplatesUseCase,
+  SaveCommandTemplateUseCase,
+  ExecuteSavedCommandUseCase,
+  RepeatSavedCommandUseCase,
+  ShellCommandCodes
+} from './src/main/ets/usecase/CommandPanelUseCases';
 export { DebugCoreBootstrap } from './src/main/ets/DebugCoreBootstrap';
 export { SessionUiFormat } from './src/main/ets/ui/SessionUiFormat';

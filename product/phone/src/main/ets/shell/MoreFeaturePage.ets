@@ -1,16 +1,15 @@
-﻿import {
+﻿import { SettingsHubPage } from 'feature_home';
+import {
   YoNavDestinationKind,
   YoPageShell
 } from 'youi_kit';
 
-/** More root tab — placeholder until settings UI is rebuilt. */
+/** More root tab hosts the settings groups. Title stays 「更多」. */
 @ComponentV2
 export struct MoreFeaturePage {
   @LocalBuilder
   pageContent() {
-    Column()
-      .width('100%')
-      .height('100%')
+    SettingsHubPage()
   }
 
   build() {

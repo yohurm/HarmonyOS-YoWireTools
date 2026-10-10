@@ -21,7 +21,7 @@ related:
 
 这些编号是整机层，不计入三模块 350，也不改写壳清单 WB / LOG / SET。壳的屏幕行为仍以 [139ddc61d1f82e3d8f5c92980d420f19230bffec](https://github.com/yohurm/HarmonyOS-YoWireTools/commit/139ddc61d1f82e3d8f5c92980d420f19230bffec)（PR #20）为准。缺的屏幕保持缺口。
 
-屏名来自 PR #19，本文件不重述视觉：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
+视觉待新 UI 规范 PR。屏名仍沿用：工作台 `screen.workbench.home`，命令面板 `screen.workbench.command`，日志中心 `screen.log.center`，日志详情 `screen.log.detail`，设置 `screen.settings.hub`。
 
 分层见 `开发/最佳实践/架构设计/应用架构/分层架构设计.md`：产品定制层、基础特性层、公共能力层。安装包见 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAP.md` 与 `开发/指南/入门/开发基础知识/应用程序包基础知识/应用程序包开发与使用/HAR.md`。HAR 不能单独安装。单 UIAbility 场景官方优先一个 entry HAP。
 
@@ -50,35 +50,35 @@ related:
 - **屏幕：** 无单独屏幕。依赖在各模块 `oh-package.json5`
 - **Given** `product/phone` 已经依赖四个 feature
 - **When** 查 feature 的 `dependencies`，以及 ets 里对另一个 feature 包名的 import
-- **Then** `product/phone` 依赖 `feature_home`、`feature_bluetooth`、`feature_nearlink`、`feature_wifi_network`，并直接依赖它自己 import 的 common 包。`features/home` 只依赖 `youi_kit`。三个射频 feature 只依赖 common，没有互相依赖，也没有依赖 `feature_home`。ets 里没有 `from 'feature_` 出现在 feature 或 common 源码中。壳对射频页面的 import 只在 `product/phone`
+- **Then** `product/phone` 依赖 `feature_home`、`feature_bluetooth`、`feature_nearlink`、`feature_wifi_network`，并直接依赖它自己 import 的 common 包。`features/home` 依赖 `debug_core` 与 `youi_kit`，不依赖三个射频包。三个射频 feature 只依赖 common，没有互相依赖，也没有依赖 `feature_home`。ets 里没有 `from 'feature_` 出现在 feature 或 common 源码中。壳对射频页面的 import 只在 `product/phone`
 - **证据：** 五个 `oh-package.json5`。全仓库 `from 'feature_` 只出现在 `product/phone`。HAR 不支持依赖传递，所以 phone 直接声明 common，这不是第二条依赖方向。本清单不改 ets
 
-### APP-003 feature 的包入口还导出了内部类型
+### APP-003 feature 包入口只导出稳定接口
 
-- **判定：** 缺口
+- **判定：** 支持
 - **屏幕：** 无单独屏幕。入口是各 feature 的 `Index.ets`
-- **Given** 壳今天只构造页面和蓝牙页已经用到的视图模型
-- **When** 看 `feature_nearlink` 与 `feature_wifi_network` 的包入口
-- **Then** 星闪入口导出 `NearLinkRepository`、`SsapTransportSession`、`NearLinkDataTransferSession` 和用例。Wi-Fi 入口导出 `WifiNetworkRepository`、用例、`MqttWireCodec` 和探测类。这些不是壳要的稳定接口。不得把「文件里已经有契约」写成入口已经收口
-- **证据：** `features/nearlink/Index.ets`；`features/wifi_network/Index.ets`。`product/phone` 实际只引用 `NearLinkFeaturePage` 与 `WifiFeaturePage`。本清单不改 ets
+- **Given** 壳只构造页面和蓝牙页已经用到的视图模型
+- **When** 看四个 feature 的包入口
+- **Then** `feature_nearlink` 只导出 `NearLinkFeaturePage`。`feature_wifi_network` 只导出 `WifiFeaturePage`。`feature_home` 只导出 `HomeFeaturePage`、`LogCenterPage`、`LogDetailPage`、`CommandPanelPage`、`SettingsHubPage`、`LogDetailNavParams`。`feature_bluetooth` 只导出 `product/phone` 已 import 的页面与视图模型。仓库、传输、用例、探测类不在入口
+- **证据：** 四个 `Index.ets`。契约在 `common/debug_core`，名单见 [APP-003](../architecture/app/APP-003.md)
 
-### APP-004 领域用例仍直接引用数据源或传输
+### APP-004 一条数据路径
 
-- **判定：** 缺口
+- **判定：** 支持
 - **屏幕：** 无单独屏幕。链路是 UI → ViewModel/State → UseCase → RepositoryContract → DataSource/KitBridge → Kit
 - **Given** 射频 Kit 已经出现在各模块 `data/datasource` 与 `data/kit`
 - **When** 查 `domain/usecase` 与 `domain/service` 的 import
-- **Then** 仍有用例或领域服务 import `data/datasource`、`data/transport` 或让契约 import 数据源里的类型。`LoadSessionLogPreviewUseCase` 直接调用 `LogRepository.getInstance().list`。这是缺口，不是唯一路径已经成立
-- **证据：** `WifiNetworkSessionUseCases.ets`、`WifiNetworkExtendedUseCases.ets`、`LanDiscoveryFacade.ets`、`WifiNetworkRepositoryContract.ets`（引用 `NetworkConnectionDataSource` 的类型）、`NearLinkExtendedUseCases.ets`、`NearLinkCapabilityService.ets`、`SppUuidFavoriteUseCases.ets`、`GattConnectionUseCases.ets`、`UartConnectionUseCases.ets`、`DeviceRegistry.ets`、`WorkbenchUseCases.ets`。本清单不改 ets
+- **Then** 这些目录不再 import `data/datasource`、`data/transport` 或射频 `@kit.*`。`WifiNetworkRepositoryContract` 引用领域模型 `NetworkStateSnapshot`。`LoadSessionLogPreviewUseCase` 只调用 `SessionLogRepositoryContract`。页面不调用 DataSource 或 Kit
+- **证据：** `WifiSessionGateway.ets`；`data/registry/DeviceRegistry.ets`；`SsapPlatformMapper.buildTree`；`BluetoothRepository.connectGattTransport`。说明见 [APP-004](../architecture/app/APP-004.md)
 
-### APP-005 壳的会话列表还没有接到唯一读模型
+### APP-005 壳接到唯一读模型
 
-- **判定：** 缺口
-- **屏幕：** 日志中心（`screen.log.center`）；工作台最近会话见 WB-005，仍是缺口
+- **判定：** 支持
+- **屏幕：** 日志中心（`screen.log.center`）；工作台最近会话见 WB-005
 - **Given** 写入侧已经进入表 `debug_log_index`（LOG-004，支持）
-- **When** 追踪壳上的一次会话行读取
-- **Then** 没有日志中心页面。唯一读代码越过契约和数据源，直连 `LogRepository`。工作台也不列出 `SessionRuntimeStore` 的摘要。没有任何界面把 `YoLog` 或 hilog 当成会话列表（LOG-008，支持）。不得把写入侧已经共用一张表写成读模型已经接到壳
-- **证据：** `LoadSessionLogPreviewUseCase`；`HomeFeaturePage` 没有调用 `LoadWorkbenchOverviewUseCase`。读模型终点只能是 `debug_log_index`。最近会话的内存摘要来自 `SessionRuntimeStore`，不是第二张日志表。本清单不改 ets
+- **When** 追踪壳上的一次会话行读取，以及工作台最近会话
+- **Then** 日志中心经 `LogCenterViewModel` → `LoadSessionLogPreviewUseCase` → `SessionLogRepositoryContract` → `LogIndexDataSource` → 表 `debug_log_index`。工作台最近会话经 `WorkbenchViewModel` → `LoadWorkbenchOverviewUseCase` → `SessionRuntimeStore`。两条都不读 `YoLog` 或 hilog（LOG-008，支持）
+- **证据：** `LogCenterPage.ets`；`HomeFeaturePage.ets`；`LogIndexDataSource.ets`。说明见 [APP-005](../architecture/app/APP-005.md)
 
 ### APP-006 没有按射频拆开的产品模块
 
@@ -95,7 +95,7 @@ related:
 
 | 判定 | 条数 | 编号 |
 | --- | --- | --- |
-| 支持 | 3 | APP-001、APP-002、APP-006 |
-| 缺口 | 3 | APP-003、APP-004、APP-005 |
+| 支持 | 6 | APP-001、APP-002、APP-003、APP-004、APP-005、APP-006 |
+| 缺口 | 0 | 无 |
 
-壳屏幕里仍然是缺口、本文件不把它们改成支持的编号：WB-003、WB-004、WB-005、WB-006、WB-008、WB-009、WB-010、WB-011、WB-012、LOG-001、LOG-002、LOG-003、LOG-005、LOG-006、LOG-007、SET-001、SET-002、SET-004、SET-005、SET-006。
+壳屏幕里仍然是缺口的编号只有 WB-003。本文件不把状态胶囊写成已经出现。

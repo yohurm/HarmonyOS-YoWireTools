@@ -229,7 +229,7 @@ export class OpenWebSocketUseCase {
   }
 
   async sendText(text: string): Promise<Result<void>> {
-    return this.repository.getWebSocketDataSource().sendText(text);
+    return this.repository.sendWebSocketText(text);
   }
 
   async disconnect(sessionId: string = ''): Promise<Result<void>> {
@@ -246,7 +246,7 @@ export class OpenWebSocketUseCase {
   private bindMessageEvidence(): void {
     this.unbindMessageEvidence();
     this.loggedMessageCount = 0;
-    this.messageSubscription = this.repository.getWebSocketDataSource().observeMessages()
+    this.messageSubscription = this.repository.observeWebSocketMessages()
       .subscribe((messages: WebSocketMessageRecord[]) => {
         if (this.activeSessionId.length === 0 || messages.length <= this.loggedMessageCount) {
           this.loggedMessageCount = messages.length;

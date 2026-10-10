@@ -106,6 +106,34 @@ export class PreferencesStore {
     return this.getString(PreferenceKeys.APP_MODE, 'expert');
   }
 
+  async setAppMode(mode: string): Promise<Result<void>> {
+    return this.putString(PreferenceKeys.APP_MODE, mode);
+  }
+
+  async getLogDefaultDisplay(): Promise<string> {
+    return this.getString(PreferenceKeys.LOG_DEFAULT_DISPLAY, 'mixed');
+  }
+
+  async setLogDefaultDisplay(value: string): Promise<Result<void>> {
+    return this.putString(PreferenceKeys.LOG_DEFAULT_DISPLAY, value);
+  }
+
+  async setLogRetentionDays(days: number): Promise<Result<void>> {
+    return this.putNumber(PreferenceKeys.LOG_RETENTION_DAYS, days);
+  }
+
+  async setBackgroundConnectionAllowed(allowed: boolean): Promise<Result<void>> {
+    return this.putBoolean(PreferenceKeys.BACKGROUND_ALLOW_CONNECTION, allowed);
+  }
+
+  async setBackgroundRepeatAllowed(allowed: boolean): Promise<Result<void>> {
+    return this.putBoolean(PreferenceKeys.BACKGROUND_ALLOW_REPEAT_COMMAND, allowed);
+  }
+
+  async getWifiScanCooldownMs(): Promise<number> {
+    return this.getNumber(PreferenceKeys.WIFI_SCAN_COOLDOWN_MS, 3000);
+  }
+
   async getLogRetentionDays(): Promise<number> {
     return this.getNumber(PreferenceKeys.LOG_RETENTION_DAYS, StorageConstants.DEFAULT_RETENTION_DAYS);
   }

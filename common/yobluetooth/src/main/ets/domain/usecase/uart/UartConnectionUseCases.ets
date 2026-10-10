@@ -11,7 +11,6 @@ import {
 } from 'debug_core';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { GattTransportSession } from '../../../data/transport/GattTransportSession';
 import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
 import { GattConnectParams } from '../../model/GattConnectParams';
 import { SerialProfileId, UartConnectPhase } from '../../model/uart/UartConnectPhase';
@@ -45,18 +44,15 @@ export class ConnectUartUseCase {
   private readonly repository: BluetoothRepository;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
-  private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
     repository: BluetoothRepository = BluetoothRepository.getInstance(),
     guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap()
   ) {
     this.repository = repository;
     this.guard = guard;
     this.sessionBootstrap = sessionBootstrap;
-    this.transportRegistry = transportRegistry;
   }
 
   async execute(
@@ -105,7 +101,6 @@ export class ConnectUartUseCase {
       onPhase(UartConnectPhase.FAILED);
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
-    const transport = new GattTransportSession(session.value.id);
     const params = new GattConnectParams(
       bleDeviceId,
       displayName,
@@ -117,25 +112,22 @@ export class ConnectUartUseCase {
     );
     onPhase(UartConnectPhase.DISCOVERING);
     onPhase(UartConnectPhase.MATCHING_PROFILE);
-    try {
-      await transport.connect(params.toConnectRecord());
-    } catch (error) {
-      const err = error as Error;
-      transport.destroy();
+    const opened = await this.repository.connectGattTransport(session.value.id, params.toConnectRecord());
+    if (!opened.success || opened.value === undefined) {
       this.repository.releaseBleConnection();
-      if (err.message.indexOf('serial') >= 0 || err.message.indexOf('characteristic') >= 0) {
+      const message = opened.error !== undefined ? opened.error.message : '';
+      if (message.indexOf('serial') >= 0 || message.indexOf('characteristic') >= 0) {
         onPhase(UartConnectPhase.FAILED_NO_PROFILE);
-        return Result.fail(new ResultError(BluetoothErrorCodes.BLE_UART_NO_PROFILE, err.message, err));
+        return Result.fail(opened.error ?? new ResultError(BluetoothErrorCodes.BLE_UART_NO_PROFILE, message));
       }
       onPhase(UartConnectPhase.FAILED);
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, err.message, err));
+      return Result.fail(opened.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_CONNECT_FAILED, message));
     }
     onPhase(UartConnectPhase.READY);
-    this.transportRegistry.register(session.value.id, transport);
     this.repository.recordRecentConnection(bleDeviceId, displayName, 'ble_uart');
     return Result.ok(new ConnectUartResult(
       session.value.id,
-      transport.id,
+      opened.value,
       SerialProfileId.NORDIC_UART,
       UartConnectPhase.READY
     ));

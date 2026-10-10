@@ -11,6 +11,7 @@ import { PayloadChunkWriter } from '../file/PayloadChunkWriter';
 import { PayloadFileDeleter } from '../file/PayloadFileDeleter';
 import { PayloadFileReader } from '../file/PayloadFileReader';
 import { LogQuery } from '../query/LogQuery';
+import { LogIndexDataSource } from '../datasource/LogIndexDataSource';
 import { DatabaseSchema } from '../rdb/DatabaseSchema';
 import { RecordMapper } from '../rdb/RecordMapper';
 import { RdbManager } from '../rdb/RdbManager';
@@ -52,38 +53,7 @@ export class LogRepository {
   }
 
   async list(query: LogQuery): Promise<Result<PageResult<LogIndexRecord>>> {
-    const store = RdbManager.getInstance().getStore();
-    if (store === undefined) {
-      return Result.fail(new ResultError(StoreErrorCodes.RDB_OPEN_FAILED, 'Database not ready'));
-    }
-    let set: relationalStore.ResultSet | undefined;
-    try {
-      const predicates = LogRepository.buildPredicates(query);
-      const total = LogRepository.countMatching(store, predicates);
-      predicates.orderByDesc('timestamp_ms');
-      predicates.limitAs(query.limit);
-      predicates.offsetAs(query.offset);
-      const queried = RdbQueryRunner.querySync(store, predicates);
-      if (!queried.success || queried.value === undefined) {
-        return Result.fail(queried.error ?? new ResultError(StoreErrorCodes.RDB_READ_FAILED, 'Query failed'));
-      }
-      set = queried.value;
-      const items: LogIndexRecord[] = [];
-      if (set.rowCount > 0) {
-        RdbResultSetReader.goToFirstRow(set);
-        do {
-          items.push(RecordMapper.logFromRow(set));
-        } while (RdbResultSetReader.goToNextRow(set));
-      }
-      return Result.ok(new PageResult(items, total, new PageQuery(query.offset, query.limit)));
-    } catch (error) {
-      const err = error as BusinessError;
-      return Result.fail(new ResultError(StoreErrorCodes.RDB_READ_FAILED, err.message));
-    } finally {
-      if (set !== undefined) {
-      RdbResultSetReader.closeQuietly(set);
-      }
-    }
+    return LogIndexDataSource.list(query);
   }
 
   async getPayload(ref: StoragePayloadRef): Promise<Result<Uint8Array>> {
@@ -203,26 +173,6 @@ export class LogRepository {
     const predicates = new relationalStore.RdbPredicates(DatabaseSchema.TABLE_LOG_INDEX);
     predicates.equalTo('session_id', sessionId);
     return LogRepository.queryLogs(store, predicates);
-  }
-
-  private static buildPredicates(query: LogQuery): relationalStore.RdbPredicates {
-    const predicates = new relationalStore.RdbPredicates(DatabaseSchema.TABLE_LOG_INDEX);
-    if (query.sessionId.length > 0) {
-      predicates.equalTo('session_id', query.sessionId);
-    }
-    if (query.direction.length > 0) {
-      predicates.equalTo('direction', query.direction);
-    }
-    if (query.recordType.length > 0) {
-      predicates.equalTo('record_type', query.recordType);
-    }
-    if (query.startMs > 0) {
-      predicates.greaterThanOrEqualTo('timestamp_ms', query.startMs);
-    }
-    if (query.endMs > 0) {
-      predicates.lessThanOrEqualTo('timestamp_ms', query.endMs);
-    }
-    return predicates;
   }
 
   private static countMatching(store: relationalStore.RdbStore, predicates: relationalStore.RdbPredicates): number {
