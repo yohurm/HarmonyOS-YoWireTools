@@ -14,11 +14,11 @@
 <text x="276.0" y="129" fill="#666666" font-size="12" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已关闭</text>
 <rect x="16" y="168" width="328" height="64" rx="16" fill="#FFFFFF"/>
 <text x="32" y="196" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">经典蓝牙</text>
-<text x="32" y="218" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">SPP 与已配对设备</text>
+<text x="32" y="218" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">不能打开</text>
 <path d="M316 194 L322 200 L316 206" fill="none" stroke="#999999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="16" y="244" width="328" height="64" rx="16" fill="#FFFFFF"/>
 <text x="32" y="272" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">低功耗</text>
-<text x="32" y="294" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">扫描、GATT、通知</text>
+<text x="32" y="294" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">GATT 浏览器</text>
 <path d="M316 270 L322 276 L316 282" fill="none" stroke="#999999" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="0" y="728" width="360" height="72" rx="0" fill="#F1F3F5"/>
 <line x1="0" y1="728" x2="360" y2="728" stroke="#E6E8EC" stroke-width="1"/>

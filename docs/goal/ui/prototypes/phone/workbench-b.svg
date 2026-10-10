@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="294" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M289 18 A6 6 0 0 1 299 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M285.5 14 A11 11 0 0 1 302.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="318" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="337" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="320" y="14" width="11" height="5" rx="1" fill="#1A1A1A"/>
+<text x="16" y="66" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工作台</text>
+<text x="344" y="64" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">命令</text>
+<text x="300" y="64" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">日志</text>
+<rect x="16" y="96" width="328" height="72" rx="16" fill="#FFFFFF"/>
+<path d="M70.66666666666666 107 V125 M70.66666666666666 107 L76.66666666666666 112 L70.66666666666666 116 L76.66666666666666 120 L70.66666666666666 125 M70.66666666666666 116 L65.66666666666666 112 M70.66666666666666 116 L65.66666666666666 120" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="70.66666666666666" y="142" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">蓝牙</text>
+<text x="70.66666666666666" y="160" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已开启</text>
+<line x1="125.33333333333333" y1="112" x2="125.33333333333333" y2="152" stroke="#CCCCCC" stroke-width="1"/>
+<circle cx="180.0" cy="122" r="1.5" fill="#0A59F7"/>
+<path d="M175.0 118 A6 6 0 0 1 185.0 118" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M171.5 114 A11 11 0 0 1 188.5 114" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="142" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络</text>
+<text x="180.0" y="160" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已连接</text>
+<line x1="234.66666666666666" y1="112" x2="234.66666666666666" y2="152" stroke="#CCCCCC" stroke-width="1"/>
+<path d="M289.3333333333333 107 L291.3333333333333 114 L298.3333333333333 116 L291.3333333333333 118 L289.3333333333333 125 L287.3333333333333 118 L280.3333333333333 116 L287.3333333333333 114 Z" fill="#0A59F7"/>
+<text x="289.3333333333333" y="142" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
+<text x="289.3333333333333" y="160" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已开启</text>
+<text x="16" y="184" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">模块</text>
+<rect x="16" y="192" width="104" height="96" rx="16" fill="#FFFFFF"/>
+<path d="M68.0 211 V229 M68.0 211 L74.0 216 L68.0 220 L74.0 224 L68.0 229 M68.0 220 L63.0 216 M68.0 220 L63.0 224" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="256" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">蓝牙</text>
+<text x="68.0" y="276" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已开启</text>
+<rect x="128" y="192" width="104" height="96" rx="16" fill="#FFFFFF"/>
+<circle cx="180.0" cy="226" r="1.5" fill="#0A59F7"/>
+<path d="M175.0 222 A6 6 0 0 1 185.0 222" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M171.5 218 A11 11 0 0 1 188.5 218" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="256" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络</text>
+<text x="180.0" y="276" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已连接</text>
+<rect x="240" y="192" width="104" height="96" rx="16" fill="#FFFFFF"/>
+<path d="M292.0 211 L294.0 218 L301.0 220 L294.0 222 L292.0 229 L290.0 222 L283.0 220 L290.0 218 Z" fill="#0A59F7"/>
+<text x="292.0" y="256" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
+<text x="292.0" y="276" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">已开启</text>
+<text x="16" y="304" fill="#666666" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">最近</text>
+<rect x="16" y="312" width="328" height="64" rx="16" fill="#FFFFFF"/>
+<path d="M40 335 V353 M40 335 L46 340 L40 344 L46 348 L40 353 M40 344 L35 340 M40 344 L35 348" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="60" y="340" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">工装-A</text>
+<text x="60" y="362" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">经典蓝牙 · 今天 08:12</text>
+<rect x="16" y="388" width="328" height="64" rx="16" fill="#FFFFFF"/>
+<circle cx="40" cy="426" r="1.5" fill="#0A59F7"/>
+<path d="M35 422 A6 6 0 0 1 45 422" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31.5 418 A11 11 0 0 1 48.5 418" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="60" y="416" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">wlanaccessv2.0</text>
+<text x="60" y="438" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">网络 · 今天 07:58</text>
+<rect x="16" y="464" width="328" height="64" rx="16" fill="#FFFFFF"/>
+<path d="M40 487 L42 494 L49 496 L42 498 L40 505 L38 498 L31 496 L38 494 Z" fill="#0A59F7"/>
+<text x="60" y="492" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">NL-Sensor</text>
+<text x="60" y="514" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">星闪 · 昨天</text>
+<rect x="0" y="728" width="360" height="72" rx="0" fill="#F1F3F5"/>
+<line x1="0" y1="728" x2="360" y2="728" stroke="#E6E8EC" stroke-width="1"/>
+<path d="M27.0 747 L36.0 740 L45.0 747 V756 H38.0 V750 H34.0 V756 H27.0 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="36.0" y="772" fill="#0A59F7" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">工作台</text>
+<path d="M108.0 739 V757 M108.0 739 L114.0 744 L108.0 748 L114.0 752 L108.0 757 M108.0 748 L103.0 744 M108.0 748 L103.0 752" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="108.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">蓝牙</text>
+<circle cx="180.0" cy="754" r="1.5" fill="#666666"/>
+<path d="M175.0 750 A6 6 0 0 1 185.0 750" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M171.5 746 A11 11 0 0 1 188.5 746" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">网络</text>
+<path d="M252.0 739 L254.0 746 L261.0 748 L254.0 750 L252.0 757 L250.0 750 L243.0 748 L250.0 746 Z" fill="#666666"/>
+<text x="252.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">星闪</text>
+<circle cx="318.0" cy="748" r="1.6" fill="#666666"/>
+<circle cx="324.0" cy="748" r="1.6" fill="#666666"/>
+<circle cx="330.0" cy="748" r="1.6" fill="#666666"/>
+<text x="324.0" y="772" fill="#666666" font-size="10" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">更多</text>
+<rect x="132.0" y="790" width="96" height="4" rx="2" fill="#D0D3D8"/>
+</svg>

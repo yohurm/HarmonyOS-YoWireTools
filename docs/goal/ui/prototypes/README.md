@@ -19,7 +19,10 @@
 | `phone/workbench-default.svg` | 工作台 | 默认 | `workbench/home.md`。底栏五个目的地来自 `app-shell/information-architecture.md` 与 E4。右上「日志」「命令」。组「最近」，行 64，左图标只用蓝牙、网络、星闪三个符号。不画 M2 三列宫格，不重复三个模块大卡 |
 | `phone/workbench-empty.svg` | 工作台 | 空 | 同上。中部 14「还没有会话」，两个文字按钮仍在 |
 | `phone/workbench-error.svg` | 工作台 | 错误 | 同上。警告一行，不出现空文案 |
-| `phone/bt-overview-default.svg` | 蓝牙总览 | 默认 | `bluetooth/overview.md`。状态胶囊「已开启」，其下经典蓝牙、低功耗两行 |
+| `phone/workbench-a.svg` | 工作台 | 方案 A · 分组列表 | 结构来自 PR #24 `ia/workbench.svg` 的方案 A。状态条、最近会话、模块三行（蓝牙 / 网络 / 星闪）都是列表。颜色、白卡片、标题右侧「日志」「命令」按 PR #26。文案用现有字符串：已开启、已连接、经典蓝牙串口 |
+| `phone/workbench-b.svg` | 工作台 | 方案 B · 模块宫格 | 结构来自同一张线框的方案 B。三个模块是宫格，最近会话仍是列表。PR #26 `workbench/home.md` 写明不采用 M2 这种宫格；这张画出来供和方案 A 对照选择 |
+| `phone/workbench-ab.svg` | 工作台 | A/B 对照 | 上面两张手机稿并排，方便直接选。左侧方案 A，右侧方案 B |
+| `phone/bt-overview-default.svg` | 蓝牙总览 | 默认 | `bluetooth/overview.md`。状态胶囊「已开启」。经典蓝牙次行「不能打开」，因为 `/bluetooth/classic-scan` 在 `main` 尚未注册。低功耗次行用现有文案「GATT 浏览器」 |
 | `phone/bt-overview-off.svg` | 蓝牙总览 | 适配器关 | 同上。胶囊「已关闭」，入口箭头变弱 |
 | `phone/bt-overview-permission.svg` | 蓝牙总览 | 无权限 | `app-shell/permission-gap-wall.md`、M5、G4。中部标题和辅文，底部一颗主按钮，无插画 |
 | `phone/bt-scan-default.svg` | 经典蓝牙扫描 | 搜索成功 | `bluetooth/classic-scan.md`、`app-shell/layout-patterns.md` 扫描列表。M12 白卡片和浅胶囊「连接」，E3 行高 76、圆角 16，E1「已连接 / 可用」，H2 状态标题。已连接行不放「断开」。底部「重新搜索」 |
