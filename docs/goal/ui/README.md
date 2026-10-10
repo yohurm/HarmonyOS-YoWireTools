@@ -11,11 +11,17 @@ related:
 
 # YoWireTools 界面设计
 
-**不可进入大规模页面实现。** 依据是 [QUALITY-GATE.md](QUALITY-GATE.md)。文档写完不等于门禁通过。
+**不可进入大规模页面实现。** 依据是 [QUALITY-GATE.md](QUALITY-GATE.md)。文档写完不等于门禁通过。第 10–12、14 项仍阻塞。没有可视化原型，也不构成可以铺页面。
 
 本目录是整 App 的 UI 设计。页面不调用 Kit。壳、Token、权限墙和深浅色只在 [app-shell](app-shell/README.md)。模块屏幕沿用 Phase-C 的行为，并补上布局、ArkUI 组件树、七态和编号追溯。旧文件怎么处置见 [PHASE-C-DISPOSITION.md](PHASE-C-DISPOSITION.md)。
 
 特性包目录是 `features/wifi_network`。界面文档目录沿用 Phase-C 的 `wifi-network`，不另建 `docs/goal/ui/wifi_network/`。
+
+## 可视化原型
+
+可视化原型不在本 PR。由 UI 原型图 Goal（agent `bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`）交付到 `docs/goal/ui/prototypes/`。本目录不创建该路径，也不放图。
+
+原型依据本目录的文字规范：各屏的布局、ArkUI 组件树、状态矩阵，以及 [app-shell](app-shell/README.md) 的 Design Token 和壳层。原型不另起一套布局或组件。目录到达后，门禁只核对两者一致。核对通过也不取消第 10–12、14 项。结论仍以 [QUALITY-GATE.md](QUALITY-GATE.md) 为准。
 
 ## 阅读顺序
 
