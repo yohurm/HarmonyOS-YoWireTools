@@ -1,0 +1,52 @@
+# YoWire 整 App 界面规范
+
+本目录是从 `main` 起写的界面规范。不沿用 PR #19（`cursor/app-ui-design-2dc3`）的正文，也不沿用已关闭且未合并的 PR #22 里的图。Phase-C（PR #9、#10、#11）同样作废，不是合并底稿。
+
+本规范只定界面。页面不调用 Kit。读数和动作都停在 ViewModel。路径对齐位是：UI → ViewModel/State → UseCase → RepositoryContract → DataSource/KitBridge → Kit。整机契约还没进 `main`，导航和状态模型只留对齐位，见 [QUALITY-GATE.md](QUALITY-GATE.md)。
+
+没有原型图。第一批原型 PR #22 已关闭且未合并，不是本规范的底稿。可视化原型以后由 UI 原型图 Goal（`bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`）另交到 `docs/goal/ui/prototypes/`。不按旧 PNG 改规格，本 PR 不拷图。
+
+**现在不可进入大规模页面实现。**
+
+## 视觉语言从哪来
+
+公开组件市场的 8 个参考（2026-10-10 浏览，不登录）。GitCode / AtomGit 返回 WAF 418，官方案例源码树没有读到，组件名只采用华为设计指南和 ArkUI 参考里能核到的。
+
+| # | 参考 | 地址 | 本规范拿走的布局 |
+| --- | --- | --- | --- |
+| 1 | wifi 扫描选择组件 | https://developer.huawei.com/consumer/cn/market/prod-detail/b7e8c084fc214b80820ae31ba5ae9358/2adce9bbd4cb42d58a87e6add45594b3 | 连接 sheet：选择、密码、一颗「下一步」 |
+| 2 | 蓝牙扫描组件 | https://developer.huawei.com/consumer/cn/market/prod-detail/f6bf602fb1224791ae5874a45e292728/2adce9bbd4cb42d58a87e6add45594b3 | 扫描列表：结果标题、图示、文字按钮「重新搜索」、设备列表 |
+| 3 | WLAN 信息查询 | https://developer.huawei.com/consumer/cn/market/prod-detail/f722288166ec49cab512d9fef9efafe6/PLATFORM | list + detail：分组列表，详情是标签/值 |
+| 4 | NetworkQuery | https://developer.huawei.com/consumer/cn/market/prod-detail/15e711a071a9441b9a9b52b185792124/PLATFORM | 场景 Tab：等宽文字页签切换内容 |
+| 5 | 智慧家居应用模板 | https://developer.huawei.com/consumer/cn/market/prod-detail/0d7dd2239ce14a8e9fe8cfcde426d5ff/2adce9bbd4cb42d58a87e6add45594b3 | App shell：底栏图标+文字。不抄家居卡片和品牌 |
+| 6 | 终端控制台 IKConsoleKit | https://developer.huawei.com/consumer/cn/market/prod-detail/11090518ae8147e9b12f9ab8fb5cf815/c5ef800e4cc6476ab179493aa30dff52 | 控制台日志：顶栏页签分日志/网络等 |
+| 7 | FastBle | https://developer.huawei.com/consumer/cn/market/prod-detail/dca785c6dc1d458c8fd12568ecd78f05/PLATFORM | 过滤后再扫描、再连接。交付截图里没有 `fastble.png`，不把它的界面当成看见过 |
+| 8 | BluetoothLowEnergy 通信 | https://developer.huawei.com/consumer/cn/market/prod-detail/c0b2e7a68718427eb7fa8ba0fd8afd00/PLATFORM | 设备数据竖卡：色点、数值、说明 |
+
+市场站点本身是 SPA。类目接口 `product/productCategoryQuery` 与列表接口 `product/list` 能拉到目录；「组件 / 工具」一类有数百条。上表 8 条是对照过界面的，其余商品名不参与视觉。
+
+Design Skill（交互规则，不替代 ArkUI 组件名）：
+
+- [ui-design-brain](https://github.com/carmahhawwari/ui-design-brain)（核到约 893 star）：一个区域一颗主按钮，动词文案；空态带下一步；页签不宜多；状态标签词短、颜色少。Web 组件名（Modal、Drawer）映射到 `CustomDialog` / `bindSheet`，不直接写进组件树。
+- [baoyu-design](https://github.com/JimLiu/baoyu-design)（核到约 4276 star）：层级、间距节奏、一个焦点操作。该 Skill 的产物是 HTML 原型。本规范不产出 HTML，也不画原型图。
+
+官方度量见 `yohurm/HarmonyOS-Developer-docs`：`设计/设计指南/通用设计基础/视觉风格/间隔参数.md`、`圆角参数.md`、`文本排版.md`，`系统特性/深色模式.md`，`控件/容器类/列表.md`、`半模态面板.md`，`控件/导航类/底部页签.md`，`控件/操作类/按钮.md`，`布局/布局基础.md`，以及 ArkUI `触摸热区设置.md`、`Navigation基础架构介绍.md`。来源规则见 `yohurm/YoAgentDocs` 的 `instructions/rules/common/design-sources.md`：规范管状态和尺寸，仓库管实现。
+
+## 目录
+
+壳层：[app-shell/](app-shell/README.md)
+
+| 模块 | 屏 |
+| --- | --- |
+| [workbench](workbench/home.md) | 工作台、命令面板 |
+| [bluetooth](bluetooth/overview.md) | 概览、经典扫描、SPP 终端、BLE 扫描、GATT 详情 |
+| [nearlink](nearlink/overview.md) | 概览、扫描、SSAP 客户端、端口数传 |
+| [wifi-network](wifi-network/overview.md) | 概览、扫描、链路详情、诊断、Socket、HTTP、WebSocket、局域网发现 |
+| [log](log/center.md) | 日志中心、日志详情 |
+| [settings](settings/hub.md) | 更多（设置） |
+
+屏名单对齐 `main` 上已有路由（`AppRoutes.ets`）和 `.projectark/5-架构设计/无线调试工具/00-总体架构与工程模块化设计.md` 第 7.2 节。第 7.2 节有、代码还没有的路由，在各屏文首标成目标路由。布局、Token、组件树、状态呈现是新写的。
+
+## 编号
+
+不新编 BT / NL / WN / WB / LOG / SET。要追溯时只指向未进 `main` 的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) `docs/goal/citation.md`。整机契约只指向未进 `main` 的 [PR #21](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/21) `docs/goal/checklist/app.md` 与 `docs/goal/architecture/app/APP-001.md`–`APP-006.md`。
