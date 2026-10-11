@@ -4,23 +4,17 @@ import { Result, ResultError } from 'common_core';
 
 export enum NearLinkScanMode {
   LOW_POWER = 'low_power',
-  BALANCED = 'balanced',
-  LOW_LATENCY = 'low_latency'
+  BALANCED = 'balanced'
 }
 
-/**
- * NearLink scan filter. Platform mapping lives in data/mapper/NearLinkScanPlatformMapper.
- */
-export class NearLinkScanFilter {
+export class NearLinkSystemFilter {
   readonly address: string;
   readonly deviceName: string;
   readonly manufacturerId: number;
   readonly manufacturerDataHex: string;
   readonly manufacturerDataMaskHex: string;
-  readonly allowNullFilter: boolean;
-  readonly scanMode: NearLinkScanMode;
-  readonly durationSec: number;
-  readonly minRssi: number;
+  readonly rssi: number;
+  readonly hasRssi: boolean;
 
   constructor(
     address: string = '',
@@ -28,63 +22,128 @@ export class NearLinkScanFilter {
     manufacturerId: number = -1,
     manufacturerDataHex: string = '',
     manufacturerDataMaskHex: string = '',
-    allowNullFilter: boolean = false,
-    scanMode: NearLinkScanMode = NearLinkScanMode.BALANCED,
-    durationSec: number = 0,
-    minRssi: number = -128
+    rssi: number = 0,
+    hasRssi: boolean = false
   ) {
     this.address = address;
     this.deviceName = deviceName;
     this.manufacturerId = manufacturerId;
     this.manufacturerDataHex = manufacturerDataHex;
     this.manufacturerDataMaskHex = manufacturerDataMaskHex;
-    this.allowNullFilter = allowNullFilter;
+    this.rssi = rssi;
+    this.hasRssi = hasRssi;
+  }
+
+  isEmpty(): boolean {
+    return this.address.length === 0 &&
+      this.deviceName.length === 0 &&
+      this.manufacturerId < 0 &&
+      this.manufacturerDataHex.length === 0 &&
+      !this.hasRssi;
+  }
+}
+
+/**
+ * Scan request. System fields and local-only fields stay apart.
+ * Kit mapping does not receive a service UUID.
+ */
+export class NearLinkScanFilter {
+  readonly groups: NearLinkSystemFilter[];
+  readonly scanMode: NearLinkScanMode;
+  readonly durationSec: number;
+  readonly scanAll: boolean;
+  readonly localServiceUuid: string;
+  readonly localUuidFilterEnabled: boolean;
+  readonly localRssiGate: number;
+  readonly hasLocalRssiGate: boolean;
+
+  constructor(
+    groups: NearLinkSystemFilter[] = [],
+    scanMode: NearLinkScanMode = NearLinkScanMode.LOW_POWER,
+    durationSec: number = 0,
+    scanAll: boolean = false,
+    localServiceUuid: string = '',
+    localUuidFilterEnabled: boolean = false,
+    localRssiGate: number = 0,
+    hasLocalRssiGate: boolean = false
+  ) {
+    this.groups = groups;
     this.scanMode = scanMode;
     this.durationSec = durationSec;
-    this.minRssi = minRssi;
+    this.scanAll = scanAll;
+    this.localServiceUuid = localServiceUuid;
+    this.localUuidFilterEnabled = localUuidFilterEnabled;
+    this.localRssiGate = localRssiGate;
+    this.hasLocalRssiGate = hasLocalRssiGate;
+  }
+
+  static named(deviceName: string): NearLinkScanFilter {
+    return new NearLinkScanFilter([new NearLinkSystemFilter('', deviceName)]);
   }
 
   validate(): Result<void> {
-    if (this.manufacturerDataHex.length > 0 && this.manufacturerId < 0) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.EMPTY_FILTER, 'manufacturerId required'));
-    }
-    if (this.manufacturerDataMaskHex.length > 0) {
-      if (this.manufacturerDataHex.length === 0) {
-        return Result.fail(new ResultError(NearLinkErrorCodes.MASK_LENGTH_MISMATCH, 'manufacturerData required'));
-      }
-      if (this.normalizeHex(this.manufacturerDataHex).length !==
-        this.normalizeHex(this.manufacturerDataMaskHex).length) {
-        return Result.fail(new ResultError(NearLinkErrorCodes.MASK_LENGTH_MISMATCH, 'mask length mismatch'));
-      }
-    }
-    if (this.durationSec > 0 &&
+    if (this.durationSec !== 0 &&
       (this.durationSec < NearLinkConstants.MIN_SCAN_DURATION_SEC ||
         this.durationSec > NearLinkConstants.MAX_SCAN_DURATION_SEC)) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.DT_INVALID_PARAMS, 'duration out of range'));
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.DURATION_RANGE,
+        'api=startScan;field=duration',
+        undefined,
+        {},
+        ''
+      ));
     }
-    if (!this.allowNullFilter && !this.hasEffectiveFilter()) {
-      return Result.fail(new ResultError(NearLinkErrorCodes.EMPTY_FILTER, 'At least one filter required on API 13+'));
+    for (let i = 0; i < this.groups.length; i++) {
+      const group = this.groups[i];
+      const groupError = NearLinkScanFilter.validateGroup(group);
+      if (groupError !== undefined) {
+        return Result.fail(groupError);
+      }
+    }
+    if (!this.scanAll && !this.hasEffectiveSystemFilter()) {
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.EMPTY_FILTER,
+        'api=startScan;native=401',
+        undefined,
+        { 'nativeCode': NearLinkConstants.NATIVE_INVALID },
+        `${NearLinkConstants.NATIVE_INVALID}`
+      ));
     }
     return Result.ok(undefined);
   }
 
-  hasEffectiveFilter(): boolean {
-    return this.address.length > 0 ||
-      this.deviceName.length > 0 ||
-      this.manufacturerId >= 0;
+  hasEffectiveSystemFilter(): boolean {
+    for (let i = 0; i < this.groups.length; i++) {
+      if (!this.groups[i].isEmpty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  matchesPostFilter(name: string, rssi: number, rssiValid: boolean): boolean {
-    if (this.minRssi > -128 && rssiValid && rssi < this.minRssi) {
-      return false;
+  private static validateGroup(group: NearLinkSystemFilter): ResultError | undefined {
+    if (group.deviceName.length > NearLinkConstants.NAME_MAX_LENGTH) {
+      return new ResultError(NearLinkErrorCodes.NAME_LENGTH, 'api=startScan;field=deviceName');
     }
-    if (this.deviceName.length > 0 && !name.includes(this.deviceName)) {
-      return false;
+    if (group.manufacturerDataHex.length > 0 && group.manufacturerId < 0) {
+      return new ResultError(NearLinkErrorCodes.MANUFACTURER_DATA_NEEDS_ID, 'api=startScan;field=manufacturerId');
     }
-    return true;
+    if (group.manufacturerId >= 0 &&
+      (group.manufacturerId < NearLinkConstants.MANUFACTURER_ID_MIN ||
+        group.manufacturerId > NearLinkConstants.MANUFACTURER_ID_MAX)) {
+      return new ResultError(NearLinkErrorCodes.MANUFACTURER_ID_RANGE, 'api=startScan;field=manufacturerId');
+    }
+    if (group.manufacturerDataMaskHex.length > 0) {
+      const dataLen = NearLinkScanFilter.normalizeHex(group.manufacturerDataHex).length;
+      const maskLen = NearLinkScanFilter.normalizeHex(group.manufacturerDataMaskHex).length;
+      if (dataLen === 0 || dataLen !== maskLen) {
+        return new ResultError(NearLinkErrorCodes.MASK_LENGTH_MISMATCH, 'api=startScan;field=manufacturerDataMask');
+      }
+    }
+    return undefined;
   }
 
-  private normalizeHex(value: string): string {
+  private static normalizeHex(value: string): string {
     return value.replace(/\s/g, '').toLowerCase();
   }
 }

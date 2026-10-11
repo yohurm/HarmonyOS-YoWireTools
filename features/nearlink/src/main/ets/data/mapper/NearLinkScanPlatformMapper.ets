@@ -1,32 +1,22 @@
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { scan } from '@kit.NearLinkKit';
-import { NearLinkScanFilter, NearLinkScanMode } from '../../domain/model/NearLinkScanFilter';
+import { NearLinkConstants } from '../../constants/NearLinkConstants';
+import { NearLinkScanFilter, NearLinkScanMode, NearLinkSystemFilter } from '../../domain/model/NearLinkScanFilter';
 
 /**
- * Maps domain NearLink scan filter to NearLinkKit scan parameters.
+ * Maps system scan fields onto Kit ScanFilters. No service UUID parameter.
  */
 export class NearLinkScanPlatformMapper {
-  static toPlatformFilters(filter: NearLinkScanFilter): scan.ScanFilters[] {
-    if (filter.allowNullFilter && !filter.hasEffectiveFilter()) {
-      return [];
+  static toPlatformFilters(filter: NearLinkScanFilter, includeRssi: boolean): scan.ScanFilters[] {
+    const mapped: scan.ScanFilters[] = [];
+    for (let i = 0; i < filter.groups.length; i++) {
+      const group = filter.groups[i];
+      if (group.isEmpty()) {
+        continue;
+      }
+      mapped.push(NearLinkScanPlatformMapper.mapGroup(group, includeRssi));
     }
-    const platformFilter: scan.ScanFilters = {};
-    if (filter.address.length > 0) {
-      platformFilter.address = filter.address;
-    }
-    if (filter.deviceName.length > 0) {
-      platformFilter.deviceName = filter.deviceName;
-    }
-    if (filter.manufacturerId >= 0) {
-      platformFilter.manufacturerId = filter.manufacturerId;
-    }
-    if (filter.manufacturerDataHex.length > 0) {
-      platformFilter.manufacturerData = NearLinkScanPlatformMapper.hexToArrayBuffer(filter.manufacturerDataHex);
-    }
-    if (filter.manufacturerDataMaskHex.length > 0) {
-      platformFilter.manufacturerDataMask =
-        NearLinkScanPlatformMapper.hexToArrayBuffer(filter.manufacturerDataMaskHex);
-    }
-    return [platformFilter];
+    return mapped;
   }
 
   static toScanOptions(filter: NearLinkScanFilter): scan.ScanOptions {
@@ -34,12 +24,35 @@ export class NearLinkScanPlatformMapper {
     if (filter.durationSec > 0) {
       options.duration = filter.durationSec;
     }
-    if (filter.scanMode === NearLinkScanMode.LOW_POWER) {
-      options.scanMode = scan.ScanMode.SCAN_MODE_LOW_POWER;
-    } else {
+    if (filter.scanMode === NearLinkScanMode.BALANCED) {
       options.scanMode = scan.ScanMode.SCAN_MODE_BALANCED;
+    } else {
+      options.scanMode = scan.ScanMode.SCAN_MODE_LOW_POWER;
     }
     return options;
+  }
+
+  private static mapGroup(group: NearLinkSystemFilter, includeRssi: boolean): scan.ScanFilters {
+    const platformFilter: scan.ScanFilters = {};
+    if (group.address.length > 0) {
+      platformFilter.address = group.address;
+    }
+    if (group.deviceName.length > 0) {
+      platformFilter.deviceName = group.deviceName;
+    }
+    if (group.manufacturerId >= 0) {
+      platformFilter.manufacturerId = group.manufacturerId;
+    }
+    if (group.manufacturerDataHex.length > 0) {
+      platformFilter.manufacturerData = NearLinkScanPlatformMapper.hexToArrayBuffer(group.manufacturerDataHex);
+    }
+    if (group.manufacturerDataMaskHex.length > 0) {
+      platformFilter.manufacturerDataMask = NearLinkScanPlatformMapper.hexToArrayBuffer(group.manufacturerDataMaskHex);
+    }
+    if (includeRssi && group.hasRssi && deviceInfo.sdkApiVersion >= NearLinkConstants.API_RSSI_FILTER) {
+      platformFilter.rssi = group.rssi;
+    }
+    return platformFilter;
   }
 
   private static hexToArrayBuffer(hex: string): ArrayBuffer {

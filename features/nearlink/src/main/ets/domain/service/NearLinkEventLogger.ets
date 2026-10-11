@@ -122,13 +122,32 @@ export class NearLinkEventLogger {
     );
   }
 
+  static async logApi(
+    sessionId: string,
+    protocol: ProtocolType,
+    recordType: LogRecordType,
+    summary: string,
+    apiName: string,
+    nativeCode: string = '',
+    attributes: Record<string, string | number | boolean> = {}
+  ): Promise<void> {
+    const attrs: Record<string, string | number | boolean> = {};
+    const keys = Object.keys(attributes);
+    for (let i = 0; i < keys.length; i++) {
+      attrs[keys[i]] = attributes[keys[i]];
+    }
+    attrs['apiName'] = apiName;
+    await NearLinkEventLogger.captureEvent(sessionId, protocol, recordType, summary, nativeCode, '', attrs);
+  }
+
   private static async captureEvent(
     sessionId: string,
     protocol: ProtocolType,
     recordType: LogRecordType,
     summary: string,
     nativeCode: string = '',
-    appCode: string = ''
+    appCode: string = '',
+    attributes: Record<string, string | number | boolean> = {}
   ): Promise<void> {
     const event = new DebugEvent(
       IdGenerator.next('evt'),
@@ -137,12 +156,12 @@ export class NearLinkEventLogger {
       recordType,
       'internal',
       TimeUtil.nowMs(),
-      ErrorSeverity.INFO,
+      nativeCode.length > 0 ? ErrorSeverity.ERROR : ErrorSeverity.INFO,
       summary,
       undefined,
       nativeCode,
       appCode,
-      {}
+      attributes
     );
     await NearLinkEventLogger.logCapture.captureEvent(event);
   }

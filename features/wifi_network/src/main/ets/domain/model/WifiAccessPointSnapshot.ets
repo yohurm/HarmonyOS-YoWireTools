@@ -14,6 +14,8 @@ export class WifiAccessPointSnapshot {
   readonly securityType: string;
   readonly source: WifiScanSource;
   readonly capturedAtMs: number;
+  readonly channelWidthLabel: string;
+  readonly addressKind: string;
 
   constructor(
     id: string,
@@ -28,7 +30,9 @@ export class WifiAccessPointSnapshot {
     channel: number,
     securityType: string,
     source: WifiScanSource,
-    capturedAtMs: number
+    capturedAtMs: number,
+    channelWidthLabel: string = '',
+    addressKind: string = ''
   ) {
     this.id = id;
     this.ssid = ssid;
@@ -43,6 +47,8 @@ export class WifiAccessPointSnapshot {
     this.securityType = securityType;
     this.source = source;
     this.capturedAtMs = capturedAtMs;
+    this.channelWidthLabel = channelWidthLabel;
+    this.addressKind = addressKind;
   }
 
   static maskedBssid(raw: string, visible: boolean, reason: BssidMaskReason): string {
@@ -50,7 +56,7 @@ export class WifiAccessPointSnapshot {
       return raw;
     }
     if (reason === BssidMaskReason.PERMISSION_DENIED) {
-      return '**:**:**:**:**:**';
+      return '';
     }
     return 'unavailable';
   }

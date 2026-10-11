@@ -1,6 +1,7 @@
 export enum DeviceNameSource {
   SYSTEM = 'system',
-  ADV_LOCAL_NAME = 'adv_local_name',
+  COMPLETE = 'complete',
+  SHORT = 'short',
   UNKNOWN = 'unknown'
 }
 
@@ -17,10 +18,22 @@ export class NearLinkManufacturerData {
 export class NearLinkServiceData {
   readonly serviceUuid: string;
   readonly dataHex: string;
+  readonly bitWidth: number;
 
-  constructor(serviceUuid: string, dataHex: string) {
+  constructor(serviceUuid: string, dataHex: string, bitWidth: number = 16) {
     this.serviceUuid = serviceUuid;
     this.dataHex = dataHex;
+    this.bitWidth = bitWidth;
+  }
+}
+
+export class NearLinkUnknownTlv {
+  readonly typeCode: number;
+  readonly valueHex: string;
+
+  constructor(typeCode: number, valueHex: string) {
+    this.typeCode = typeCode;
+    this.valueHex = valueHex;
   }
 }
 
@@ -33,6 +46,13 @@ export class NearLinkAdvertisingPacket {
   readonly localName: string;
   readonly nameSource: DeviceNameSource;
   readonly parseWarnings: string[];
+  readonly completeLocalName: string;
+  readonly shortLocalName: string;
+  readonly reportedDeviceName: string;
+  readonly unknownTlvs: NearLinkUnknownTlv[];
+  readonly discoveryLevel: number;
+  readonly deviceInfoNameByteLength: number;
+  readonly isEmpty: boolean;
 
   constructor(
     rawHex: string = '',
@@ -42,7 +62,14 @@ export class NearLinkAdvertisingPacket {
     manufacturerData: NearLinkManufacturerData[] = [],
     localName: string = '',
     nameSource: DeviceNameSource = DeviceNameSource.UNKNOWN,
-    parseWarnings: string[] = []
+    parseWarnings: string[] = [],
+    completeLocalName: string = '',
+    shortLocalName: string = '',
+    reportedDeviceName: string = '',
+    unknownTlvs: NearLinkUnknownTlv[] = [],
+    discoveryLevel: number = -1,
+    deviceInfoNameByteLength: number = -1,
+    isEmpty: boolean = false
   ) {
     this.rawHex = rawHex;
     this.rawSize = rawSize;
@@ -52,5 +79,12 @@ export class NearLinkAdvertisingPacket {
     this.localName = localName;
     this.nameSource = nameSource;
     this.parseWarnings = parseWarnings;
+    this.completeLocalName = completeLocalName;
+    this.shortLocalName = shortLocalName;
+    this.reportedDeviceName = reportedDeviceName;
+    this.unknownTlvs = unknownTlvs;
+    this.discoveryLevel = discoveryLevel;
+    this.deviceInfoNameByteLength = deviceInfoNameByteLength;
+    this.isEmpty = isEmpty;
   }
 }

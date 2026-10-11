@@ -43,6 +43,34 @@ export class TcpSocketDataSource {
     }
   }
 
+  async connectTls(
+    host: string,
+    port: number,
+    timeoutMs: number
+  ): Promise<Result<socket.TLSSocket>> {
+    const tls = socket.constructTLSSocketInstance();
+    const secureOptions: socket.TLSSecureOptions = {};
+    const options: socket.TLSConnectOptions = {
+      address: { address: host, port: port, family: 1 },
+      secureOptions: secureOptions
+    };
+    try {
+      const connectPromise = tls.connect(options);
+      const timeoutPromise = new Promise<void>((_, reject) => {
+        setTimeout(() => reject(new Error('connect timeout')), timeoutMs);
+      });
+      await Promise.race([connectPromise, timeoutPromise]);
+      return Result.ok(tls);
+    } catch (error) {
+      try {
+        await tls.close();
+      } catch (_closeError) {
+      }
+      const err = error as BusinessError;
+      return Result.fail(ResultError.fromError(WifiNetworkErrorCodes.CONNECT_TIMEOUT, err));
+    }
+  }
+
   async connectWithTimeout(
     host: string,
     port: number,

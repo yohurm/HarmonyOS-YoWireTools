@@ -15,22 +15,21 @@ import {
 } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { NearLinkErrorCodes } from '../../constants/NearLinkErrorCodes';
-import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
-import { NearLinkAdapterSnapshot, NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
+import { NearLinkRepositoryContract } from '../repository/NearLinkRepositoryContract';
+import { NearLinkDevice, NearLinkCapabilitySnapshot } from '../model/NearLinkDevice';
 import { NearLinkScanFilter } from '../model/NearLinkScanFilter';
-import { NearLinkScanPhase } from '../model/NearLinkScanPhase';
 import { CapabilityResult } from 'common_platform';
 import { NearLinkCapabilityService } from '../service/NearLinkCapabilityService';
 import { NearLinkScanLogger } from '../service/NearLinkScanLogger';
 
 export class StartNearLinkScanUseCase {
-  private readonly repository: NearLinkRepository;
+  private readonly repository: NearLinkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
   private readonly createSession: CreateSessionUseCase;
   private readonly startSession: StartSessionUseCase;
 
   constructor(
-    repository: NearLinkRepository = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
     createSession: CreateSessionUseCase = new CreateSessionUseCase(),
     startSession: StartSessionUseCase = new StartSessionUseCase()
@@ -68,7 +67,7 @@ export class StartNearLinkScanUseCase {
     if (!started.success) {
       return Result.fail(started.error ?? new ResultError('YW-SESSION-1003', 'Session start failed'));
     }
-    const scan = this.repository.startScan(created.value.id, filter);
+    const scan = await this.repository.startScan(created.value.id, filter);
     if (!scan.success) {
       return Result.fail(scan.error ?? new ResultError(NearLinkErrorCodes.SCAN_FAILED, 'Scan failed'));
     }
@@ -78,11 +77,11 @@ export class StartNearLinkScanUseCase {
 }
 
 export class StopNearLinkScanUseCase {
-  private readonly repository: NearLinkRepository;
+  private readonly repository: NearLinkRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: NearLinkRepository = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     stopSession: StopSessionUseCase = new StopSessionUseCase()
   ) {
     this.repository = repository;
@@ -90,7 +89,7 @@ export class StopNearLinkScanUseCase {
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    const stopped = this.repository.stopScan();
+    const stopped = await this.repository.stopScan();
     if (!stopped.success) {
       return stopped;
     }
@@ -107,11 +106,11 @@ export class StopNearLinkScanUseCase {
 }
 
 export class LoadNearLinkOverviewUseCase {
-  private readonly repository: NearLinkRepository;
+  private readonly repository: NearLinkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: NearLinkRepository = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -128,9 +127,9 @@ export class LoadNearLinkOverviewUseCase {
 }
 
 export class ObserveNearLinkDevicesUseCase {
-  private readonly repository: NearLinkRepository;
+  private readonly repository: NearLinkRepositoryContract;
 
-  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
+  constructor(repository: NearLinkRepositoryContract) {
     this.repository = repository;
   }
 
@@ -140,11 +139,11 @@ export class ObserveNearLinkDevicesUseCase {
 }
 
 export class ResolveNearLinkCapabilityUseCase {
-  private readonly repository: NearLinkRepository;
+  private readonly repository: NearLinkRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: NearLinkRepository = NearLinkRepository.getInstance(),
+    repository: NearLinkRepositoryContract,
     ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
   ) {
     this.repository = repository;
@@ -168,41 +167,5 @@ export class ResolveNearLinkCapabilityUseCase {
       readyForScan,
       readyForConnect
     ));
-  }
-}
-
-export class ObserveNearLinkScanPhaseUseCase {
-  private readonly repository: NearLinkRepository;
-
-  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
-    this.repository = repository;
-  }
-
-  execute(listener: (phase: NearLinkScanPhase) => void): Subscription {
-    return this.repository.observeScanPhase().subscribe(listener);
-  }
-}
-
-export class ReadNearLinkScanFailureUseCase {
-  private readonly repository: NearLinkRepository;
-
-  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
-    this.repository = repository;
-  }
-
-  execute(): string {
-    return this.repository.getLastScanFailureCode();
-  }
-}
-
-export class ObserveNearLinkAdapterUseCase {
-  private readonly repository: NearLinkRepository;
-
-  constructor(repository: NearLinkRepository = NearLinkRepository.getInstance()) {
-    this.repository = repository;
-  }
-
-  execute(listener: (snapshot: NearLinkAdapterSnapshot) => void): Subscription {
-    return this.repository.observeAdapterState().subscribe(listener, false);
   }
 }

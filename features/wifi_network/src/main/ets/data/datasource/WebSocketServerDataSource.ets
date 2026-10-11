@@ -1,5 +1,6 @@
 import { webSocket } from '@kit.NetworkKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
+import { WifiNetworkConstants } from '../../constants/WifiNetworkConstants';
 import { Observable, Result, ResultError } from 'common_core';
 import { WifiNetworkErrorCodes } from '../../constants/WifiNetworkErrorCodes';
 import {
@@ -41,6 +42,13 @@ export class WebSocketServerDataSource {
     return this.clientsObservable;
   }
   async start(config: WebSocketServerConfigModel): Promise<Result<void>> {
+    if (deviceInfo.sdkApiVersion < WifiNetworkConstants.WEB_SOCKET_SERVER_MIN_API) {
+      this.setPhase(WebSocketServerPhase.FAILED);
+      return Result.fail(new ResultError(
+        WifiNetworkErrorCodes.WS_SERVER_UNSUPPORTED,
+        '当前系统版本没有该接口'
+      ));
+    }
     await this.stop();
     try {
       this.server = webSocket.createWebSocketServer();

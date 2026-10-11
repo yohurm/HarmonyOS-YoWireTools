@@ -1,63 +1,52 @@
+import { NearLinkRepository } from '../../data/repository/NearLinkRepository';
+import { NearLinkDestination } from '../../domain/model/NearLinkScreenCategory';
+import { NearLinkDebugModel } from '../state/NearLinkDebugModel';
+import { NearLinkCdsmView } from '../view/NearLinkCdsmView';
+import { NearLinkDetailView } from '../view/NearLinkDetailView';
+import { NearLinkLogView } from '../view/NearLinkLogView';
+import { NearLinkRootView } from '../view/NearLinkRootView';
+import { NearLinkScanView } from '../view/NearLinkScanView';
 import {
-  YoContentState,
-  YoLoadingStateModel,
-  YoNavDestinationKind,
-  YoPageShell,
-  YoPageState
-} from 'youi_kit';
-import { NearLinkOverviewViewModel } from '../../viewmodel/NearLinkOverviewViewModel';
-import { NearLinkOverviewContentView } from '../view/NearLinkOverviewContentView';
+  NearLinkAdvertisingView,
+  NearLinkPairingView,
+  NearLinkPortView,
+  NearLinkSsapClientView,
+  NearLinkSsapServerView
+} from '../view/NearLinkSessionViews';
 
 @ComponentV2
 export struct NearLinkFeaturePage {
-  @Local vm: NearLinkOverviewViewModel = new NearLinkOverviewViewModel();
+  @Local vm: NearLinkDebugModel = new NearLinkDebugModel(NearLinkRepository.getInstance());
 
   aboutToAppear(): void {
-    void this.vm.onPageAppear();
+    void this.vm.onAppear();
   }
 
   aboutToDisappear(): void {
-    this.vm.onPageDisappear();
-  }
-
-  private resolvePageState(): YoPageState {
-    if (!this.vm.hasLoaded) {
-      return YoPageState.LOADING;
-    }
-    if (!this.vm.permissionGranted) {
-      return YoPageState.PERMISSION;
-    }
-    return YoPageState.CONTENT;
-  }
-
-  @LocalBuilder
-  pageContent() {
-    YoContentState({
-      state: this.resolvePageState(),
-      loadingModel: new YoLoadingStateModel($r('app.string.youi_loading_default_message')),
-      permissionState: this.vm.permissionUiState,
-      content: this.pageBody,
-      onRequestPermission: () => {
-        void this.vm.requestPermission();
-      },
-      onOpenSettings: () => {
-        void this.vm.requestPermission();
-      }
-    })
-  }
-
-  @LocalBuilder
-  pageBody() {
-    NearLinkOverviewContentView({ vm: this.vm })
+    void this.vm.onDisappear();
   }
 
   build() {
-    YoPageShell({
-      title: $r('app.string.nl_title_overview'),
-      destinationKind: YoNavDestinationKind.ROOT_TAB,
-      scrollable: false,
-      immersiveTitleBar: true,
-      content: this.pageContent
-    })
+    if (this.vm.destination === NearLinkDestination.SCAN) {
+      NearLinkScanView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.DETAIL) {
+      NearLinkDetailView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.ADVERTISING) {
+      NearLinkAdvertisingView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.SSAP_CLIENT) {
+      NearLinkSsapClientView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.SSAP_SERVER) {
+      NearLinkSsapServerView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.PORT) {
+      NearLinkPortView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.PAIRING) {
+      NearLinkPairingView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.LOG) {
+      NearLinkLogView({ vm: this.vm })
+    } else if (this.vm.destination === NearLinkDestination.CDSM) {
+      NearLinkCdsmView({ vm: this.vm })
+    } else {
+      NearLinkRootView({ vm: this.vm })
+    }
   }
 }

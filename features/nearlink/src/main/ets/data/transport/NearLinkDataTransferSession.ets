@@ -71,7 +71,7 @@ export class NearLinkDataTransferSession implements ITransportSession {
   async connect(params: Record<string, string | number | boolean>): Promise<void> {
     this.address = `${params['address'] ?? params['deviceId'] ?? ''}`;
     this.portUuid = `${params['uuid'] ?? params['portUuid'] ?? ''}`;
-    this.mtu = Number(params['mtu'] ?? NearLinkConstants.DEFAULT_MTU);
+    this.mtu = Number(params['mtu'] ?? NearLinkConstants.PORT_MTU_DEFAULT);
     if (this.address.length === 0 || this.portUuid.length === 0) {
       this.transition(TransportState.FAILED, 'address or uuid missing');
       throw new Error('dataTransfer address/uuid required');
@@ -139,8 +139,9 @@ export class NearLinkDataTransferSession implements ITransportSession {
         );
       }
       this.transition(TransportState.CONNECTED, 'congested');
-      await NearLinkExtendedUseCases.sleep(backoff);
-      backoff = Math.min(backoff * 2, this.congestionPolicy.maxBackoffMs);
+      const gap = Math.max(backoff, NearLinkConstants.CONGESTION_MIN_GAP_MS);
+      await NearLinkExtendedUseCases.sleep(gap);
+      backoff = Math.min(Math.max(backoff * 2, NearLinkConstants.CONGESTION_MIN_GAP_MS), this.congestionPolicy.maxBackoffMs);
     }
     return new WriteResult(false, 0, NearLinkErrorCodes.DT_WRITE_CONGESTED, 'Write congested after retries');
   }

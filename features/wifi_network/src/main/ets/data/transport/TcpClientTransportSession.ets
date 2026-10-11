@@ -24,6 +24,9 @@ export class TcpClientTransportSession implements ITransportSession {
   readonly capabilities: TransportCapabilities;
   private currentState: TransportState = TransportState.IDLE;
   private tcpSocket: socket.TCPSocket | undefined;
+  private tlsSocket: socket.TLSSocket | undefined;
+  private closeHandler: (() => void) | undefined;
+  private tlsMessageHandler: ((value: socket.SocketMessageInfo) => void) | undefined;
   private readonly incomingObservable: Observable<IncomingPayload>;
   private readonly stateObservable: Observable<TransportStateSnapshot>;
 
@@ -47,14 +50,37 @@ export class TcpClientTransportSession implements ITransportSession {
         this.incomingObservable.next(new IncomingPayload(bytes, TimeUtil.nowMs(), false));
       }
     });
+    this.closeHandler = () => {
+      this.tcpSocket = undefined;
+      this.transition(TransportState.DISCONNECTED, '关闭');
+    };
+    NetworkKitEventBridge.subscribeTcpClose(tcp, this.closeHandler);
+  }
+
+  bindTls(tls: socket.TLSSocket): void {
+    this.tlsSocket = tls;
+    this.transition(TransportState.CONNECTED);
+    this.tlsMessageHandler = (value: socket.SocketMessageInfo) => {
+      if (typeof value.message === 'string') {
+        const bytes = TcpClientTransportSession.textToBytes(value.message);
+        this.incomingObservable.next(new IncomingPayload(bytes, TimeUtil.nowMs(), false));
+      }
+    };
+    NetworkKitEventBridge.subscribeTlsMessage(tls, this.tlsMessageHandler);
+    this.closeHandler = () => {
+      this.tlsSocket = undefined;
+      this.transition(TransportState.DISCONNECTED, '关闭');
+    };
+    NetworkKitEventBridge.subscribeTlsClose(tls, this.closeHandler);
   }
 
   async connect(_params: Record<string, string | number | boolean>): Promise<void> {
     this.transition(TransportState.CONNECTING);
   }
 
-  async disconnect(_reason: string): Promise<void> {
+  async disconnect(reason: string): Promise<void> {
     this.transition(TransportState.DISCONNECTING);
+    this.detachClose();
     if (this.tcpSocket !== undefined) {
       try {
         await this.tcpSocket.close();
@@ -62,14 +88,28 @@ export class TcpClientTransportSession implements ITransportSession {
       }
       this.tcpSocket = undefined;
     }
-    this.transition(TransportState.DISCONNECTED);
+    if (this.tlsSocket !== undefined) {
+      try {
+        await this.tlsSocket.close();
+      } catch (_error) {
+      }
+      this.tlsSocket = undefined;
+    }
+    this.transition(TransportState.DISCONNECTED, reason);
   }
 
   async write(payload: Uint8Array, _options?: WriteOptions): Promise<WriteResult> {
-    if (this.tcpSocket === undefined || this.currentState !== TransportState.CONNECTED) {
-      return new WriteResult(false, 0, WifiNetworkErrorCodes.NOT_CONNECTED, 'TCP not connected');
+    if (this.currentState !== TransportState.CONNECTED) {
+      return new WriteResult(false, 0, WifiNetworkErrorCodes.NOT_CONNECTED, '发送不可用');
     }
     try {
+      if (this.tlsSocket !== undefined) {
+        await this.tlsSocket.send(payload.buffer);
+        return new WriteResult(true, payload.length);
+      }
+      if (this.tcpSocket === undefined) {
+        return new WriteResult(false, 0, WifiNetworkErrorCodes.NOT_CONNECTED, '发送不可用');
+      }
       await this.tcpSocket.send({ data: payload.buffer });
       return new WriteResult(true, payload.length);
     } catch (error) {
@@ -90,6 +130,20 @@ export class TcpClientTransportSession implements ITransportSession {
     void this.disconnect('destroy');
     this.incomingObservable.clearObservers();
     this.stateObservable.clearObservers();
+  }
+
+  private detachClose(): void {
+    if (this.closeHandler !== undefined && this.tcpSocket !== undefined) {
+      NetworkKitEventBridge.unsubscribeTcpClose(this.tcpSocket, this.closeHandler);
+    }
+    if (this.closeHandler !== undefined && this.tlsSocket !== undefined) {
+      NetworkKitEventBridge.unsubscribeTlsClose(this.tlsSocket, this.closeHandler);
+    }
+    if (this.tlsMessageHandler !== undefined && this.tlsSocket !== undefined) {
+      NetworkKitEventBridge.unsubscribeTlsMessage(this.tlsSocket, this.tlsMessageHandler);
+    }
+    this.closeHandler = undefined;
+    this.tlsMessageHandler = undefined;
   }
 
   private transition(state: TransportState, reason: string = ''): void {

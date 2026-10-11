@@ -33,6 +33,42 @@ export class NetworkKitEventBridge {
     }, 'wifiManager.wifiConnectionChange');
   }
 
+  static subscribeWifiScanStateChange(handler: (state: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiScanStateChange', handler);
+    }, 'wifiManager.wifiScanStateChange');
+  }
+
+  static unsubscribeWifiScanStateChange(handler: (state: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiScanStateChange', handler);
+    }, 'wifiManager.wifiScanStateChange');
+  }
+
+  static subscribeWifiRssiChange(handler: (rssi: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiRssiChange', handler);
+    }, 'wifiManager.wifiRssiChange');
+  }
+
+  static unsubscribeWifiRssiChange(handler: (rssi: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiRssiChange', handler);
+    }, 'wifiManager.wifiRssiChange');
+  }
+
+  static subscribeWifiConnectionState(handler: (state: number) => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      wifiManager.on('wifiConnectionChange', handler);
+    }, 'wifiManager.wifiConnectionState');
+  }
+
+  static unsubscribeWifiConnectionState(handler: (state: number) => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      wifiManager.off('wifiConnectionChange', handler);
+    }, 'wifiManager.wifiConnectionState');
+  }
+
   static subscribeMdnsServiceFound(
     service: mdns.DiscoveryService,
     handler: (info: mdns.LocalServiceInfo) => void
@@ -103,6 +139,48 @@ export class NetworkKitEventBridge {
     KitEventSubscription.unsubscribe(() => {
       tcp.off('message', handler);
     }, 'tcp.message');
+  }
+
+  static subscribeTcpClose(tcp: socket.TCPSocket, handler: () => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tcp.on('close', handler);
+    }, 'tcp.close');
+  }
+
+  static unsubscribeTcpClose(tcp: socket.TCPSocket, handler: () => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      tcp.off('close', handler);
+    }, 'tcp.close');
+  }
+
+  static subscribeTlsMessage(
+    tls: socket.TLSSocket,
+    handler: (value: socket.SocketMessageInfo) => void
+  ): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tls.on('message', handler);
+    }, 'tls.message');
+  }
+
+  static unsubscribeTlsMessage(
+    tls: socket.TLSSocket,
+    handler: (value: socket.SocketMessageInfo) => void
+  ): void {
+    KitEventSubscription.unsubscribe(() => {
+      tls.off('message', handler);
+    }, 'tls.message');
+  }
+
+  static subscribeTlsClose(tls: socket.TLSSocket, handler: () => void): Result<void> {
+    return KitEventSubscription.subscribe(() => {
+      tls.on('close', handler);
+    }, 'tls.close');
+  }
+
+  static unsubscribeTlsClose(tls: socket.TLSSocket, handler: () => void): void {
+    KitEventSubscription.unsubscribe(() => {
+      tls.off('close', handler);
+    }, 'tls.close');
   }
 
   static subscribeMulticastMessage(

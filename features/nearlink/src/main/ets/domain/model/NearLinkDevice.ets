@@ -14,6 +14,8 @@ export class NearLinkDevice {
   readonly serviceUuids: string[];
   readonly rawHex: string;
   readonly seenCount: number;
+  readonly deviceClass: string;
+  readonly belowLocalRssiGate: boolean;
 
   constructor(
     randomAddress: string,
@@ -27,7 +29,9 @@ export class NearLinkDevice {
     serviceUuids: string[] = [],
     alias: string = '',
     rawHex: string = '',
-    seenCount: number = 1
+    seenCount: number = 1,
+    deviceClass: string = '',
+    belowLocalRssiGate: boolean = false
   ) {
     this.randomAddress = randomAddress;
     this.displayName = displayName;
@@ -41,6 +45,8 @@ export class NearLinkDevice {
     this.serviceUuids = serviceUuids;
     this.rawHex = rawHex;
     this.seenCount = seenCount;
+    this.deviceClass = deviceClass;
+    this.belowLocalRssiGate = belowLocalRssiGate;
   }
 
   get effectiveName(): string {
@@ -51,7 +57,7 @@ export class NearLinkDevice {
     return new NearLinkDevice(
       this.randomAddress,
       this.displayName,
-      rssiValid ? rssi : this.rssi,
+      rssi,
       rssiValid,
       this.connectable,
       this.favorite,
@@ -60,7 +66,9 @@ export class NearLinkDevice {
       this.serviceUuids,
       this.alias,
       this.rawHex,
-      this.seenCount + 1
+      this.seenCount + 1,
+      this.deviceClass,
+      this.belowLocalRssiGate
     );
   }
 
@@ -77,7 +85,9 @@ export class NearLinkDevice {
       this.serviceUuids,
       alias,
       this.rawHex,
-      this.seenCount
+      this.seenCount,
+      this.deviceClass,
+      this.belowLocalRssiGate
     );
   }
 }

@@ -1,9 +1,12 @@
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { dataTransfer } from '@kit.NearLinkKit';
+import constant from '@hms.nearlink.constant';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { NearLinkAdvParser } from '../../../domain/service/NearLinkAdvParser';
 import { Result, ResultError } from 'common_core';
+import { KitEventSubscription } from 'common_platform';
 import { NearLinkConstants } from '../../../constants/NearLinkConstants';
 import { NearLinkErrorCodes } from '../../../constants/NearLinkErrorCodes';
-import { NearLinkKitEventBridge } from '../../kit/NearLinkKitEventBridge';
 
 type ConnectionStateListener = (info: dataTransfer.ConnectionResult) => void;
 type ReadDataListener = (info: dataTransfer.DataParams) => void;
@@ -14,6 +17,12 @@ export class DataTransferDataSource {
   private registeredUuid: string = '';
 
   createPort(uuid: string): Result<void> {
+    if (deviceInfo.sdkApiVersion < NearLinkConstants.API_DATA_TRANSFER) {
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.VERSION_UNAVAILABLE,
+        `api=createPort;since=${NearLinkConstants.SINCE_DATA_TRANSFER}`
+      ));
+    }
     try {
       dataTransfer.createPort(uuid);
       this.registeredUuid = uuid;
@@ -46,9 +55,21 @@ export class DataTransferDataSource {
     }
   }
 
-  async connect(address: string, uuid: string, mtu: number = NearLinkConstants.DEFAULT_MTU): Promise<Result<void>> {
+  async connect(
+    address: string,
+    uuid: string,
+    mtu: number = NearLinkConstants.PORT_MTU_DEFAULT,
+    reliable: boolean = false
+  ): Promise<Result<void>> {
+    if (deviceInfo.sdkApiVersion < NearLinkConstants.API_DATA_TRANSFER) {
+      return Result.fail(new ResultError(
+        NearLinkErrorCodes.VERSION_UNAVAILABLE,
+        `api=connect;since=${NearLinkConstants.SINCE_DATA_TRANSFER}`
+      ));
+    }
     try {
-      await dataTransfer.connect({ address: address, uuid: uuid, mtu: mtu });
+      const mode = reliable ? dataTransfer.TransferMode.RELIABLE : dataTransfer.TransferMode.BASIC;
+      await dataTransfer.connect({ address: address, uuid: uuid, mtu: mtu, transferMode: mode });
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
@@ -91,26 +112,64 @@ export class DataTransferDataSource {
 
   onConnectionStateChanged(listener: ConnectionStateListener): Result<void> {
     this.offConnectionStateChanged();
-    this.connectionHandler = listener;
-    return NearLinkKitEventBridge.subscribeDataTransferConnectionState(this.connectionHandler);
+    const handler = listener;
+    this.connectionHandler = handler;
+    return KitEventSubscription.subscribe(() => {
+      dataTransfer.on('connectionStateChanged', handler);
+    }, 'dataTransfer.connectionStateChanged');
   }
 
   offConnectionStateChanged(): void {
     if (this.connectionHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribeDataTransferConnectionState(this.connectionHandler);
+      const handler = this.connectionHandler;
+      KitEventSubscription.unsubscribe(() => {
+        dataTransfer.off('connectionStateChanged', handler);
+      }, 'dataTransfer.connectionStateChanged');
       this.connectionHandler = undefined;
     }
   }
 
+  watchLink(onState: (address: string, uuid: string, mtu: number, state: number) => void): Result<void> {
+    return this.onConnectionStateChanged((info: dataTransfer.ConnectionResult) => {
+      onState(info.address, info.uuid, info.mtu, DataTransferDataSource.stateCode(info.state));
+    });
+  }
+
+  watchRead(onRead: (address: string, uuid: string, hex: string, byteLength: number) => void): Result<void> {
+    return this.onReadData((info: dataTransfer.DataParams) => {
+      const bytes = new Uint8Array(info.data);
+      onRead(info.address, info.uuid, NearLinkAdvParser.toHex(bytes), bytes.byteLength);
+    });
+  }
+
+  private static stateCode(state: dataTransfer.ConnectionState): number {
+    if (state === constant.ConnectionState.STATE_CONNECTING) {
+      return 0;
+    }
+    if (state === constant.ConnectionState.STATE_CONNECTED) {
+      return 1;
+    }
+    if (state === constant.ConnectionState.STATE_DISCONNECTING) {
+      return 2;
+    }
+    return 3;
+  }
+
   onReadData(listener: ReadDataListener): Result<void> {
     this.offReadData();
-    this.readHandler = listener;
-    return NearLinkKitEventBridge.subscribeReadData(this.readHandler);
+    const handler = listener;
+    this.readHandler = handler;
+    return KitEventSubscription.subscribe(() => {
+      dataTransfer.on('readData', handler);
+    }, 'dataTransfer.readData');
   }
 
   offReadData(): void {
     if (this.readHandler !== undefined) {
-      NearLinkKitEventBridge.unsubscribeReadData(this.readHandler);
+      const handler = this.readHandler;
+      KitEventSubscription.unsubscribe(() => {
+        dataTransfer.off('readData', handler);
+      }, 'dataTransfer.readData');
       this.readHandler = undefined;
     }
   }
