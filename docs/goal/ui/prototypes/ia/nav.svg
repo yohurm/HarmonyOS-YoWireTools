@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720">
+<rect width="100%" height="100%" fill="#F4F4F2"/>
+<rect x="0" y="0" width="960" height="64" rx="0" fill="#E7E7E4" stroke="none" stroke-width="0"/>
+<text x="24" y="24" font-size="13" font-weight="700" fill="#8A4B08" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">信息架构草图 · 非高保真</text>
+<text x="24" y="46" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">单根导航</text>
+<text x="936" y="46" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">一个 Navigation · 一个 NavPathStack</text>
+<text x="24" y="96" font-size="14" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">窄屏：工作台是导航栏，其余都是压入同一栈的目的地。宽屏：同一批目的地分栏，不另起导航。</text>
+<rect x="390" y="128" width="180" height="64" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="480" y="152" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工作台</text>
+<text x="480" y="174" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">导航栏内容</text>
+<line x1="480" y1="192" x2="480" y2="228" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="120" y1="228" x2="840" y2="228" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="130" y1="228" x2="130" y2="256" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="40" y="256" width="180" height="64" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="130" y="280" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">蓝牙</text>
+<text x="130" y="302" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">经典 / BLE</text>
+<line x1="360" y1="228" x2="360" y2="256" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="270" y="256" width="180" height="64" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="360" y="280" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Wi-Fi</text>
+<text x="360" y="302" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">环境 · 诊断 · 协议</text>
+<line x1="590" y1="228" x2="590" y2="256" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="500" y="256" width="180" height="64" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="590" y="280" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">星闪</text>
+<text x="590" y="302" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">扫描 · SSAP · 数传</text>
+<line x1="820" y1="228" x2="820" y2="256" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="730" y="256" width="180" height="64" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="820" y="280" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工具</text>
+<text x="820" y="302" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">命令 · 日志 · 设置</text>
+<text x="24" y="380" font-size="14" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">蓝牙栈（仍是同一条 NavPathStack）</text>
+<rect x="24" y="404" width="150" height="48" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="99" y="428" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">蓝牙入口</text>
+<line x1="174" y1="428" x2="192" y2="428" stroke="#1A1A1A" stroke-width="1.5"/>
+<polygon points="200,428 192,423 192,433" fill="#1A1A1A"/>
+<rect x="200" y="404" width="150" height="48" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="275" y="428" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">经典扫描</text>
+<line x1="350" y1="428" x2="368" y2="428" stroke="#1A1A1A" stroke-width="1.5"/>
+<polygon points="376,428 368,423 368,433" fill="#1A1A1A"/>
+<rect x="376" y="404" width="150" height="48" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="451" y="428" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">配对半模态</text>
+<line x1="526" y1="428" x2="544" y2="428" stroke="#1A1A1A" stroke-width="1.5"/>
+<polygon points="552,428 544,423 544,433" fill="#1A1A1A"/>
+<rect x="552" y="404" width="150" height="48" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="627" y="428" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">连接半模态</text>
+<line x1="702" y1="428" x2="720" y2="428" stroke="#1A1A1A" stroke-width="1.5"/>
+<polygon points="728,428 720,423 720,433" fill="#1A1A1A"/>
+<rect x="728" y="404" width="150" height="48" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="803" y="428" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">SPP 终端</text>
+<text x="24" y="480" font-size="14" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">BLE 从蓝牙入口进入 GATT，再进 BLE 串口。不回到第二套底部导航。</text>
+<rect x="24" y="520" width="912" height="160" rx="8" fill="#FFF6E8" stroke="#8A4B08" stroke-width="1.5"/>
+<text x="40" y="548" font-size="15" font-weight="700" fill="#8A4B08" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">本图只锁定页面归属。</text>
+<text x="40" y="576" font-size="14" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">未锁定：工作台用列表还是宫格；命令面板用整页还是半模态；宽屏栏宽用 40%、240vp 还是 4:6。</text>
+<text x="40" y="604" font-size="14" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">未锁定：标题栏、列表密度、色彩。那些要等工具库截图、更多官方页面样例和高星开源之后再画。</text>
+<text x="40" y="640" font-size="14" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">空 / 错 / 无权限是列表页内容区的状态，不是新的导航目的地。</text>
+</svg>

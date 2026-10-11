@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560">
+<rect width="100%" height="100%" fill="#F4F4F2"/>
+<rect x="0" y="0" width="960" height="64" rx="0" fill="#E7E7E4" stroke="none" stroke-width="0"/>
+<text x="24" y="24" font-size="13" font-weight="700" fill="#8A4B08" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">信息架构草图 · 非高保真</text>
+<text x="24" y="46" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">命令面板</text>
+<text x="936" y="46" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">容器未选定</text>
+<rect x="36" y="88" width="420" height="440" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="48" y1="124" x2="444" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="48" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">方案 A · 栈内整页</text>
+<rect x="52" y="140" width="388" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="158.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">标题栏：命令面板</text>
+<rect x="52" y="188" width="388" height="36" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="206.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">搜索</text>
+<rect x="52" y="236" width="388" height="112" rx="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<rect x="52" y="236" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="272" x2="430" y2="272" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="254" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">字节发送</text>
+<text x="428" y="254" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">执行</text>
+<rect x="52" y="272" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="308" x2="430" y2="308" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="290" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">连接 / 诊断</text>
+<text x="428" y="290" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">执行</text>
+<rect x="52" y="308" width="388" height="36" rx="0" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="62" y1="344" x2="430" y2="344" stroke="#8A8A8A" stroke-width="1"/>
+<text x="64" y="326" font-size="13" font-weight="400" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">所选命令只有一个主按钮</text>
+<text x="428" y="326" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif"></text>
+<rect x="52" y="364" width="388" height="72" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="62" y="392.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">结果区</text>
+<text x="62" y="410.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">成功、失败或缺少权限，写在结果区</text>
+<text x="52" y="470" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">失败和无权限不新开导航。</text>
+<rect x="500" y="88" width="420" height="440" rx="12" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<line x1="512" y1="124" x2="908" y2="124" stroke="#8A8A8A" stroke-width="1"/>
+<text x="512" y="106" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">方案 B · 半模态</text>
+<rect x="516" y="140" width="388" height="180" rx="6" fill="#FAFAF8" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="526" y="222.0" font-size="13" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">背后仍是当前页</text>
+<text x="526" y="240.0" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工作台或终端，不被第二套导航替换</text>
+<rect x="516" y="336" width="388" height="160" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+<text x="532" y="364" font-size="14" font-weight="700" fill="#1A1A1A" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">半模态：命令</text>
+<text x="532" y="392" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">搜索、短列表、一个执行按钮</text>
+<text x="532" y="416" font-size="13" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">关闭后回到原页</text>
+<text x="532" y="456" font-size="12" font-weight="400" fill="#5C5C5C" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">不在半模态上再叠半模态。</text>
+</svg>

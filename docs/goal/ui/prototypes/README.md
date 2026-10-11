@@ -81,3 +81,29 @@
 | 星闪概览 | [support-radio.md](../nearlink/support-radio.md) |
 | Wi-Fi 概览 | [shell-and-navigation.md](../wifi-network/shell-and-navigation.md) |
 | 宽屏壳 | [navigation.md](../app-shell/navigation.md) |
+# 原型目录
+
+高保真还没画。这里只有信息架构草图，用来看页面怎么挂在同一个导航上。颜色、密度、标题栏和组件外观都还没定，要等华为工具库截图、更多官方页面样例和高星开源对照之后再出。
+
+## 怎么看
+
+PR 里直接打开同名 PNG。SVG 是源文件，用浏览器打开即可。每张图角上标了「信息架构草图 · 非高保真」。
+
+`references/harmonyos-component-ux-phone.png` 是组件示例仓库自带的手机截图，只说明看过那一个橱窗，不是本 App 的稿。
+
+主分支上没有单独的界面屏文档。页面范围写在 `REWORK.md`，不从已作废的 PR #19 抄规范。
+
+## 路径 → 屏 → 状态
+
+| 路径 | 屏 | 状态 |
+| --- | --- | --- |
+| `ia/nav.svg` | 单根导航总图 | 结构草图。窄屏栈、宽屏同一批目的地。 |
+| `ia/workbench.svg` | 工作台 | 草图。列表入口和宫格入口并列，未选定。 |
+| `ia/list.svg` | 列表页（扫描、日志、发现共用） | 草图。默认布局，并标出空、错、无权限都留在内容区。 |
+| `ia/command.svg` | 命令面板 | 草图。整页和半模态并列，未选定。 |
+| `ia/logs-settings.svg` | 日志、设置 | 草图。日志含列表和详情；设置按组，不按三种无线拆首页。 |
+| `ia/radios.svg` | 蓝牙、星闪、Wi-Fi | 草图。三条链路的关键页，仍进同一栈。 |
+| `ia/sheet-terminal.svg` | 配对/连接半模态、终端 | 草图。半模态不叠两层；终端分摘要、接收、发送。 |
+| `ia/wide.svg` | 宽屏分栏 | 草图。左侧是同一导航，返回键隐藏。栏宽未选定。 |
+
+每张 SVG 旁有同名 PNG。
