@@ -3,6 +3,7 @@ import {
   AppMode,
   CreateSessionInput,
   DebugTarget,
+  ITransportSession,
   ModuleType,
   ProtocolType,
   SessionType,
@@ -11,8 +12,7 @@ import {
 } from 'debug_core';
 import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { GattTransportSession } from '../../../data/transport/GattTransportSession';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { GattConnectParams } from '../../model/GattConnectParams';
 import { SerialProfileId, UartConnectPhase } from '../../model/uart/UartConnectPhase';
 import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
@@ -39,19 +39,19 @@ export class ConnectUartResult {
 }
 
 /**
- * BLE-UART connect via GattTransportSession (Nordic + autoDetect) 鈥?architecture bluetooth/04.
+ * BLE-UART connect through the repository GATT transport (Nordic + autoDetect).
  */
 export class ConnectUartUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
   private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap,
+    transportRegistry: TransportSessionRegistry
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -81,7 +81,7 @@ export class ConnectUartUseCase {
         `GATT session limit ${BluetoothConstants.GATT_MAX_SESSIONS}`
       ));
     }
-    this.repository.stopBleScan();
+    this.repository.stopBleScan('');
     onPhase(UartConnectPhase.CONNECTING);
     const target = new DebugTarget(
       bleDeviceId,
@@ -105,7 +105,8 @@ export class ConnectUartUseCase {
       onPhase(UartConnectPhase.FAILED);
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
-    const transport = new GattTransportSession(session.value.id);
+    const created = this.repository.createGattTransport(session.value.id);
+    const transport = created as ITransportSession;
     const params = new GattConnectParams(
       bleDeviceId,
       displayName,
@@ -145,12 +146,12 @@ export class ConnectUartUseCase {
 export class DisconnectUartUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
   private readonly stopSession: StopSessionUseCase;
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
   constructor(
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase(),
-    repository: BluetoothRepository = BluetoothRepository.getInstance()
+    transportRegistry: TransportSessionRegistry,
+    stopSession: StopSessionUseCase,
+    repository: BluetoothRepositoryContract
   ) {
     this.transportRegistry = transportRegistry;
     this.stopSession = stopSession;

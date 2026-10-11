@@ -20,6 +20,8 @@ export struct SppMainContentView {
   };
   @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
   };
+  @Event onOpenIdentity: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
   @Local private segmentIndex: number = 0;
 
   aboutToAppear(): void {
@@ -68,6 +70,9 @@ export struct SppMainContentView {
           bottomInsetVp: this.bottomInsetVp,
           onOpenConnect: (item: ClassicDeviceListItem) => {
             this.onOpenConnect(item);
+          },
+          onOpenIdentity: (item: ClassicDeviceListItem) => {
+            this.onOpenIdentity(item);
           }
         })
           .layoutWeight(1)

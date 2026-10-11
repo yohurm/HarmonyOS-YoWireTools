@@ -1,15 +1,18 @@
 import { Result } from 'common_core';
 import { DeviceFavoriteRecord } from 'common_storage';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 
 export class SaveBluetoothFavoriteUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
+  /**
+   * Local bookmark only. Does not call addPersistentDeviceId and must not be shown as 已固化.
+   */
   async execute(device: BluetoothDevice, alias: string, protocol: string, uuid: string = ''): Promise<Result<void>> {
     return this.repository.saveFavorite(device, alias, protocol, uuid);
   }
@@ -20,9 +23,9 @@ export class SaveBluetoothFavoriteUseCase {
 }
 
 export class LoadRemoteProfileUuidsUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

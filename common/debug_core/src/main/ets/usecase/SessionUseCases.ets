@@ -118,6 +118,8 @@ export class EnsurePermissionUseCase {
         return 'YW-PERM-1001';
       case PermissionScenario.BLUETOOTH_PERSISTENT_MAC:
         return 'YW-PERM-1002';
+      case PermissionScenario.BLUETOOTH_BACKGROUND:
+        return 'YW-PERM-1003';
       case PermissionScenario.NETWORK_ACCESS:
         return 'YW-PERM-2001';
       case PermissionScenario.WIFI_INFO:

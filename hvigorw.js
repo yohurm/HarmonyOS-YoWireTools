@@ -31493,7 +31493,7 @@ const fW = dW(t), pW = dW(r), hW = dW(n), mW = _, gW = Ug, vW = Hg, yW = XV(), _
         const e = hW.default.argv.slice(2);
         e.filter(e => EW.globalVersionCommands.includes(e)).length > 0 && EW.GlobalExecute.version(e.toString()), 
         e.filter(e => EW.globalHelpCommands.includes(e)).length > 0 && EW.GlobalExecute.help();
-    }(), (0, gW.gte)(hW.default.version.slice(1), vW.BASE_NODE_VERSION) && !(0, yW.isHvigorDependencyUseNpm)() && ((0, 
+    }(), (0, gW.gte)(hW.default.version.slice(1), vW.BASE_NODE_VERSION) && !(0, yW.isHvigorDependencyUseNpm)() && !fW.default.existsSync(pW.default.resolve(process.cwd(), "oh-package.json5")) && ((0, 
     wW.isPnpmInstalled)() || ((0, wW.checkNpmConfig)(), (0, wW.executeInstallPnpm)()));
     const e = pW.default.resolve(__dirname, "../../ohpm/bin/", (0, mW.isWindows)() ? "ohpm.bat" : "ohpm");
     fW.default.existsSync(e) && (hW.default.env.ohpmBin = e);

@@ -50,6 +50,10 @@ export class SppRfcommClient {
     return this.clientSocket >= 0;
   }
 
+  maxTransmitLimit(): Result<number> {
+    return this.gateway.maxTransmitBytes(this.clientSocket);
+  }
+
   setIncomingListener(listener: IncomingListener | undefined): void {
     this.incomingListener = listener;
   }

@@ -1,7 +1,9 @@
 import { access, connection } from '@kit.ConnectivityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { Observable, Result, ResultError } from 'common_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
+import { BluetoothPlatformCodes } from '../../../constants/BluetoothPlatformCodes';
 import { BluetoothAdapterSnapshot } from '../../../domain/model/BluetoothDevice';
 import {
   BluetoothTransportPolicy,
@@ -215,17 +217,39 @@ export class ClassicBluetoothDataSource {
     }
   }
 
+  async enableBluetooth(): Promise<Result<void>> {
+    try {
+      await access.enableBluetooth();
+      return Result.ok(undefined);
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ClassicBluetoothDataSource.mapPlatform(err, BluetoothErrorCodes.ADAPTER_OFF));
+    }
+  }
+
+  async disableBluetooth(): Promise<Result<void>> {
+    try {
+      await access.disableBluetooth();
+      return Result.ok(undefined);
+    } catch (error) {
+      const err = error as BusinessError;
+      return Result.fail(ClassicBluetoothDataSource.mapPlatform(err, BluetoothErrorCodes.CLASSIC_UNAVAILABLE));
+    }
+  }
+
   async startBluetoothDiscovery(): Promise<Result<void>> {
     try {
-      // Official: do not call start while already discovering; stop first then start.
       if (connection.isBluetoothDiscovering()) {
-        connection.stopBluetoothDiscovery();
+        return Result.fail(new ResultError(
+          BluetoothErrorCodes.SCAN_ALREADY_RUNNING,
+          'Discovery already running'
+        ));
       }
       connection.startBluetoothDiscovery();
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.SCAN_RESOURCE_FAILED, err));
+      return Result.fail(ClassicBluetoothDataSource.mapPlatform(err, BluetoothErrorCodes.SCAN_RESOURCE_FAILED));
     }
   }
 
@@ -251,7 +275,7 @@ export class ClassicBluetoothDataSource {
         const cod = ClassicBluetoothDataSource.parseDeviceClass(item.deviceClass);
         const payload = new PlatformDiscoveryPayload(
           item.deviceId,
-          item.deviceName ?? item.deviceId,
+          item.deviceName ?? '',
           item.rssi ?? 0,
           cod.classOfDevice,
           false,
@@ -261,16 +285,19 @@ export class ClassicBluetoothDataSource {
         listener(payload);
       }
     };
-    const discoveryRegistered =
-      ConnectivityKitEventBridge.subscribeDiscoveryResult(this.discoveryResultHandler);
-    if (!discoveryRegistered.success) {
-      this.discoveryResultHandler = undefined;
-      this.discoveryListener = undefined;
+    if (deviceInfo.sdkApiVersion >= BluetoothConstants.CLASSIC_DISCOVERY_API) {
+      const discoveryRegistered =
+        ConnectivityKitEventBridge.subscribeDiscoveryResult(this.discoveryResultHandler);
+      if (!discoveryRegistered.success) {
+        this.discoveryResultHandler = undefined;
+        this.discoveryListener = undefined;
+      }
       return discoveryRegistered;
     }
+    this.discoveryResultHandler = undefined;
     this.deviceFindHandler = (deviceIds: Array<string>) => {
       for (let i = 0; i < deviceIds.length; i++) {
-        const payload = new PlatformDiscoveryPayload(deviceIds[i], deviceIds[i], 0, 0, true);
+        const payload = new PlatformDiscoveryPayload(deviceIds[i], '', 0, 0, true);
         listener(payload);
       }
     };
@@ -313,11 +340,14 @@ export class ClassicBluetoothDataSource {
       return Result.ok(undefined);
     } catch (error) {
       const err = error as BusinessError;
-      if (err.code === 2900001) {
-        return Result.fail(new ResultError(BluetoothErrorCodes.PAIRING_CANCELLED, err.message, err));
-      }
-      return Result.fail(ResultError.fromError(BluetoothErrorCodes.CLASSIC_UNAVAILABLE, err));
+      return Result.fail(ClassicBluetoothDataSource.mapPlatform(err, BluetoothErrorCodes.CLASSIC_UNAVAILABLE));
     }
+  }
+
+  private static mapPlatform(err: BusinessError, fallback: string): ResultError {
+    const mapped = BluetoothPlatformCodes.domainCode(err.code);
+    const code = mapped.length > 0 ? mapped : fallback;
+    return ResultError.fromBusinessError(code, err);
   }
 
   private static parseDeviceClass(deviceClass: connection.DeviceClass | number | undefined): DeviceClassCod {

@@ -27,6 +27,8 @@ export struct SppMainPage {
   };
   @Event onOpenTerminal: (sessionId: string) => void = (_sessionId: string) => {
   };
+  @Event onOpenIdentity: (item: ClassicDeviceListItem) => void = (_item: ClassicDeviceListItem) => {
+  };
   @Local private vm: SppMainViewModel = new SppMainViewModel();
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
@@ -62,6 +64,9 @@ export struct SppMainPage {
       },
       onOpenTerminal: (sessionId: string) => {
         this.onOpenTerminal(sessionId);
+      },
+      onOpenIdentity: (item: ClassicDeviceListItem) => {
+        this.onOpenIdentity(item);
       }
     })
   }
@@ -109,9 +114,12 @@ export struct SppMainPage {
       $r('sys.symbol.more'),
       $r('app.string.youi_more_actions'),
       () => {
-        openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID, () => {
+        const opened = openSppTitleMoreMenu(this.getUIContext(), SPP_TITLE_MORE_MENU_ID, () => {
           void this.vm.openBluetoothSettings();
         });
+        if (!opened) {
+          void this.vm.openBluetoothSettings();
+        }
       },
       true,
       SPP_TITLE_MORE_MENU_ID

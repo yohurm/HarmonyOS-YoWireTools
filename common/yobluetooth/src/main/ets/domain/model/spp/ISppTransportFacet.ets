@@ -1,3 +1,4 @@
+import { Result } from 'common_core';
 import { ITransportSession } from 'debug_core';
 import { SppReadStrategy } from '../SppRuntimeState';
 import { SppSessionKey } from '../SppSessionKey';
@@ -24,6 +25,9 @@ export interface ISppTransportFacet {
 
   /** Coordinator-bound reopen after link loss (sole reconnect action). */
   reopenForReconnect(): Promise<void>;
+
+  /** API 22 getMaxTransmitDataSize. Unavailable results stay a failure, not 0. */
+  maxTransmitBytes(): Result<number>;
 }
 
 /**

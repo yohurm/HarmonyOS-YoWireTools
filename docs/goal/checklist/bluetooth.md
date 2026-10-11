@@ -733,6 +733,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 吞吐进行中
 - **When** 用户停止
 - **Then** 不再继续写；已发送字节保留
+- **证据：** 应用层吞吐没有平台停止 API，停止就是不再继续写。研究笔记：平台不提供「吞吐测试」API；nRF Toolbox `ThroughputManager` 在应用层 `measureTime` 计时
 
 ### BT-088 应用内不能抓空口 HCI
 
@@ -756,6 +757,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 一次 SPP 或 GATT 会话中有收发
 - **When** 用户导出
 - **Then** 导出含时间、方向、原始字节；导出失败可见。清屏只影响显示，不删已导出文件
+- **证据：** 应用层会话日志。平台不提供该导出。SimpleBluetoothTerminal 保存一次 `read` 的原始长度，清屏只清显示
 
 ## 12. 回连、后台、诊断
 
@@ -773,6 +775,7 @@ related: [docs/goal/research/bluetooth.md]
 - **Given** 用户打开自动回连，对端不可达
 - **When** 连续失败
 - **Then** 每次失败有次数与原因；用户可关闭自动回连，之后不再发起
+- **证据：** 应用层自动回连。平台没有统一回连器。研究笔记的回连是保存地址再连
 
 ### BT-093 扫描未停时不回连
 

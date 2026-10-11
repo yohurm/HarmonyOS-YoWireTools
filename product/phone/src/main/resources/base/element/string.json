@@ -45,6 +45,10 @@
       "value": "NearLink wireless debugging"
     },
     {
+      "name": "perm_keep_background_reason",
+      "value": "Keep an active Bluetooth session running in the background"
+    },
+    {
       "name": "tab_workbench",
       "value": "工作台"
     },

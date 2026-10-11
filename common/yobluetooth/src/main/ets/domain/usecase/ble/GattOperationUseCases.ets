@@ -1,15 +1,17 @@
 import { Result, ResultError } from 'common_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { GattPlatformMapper } from '../../../data/mapper/GattPlatformMapper';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { ConnectionParamPreset } from '../../model/ConnectionParamPreset';
 import { GattServiceTreeSnapshot } from '../../model/GattServiceTree';
+import { MtuBounds } from '../../model/MtuBounds';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { GattOperationQueue } from '../../service/GattOperationQueue';
 import { GattWriteChunker } from '../../service/GattWriteChunker';
 
 export class DiscoverGattServicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -19,12 +21,12 @@ export class DiscoverGattServicesUseCase {
 }
 
 export class ReadGattCharacteristicUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -35,29 +37,19 @@ export class ReadGattCharacteristicUseCase {
     serviceUuid: string,
     characteristicUuid: string
   ): Promise<Result<string>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
-    }
-    const characteristic = client.findCharacteristic(serviceUuid, characteristicUuid);
-    if (characteristic === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Characteristic not found'));
-    }
-    const readResult = await this.queue.enqueue(() => client.readCharacteristic(characteristic));
-    if (!readResult.success || readResult.value === undefined) {
-      return Result.fail(readResult.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Read failed'));
-    }
-    return Result.ok(GattPlatformMapper.valueToHex(readResult.value.characteristicValue));
+    return this.queue.enqueue(() =>
+      this.repository.readGattCharacteristicHex(sessionId, serviceUuid, characteristicUuid)
+    );
   }
 }
 
 export class WriteGattCharacteristicUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -67,21 +59,22 @@ export class WriteGattCharacteristicUseCase {
     sessionId: string,
     serviceUuid: string,
     characteristicUuid: string,
-    bytes: Uint8Array
+    bytes: Uint8Array,
+    noResponse: boolean = false
   ): Promise<Result<void>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
-    }
-    const characteristic = client.findCharacteristic(serviceUuid, characteristicUuid);
-    if (characteristic === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Characteristic not found'));
-    }
     const tree = this.repository.getGattTree(sessionId);
-    const mtu = tree?.mtu ?? 23;
+    const mtu = tree !== undefined ? tree.mtu : BluetoothConstants.BLE_DEFAULT_MTU;
     const chunks = GattWriteChunker.chunk(bytes, mtu);
     for (let i = 0; i < chunks.length; i++) {
-      const chunkResult = await this.queue.enqueue(() => client.writeCharacteristic(characteristic, chunks[i]));
+      const chunkResult = await this.queue.enqueue(() =>
+        this.repository.writeGattCharacteristicChunk(
+          sessionId,
+          serviceUuid,
+          characteristicUuid,
+          chunks[i],
+          noResponse
+        )
+      );
       if (!chunkResult.success) {
         return chunkResult;
       }
@@ -91,12 +84,12 @@ export class WriteGattCharacteristicUseCase {
 }
 
 export class SetGattNotificationUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -109,32 +102,19 @@ export class SetGattNotificationUseCase {
     enable: boolean,
     useIndication: boolean = false
   ): Promise<Result<void>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
-    }
-    const characteristic = client.findCharacteristic(serviceUuid, characteristicUuid);
-    if (characteristic === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Characteristic not found'));
-    }
-    if (useIndication) {
-      return this.queue.enqueue(() =>
-        enable ? client.enableIndication(characteristic) : client.disableIndication(characteristic)
-      );
-    }
     return this.queue.enqueue(() =>
-      enable ? client.enableNotification(characteristic) : client.disableNotification(characteristic)
+      this.repository.setGattNotification(sessionId, serviceUuid, characteristicUuid, enable, useIndication)
     );
   }
 }
 
 export class ReadGattDescriptorUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -146,29 +126,19 @@ export class ReadGattDescriptorUseCase {
     characteristicUuid: string,
     descriptorUuid: string
   ): Promise<Result<string>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
-    }
-    const descriptor = client.findDescriptor(serviceUuid, characteristicUuid, descriptorUuid);
-    if (descriptor === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Descriptor not found'));
-    }
-    const readResult = await this.queue.enqueue(() => client.readDescriptor(descriptor));
-    if (!readResult.success || readResult.value === undefined) {
-      return Result.fail(readResult.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Read failed'));
-    }
-    return Result.ok(GattPlatformMapper.valueToHex(readResult.value.descriptorValue));
+    return this.queue.enqueue(() =>
+      this.repository.readGattDescriptorHex(sessionId, serviceUuid, characteristicUuid, descriptorUuid)
+    );
   }
 }
 
 export class WriteGattDescriptorUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
@@ -181,40 +151,60 @@ export class WriteGattDescriptorUseCase {
     descriptorUuid: string,
     bytes: Uint8Array
   ): Promise<Result<void>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
-    }
     return this.queue.enqueue(() =>
-      client.writeDescriptorByUuid(serviceUuid, characteristicUuid, descriptorUuid, bytes)
+      this.repository.writeGattDescriptor(sessionId, serviceUuid, characteristicUuid, descriptorUuid, bytes)
     );
   }
 }
 
 export class RequestBleMtuUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly queue: GattOperationQueue;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    queue: GattOperationQueue = new GattOperationQueue()
+    repository: BluetoothRepositoryContract,
+    queue: GattOperationQueue
   ) {
     this.repository = repository;
     this.queue = queue;
   }
 
   async execute(sessionId: string, mtu: number): Promise<Result<number>> {
-    const client = this.repository.getGattClient(sessionId);
-    if (client === undefined) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    const bounds = MtuBounds.accept(mtu);
+    if (!bounds.success) {
+      return Result.fail(bounds.error ?? new ResultError(BluetoothErrorCodes.MTU_OUT_OF_RANGE, 'MTU out of range'));
     }
-    const result = await this.queue.enqueue(() => client.requestMtu(mtu));
+    const result = await this.queue.enqueue(() => this.repository.requestGattMtu(sessionId, mtu));
     if (result.success) {
       const tree = this.repository.getGattTree(sessionId);
       if (tree !== undefined) {
-        await this.repository.discoverGattServices(sessionId, tree.bleDeviceId, mtu);
+        await this.repository.discoverGattServices(sessionId, tree.bleDeviceId, this.repository.gattCurrentMtu(sessionId));
       }
     }
     return result;
+  }
+}
+
+export class ReadGattRssiUseCase {
+  private readonly repository: BluetoothRepositoryContract;
+
+  constructor(repository: BluetoothRepositoryContract) {
+    this.repository = repository;
+  }
+
+  async execute(sessionId: string): Promise<Result<number>> {
+    return this.repository.readGattRssi(sessionId);
+  }
+}
+
+export class UpdateGattConnectionParamUseCase {
+  private readonly repository: BluetoothRepositoryContract;
+
+  constructor(repository: BluetoothRepositoryContract) {
+    this.repository = repository;
+  }
+
+  async execute(sessionId: string, preset: ConnectionParamPreset): Promise<Result<void>> {
+    return this.repository.updateGattConnectionParam(sessionId, preset);
   }
 }

@@ -43,7 +43,7 @@ export function openSppTitleMoreMenu(
   targetComponentId: string,
   onOpenSettings: () => void = () => {
   }
-): void {
+): boolean {
   const params = new SppTitleMoreMenuParams();
   params.onOpenSettings = onOpenSettings;
   const contentNode: ComponentContent<SppTitleMoreMenuParams> =
@@ -54,7 +54,8 @@ export function openSppTitleMoreMenu(
       { id: targetComponentId },
       { placement: Placement.Bottom }
     );
+    return true;
   } catch (_error) {
-    // Anchor missing or API rejected — ignore for stub menu.
+    return false;
   }
 }

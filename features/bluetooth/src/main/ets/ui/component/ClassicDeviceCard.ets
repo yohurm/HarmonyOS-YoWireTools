@@ -77,6 +77,9 @@ export struct ClassicDeviceCard {
 
           Row({ space: YoSpace.XS }) {
             if (this.address.length > 0) {
+              Text($r('app.string.bt_address_virtual'))
+                .fontSize(YoTypeStyle.BODY_S.size)
+                .fontColor(YoColor.TEXT_TERTIARY)
               Text(this.address)
                 .fontSize(YoTypeStyle.BODY_S.size)
                 .fontColor(YoColor.TEXT_SECONDARY)

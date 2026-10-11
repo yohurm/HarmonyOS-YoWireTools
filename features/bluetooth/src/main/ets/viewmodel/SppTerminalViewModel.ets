@@ -6,9 +6,11 @@ import {
   TransportSessionRegistry
 } from 'debug_core';
 import {
+  BluetoothUseCaseFactory,
   DisconnectSppUseCase,
   ListSppSessionsUseCase,
   ObserveSppSessionsUseCase,
+  QuerySppMaxTransmitUseCase,
   SendSppCommandUseCase,
   SppSessionDescriptor
 } from 'yobluetooth';
@@ -55,6 +57,8 @@ export class SppTerminalViewModel {
   @Trace stateLabel: string = '';
   @Trace bytesIn: number = 0;
   @Trace bytesOut: number = 0;
+  /** "—" until getMaxTransmitDataSize returns. Never show 0 as a stand-in. */
+  @Trace maxTransmitText: string = '—';
   @Trace logEntries: SppTerminalLogEntry[] = [];
   @Trace draftText: string = '';
   @Trace sending: boolean = false;
@@ -76,6 +80,7 @@ export class SppTerminalViewModel {
   private readonly listSessions: ListSppSessionsUseCase;
   private readonly sendCommand: SendSppCommandUseCase;
   private readonly disconnectSpp: DisconnectSppUseCase;
+  private readonly queryMaxTransmit: QuerySppMaxTransmitUseCase = BluetoothUseCaseFactory.querySppMaxTransmit();
   private readonly transportRegistry: TransportSessionRegistry;
   private sessionsSubscription: Subscription | undefined;
   private incomingSubscription: Subscription | undefined;
@@ -83,10 +88,10 @@ export class SppTerminalViewModel {
   private logSeq: number = 0;
 
   constructor(
-    observeSessions: ObserveSppSessionsUseCase = new ObserveSppSessionsUseCase(),
-    listSessions: ListSppSessionsUseCase = new ListSppSessionsUseCase(),
-    sendCommand: SendSppCommandUseCase = new SendSppCommandUseCase(),
-    disconnectSpp: DisconnectSppUseCase = new DisconnectSppUseCase(),
+    observeSessions: ObserveSppSessionsUseCase = BluetoothUseCaseFactory.observeSppSessions(),
+    listSessions: ListSppSessionsUseCase = BluetoothUseCaseFactory.listSppSessions(),
+    sendCommand: SendSppCommandUseCase = BluetoothUseCaseFactory.sendSppCommand(),
+    disconnectSpp: DisconnectSppUseCase = BluetoothUseCaseFactory.disconnectSpp(),
     transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
   ) {
     this.observeSessions = observeSessions;
@@ -257,10 +262,21 @@ export class SppTerminalViewModel {
         this.uuidShortLabel = descriptor.uuidShortLabel;
         this.stateLabel = descriptor.stateLabel;
         this.bytesIn = descriptor.bytesIn;
+        this.refreshMaxTransmit();
         this.bytesOut = descriptor.bytesOut;
         return;
       }
     }
+    this.maxTransmitText = '—';
+  }
+
+  private refreshMaxTransmit(): void {
+    const limit = this.queryMaxTransmit.execute(this.focusSessionId);
+    if (!limit.success || limit.value === undefined) {
+      this.maxTransmitText = '—';
+      return;
+    }
+    this.maxTransmitText = `${limit.value}`;
   }
 
   private bindIncoming(sessionId: string): void {

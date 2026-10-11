@@ -1,6 +1,8 @@
 import { Observable, Subscription } from 'common_core';
 import { YoLog, YoLogTag, LogParams } from 'yolog';
+import { AbilityContextRegistry } from '../context/AbilityContextRegistry';
 import { AppLifecycleState } from './AppLifecycleState';
+import { BluetoothInteractionTask } from './BluetoothInteractionTask';
 import { LifecycleListener, ReconcileCallback } from './LifecycleContracts';
 import { PlatformEvent } from './PlatformEvent';
 import { PlatformEventType } from './PlatformEventType';
@@ -17,6 +19,7 @@ export class LifecycleCoordinator {
   private currentState: AppLifecycleState = AppLifecycleState.FOREGROUND;
   private backgroundConnectionEnabledValue: boolean = true;
   private backgroundPeriodicEnabledValue: boolean = false;
+  private readonly bluetoothTask: BluetoothInteractionTask = new BluetoothInteractionTask();
   private constructor() {
     this.lifecycleObservable = new Observable<AppLifecycleState>(AppLifecycleState.FOREGROUND);
   }
@@ -44,13 +47,21 @@ export class LifecycleCoordinator {
     logger.params('background_settings', LogParams.create()
       .put('connection', connectionEnabled ? 1 : 0)
       .put('periodic', periodicEnabled ? 1 : 0));
+    if (!connectionEnabled) {
+      void this.syncBluetoothInteractionTask(false);
+    }
+  }
+  bluetoothInteractionRunning(): boolean {
+    return this.bluetoothTask.isRunning();
   }
   onAppForeground(detail: string = ''): void {
     this.transition(AppLifecycleState.FOREGROUND, PlatformEventType.APP_FOREGROUND, detail);
+    void this.syncBluetoothInteractionTask(false);
     this.reconcile();
   }
   onAppBackground(detail: string = ''): void {
     this.transition(AppLifecycleState.BACKGROUND, PlatformEventType.APP_BACKGROUND, detail);
+    void this.syncBluetoothInteractionTask(this.backgroundConnectionEnabledValue);
     void YoLog.flush();
   }
   onWindowStageCreate(detail: string = ''): void {
@@ -101,6 +112,17 @@ export class LifecycleCoordinator {
     this.lifecycleObservable.next(state);
     logger.stateTransition('app_lifecycle', previous, state, detail);
     this.dispatch(new PlatformEvent(eventType, detail));
+  }
+  private async syncBluetoothInteractionTask(shouldRun: boolean): Promise<void> {
+    const context = AbilityContextRegistry.getInstance().get();
+    if (context === undefined) {
+      return;
+    }
+    if (shouldRun) {
+      await this.bluetoothTask.start(context);
+      return;
+    }
+    await this.bluetoothTask.stop(context);
   }
   private dispatch(event: PlatformEvent): void {
     this.listeners.forEach((listener: LifecycleListener) => {

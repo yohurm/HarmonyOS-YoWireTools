@@ -1,3 +1,5 @@
+import { BluetoothConstants } from '../../constants/BluetoothConstants';
+
 export enum BleScanDutyPreset {
   LOW_POWER = 'low_power',
   BALANCED = 'balanced',
@@ -18,6 +20,9 @@ export class BleScanFilter {
   readonly minRssi: number;
   readonly favoritesOnly: boolean;
   readonly dutyPreset: BleScanDutyPreset;
+  readonly exactName: string;
+  readonly serviceUuidMask: string;
+  readonly rssiThreshold: number;
 
   constructor(
     namePrefix: string = '',
@@ -28,7 +33,10 @@ export class BleScanFilter {
     manufacturerMask: string = '',
     minRssi: number = -127,
     favoritesOnly: boolean = false,
-    dutyPreset: BleScanDutyPreset = BleScanDutyPreset.BALANCED
+    dutyPreset: BleScanDutyPreset = BleScanDutyPreset.BALANCED,
+    exactName: string = '',
+    serviceUuidMask: string = '',
+    rssiThreshold: number = BluetoothConstants.RSSI_THRESHOLD_UNSET
   ) {
     this.namePrefix = namePrefix;
     this.bleDeviceId = bleDeviceId;
@@ -39,6 +47,9 @@ export class BleScanFilter {
     this.minRssi = minRssi;
     this.favoritesOnly = favoritesOnly;
     this.dutyPreset = dutyPreset;
+    this.exactName = exactName;
+    this.serviceUuidMask = serviceUuidMask;
+    this.rssiThreshold = rssiThreshold;
   }
 
   matchesPostFilter(deviceName: string, rssi: number, favorite: boolean): boolean {
@@ -49,6 +60,9 @@ export class BleScanFilter {
       return false;
     }
     if (this.namePrefix.length > 0 && !deviceName.includes(this.namePrefix)) {
+      return false;
+    }
+    if (this.exactName.length > 0 && deviceName !== this.exactName) {
       return false;
     }
     return true;

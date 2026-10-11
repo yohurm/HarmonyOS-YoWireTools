@@ -1,4 +1,4 @@
-﻿import { Result, ResultError } from 'common_core';
+﻿import { Result, ResultError, TaskExecutionPolicy, TaskExecutorRegistry, TaskSubmitOptions } from 'common_core';
 import {
   DebugLogRecord,
   LineEndingMode,
@@ -19,8 +19,8 @@ export class SendSppCommandUseCase {
   private readonly transportRegistry: TransportSessionRegistry;
 
   constructor(
-    sendCommand: SendCommandUseCase = new SendCommandUseCase(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance()
+    sendCommand: SendCommandUseCase,
+    transportRegistry: TransportSessionRegistry
   ) {
     this.sendCommand = sendCommand;
     this.transportRegistry = transportRegistry;
@@ -43,12 +43,14 @@ export class SendSppCommandUseCase {
         `TX queue full (max ${BluetoothConstants.COMMAND_WRITE_QUEUE_MAX_DEPTH})`
       ));
     }
-    return this.sendCommand.execute(new SendCommandInput(
-      sessionId,
-      transport,
-      payloadText,
-      encoding,
-      lineEnding
-    ));
+    return TaskExecutorRegistry.get().execute(() => {
+      return this.sendCommand.execute(new SendCommandInput(
+        sessionId,
+        transport,
+        payloadText,
+        encoding,
+        lineEnding
+      ));
+    }, new TaskSubmitOptions(TaskExecutionPolicy.IO_BOUND, 'spp_write'));
   }
 }

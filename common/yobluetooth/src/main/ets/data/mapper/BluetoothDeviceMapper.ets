@@ -110,7 +110,7 @@ export class BluetoothDeviceMapper {
     );
     const draft = new BluetoothDeviceDraft();
     draft.identityId = identity.identityId;
-    draft.displayName = payload.deviceName.length > 0 ? payload.deviceName : payload.classicDeviceId;
+    draft.displayName = payload.fromLegacyFind ? '' : payload.deviceName;
     draft.classicDeviceId = payload.classicDeviceId;
     draft.primaryDeviceId = payload.classicDeviceId;
     draft.listRail = BluetoothListRail.CLASSIC_SCAN;
@@ -118,7 +118,8 @@ export class BluetoothDeviceMapper {
     draft.deviceClassCod = payload.deviceClass;
     draft.majorClass = payload.majorClass;
     draft.majorMinorClass = payload.majorMinorClass;
-    draft.rssi = payload.rssi;
+    draft.rssi = payload.fromLegacyFind ? 0 : payload.rssi;
+    draft.rssiKnown = !payload.fromLegacyFind;
     draft.paired = paired;
     draft.pairState = paired ? PairingState.PAIRED : PairingState.UNPAIRED;
     draft.connectable = true;
@@ -152,6 +153,7 @@ export class BluetoothDeviceMapper {
     draft.listRail = BluetoothListRail.BLE_SCAN;
     draft.transport = BluetoothTransportType.LE;
     draft.rssi = packet.rssi;
+    draft.rssiKnown = true;
     draft.paired = false;
     draft.pairState = PairingState.UNPAIRED;
     draft.connectable = packet.connectable;

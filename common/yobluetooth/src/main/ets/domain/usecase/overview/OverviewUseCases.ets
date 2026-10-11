@@ -1,7 +1,7 @@
 ﻿import { Result } from 'common_core';
 import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import {
   BluetoothCapabilitySnapshot,
   BluetoothDevice,
@@ -10,12 +10,12 @@ import {
 import { BluetoothSubscriptionBundle } from '../shared/BluetoothSubscriptionBundle';
 
 export class LoadBluetoothOverviewUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -31,12 +31,12 @@ export class LoadBluetoothOverviewUseCase {
 }
 
 export class LoadBluetoothOverviewSnapshotUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -51,12 +51,12 @@ export class LoadBluetoothOverviewSnapshotUseCase {
 }
 
 export class ResolveBluetoothCapabilityUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly ensurePermission: EnsurePermissionUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase()
+    repository: BluetoothRepositoryContract,
+    ensurePermission: EnsurePermissionUseCase
   ) {
     this.repository = repository;
     this.ensurePermission = ensurePermission;
@@ -65,16 +65,16 @@ export class ResolveBluetoothCapabilityUseCase {
   async execute(): Promise<Result<BluetoothCapabilitySnapshot>> {
     const permission: PermissionDecision =
       await this.ensurePermission.execute(PermissionScenario.BLUETOOTH_SCAN_CONNECT);
-    const adapter = await this.repository.loadAdapterState();
+    const adapter = await this.repository.getAdapterState();
     const adapterOn = adapter.success && adapter.value !== undefined && adapter.value.enabled;
     return Result.ok(new BluetoothCapabilitySnapshot(permission.granted, adapterOn === true));
   }
 }
 
 export class ObserveBluetoothDevicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

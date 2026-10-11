@@ -3,7 +3,14 @@ export { SppMainViewModel, SppSegmentTab, ClassicDeviceListItem, SppActiveSessio
 export { SppTerminalViewModel } from './src/main/ets/viewmodel/SppTerminalViewModel';
 export { SppConnectDialogController, SppConnectDialogParams } from './src/main/ets/viewmodel/SppConnectDialogController';
 export { SppPairingGuideController, PairingGuideDialogParams } from './src/main/ets/viewmodel/SppPairingGuideController';
-export { BleMainViewModel } from './src/main/ets/viewmodel/BleMainViewModel';
+export { BleMainViewModel, BleDeviceRow } from './src/main/ets/viewmodel/BleMainViewModel';
+export { BleScanContentView } from './src/main/ets/ui/view/BleScanContentView';
+export { DeviceIdentityPage } from './src/main/ets/ui/page/DeviceIdentityPage';
+export { BlePeripheralPage } from './src/main/ets/ui/page/BlePeripheralPage';
+export { GattClientPage } from './src/main/ets/ui/page/GattClientPage';
+export { SessionLogPage } from './src/main/ets/ui/page/SessionLogPage';
+export { BluetoothDiagnosticsPage } from './src/main/ets/ui/page/BluetoothDiagnosticsPage';
+export { BluetoothObjectNavParams } from './src/main/ets/navigation/BluetoothObjectNavParams';
 export { BtStatusCard } from './src/main/ets/ui/component/BtStatusCard';
 export { BtSummaryCard } from './src/main/ets/ui/component/BtSummaryCard';
 export { ClassicDeviceCard } from './src/main/ets/ui/component/ClassicDeviceCard';

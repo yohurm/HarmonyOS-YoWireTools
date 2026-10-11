@@ -7,8 +7,9 @@ import {
   SessionType,
   StopSessionUseCase
 } from 'debug_core';
+import { BluetoothConstants } from '../../../constants/BluetoothConstants';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { BleScanFilter } from '../../model/BleScanFilter';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import { BluetoothScanLogger } from '../../service/BluetoothScanLogger';
@@ -16,14 +17,14 @@ import { BluetoothOperationGuard } from '../shared/BluetoothOperationGuard';
 import { BluetoothSessionBootstrap } from '../shared/BluetoothSessionBootstrap';
 
 export class StartBleScanUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -48,6 +49,14 @@ export class StartBleScanUseCase {
       return Result.fail(session.error ?? new ResultError('YW-SESSION-1001', 'Session create failed'));
     }
     const scanFilter: BleScanFilter = filter !== undefined ? filter : new BleScanFilter('', '', serviceUuid);
+    if (scanFilter.rssiThreshold !== BluetoothConstants.RSSI_THRESHOLD_UNSET &&
+      (scanFilter.rssiThreshold < BluetoothConstants.RSSI_PROTOCOL_MIN ||
+        scanFilter.rssiThreshold > BluetoothConstants.RSSI_PROTOCOL_MAX)) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.RSSI_OUT_OF_RANGE,
+        'RSSI threshold is outside -128 to 127'
+      ));
+    }
     const scan = this.repository.startBleScan(session.value.id, scanFilter);
     if (!scan.success) {
       return Result.fail(scan.error ?? new ResultError(BluetoothErrorCodes.BLE_SCAN_FAILED, 'BLE scan failed'));
@@ -58,19 +67,19 @@ export class StartBleScanUseCase {
 }
 
 export class StopBleScanUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly stopSession: StopSessionUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    stopSession: StopSessionUseCase = new StopSessionUseCase()
+    repository: BluetoothRepositoryContract,
+    stopSession: StopSessionUseCase
   ) {
     this.repository = repository;
     this.stopSession = stopSession;
   }
 
   async execute(sessionId: string): Promise<Result<void>> {
-    const stopped = this.repository.stopBleScan();
+    const stopped = this.repository.stopBleScan('');
     if (!stopped.success) {
       return stopped;
     }
@@ -87,9 +96,9 @@ export class StopBleScanUseCase {
 }
 
 export class StartBleScanWithFilterUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -99,12 +108,12 @@ export class StartBleScanWithFilterUseCase {
 }
 
 export class LoadPairedBleDevicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -120,9 +129,9 @@ export class LoadPairedBleDevicesUseCase {
 }
 
 export class ObserveBleDevicesUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 

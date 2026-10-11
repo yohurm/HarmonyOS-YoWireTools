@@ -2,18 +2,18 @@
 import { EnsurePermissionUseCase, PermissionScenario } from 'debug_core';
 import { PermissionDecision } from 'common_platform';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 
 /**
  * Shared permission and adapter preconditions for bluetooth use cases.
  */
 export class BluetoothOperationGuard {
   private readonly ensurePermission: EnsurePermissionUseCase;
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
   constructor(
-    ensurePermission: EnsurePermissionUseCase = new EnsurePermissionUseCase(),
-    repository: BluetoothRepository = BluetoothRepository.getInstance()
+    ensurePermission: EnsurePermissionUseCase,
+    repository: BluetoothRepositoryContract
   ) {
     this.ensurePermission = ensurePermission;
     this.repository = repository;
@@ -32,7 +32,7 @@ export class BluetoothOperationGuard {
   }
 
   async ensureAdapterOn(): Promise<Result<void>> {
-    const adapter = await this.repository.loadAdapterState();
+    const adapter = await this.repository.getAdapterState();
     if (!adapter.success || adapter.value === undefined || !adapter.value.enabled) {
       return Result.fail(new ResultError(BluetoothErrorCodes.ADAPTER_OFF, 'Bluetooth adapter is off'));
     }

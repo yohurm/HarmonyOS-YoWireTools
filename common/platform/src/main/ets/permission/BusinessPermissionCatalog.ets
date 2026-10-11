@@ -8,6 +8,7 @@ import { PlatformPermission } from './PlatformPermission';
 export enum BusinessPermissionGroup {
   BLUETOOTH_SCAN_CONNECT = 'bluetooth_scan_connect',
   BLUETOOTH_PERSISTENT_MAC = 'bluetooth_persistent_mac',
+  BLUETOOTH_BACKGROUND = 'bluetooth_background',
   WIFI_INFO = 'wifi_info',
   WIFI_PEERS_MAC = 'wifi_peers_mac',
   WIFI_CONTROL = 'wifi_control',
@@ -23,6 +24,8 @@ export class BusinessPermissionCatalog {
         return [AppPermission.ACCESS_BLUETOOTH];
       case BusinessPermissionGroup.BLUETOOTH_PERSISTENT_MAC:
         return [AppPermission.ACCESS_BLUETOOTH, AppPermission.PERSISTENT_BLUETOOTH_PEERS_MAC];
+      case BusinessPermissionGroup.BLUETOOTH_BACKGROUND:
+        return [AppPermission.KEEP_BACKGROUND_RUNNING];
       case BusinessPermissionGroup.WIFI_INFO:
         return [AppPermission.GET_WIFI_INFO];
       case BusinessPermissionGroup.WIFI_PEERS_MAC:
@@ -46,6 +49,8 @@ export class BusinessPermissionCatalog {
         return $r('app.string.perm_reason_bluetooth_scan_connect');
       case BusinessPermissionGroup.BLUETOOTH_PERSISTENT_MAC:
         return $r('app.string.perm_reason_bluetooth_persistent_mac');
+      case BusinessPermissionGroup.BLUETOOTH_BACKGROUND:
+        return $r('app.string.perm_reason_bluetooth_background');
       case BusinessPermissionGroup.WIFI_INFO:
         return $r('app.string.perm_reason_wifi_info');
       case BusinessPermissionGroup.WIFI_PEERS_MAC:

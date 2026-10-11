@@ -17,6 +17,10 @@
       "value": "持久化蓝牙地址需要额外权限"
     },
     {
+      "name": "perm_reason_bluetooth_background",
+      "value": "后台保持蓝牙连接需要 KEEP_BACKGROUND_RUNNING"
+    },
+    {
       "name": "perm_reason_wifi_info",
       "value": "WiFi 环境分析需要 GET_WIFI_INFO 权限"
     },

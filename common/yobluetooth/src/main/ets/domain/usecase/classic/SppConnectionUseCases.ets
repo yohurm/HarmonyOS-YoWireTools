@@ -10,7 +10,7 @@ import {
   TransportSessionRegistry
 } from 'debug_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { ConnectSppResult, SppConnectParams } from '../../model/SppConnectParams';
 import { BluetoothTransportPolicy, BluetoothTransportType } from '../../model/BluetoothTransportType';
 import { asSppTransportFacet } from '../../model/spp/ISppTransportFacet';
@@ -28,21 +28,23 @@ import { SppSessionKey } from '../../model/SppSessionKey';
  * guard → resolve → admission/ledger.reserve → stop discovery → bootstrap → connect → register → promote → bind reconnect.
  */
 export class ConnectSppUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly guard: BluetoothOperationGuard;
   private readonly sessionBootstrap: BluetoothSessionBootstrap;
   private readonly transportRegistry: TransportSessionRegistry;
   private readonly resolveAddress: ResolveSppTargetAddressUseCase;
   private readonly ledger: SppSessionLedger;
   private readonly admissionPolicy: SppSessionAdmissionPolicy;
+  private readonly reconnect: SppReconnectCoordinator;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    guard: BluetoothOperationGuard = new BluetoothOperationGuard(),
-    sessionBootstrap: BluetoothSessionBootstrap = new BluetoothSessionBootstrap(),
-    transportRegistry: TransportSessionRegistry = TransportSessionRegistry.getInstance(),
-    resolveAddress: ResolveSppTargetAddressUseCase = new ResolveSppTargetAddressUseCase(),
-    ledger: SppSessionLedger = SppSessionLedger.getInstance()
+    repository: BluetoothRepositoryContract,
+    guard: BluetoothOperationGuard,
+    sessionBootstrap: BluetoothSessionBootstrap,
+    transportRegistry: TransportSessionRegistry,
+    resolveAddress: ResolveSppTargetAddressUseCase,
+    ledger: SppSessionLedger,
+    reconnect: SppReconnectCoordinator
   ) {
     this.repository = repository;
     this.guard = guard;
@@ -51,6 +53,7 @@ export class ConnectSppUseCase {
     this.resolveAddress = resolveAddress;
     this.ledger = ledger;
     this.admissionPolicy = new SppSessionAdmissionPolicy(ledger);
+    this.reconnect = reconnect;
   }
 
   async execute(params: SppConnectParams): Promise<Result<ConnectSppResult>> {
@@ -151,7 +154,7 @@ export class ConnectSppUseCase {
     this.transportRegistry.register(session.value.id, transport);
     this.ledger.promoteConnected(sessionKey, facet.getClientSocketId());
     if (connectParams.autoReconnect) {
-      SppReconnectCoordinator.getInstance().bind(
+      this.reconnect.bind(
         session.value.id,
         classicId,
         (): Promise<void> => facet.reopenForReconnect(),
@@ -169,8 +172,14 @@ export class ConnectSppUseCase {
  * Coordinator.unbind → queue.reset → disconnect → TSR.remove → markClosing → release → stopSession → republish.
  */
 export class DisconnectSppUseCase {
+  private readonly reconnect: SppReconnectCoordinator;
+
+  constructor(reconnect: SppReconnectCoordinator) {
+    this.reconnect = reconnect;
+  }
+
   async execute(sessionId: string): Promise<Result<void>> {
-    SppReconnectCoordinator.getInstance().unbind(sessionId);
+    this.reconnect.unbind(sessionId);
     return await SppSessionTeardown.userDisconnectCleanup(sessionId);
   }
 }

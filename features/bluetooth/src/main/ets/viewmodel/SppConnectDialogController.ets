@@ -1,11 +1,15 @@
 import {
   BluetoothConstants,
+  BluetoothErrorCodes,
+  BluetoothUseCaseFactory,
   BluetoothTransportType,
   ConnectSppUseCase,
   QuerySppConnectEligibilityUseCase,
   ReconnectPolicy,
   SppConnectFailureHints,
   SppConnectParams,
+  SppSocketKind,
+  SppSocketRequestPolicy,
   SppUuidFavoriteEntry,
   SppUuidFavoriteUseCases
 } from 'yobluetooth';
@@ -32,6 +36,8 @@ export class SppConnectDialogParams {
   @Track secure: boolean = false;
   @Track timeoutText: string = `${BluetoothConstants.DEFAULT_SPP_CONNECT_TIMEOUT_MS}`;
   @Track autoReconnect: boolean = false;
+  @Track socketKind: SppSocketKind = SppSocketKind.RFCOMM;
+  @Track psmText: string = '';
   @Track connecting: boolean = false;
   @Track errorMessage: string = '';
   @Track hintLines: string[] = [];
@@ -79,9 +85,9 @@ export class SppConnectDialogController {
   private readonly uuidFavorites: SppUuidFavoriteUseCases;
 
   constructor(
-    connectSpp: ConnectSppUseCase = new ConnectSppUseCase(),
-    queryEligibility: QuerySppConnectEligibilityUseCase = new QuerySppConnectEligibilityUseCase(),
-    uuidFavorites: SppUuidFavoriteUseCases = new SppUuidFavoriteUseCases()
+    connectSpp: ConnectSppUseCase = BluetoothUseCaseFactory.connectSpp(),
+    queryEligibility: QuerySppConnectEligibilityUseCase = BluetoothUseCaseFactory.querySppEligibility(),
+    uuidFavorites: SppUuidFavoriteUseCases = BluetoothUseCaseFactory.sppUuidFavorites()
   ) {
     this.connectSpp = connectSpp;
     this.queryEligibility = queryEligibility;
@@ -186,6 +192,16 @@ export class SppConnectDialogController {
         eligibility.error?.message ?? 'not eligible', eligibility.error?.nativeCode ?? '');
       return;
     }
+    const psmDecision = SppSocketRequestPolicy.acceptPsm(form.socketKind, Number(form.psmText.trim()));
+    if (!psmDecision.success || psmDecision.value === undefined) {
+      SppConnectDialogController.applyFailure(
+        form,
+        psmDecision.error?.code ?? BluetoothErrorCodes.L2CAP_PSM_REQUIRED,
+        psmDecision.error?.message ?? 'L2CAP connect requires a PSM',
+        ''
+      );
+      return;
+    }
     form.connecting = true;
     const result = await this.connectSpp.execute(new SppConnectParams(
       form.classicDeviceId,
@@ -195,7 +211,10 @@ export class SppConnectDialogController {
       Math.floor(timeoutMs),
       form.autoReconnect,
       ReconnectPolicy.defaultPolicy(),
-      form.transport
+      form.transport,
+      '',
+      form.socketKind,
+      psmDecision.value
     ));
     form.connecting = false;
     if (!result.success || result.value === undefined) {

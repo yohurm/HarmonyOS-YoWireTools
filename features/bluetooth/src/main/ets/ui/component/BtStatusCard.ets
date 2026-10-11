@@ -25,6 +25,9 @@ export interface BtStatusCellModel {
 export struct BtStatusCard {
   @Param isLoading: boolean = false;
   @Param adapterEnabled: boolean = false;
+  @Param adapterLabel: ResourceStr = $r('app.string.bt_status_off');
+  @Param emulatorBlocked: boolean = false;
+  @Param switchPending: boolean = false;
   @Param permissionGranted: boolean = false;
   @Param classicReady: boolean = false;
   @Param bleReady: boolean = false;
@@ -33,6 +36,10 @@ export struct BtStatusCard {
   @Event onPermissionAction: () => void = () => {
   };
   @Event onAdapterAction: () => void = () => {
+  };
+  @Event onEnableAdapter: () => void = () => {
+  };
+  @Event onDisableAdapter: () => void = () => {
   };
   @Local private metrics: WindowMetricsState = WindowMetricsRegistry.connect();
 
@@ -96,7 +103,14 @@ export struct BtStatusCard {
     if (kind === 'permission') {
       this.onPermissionAction();
     } else if (kind === 'adapter') {
-      this.onAdapterAction();
+      if (this.emulatorBlocked || this.switchPending) {
+        return;
+      }
+      if (this.adapterEnabled) {
+        this.onDisableAdapter();
+        return;
+      }
+      this.onEnableAdapter();
     }
   }
 
@@ -113,9 +127,9 @@ export struct BtStatusCard {
     return {
       kind: 'adapter',
       label: $r('app.string.bt_status_adapter'),
-      value: this.adapterEnabled ? $r('app.string.bt_status_on') : $r('app.string.bt_status_off'),
-      tone: this.adapterEnabled ? 'success' : 'warning',
-      actionEnabled: !this.adapterEnabled
+      value: this.adapterLabel,
+      tone: this.emulatorBlocked ? 'error' : (this.adapterEnabled ? 'success' : 'warning'),
+      actionEnabled: !this.emulatorBlocked && !this.switchPending
     };
   }
 
@@ -190,6 +204,9 @@ export struct BtStatusCard {
     if (model.kind === 'permission') {
       return $r('app.string.bt_action_grant_permission');
     }
-    return $r('app.string.bt_action_open_settings');
+    if (this.adapterEnabled) {
+      return $r('app.string.bt_action_disable');
+    }
+    return $r('app.string.bt_action_enable');
   }
 }

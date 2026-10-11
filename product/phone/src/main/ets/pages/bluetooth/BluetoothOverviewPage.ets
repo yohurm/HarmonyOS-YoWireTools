@@ -2,6 +2,8 @@ import {
   YoContentState,
   YoLoadingStateModel,
   YoModeEntryCard,
+  YoActionButton,
+  YoActionButtonKind,
   YoColor,
   YoPageState,
   YoResponsive,
@@ -21,6 +23,10 @@ export struct BluetoothOverviewPage {
   @Event onOpenSpp: () => void = () => {
   };
   @Event onOpenBle: () => void = () => {
+  };
+  @Event onOpenDiagnostics: () => void = () => {
+  };
+  @Event onOpenIdentity: () => void = () => {
   };
   @Local private vm: BtOverviewViewModel = new BtOverviewViewModel();
 
@@ -74,6 +80,9 @@ export struct BluetoothOverviewPage {
       BtStatusCard({
         isLoading: this.vm.isLoading,
         adapterEnabled: this.vm.adapterEnabled,
+        adapterLabel: this.vm.adapterLabel(),
+        emulatorBlocked: this.vm.emulatorBlocked,
+        switchPending: this.vm.switchPending,
         permissionGranted: this.vm.permissionGranted,
         classicReady: this.vm.isClassicReady(),
         bleReady: this.vm.isBleReady(),
@@ -82,10 +91,31 @@ export struct BluetoothOverviewPage {
         onPermissionAction: () => {
           void this.vm.requestPermission();
         },
-        onAdapterAction: () => {
-          void this.vm.openBluetoothSettings();
+        onEnableAdapter: () => {
+          void this.vm.requestEnable();
+        },
+        onDisableAdapter: () => {
+          void this.vm.requestDisable();
         }
       })
+      if (this.vm.emulatorBlocked) {
+        Text($r('app.string.bt_emulator_limitation'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.ERROR)
+          .width('100%')
+      }
+      if (this.vm.serviceStopped) {
+        Text($r('app.string.bt_error_service_stopped'))
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.ERROR)
+          .width('100%')
+      }
+      if (this.vm.actionMessage.length > 0) {
+        Text(this.vm.actionMessage)
+          .fontSize(YoTypeStyle.BODY_S.size)
+          .fontColor(YoColor.TEXT_SECONDARY)
+          .width('100%')
+      }
       this.bluetoothEntryOverview()
     }
     .width('100%')
@@ -96,7 +126,7 @@ export struct BluetoothOverviewPage {
     YoPageShell({
       title: $r('app.string.bt_title_overview'),
       destinationKind: YoNavDestinationKind.ROOT_TAB,
-      scrollable: false,
+      scrollable: true,
       immersiveTitleBar: true,
       content: this.pageContent
     })
@@ -140,6 +170,28 @@ export struct BluetoothOverviewPage {
       }
       .width('100%')
       .alignItems(VerticalAlign.Top)
+      YoActionButton({
+        label: $r('app.string.bt_action_open_settings'),
+        kind: YoActionButtonKind.TEXT,
+        fullWidth: false,
+        onTap: () => {
+          void this.vm.openBluetoothSettings();
+        }
+      })
+      YoActionButton({
+        label: $r('app.string.bt_entry_diagnostics'),
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          this.onOpenDiagnostics();
+        }
+      })
+      YoActionButton({
+        label: $r('app.string.bt_entry_identity'),
+        kind: YoActionButtonKind.SECONDARY,
+        onTap: () => {
+          this.onOpenIdentity();
+        }
+      })
     }
     .width('100%')
   }

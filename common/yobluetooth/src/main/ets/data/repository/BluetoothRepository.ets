@@ -6,6 +6,15 @@ import { PlatformConnectedClassicSource } from '../datasource/platform/PlatformC
 import { BleDiscoveryPayload, BleScannerDataSource } from '../datasource/platform/BleScannerDataSource';
 import { BluetoothIdentityDataSource } from '../datasource/platform/BluetoothIdentityDataSource';
 import { GattClientDataSource } from '../datasource/platform/GattClientDataSource';
+import { GattServerDataSource } from '../datasource/platform/GattServerDataSource';
+import { BleAdvertiserDataSource } from '../datasource/platform/BleAdvertiserDataSource';
+import { SppUuidFavoriteDataSource } from '../datasource/local/SppUuidFavoriteDataSource';
+import { SppPlatformGateway } from '../platform/spp/SppPlatformGateway';
+import { GattTransportSession } from '../transport/GattTransportSession';
+import { AdvertisingRequest } from '../../domain/model/AdvertisingRequest';
+import { ConnectionParamPreset } from '../../domain/model/ConnectionParamPreset';
+import { SppSocketKind } from '../../domain/model/SppSocketKind';
+import { SppUuidFavoriteEntry } from '../../domain/model/SppUuidFavoriteEntry';
 import { BluetoothDeviceMapper, PlatformPairedSnapshot } from '../mapper/BluetoothDeviceMapper';
 import {
   BluetoothAdapterSnapshot,
@@ -31,6 +40,7 @@ import { SppSessionLedger } from '../../domain/service/spp/SppSessionLedger';
 import { PairingEvent, PairingState } from '../../domain/model/PairingState';
 import { ClassicScanTimer } from '../../domain/service/ClassicScanTimer';
 import { BluetoothErrorCodes } from '../../constants/BluetoothErrorCodes';
+import { ClassicDiscoveryAdmission } from '../../domain/service/ClassicDiscoveryAdmission';
 import { GattServiceTreeSnapshot, GattClientState } from '../../domain/model/GattServiceTree';
 import { GattPlatformMapper } from '../mapper/GattPlatformMapper';
 import { GattCharacteristicChangeEvent, GattCharacteristicRef, GattDescriptorRef } from '../../domain/model/GattCharacteristicRef';
@@ -80,6 +90,11 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
   private scanTimeoutHandler: (() => void) | undefined;
   private classicFilter: ClassicScanFilter = ClassicScanFilter.empty();
   private activeBleScanFilter: BleScanFilter = new BleScanFilter();
+  private serviceStopped: boolean = false;
+  private readonly serviceStoppedObservable: Observable<boolean>;
+  private readonly gattServerDataSource: GattServerDataSource = new GattServerDataSource();
+  private readonly bleAdvertiserDataSource: BleAdvertiserDataSource = new BleAdvertiserDataSource();
+  private readonly sppGateway: SppPlatformGateway = new SppPlatformGateway();
 
   private constructor(
     classicDataSource: ClassicBluetoothDataSource = ClassicBluetoothDataSource.getInstance(),
@@ -94,6 +109,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     this.classicDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.bleDevicesObservable = new Observable<BluetoothDevice[]>([]);
     this.scanRemainingObservable = new Observable<number>(0);
+    this.serviceStoppedObservable = new Observable<boolean>(false);
     this.gattTreeObservable = new Observable<GattServiceTreeSnapshot>(
       new GattServiceTreeSnapshot('', '', 23, [], GattClientState.IDLE)
     );
@@ -118,6 +134,10 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   createSppTransport(sessionId: string, _params: SppConnectParams): SppTransportSession {
     return new SppTransportSession(sessionId);
+  }
+
+  createGattTransport(sessionId: string): object {
+    return new GattTransportSession(sessionId);
   }
 
   getActiveSppSessionCount(): number {
@@ -376,13 +396,24 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     return this.classicFilter;
   }
 
+  async enableBluetooth(): Promise<Result<void>> {
+    const result = await this.classicDataSource.enableBluetooth();
+    this.absorbPlatformFailure(result);
+    return result;
+  }
+
+  async disableBluetooth(): Promise<Result<void>> {
+    const result = await this.classicDataSource.disableBluetooth();
+    this.absorbPlatformFailure(result);
+    return result;
+  }
+
   async startClassicDiscovery(sessionId: string, onTimeout?: () => void): Promise<Result<void>> {
-    if (this.classicScanPhase === ClassicScanPhase.SCANNING) {
-      return Result.fail(new ResultError(BluetoothErrorCodes.SCAN_ALREADY_RUNNING, 'Scan already running'));
-    }
     const discovering = await this.classicDataSource.isBluetoothDiscovering();
-    if (discovering.success && discovering.value === true) {
-      await this.classicDataSource.stopBluetoothDiscovery();
+    const platformDiscovering = discovering.success && discovering.value === true;
+    const admission = ClassicDiscoveryAdmission.admit(this.classicScanPhase, platformDiscovering);
+    if (!admission.success) {
+      return admission;
     }
     await this.refreshPairedClassicCache();
     this.prepareClassicScanList();
@@ -395,6 +426,7 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
     if (!started.success) {
       this.classicScanPhase = ClassicScanPhase.FAILED;
       this.classicDataSource.offDiscoveryResult();
+      this.absorbPlatformFailure(started);
       return Result.fail(started.error ?? new ResultError(BluetoothErrorCodes.SCAN_RESOURCE_FAILED, 'start failed'));
     }
     this.scanTimeoutHandler = onTimeout;
@@ -501,6 +533,35 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       return started;
     }
     return Result.ok(undefined);
+  }
+
+  bleRssiThresholdAvailable(): boolean {
+    return this.bleDataSource.rssiThresholdAvailable();
+  }
+
+  bleParallelScanAvailable(): boolean {
+    return this.bleDataSource.parallelScanAvailable();
+  }
+
+  startExtraBleScan(filter: BleScanFilter): Result<void> {
+    return this.bleDataSource.startExtraScan(filter);
+  }
+
+  stopExtraBleScan(): Result<void> {
+    return this.bleDataSource.stopExtraScan();
+  }
+
+  gattCurrentMtu(sessionId: string): number {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return BluetoothConstants.BLE_DEFAULT_MTU;
+    }
+    return client.currentMtu();
+  }
+
+  gattMtuPending(sessionId: string): boolean {
+    const client = this.gattClients.get(sessionId);
+    return client !== undefined && client.isMtuPending();
   }
 
   stopBleScan(): Result<void> {
@@ -677,6 +738,35 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
 
   resetClassicScanPhase(): void {
     this.classicScanPhase = ClassicScanPhase.IDLE;
+  }
+
+  isServiceStopped(): boolean {
+    return this.serviceStopped;
+  }
+
+  observeServiceStopped(): Observable<boolean> {
+    return this.serviceStoppedObservable;
+  }
+
+  haltForServiceStop(): void {
+    this.serviceStopped = true;
+    this.serviceStoppedObservable.next(true);
+    void this.stopClassicDiscovery();
+    this.stopBleScan();
+    const clients = Array.from(this.gattClients.values());
+    for (let i = 0; i < clients.length; i++) {
+      clients[i].release();
+    }
+    this.gattClients.clear();
+    SppSessionLedger.getInstance().closeAll();
+  }
+
+  private absorbPlatformFailure(result: Result<void>): void {
+    const code = result.error?.code ?? '';
+    const nativeCode = result.error?.nativeCode ?? '';
+    if (code === BluetoothErrorCodes.SERVICE_STOPPED || nativeCode === '2900001') {
+      this.haltForServiceStop();
+    }
   }
 
   /** 会话态变化后刷新扫描列表可见性（注入正在连接的 SPP 目标）。 */
@@ -1020,6 +1110,223 @@ export class BluetoothRepository implements BluetoothRepositoryContract {
       packet.discoveredAtMs,
       packet.discoveryCount
     );
+  }
+
+  async readGattCharacteristicHex(
+    sessionId: string,
+    serviceUuid: string,
+    characteristicUuid: string
+  ): Promise<Result<string>> {
+    const ready = this.readyGattClient(sessionId);
+    if (!ready.success || ready.value === undefined) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    const characteristic = ready.value.findCharacteristic(serviceUuid, characteristicUuid);
+    if (characteristic === undefined) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.GATT_SERVICE_MISSING,
+        'Characteristic not in discovered services'
+      ));
+    }
+    const readResult = await ready.value.readCharacteristic(characteristic);
+    if (!readResult.success || readResult.value === undefined) {
+      return Result.fail(readResult.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Read failed'));
+    }
+    return Result.ok(GattPlatformMapper.valueToHex(readResult.value.characteristicValue));
+  }
+
+  async writeGattCharacteristicChunk(
+    sessionId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    bytes: Uint8Array,
+    noResponse: boolean
+  ): Promise<Result<void>> {
+    const ready = this.readyGattClient(sessionId);
+    if (!ready.success || ready.value === undefined) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    const characteristic = ready.value.findCharacteristic(serviceUuid, characteristicUuid);
+    if (characteristic === undefined) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.GATT_SERVICE_MISSING,
+        'Characteristic not in discovered services'
+      ));
+    }
+    return ready.value.writeCharacteristic(characteristic, bytes, noResponse);
+  }
+
+  async setGattNotification(
+    sessionId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    enable: boolean,
+    useIndication: boolean
+  ): Promise<Result<void>> {
+    const ready = this.readyGattClient(sessionId);
+    if (!ready.success || ready.value === undefined) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    const characteristic = ready.value.findCharacteristic(serviceUuid, characteristicUuid);
+    if (characteristic === undefined) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.GATT_SERVICE_MISSING,
+        'Characteristic not in discovered services'
+      ));
+    }
+    if (useIndication) {
+      return enable ?
+        ready.value.enableIndication(characteristic) :
+        ready.value.disableIndication(characteristic);
+    }
+    return enable ?
+      ready.value.enableNotification(characteristic) :
+      ready.value.disableNotification(characteristic);
+  }
+
+  async readGattDescriptorHex(
+    sessionId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    descriptorUuid: string
+  ): Promise<Result<string>> {
+    const ready = this.readyGattClient(sessionId);
+    if (!ready.success || ready.value === undefined) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    const descriptor = ready.value.findDescriptor(serviceUuid, characteristicUuid, descriptorUuid);
+    if (descriptor === undefined) {
+      return Result.fail(new ResultError(
+        BluetoothErrorCodes.GATT_SERVICE_MISSING,
+        'Descriptor not in discovered services'
+      ));
+    }
+    const readResult = await ready.value.readDescriptor(descriptor);
+    if (!readResult.success || readResult.value === undefined) {
+      return Result.fail(readResult.error ?? new ResultError(BluetoothErrorCodes.BLE_GATT_DISCOVER_FAILED, 'Read failed'));
+    }
+    return Result.ok(GattPlatformMapper.valueToHex(readResult.value.descriptorValue));
+  }
+
+  async writeGattDescriptor(
+    sessionId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    descriptorUuid: string,
+    bytes: Uint8Array
+  ): Promise<Result<void>> {
+    const ready = this.readyGattClient(sessionId);
+    if (!ready.success || ready.value === undefined) {
+      return Result.fail(ready.error ?? new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    return ready.value.writeDescriptorByUuid(serviceUuid, characteristicUuid, descriptorUuid, bytes);
+  }
+
+  requestGattMtu(sessionId: string, mtu: number): Promise<Result<number>> {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected')));
+    }
+    return client.requestMtu(mtu);
+  }
+
+  readGattRssi(sessionId: string): Promise<Result<number>> {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected')));
+    }
+    return client.readRssi();
+  }
+
+  updateGattConnectionParam(sessionId: string, preset: ConnectionParamPreset): Promise<Result<void>> {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return Promise.resolve(Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected')));
+    }
+    return client.updateConnectionParam(preset);
+  }
+
+  openGattServer(serviceUuid: string, characteristicUuid: string, value: Uint8Array): Result<void> {
+    const opened = this.gattServerDataSource.openServer();
+    if (!opened.success) {
+      return opened;
+    }
+    return this.gattServerDataSource.addPrimaryService(serviceUuid, characteristicUuid, value);
+  }
+
+  closeGattServer(): Result<void> {
+    return this.gattServerDataSource.closeServer();
+  }
+
+  notifyGattServer(
+    deviceId: string,
+    serviceUuid: string,
+    characteristicUuid: string,
+    value: Uint8Array,
+    confirm: boolean
+  ): Result<void> {
+    return this.gattServerDataSource.notifyValue(deviceId, serviceUuid, characteristicUuid, value, confirm);
+  }
+
+  startBleAdvertise(request: AdvertisingRequest): Promise<Result<void>> {
+    return this.bleAdvertiserDataSource.start(request);
+  }
+
+  stopBleAdvertise(): Promise<Result<void>> {
+    return this.bleAdvertiserDataSource.stop();
+  }
+
+  listSppUuidFavorites(): Promise<SppUuidFavoriteEntry[]> {
+    return SppUuidFavoriteDataSource.getInstance().ensureLoaded();
+  }
+
+  isSppUuidFavorite(uuid: string): boolean {
+    return SppUuidFavoriteDataSource.getInstance().contains(uuid);
+  }
+
+  toggleSppUuidFavorite(uuid: string, label: string): Promise<Result<boolean>> {
+    return SppUuidFavoriteDataSource.getInstance().toggle(uuid, label);
+  }
+
+  addSppUuidFavorite(uuid: string, label: string): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().add(uuid, label);
+  }
+
+  updateSppUuidFavorite(uuid: string, nextUuid: string, label: string): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().update(uuid, nextUuid, label);
+  }
+
+  removeSppUuidFavorite(uuid: string): Promise<Result<void>> {
+    return SppUuidFavoriteDataSource.getInstance().remove(uuid);
+  }
+
+  listenSpp(
+    name: string,
+    uuid: string,
+    secure: boolean,
+    kind: SppSocketKind,
+    psm: number
+  ): Promise<Result<number>> {
+    return this.sppGateway.listen(name, uuid, secure, kind, psm);
+  }
+
+  acceptSpp(serverSocket: number): Promise<Result<number>> {
+    return this.sppGateway.accept(serverSocket);
+  }
+
+  closeSppServer(serverSocket: number): Result<void> {
+    return this.sppGateway.closeServer(serverSocket);
+  }
+
+  private readyGattClient(sessionId: string): Result<GattClientDataSource> {
+    const client = this.gattClients.get(sessionId);
+    if (client === undefined) {
+      return Result.fail(new ResultError(BluetoothErrorCodes.NOT_CONNECTED, 'GATT not connected'));
+    }
+    if (!client.hasServiceTree()) {
+      return Result.fail(new ResultError(BluetoothErrorCodes.GATT_SEQUENCE, 'Service discovery is not finished'));
+    }
+    return Result.ok(client);
   }
 }
 

@@ -1,6 +1,6 @@
 import { Result, ResultError } from 'common_core';
 import { BluetoothErrorCodes } from '../../../constants/BluetoothErrorCodes';
-import { BluetoothRepository } from '../../../data/repository/BluetoothRepository';
+import { BluetoothRepositoryContract } from '../../repository/BluetoothRepositoryContract';
 import { BluetoothDevice } from '../../model/BluetoothDevice';
 import {
   BluetoothTransportPolicy,
@@ -14,9 +14,9 @@ import { PairBluetoothDeviceUseCase } from './ClassicScanUseCases';
  * Ensures a classic address for sppConnect. Rejects BLE-only / BLE address misuse.
  */
 export class ResolveSppTargetAddressUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
 
-  constructor(repository: BluetoothRepository = BluetoothRepository.getInstance()) {
+  constructor(repository: BluetoothRepositoryContract) {
     this.repository = repository;
   }
 
@@ -57,12 +57,12 @@ export class ResolveSppTargetAddressUseCase {
  * pair via BLE MAC → paired list gains classic MAC → name match → link identity.
  */
 export class BridgeBleToClassicPairUseCase {
-  private readonly repository: BluetoothRepository;
+  private readonly repository: BluetoothRepositoryContract;
   private readonly pairDevice: PairBluetoothDeviceUseCase;
 
   constructor(
-    repository: BluetoothRepository = BluetoothRepository.getInstance(),
-    pairDevice: PairBluetoothDeviceUseCase = new PairBluetoothDeviceUseCase()
+    repository: BluetoothRepositoryContract,
+    pairDevice: PairBluetoothDeviceUseCase
   ) {
     this.repository = repository;
     this.pairDevice = pairDevice;
