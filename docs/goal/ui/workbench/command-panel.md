@@ -63,3 +63,19 @@ AlertDialog                                  // 停止周期前确认
 | 架构编号 | 无。不把 PRD 02 的章节号写成 WB 或 LOG 切片 |
 | 工作台 | 从 `screen.workbench.home` 进入。槽 0 |
 | 相关能力 | 执行结果若写入会话，呈现规则同各模块日志：BT-090、NL-107、WN-128。写到哪一个日志对象，见 [日志中心](../log/center.md) 的缺口 |
+
+## 可视化原型
+
+静态图，不是页面实现。从工作台进入，窄屏不显示底栏。
+
+![命令面板默认](../prototypes/phone-command-panel.png)
+
+默认：有收藏，选中第一条；「执行一次」可点，「周期发送」因设置未允许而禁用。
+
+![命令面板空态](../prototypes/phone-command-panel-empty.png)
+
+空：还没有命令，没有主操作。
+
+![命令面板无权限](../prototypes/phone-command-panel-permission.png)
+
+无权限：列表保留，参数区换成「去该模块授权」，不弹系统框。

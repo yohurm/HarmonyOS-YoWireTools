@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="956" viewBox="0 0 420 956">
+<rect x="0.0" y="0.0" width="420.0" height="956.0" rx="0" fill="#E8EAED" fill-opacity="1"/>
+<rect x="20.0" y="20.0" width="380.0" height="800.0" rx="28" fill="#1C1C1E" fill-opacity="1"/>
+<clipPath id="screen"><rect x="30" y="30" width="360" height="780" rx="18"/></clipPath>
+<g clip-path="url(#screen)">
+<rect x="30.0" y="30.0" width="360.0" height="780.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<g transform="translate(30,30)">
+<rect x="0.0" y="0.0" width="360.0" height="32.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<text x="16.0" y="21.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">9:41</text>
+<rect x="326.0" y="11.0" width="16.0" height="10.0" rx="2" fill="none" fill-opacity="1" stroke="#182431" stroke-width="1.2"/>
+<rect x="343.0" y="14.0" width="2.0" height="4.0" rx="0" fill="#182431" fill-opacity="1"/>
+<rect x="328.0" y="13.0" width="9.0" height="6.0" rx="1" fill="#182431" fill-opacity="1"/>
+<rect x="0.0" y="32.0" width="360.0" height="56.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<path d="M22 56 L15 62 L22 68" fill="none" stroke="#182431" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="36.0" y="66.0" font-family="WenQuanYi Micro Hei" font-size="20" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">命令面板</text>
+<g transform="translate(0,88)">
+<text x="16.0" y="14.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">收藏</text>
+<rect x="16.0" y="22.0" width="328.0" height="60.0" rx="12" fill="#E7F0FE" fill-opacity="1"/>
+<text x="28.0" y="46.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">读固件版本</text>
+<text x="28.0" y="66.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">SPP · 工装串口</text>
+<rect x="16.0" y="82.0" width="328.0" height="60.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="28" y1="142" x2="332" y2="142" stroke="#E6E8EE"/>
+<text x="28.0" y="106.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">写特征值</text>
+<text x="28.0" y="126.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">BLE Write · 温湿度计</text>
+<rect x="16.0" y="142.0" width="328.0" height="60.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="28" y1="202" x2="332" y2="202" stroke="#E6E8EE"/>
+<text x="28.0" y="166.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">发 HEX</text>
+<text x="28.0" y="186.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">星闪 dataTransfer · 端口</text>
+<text x="16.0" y="230.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">参数</text>
+<rect x="16.0" y="238.0" width="52.0" height="22.0" rx="11.0" fill="#EEE4DF" fill-opacity="1"/>
+<text x="42.0" y="253.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#D45C11" fill-opacity="1" text-anchor="middle">未授权</text>
+<text x="16.0" y="284.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">目标模块未授权，不执行。</text>
+<text x="16.0" y="304.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">面板不弹系统授权框。</text>
+<rect x="16.0" y="318.0" width="328.0" height="40.0" rx="20" fill="#0A59F7" fill-opacity="1"/>
+<text x="180.0" y="344.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">去该模块授权</text>
+</g>
+</g></g>
+<text x="20.0" y="848.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">窄屏 360 · 命令面板 · 无权限</text>
+<text x="20.0" y="866.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">列表保留。参数区换成权限墙，主操作「去该模块授权」。不弹系统</text>
+<text x="20.0" y="884.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">框。</text>
+<text x="20.0" y="902.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#8A4B08" fill-opacity="1" text-anchor="start">待对齐：目标模块只是示例，跨模块跳转契约未到。</text>
+</svg>

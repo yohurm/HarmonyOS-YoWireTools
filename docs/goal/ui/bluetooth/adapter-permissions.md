@@ -128,3 +128,19 @@ BT-008：运行环境探针为模拟器时，胶囊为「蓝牙不可用」，�
 
 - 不在这页申请 `PERSISTENT_BLUETOOTH_PEERS_MAC` 或 `MANAGE_BLUETOOTH`。
 - 不把星闪或 Wi‑Fi 的开关放进这张状态卡。
+
+## 可视化原型
+
+静态图，不是页面实现。蓝牙是底栏第二槽，不是独立 App。
+
+![蓝牙概览默认](../prototypes/phone-bluetooth-overview.png)
+
+默认：已打开，经典与低功耗可进，主按钮「关闭蓝牙」。
+
+![蓝牙概览无权限](../prototypes/phone-bluetooth-overview-permission.png)
+
+无权限：未授予 `ACCESS_BLUETOOTH`，整页权限墙，主操作「授权」。
+
+![蓝牙概览模拟器不可用](../prototypes/phone-bluetooth-overview-gap.png)
+
+禁用：BT-008，胶囊「蓝牙不可用」，没有成功扫描。

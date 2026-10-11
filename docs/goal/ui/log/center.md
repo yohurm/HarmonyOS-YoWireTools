@@ -74,3 +74,23 @@ YoSplitScaffold                         // ≥600vp
 | 设计屏 | `screen.log.center` |
 | 架构编号 | 无 LOG 切片。行内容可追溯到 BT-086–BT-090、NL-103、NL-107–NL-109、NL-113、WN-128–WN-132 |
 | 工作台 | `screen.workbench.home` 的日志卡片。槽 0 |
+
+## 可视化原型
+
+静态图，不是页面实现。窄屏从工作台进入；宽屏仍是同一条侧栏。
+
+![日志中心默认](../prototypes/phone-log-center.png)
+
+默认：搜索、模块分段、最新在上。星闪行是权限失败，不挡住其他模块。
+
+![日志中心空态](../prototypes/phone-log-center-empty.png)
+
+空：没有会话日志，导出和清空禁用。
+
+![日志中心错误](../prototypes/phone-log-center-error.png)
+
+错误：读模型未就绪时整页「日志来源未收口」，不编造行。
+
+![宽屏日志中心](../prototypes/wide-log-center.png)
+
+宽屏：侧栏仍高亮工作台，左列表右详情。日志中心不是第六个导航项。

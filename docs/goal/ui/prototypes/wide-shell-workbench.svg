@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="794" viewBox="0 0 1160 794">
+<rect x="0.0" y="0.0" width="1160.0" height="794.0" rx="0" fill="#E8EAED" fill-opacity="1"/>
+<rect x="16.0" y="16.0" width="1128.0" height="688.0" rx="16" fill="#1C1C1E" fill-opacity="1"/>
+<g transform="translate(20,20)">
+<rect x="0.0" y="0.0" width="1120.0" height="680.0" rx="0" fill="#F1F3F5" fill-opacity="1"/>
+<rect x="0.0" y="0.0" width="240.0" height="680.0" rx="0" fill="#FFFFFF" fill-opacity="1"/>
+<line x1="240" y1="0" x2="240" y2="680" stroke="#E6E8EE"/>
+<text x="20.0" y="36.0" font-family="WenQuanYi Micro Hei" font-size="13" font-weight="bold" fill="#5C6570" fill-opacity="1" text-anchor="start">YoWireTools</text>
+<rect x="12.0" y="64.0" width="216.0" height="44.0" rx="12" fill="#E7F0FE" fill-opacity="1"/>
+<path d="M31 85 L40 77 L49 85 V94 H43 V88 H37 V94 H31 Z" fill="#0A59F7"/>
+<text x="60.0" y="92.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#0A59F7" fill-opacity="1" text-anchor="start">工作台</text>
+<path d="M38 129 L44 134 L38 138 L44 142 L38 147 V129" fill="none" stroke="#182431" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M35 134 L38 138 L35 142" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round"/>
+<text x="60.0" y="144.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">蓝牙</text>
+<path d="M32 188 Q40 182 48 188" fill="none" stroke="#182431" stroke-width="1.7" stroke-linecap="round"/><path d="M35 192 Q40 188 45 192" fill="none" stroke="#182431" stroke-width="1.7" stroke-linecap="round"/><circle cx="40" cy="196" r="1.6" fill="#182431"/>
+<text x="60.0" y="196.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">网络</text>
+<path d="M40 232.5 L42.4 239 L49.2 239 L43.7 243.2 L45.8 250 L40 246 L34.2 250 L36.3 243.2 L30.8 239 L37.6 239 Z" fill="#182431"/>
+<text x="60.0" y="248.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">星闪</text>
+<circle cx="34" cy="294" r="1.7" fill="#182431"/>
+<circle cx="40" cy="294" r="1.7" fill="#182431"/>
+<circle cx="46" cy="294" r="1.7" fill="#182431"/>
+<text x="60.0" y="300.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">更多</text>
+<text x="264.0" y="48.0" font-family="WenQuanYi Micro Hei" font-size="22" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">工作台</text>
+<rect x="264.0" y="72.0" width="82.7" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="305.4" y="87.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">蓝牙 已打开</text>
+<rect x="354.7" y="72.0" width="85.6" height="22.0" rx="11.0" fill="#E5E5EA" fill-opacity="1"/>
+<text x="397.5" y="87.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">WLAN 未读取</text>
+<rect x="448.3" y="72.0" width="82.7" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="489.7" y="87.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">星闪 已打开</text>
+<rect x="264.0" y="112.0" width="269.3" height="84.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="278.0" y="144.0" font-family="WenQuanYi Micro Hei" font-size="16" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">蓝牙</text>
+<text x="278.0" y="168.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">经典与低功耗</text>
+<rect x="467.3" y="128.0" width="52.0" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="493.3" y="143.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">可进入</text>
+<rect x="545.3" y="112.0" width="269.3" height="84.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="559.3" y="144.0" font-family="WenQuanYi Micro Hei" font-size="16" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">网络</text>
+<text x="559.3" y="168.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">WLAN 与诊断</text>
+<rect x="748.7" y="128.0" width="52.0" height="22.0" rx="11.0" fill="#E5E5EA" fill-opacity="1"/>
+<text x="774.7" y="143.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">可进入</text>
+<rect x="826.7" y="112.0" width="269.3" height="84.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="840.7" y="144.0" font-family="WenQuanYi Micro Hei" font-size="16" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">星闪</text>
+<text x="840.7" y="168.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">扫描与 SSAP</text>
+<rect x="1030.0" y="128.0" width="52.0" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="1056.0" y="143.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">可进入</text>
+<text x="264.0" y="228.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">最近会话</text>
+<rect x="264.0" y="240.0" width="832.0" height="52.0" rx="10" fill="#FFFFFF" fill-opacity="1"/>
+<text x="278.0" y="262.0" font-family="WenQuanYi Micro Hei" font-size="14" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">工装串口</text>
+<text x="278.0" y="280.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">蓝牙 · 对象页</text>
+<rect x="1032.0" y="255.0" width="52.0" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="1058.0" y="270.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">已连接</text>
+<rect x="264.0" y="300.0" width="832.0" height="52.0" rx="10" fill="#FFFFFF" fill-opacity="1"/>
+<text x="278.0" y="322.0" font-family="WenQuanYi Micro Hei" font-size="14" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">温湿度计</text>
+<text x="278.0" y="340.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">蓝牙 · 空闲</text>
+<rect x="1040.0" y="315.0" width="44.0" height="22.0" rx="11.0" fill="#E5E5EA" fill-opacity="1"/>
+<text x="1062.0" y="330.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="middle">空闲</text>
+<rect x="264.0" y="360.0" width="832.0" height="52.0" rx="10" fill="#FFFFFF" fill-opacity="1"/>
+<text x="278.0" y="382.0" font-family="WenQuanYi Micro Hei" font-size="14" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">星闪端口</text>
+<text x="278.0" y="400.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">星闪 · 终端</text>
+<rect x="1032.0" y="375.0" width="52.0" height="22.0" rx="11.0" fill="#E0E9E3" fill-opacity="1"/>
+<text x="1058.0" y="390.2" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#44923D" fill-opacity="1" text-anchor="middle">已连接</text>
+<rect x="264.0" y="428.0" width="410.0" height="64.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="278.0" y="454.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">日志中心</text>
+<text x="278.0" y="474.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">从工作台进入，不是第六个导航项</text>
+<rect x="686.0" y="428.0" width="410.0" height="64.0" rx="16" fill="#FFFFFF" fill-opacity="1"/>
+<text x="700.0" y="454.0" font-family="WenQuanYi Micro Hei" font-size="15" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">命令面板</text>
+<text x="700.0" y="474.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#5C6570" fill-opacity="1" text-anchor="start">二级页，返回工作台</text>
+</g>
+<text x="20.0" y="728.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="bold" fill="#182431" fill-opacity="1" text-anchor="start">宽屏 · 工作台 · 侧栏展开</text>
+<text x="20.0" y="746.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#182431" fill-opacity="1" text-anchor="start">同一单根导航。侧栏五项与底栏相同，不是蓝牙 / 星闪 / Wi-Fi 三套导航。</text>
+<text x="20.0" y="764.0" font-family="WenQuanYi Micro Hei" font-size="12" font-weight="normal" fill="#8A4B08" fill-opacity="1" text-anchor="start">待对齐：整 App 导航契约未到，沿用 Index.ets 的一个 Navigation。</text>
+</svg>

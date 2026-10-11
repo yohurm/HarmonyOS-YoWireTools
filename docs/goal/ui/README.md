@@ -22,6 +22,7 @@ related:
 第一批静态图在 [PR #22](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/22)（head `da7dcde`）的 `docs/goal/ui/prototypes/`，不在本 PR，这里不拷图。交付方是 UI 原型图 Goal，agent `bc-b0fee2c5-cd47-50ca-8063-a2e2089334a1`。
 
 原型依据本目录的文字规范：各屏的布局、ArkUI 组件树、状态矩阵，以及 [app-shell](app-shell/README.md) 的 Design Token 和壳层。原型不另起一套布局或组件。门禁只核对两者一致。核对通过也不取消第 10、11、12、14 项。结论仍以 [QUALITY-GATE.md](QUALITY-GATE.md) 为准。
+静态原型在 [prototypes/README.md](prototypes/README.md)。图按本目录的布局、文案和单根导航绘制，不是组件实现，也不另起一套壳。对上原型也不取消第 10–12、14 项。结论仍以 [QUALITY-GATE.md](QUALITY-GATE.md) 为准。
 
 ## 阅读顺序
 
