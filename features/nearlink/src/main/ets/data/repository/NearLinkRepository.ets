@@ -52,6 +52,10 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
   private readonly dataTransferPacketObservable: Observable<DataTransferPacket>;
   private readonly dataTransferIncomingSubscriptions: Map<string, Subscription> = new Map();
   private scanPhase: NearLinkScanPhase = NearLinkScanPhase.IDLE;
+  private readonly scanPhaseObservable: Observable<NearLinkScanPhase> =
+    new Observable<NearLinkScanPhase>(NearLinkScanPhase.IDLE);
+  private lastScanFailureCode: string = '';
+  private scanGeneration: number = 0;
   private activeScanSessionId: string = '';
   private favoritesCache: DeviceFavoriteRecord[] = [];
 
@@ -81,6 +85,10 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
 
   observeDevices(): Observable<NearLinkDevice[]> {
     return this.devicesObservable;
+  }
+
+  observeScanPhase(): Observable<NearLinkScanPhase> {
+    return this.scanPhaseObservable;
   }
 
   observeAdapterState(): Observable<NearLinkAdapterSnapshot> {
@@ -124,13 +132,27 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     return this.scanPhase;
   }
 
+  getLastScanFailureCode(): string {
+    return this.lastScanFailureCode;
+  }
+
+  private publishScanPhase(phase: NearLinkScanPhase, failureCode: string = ''): void {
+    this.scanPhase = phase;
+    if (phase === NearLinkScanPhase.FAILED) {
+      this.lastScanFailureCode = failureCode.length > 0 ? failureCode : NearLinkErrorCodes.SCAN_FAILED;
+    } else {
+      this.lastScanFailureCode = '';
+    }
+    this.scanPhaseObservable.next(phase);
+  }
+
   getActiveScanSessionId(): string {
     return this.activeScanSessionId;
   }
 
   resetScanPhase(): void {
-    this.scanPhase = NearLinkScanPhase.IDLE;
     this.activeScanSessionId = '';
+    this.publishScanPhase(NearLinkScanPhase.IDLE);
   }
 
   onAdapterStateChange(listener: (snapshot: NearLinkAdapterSnapshot) => void): void {
@@ -192,29 +214,43 @@ export class NearLinkRepository implements NearLinkRepositoryContract {
     if (!subscribed.success) {
       return subscribed;
     }
-    this.scanPhase = NearLinkScanPhase.SCANNING;
+    this.scanGeneration++;
+    const generation = this.scanGeneration;
     this.activeScanSessionId = sessionId;
-    void this.runScan(filter);
+    this.publishScanPhase(NearLinkScanPhase.SCANNING);
+    void this.runScan(filter, generation);
     return Result.ok(undefined);
   }
 
-  private async runScan(filter: NearLinkScanFilter): Promise<void> {
+  private async runScan(filter: NearLinkScanFilter, generation: number): Promise<void> {
     const started = await this.scanDataSource.startScan(filter);
+    if (generation !== this.scanGeneration) {
+      return;
+    }
     if (!started.success) {
       this.scanDataSource.offDeviceFound();
-      this.scanPhase = NearLinkScanPhase.FAILED;
+      const code = started.error !== undefined ? started.error.code : NearLinkErrorCodes.SCAN_FAILED;
+      this.publishScanPhase(NearLinkScanPhase.FAILED, code);
     }
   }
 
   stopScan(): Result<void> {
-    void this.stopScanAsync();
+    void this.stopScanAsync(this.scanGeneration);
     return Result.ok(undefined);
   }
 
-  private async stopScanAsync(): Promise<void> {
+  private async stopScanAsync(generation: number): Promise<void> {
     const stopped = await this.scanDataSource.stopScan();
+    if (generation !== this.scanGeneration) {
+      return;
+    }
     this.scanDataSource.offDeviceFound();
-    this.scanPhase = stopped.success ? NearLinkScanPhase.COMPLETED : NearLinkScanPhase.FAILED;
+    if (stopped.success) {
+      this.publishScanPhase(NearLinkScanPhase.COMPLETED);
+    } else {
+      const code = stopped.error !== undefined ? stopped.error.code : NearLinkErrorCodes.SCAN_FAILED;
+      this.publishScanPhase(NearLinkScanPhase.FAILED, code);
+    }
   }
 
   listDevices(): NearLinkDevice[] {

@@ -1,4 +1,5 @@
 ﻿import { UIContextRegistry } from 'common_platform';
+import { HomeSessionTarget } from 'feature_home';
 import { YoColor } from 'youi_kit';
 import {
   ClassicDeviceListItem,
@@ -39,6 +40,31 @@ struct Index {
       return;
     }
     openConnect();
+  }
+
+  private openHomeTarget(target: string): void {
+    this.rootNavStack.clear(false);
+    if (target === HomeSessionTarget.BLUETOOTH_SPP) {
+      this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+      this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_SPP });
+      return;
+    }
+    if (target === HomeSessionTarget.BLUETOOTH_BLE) {
+      this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+      this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
+      return;
+    }
+    if (target === HomeSessionTarget.BLUETOOTH) {
+      this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
+      return;
+    }
+    if (target === HomeSessionTarget.WIFI) {
+      this.activeTabIndex = AppRoutes.TAB_INDEX_NETWORK;
+      return;
+    }
+    if (target === HomeSessionTarget.NEARLINK) {
+      this.activeTabIndex = AppRoutes.TAB_INDEX_NEARLINK;
+    }
   }
 
   private openSppTerminal(sessionId: string): void {
@@ -115,6 +141,9 @@ struct Index {
           onOpenBluetoothBle: () => {
             this.activeTabIndex = AppRoutes.TAB_INDEX_BLUETOOTH;
             this.rootNavStack.pushPath({ name: AppRoutes.BLUETOOTH_BLE });
+          },
+          onOpenTarget: (target: string) => {
+            this.openHomeTarget(target);
           }
         })
       }

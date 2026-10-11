@@ -7,11 +7,6 @@ import { BluetoothOverviewPage } from '../pages/bluetooth/BluetoothOverviewPage'
 import { MoreFeaturePage } from './MoreFeaturePage';
 
 @Builder
-function workbenchTab() {
-  HomeFeaturePage()
-}
-
-@Builder
 function networkTab() {
   WifiFeaturePage()
 }
@@ -35,6 +30,8 @@ export struct MainTabContainer {
   };
   @Event onOpenBluetoothBle: () => void = () => {
   };
+  @Event onOpenTarget: (target: string) => void = (_target: string) => {
+  };
   private readonly tabItems: YoSideNavItem[] = [
     { index: 0, label: $r('app.string.tab_workbench'), symbol: $r('sys.symbol.house') },
     { index: 1, label: $r('app.string.tab_bluetooth'), symbol: $r('sys.symbol.trunk') },
@@ -42,6 +39,15 @@ export struct MainTabContainer {
     { index: 3, label: $r('app.string.tab_nearlink'), symbol: $r('sys.symbol.card_writer') },
     { index: 4, label: $r('app.string.tab_more'), symbol: $r('sys.symbol.more') }
   ];
+
+  @LocalBuilder
+  workbenchTab() {
+    HomeFeaturePage({
+      onOpenTarget: (target: string) => {
+        this.onOpenTarget(target);
+      }
+    })
+  }
 
   @LocalBuilder
   bluetoothTab() {
@@ -58,7 +64,7 @@ export struct MainTabContainer {
       onTabChange: (index: number) => {
         this.onTabChange(index);
       },
-      tabContent0: workbenchTab,
+      tabContent0: this.workbenchTab,
       tabContent1: this.bluetoothTab,
       tabContent2: networkTab,
       tabContent3: nearlinkTab,

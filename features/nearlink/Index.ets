@@ -4,6 +4,9 @@ export {
   StartNearLinkScanUseCase,
   StopNearLinkScanUseCase,
   ObserveNearLinkDevicesUseCase,
+  ObserveNearLinkScanPhaseUseCase,
+  ObserveNearLinkAdapterUseCase,
+  ReadNearLinkScanFailureUseCase,
   ResolveNearLinkCapabilityUseCase
 } from './src/main/ets/domain/usecase/NearLinkUseCases';
 

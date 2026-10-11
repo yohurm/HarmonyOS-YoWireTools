@@ -1,11 +1,14 @@
 ﻿{
   "name": "feature_home",
   "version": "1.0.0",
-  "description": "YoWire home workbench tab placeholder",
+  "description": "YoWire home workbench: module entries, permission summary, active sessions",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
+    "common_core": "file:../../common/core",
+    "common_platform": "file:../../common/platform",
+    "debug_core": "file:../../common/debug_core",
     "youi_kit": "file:../../common/youi_kit"
   }
 }

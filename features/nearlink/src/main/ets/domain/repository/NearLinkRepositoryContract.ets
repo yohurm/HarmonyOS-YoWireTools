@@ -10,9 +10,11 @@ import { Observable } from 'common_core';
 
 export interface NearLinkRepositoryContract {
   observeDevices(): Observable<NearLinkDevice[]>;
+  observeScanPhase(): Observable<NearLinkScanPhase>;
   observeAdapterState(): Observable<NearLinkAdapterSnapshot>;
   observeSsapTree(): Observable<SsapServiceTreeSnapshot>;
   getScanPhase(): NearLinkScanPhase;
+  getLastScanFailureCode(): string;
   loadAdapterState(): Promise<Result<NearLinkAdapterSnapshot>>;
   loadOverview(permissionGranted: boolean): Promise<NearLinkOverviewSnapshot>;
   startScan(sessionId: string, filter: NearLinkScanFilter): Result<void>;

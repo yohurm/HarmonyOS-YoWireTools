@@ -1,4 +1,4 @@
-import { Result } from 'common_core';
+import { Result, Subscription } from 'common_core';
 import { LogQuery, LogRepository } from 'common_storage';
 import { DebugSessionSummary } from '../runtime/DebugSessionState';
 import { SessionRuntimeStore } from '../runtime/SessionRuntimeStore';
@@ -69,6 +69,15 @@ export class LoadWorkbenchOverviewUseCase {
       return Result.ok(fallback);
     }
     return Result.ok(summaries);
+  }
+
+  subscribe(listener: (summaries: DebugSessionSummary[]) => void): Subscription {
+    return this.runtimeStore.subscribeActiveSessions(() => {
+      const loaded = this.execute();
+      if (loaded.success && loaded.value !== undefined) {
+        listener(loaded.value);
+      }
+    });
   }
 }
 
