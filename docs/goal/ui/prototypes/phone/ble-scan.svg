@@ -1,35 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
-<rect width="100%" height="100%" fill="#FFFFFF"/>
-<rect x="0.0" y="0.0" width="360.0" height="36.0" rx="0" fill="#FFFFFF" stroke="none"/>
-<text x="16.0" y="18.0" font-size="14" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">08:20</text>
-<text x="312.0" y="18.0" font-size="12" font-weight="400" fill="#182431" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">100%</text>
-<rect x="320.0" y="12.0" width="18.0" height="11.0" rx="2" fill="none" stroke="#182431" stroke-width="1.2"/>
-<rect x="322.0" y="14.0" width="12.0" height="7.0" rx="1" fill="#182431" stroke="none"/>
-<rect x="338.0" y="15.0" width="2.0" height="5.0" rx="0" fill="#182431" stroke="none"/>
-<text x="16.0" y="64.0" font-size="28" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">BLE</text>
-<text x="16.0" y="96.0" font-size="16" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已搜索到周边设备</text>
-<text x="180.0" y="128.0" font-size="16" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">重新搜索</text>
-<text x="16.0" y="158.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">设备</text>
-<circle cx="28.0" cy="208.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
-<text x="28.0" y="208.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">N</text>
-<text x="52.0" y="198.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Nordic UART</text>
-<text x="52.0" y="220.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">随机地址 · -52 dBm</text>
-<circle cx="332.0" cy="204.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
-<text x="332.0" y="204.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
-<line x1="68.0" y1="240.0" x2="396.0" y2="240.0" stroke="#E6E6E6" stroke-width="1"/>
-<circle cx="28.0" cy="272.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
-<text x="28.0" y="272.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">S</text>
-<text x="52.0" y="262.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Sensor-9</text>
-<text x="52.0" y="284.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">公共地址 · -70 dBm</text>
-<circle cx="332.0" cy="268.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
-<text x="332.0" y="268.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
-<line x1="68.0" y1="304.0" x2="396.0" y2="304.0" stroke="#E6E6E6" stroke-width="1"/>
-<circle cx="28.0" cy="336.0" r="16" fill="#E8F1FE" stroke="none" stroke-width="0"/>
-<text x="28.0" y="336.0" font-size="14" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">未</text>
-<text x="52.0" y="326.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">未命名</text>
-<text x="52.0" y="348.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">随机地址 · -81 dBm</text>
-<circle cx="332.0" cy="332.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
-<text x="332.0" y="332.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
-<line x1="68.0" y1="368.0" x2="396.0" y2="368.0" stroke="#E6E6E6" stroke-width="1"/>
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="280" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M275 18 A6 6 0 0 1 285 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M271.5 14 A11 11 0 0 1 288.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M269 10 A15 15 0 0 1 291 10" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="296" y="18" width="3" height="4" rx="1" fill="#1A1A1A"/>
+<rect x="301" y="15" width="3" height="7" rx="1" fill="#1A1A1A"/>
+<rect x="306" y="12" width="3" height="10" rx="1" fill="#1A1A1A"/>
+<rect x="311" y="9" width="3" height="13" rx="1" fill="#1A1A1A"/>
+<rect x="324" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="343" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
+<path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">BLE 扫描</text>
+<line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
+<rect x="16" y="100" width="56" height="32" rx="16" fill="#E8EAEE"/>
+<text x="44.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">全部</text>
+<rect x="80" y="100" width="70" height="32" rx="16" fill="#FFFFFF" stroke="#0A59F7" stroke-width="1.2"/>
+<text x="115.0" y="121" fill="#0A59F7" font-size="13" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">可连接</text>
+<rect x="158" y="100" width="70" height="32" rx="16" fill="#E8EAEE"/>
+<text x="193.0" y="121" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">有名称</text>
+<text x="16" y="144" fill="#1A1A1A" font-size="20" font-weight="700" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">搜索成功</text>
+<text x="16" y="168" fill="#666666" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">已搜索到周边设备</text>
+<rect x="16" y="184" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="216" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">手环-01</text>
+<text x="32" y="238" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">4C:27:EF:F2:E7:44 · -48 dBm</text>
+<rect x="252" y="206" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="227" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="16" y="272" width="328" height="76" rx="16" fill="#FFFFFF"/>
+<text x="32" y="304" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">Sensor-BLE</text>
+<text x="32" y="326" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">6F:6F:E9:1A:A2:40 · -63 dBm</text>
+<rect x="252" y="294" width="72" height="32" rx="16" fill="#F2F3F5"/>
+<text x="288" y="315" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">连接</text>
+<rect x="100" y="708" width="160" height="40" rx="20" fill="#0A59F7"/>
+<text x="180.0" y="734" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">搜索设备</text>
 </svg>

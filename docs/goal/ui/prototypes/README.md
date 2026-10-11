@@ -151,3 +151,57 @@ PR 里直接打开同名 PNG。SVG 是源文件，用浏览器打开即可。每
 | `wide/wifi-split.svg` | Wi-Fi 列表 + 详情 | 宽屏，同一条任务 |
 
 每个 SVG 旁边有同名 PNG。
+# 原型索引
+
+手机画布 360×800，宽屏 900×640。每屏同时有 SVG 和 PNG。中文界面。`main` 没有逐屏 UI 规格，下表是这套原型自己的路径、屏幕、状态和参照，不回填 PR #19。
+
+壳层只有一条导航。底栏是首页、调试、控制台、设置。Wi-Fi、蓝牙、星闪从「调试」推进去。
+
+| 路径 | 屏幕 | 状态 | 参照 |
+| --- | --- | --- | --- |
+| `phone/home-default.svg` | 首页 | 默认 | 健康管理模板的设备卡和「开始调试」；综合工具模板的三列宫格，图标收成宇宙蓝；multi-nav-bar 底栏 |
+| `phone/home-empty.svg` | 首页 | 空 | 通用状态服务：状态胶囊、环形空态、查看帮助、浅底蓝字按钮 |
+| `phone/home-error.svg` | 首页 | 错误 | 通用状态服务；PRD 失败要给出下一步 |
+| `phone/home-permission.svg` | 首页 | 无权限 | 通用状态服务；BluetoothLowEnergy 权限检查 |
+| `phone/debug-default.svg` | 调试 | 默认 | 综合工具 / 计算器模板的宫格壳和「默认打开」；同一导航栈，不另做底栏 |
+| `phone/wifi-home.svg` | Wi-Fi 首页 | 默认 | network-query 四场景改成分组列表；PRD 当前网络 + 环境 / 诊断 / 协议 / 局域网；wlan-info 连接行 |
+| `phone/wifi-list-default.svg` | 环境分析 | 默认 | wlan-info-query 已连接 / 可用；H3 列表；PRD 信道占用 |
+| `phone/wifi-list-empty.svg` | 环境分析 | 空 | 通用状态服务的「加载中 / 网络未设置 / 获取不到内容」 |
+| `phone/wifi-list-error.svg` | 环境分析 | 错误 | 同上，WLAN 未开启 |
+| `phone/wifi-list-permission.svg` | 环境分析 | 无权限 | 同上，缺少位置权限 |
+| `phone/wifi-detail.svg` | 热点详情 | 默认 | wlan-info `InfoItemView` 左标签右值；H3 详情；一个主按钮「网络诊断」 |
+| `phone/wifi-connect.svg` | 连接网络 | 半模态 | H1 灰选择框、密码与眼睛、居中「下一步」；手机用底部半模态，不套第二层 |
+| `phone/wifi-diag-default.svg` | 网络诊断 | 默认 | 网络测速组件的表盘、时延 / 下载 / 上传；network-query 的网关和 DNS |
+| `phone/wifi-diag-error.svg` | 网络诊断 | 错误 | 通用状态服务，「设置网络」 |
+| `phone/wifi-protocol.svg` | 协议调试 | 默认 | PRD TCP / UDP / HTTP / WebSocket / MQTT；NavigationSettings 行 |
+| `phone/bt-home.svg` | 蓝牙首页 | 默认 | PRD 经典蓝牙与 BLE 分开；NavigationSettings 行 |
+| `phone/bt-scan-default.svg` | 经典蓝牙扫描 | 默认 | 蓝牙通讯组件：地址行、浅底「连接」、底部「搜索设备」；「搜索成功」来自蓝牙扫描组件 |
+| `phone/bt-scan-empty.svg` | 经典蓝牙扫描 | 空 | 通用状态服务 |
+| `phone/bt-scan-error.svg` | 经典蓝牙扫描 | 错误 | 通用状态服务，蓝牙未开启 |
+| `phone/bt-scan-permission.svg` | 经典蓝牙扫描 | 无权限 | 通用状态服务；BLE 权限列表 |
+| `phone/bt-connect.svg` | SPP 连接 | 半模态 | PRD 连接配置；复选框表示安全连接；主按钮只有「连接」 |
+| `phone/bt-terminal.svg` | SPP 终端 | 默认 | PRD 终端结构；hadice 日志行；等宽只用于报文 |
+| `phone/bt-terminal-empty.svg` | SPP 终端 | 空 | 已连接但还没有收发；空态图形来自通用状态服务 |
+| `phone/bt-terminal-error.svg` | SPP 终端 | 错误 | 发送失败并给出重新连接 |
+| `phone/ble-scan.svg` | BLE 扫描 | 默认 | 蓝牙通讯组件的列表和「连接」。不采用心率标题和心率卡片 |
+| `phone/ble-gatt.svg` | GATT | 默认 | PRD 服务树；读 / 写 / 通知用文字；JhSetCell 右值 |
+| `phone/nl-home.svg` | 星闪首页 | 默认 | PRD 先展示能力、开关和权限 |
+| `phone/nl-scan-default.svg` | 星闪扫描 | 默认 | 蓝牙通讯组件的列表结构；PRD 星闪地址 |
+| `phone/nl-scan-empty.svg` | 星闪扫描 | 空 | 通用状态服务 |
+| `phone/nl-scan-unsupported.svg` | 星闪扫描 | 能力不支持 | PRD：不支持时不要进入空白扫描；通用状态服务 |
+| `phone/nl-scan-permission.svg` | 星闪扫描 | 无权限 | ACCESS_NEARLINK；通用状态服务 |
+| `phone/nl-ssap.svg` | SSAP | 默认 | PRD Property 读、写、通知；MTU |
+| `phone/nl-transfer.svg` | dataTransfer | 默认 | PRD 终端；alert 色提示默认不保证加密 |
+| `phone/console-log.svg` | 控制台日志 | 默认 | 应用内可视化日志：搜索、Debug/Info/Warn/Error/Fatal、深色分级卡片 |
+| `phone/console-log-empty.svg` | 控制台日志 | 空 | 通用状态服务 |
+| `phone/console-log-error.svg` | 控制台日志 | 错误 | 通用状态服务，写入失败 |
+| `phone/console-sheet.svg` | 控制台日志 | 半模态设置 | 应用内日志的背景、滑到底部、半模态 / 全模态 |
+| `phone/console-swipe.svg` | 控制台日志 | 侧滑 | 消息管理的分段胶囊和侧滑「导出 / 删除」 |
+| `phone/action-sheet.svg` | 导出文件 | 操作列表 | 文件管理底部操作列表：导出、删除、取消 |
+| `phone/console-network.svg` | 控制台网络 | 默认 | hadice 网络记录；H6 网络数据 |
+| `phone/console-command.svg` | 命令 | 默认 | 消息管理的选中胶囊和左标题右操作；PRD 命令面板 |
+| `phone/settings-default.svg` | 设置 | 默认 | NavigationSettings 搜索和分组；PRD 显示 / 日志 / 后台 / 蓝牙 / 关于；JhSetCell；开关只给立刻生效项 |
+| `phone/settings-error.svg` | 设置 | 错误 | 通用状态服务 |
+| `wide/wifi-split.svg` | Wi-Fi 分栏 | 默认 | multi-nav-bar lg 竖栏 96，目的地与手机相同；wlan-info 与 H3 的列表\|详情；分栏不画返回 |
+
+每张 PNG 与同名 SVG 放在一起。
