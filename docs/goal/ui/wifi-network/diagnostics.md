@@ -51,3 +51,23 @@ NavDestination 「诊断」
 ## 对照
 
 采用 NetworkQuery 的等宽文字页签。状态页采用 WLAN 标签/值。不把连接页做成 wifi 密码 sheet。不采用扫描雷达、控制台、家居底栏、FastBle、体温卡。
+目标名 `/wifi/diagnostics`。来源：E2 四个视图 `WifiConnector`、`NetworkMonitor`、`WlanLocation`、`NetworkDiagnostics`；H4 等宽页签。E2 把四颗按钮放在栈底，本页改顶栏 `Tabs`。
+
+页签：「连接」「状态」「定位」「故障」。`BarMode.Fixed`。
+
+- 连接：只读当前 SSID、是否验证通过、是否需要门户。这些句子来自 ViewModel，不写死 E2 的 `MyWifi`。需要口令时按钮「连接」打开扫描页那张半模态。
+- 状态：标签/值列表，沿链路详情的卡片，字段由 ViewModel 给。
+- 定位：AP 列表行 56，主行 BSSID，次行 RSSI。没有地图。
+- 故障：行 48，名称 + 胶囊「通过 / 失败 / 未测」。点行在项下展开 14 的说明，不播放展开动画以外的插画。
+
+## 状态
+
+| 态 | 表现 |
+| --- | --- |
+| 默认 | 当前页签有内容 |
+| 按下 | 页签字色 `brand`；行按下 |
+| 禁用 | 无 WLAN 时四个页签仍可切换，内容为「WLAN 已关闭」 |
+| 空 | 定位无 AP：「没有接入点」 |
+| 错误 | 该页签顶部 `warning`，其他页签保持上次内容 |
+| 加载 | 当前页签中部 `LoadingProgress` +「正在读取」 |
+| 无权限 | 权限墙盖住页签内容，页签条保留 |

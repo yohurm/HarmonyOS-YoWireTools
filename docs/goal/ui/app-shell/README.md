@@ -71,3 +71,14 @@ ArkUI / UI Design Kit 只使用文档仓里有专页的组件。本设计用到�
 | [color-scheme.md](color-scheme.md) | 浅色 / 深色 |
 
 壳不读取射频 Kit，不在工作台弹出蓝牙、星闪或 WLAN 授权。
+# 应用壳
+
+一个 `Navigation`，一条 `NavPathStack`，五个一级目的地。子页用 `navDestination` 推进去，不在底栏再加一项。
+
+- [信息架构](information-architecture.md)
+- [导航](navigation.md)
+- [布局模式](layout-patterns.md)
+- [色彩与度量](design-tokens.md)
+- [浅色与深色](color-scheme.md)
+- [密度](density.md)
+- [权限与缺口墙](permission-gap-wall.md)
