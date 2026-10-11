@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<text x="16" y="22" fill="#1A1A1A" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">08:20</text>
+<circle cx="280" cy="22" r="1.5" fill="#1A1A1A"/>
+<path d="M275 18 A6 6 0 0 1 285 18" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M271.5 14 A11 11 0 0 1 288.5 14" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M269 10 A15 15 0 0 1 291 10" fill="none" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="296" y="18" width="3" height="4" rx="1" fill="#1A1A1A"/>
+<rect x="301" y="15" width="3" height="7" rx="1" fill="#1A1A1A"/>
+<rect x="306" y="12" width="3" height="10" rx="1" fill="#1A1A1A"/>
+<rect x="311" y="9" width="3" height="13" rx="1" fill="#1A1A1A"/>
+<rect x="324" y="12" width="18" height="9" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="343" y="15" width="2" height="3" rx="0" fill="#1A1A1A"/>
+<rect x="326" y="14" width="12" height="5" rx="1" fill="#1A1A1A"/>
+<path d="M22 44 L14 52 L22 60" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="64" fill="#1A1A1A" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">NL-Sensor</text>
+<text x="344" y="64" fill="#0A59F7" font-size="14" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="end">断开</text>
+<line x1="0" y1="88" x2="360" y2="88" stroke="#E5E6EB" stroke-width="1"/>
+<rect x="16" y="100" width="328" height="36" rx="10" fill="#FFF4E8"/>
+<text x="32" y="123" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">此 dataTransfer 链路默认不保证加密</text>
+<rect x="16" y="148" width="328" height="32" rx="10" fill="#FFFFFF"/>
+<text x="28" y="169" fill="#1A1A1A" font-size="13" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">端口 0xA1 · 已连接</text>
+<rect x="16" y="192" width="328" height="128" rx="16" fill="#FFFFFF"/>
+<text x="28" y="218" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">08:12:01</text>
+<text x="94" y="218" fill="#0A59F7" font-size="12" font-weight="700" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">I</text>
+<text x="112" y="218" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">通道已建立</text>
+<text x="28" y="246" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">08:12:02</text>
+<text x="94" y="246" fill="#666666" font-size="12" font-weight="700" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">→</text>
+<text x="112" y="246" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">01 0A 00</text>
+<text x="28" y="274" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">08:12:03</text>
+<text x="94" y="274" fill="#1A1A1A" font-size="12" font-weight="700" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">←</text>
+<text x="112" y="274" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">01 0A 01</text>
+<text x="28" y="302" fill="#666666" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">08:12:04</text>
+<text x="94" y="302" fill="#ED6F21" font-size="12" font-weight="700" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">W</text>
+<text x="112" y="302" fill="#1A1A1A" font-size="12" font-weight="400" font-family="'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', monospace" text-anchor="start">对端未声明加密</text>
+<rect x="16" y="700" width="248" height="44" rx="12" fill="#FFFFFF"/>
+<text x="32" y="728" fill="#666666" font-size="14" font-weight="400" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="start">文本或 HEX</text>
+<rect x="272" y="702" width="72" height="40" rx="20" fill="#0A59F7"/>
+<text x="308.0" y="728" fill="#FFFFFF" font-size="16" font-weight="500" font-family="'WenQuanYi Micro Hei', sans-serif" text-anchor="middle">发送</text>
+</svg>
