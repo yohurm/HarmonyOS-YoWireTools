@@ -8,6 +8,59 @@ related: [ui.wifi-network.shell, checklist.wifi-network]
 
 # 本应用连接检查
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell                         // TERMINAL
+        └── Column
+            ├── Row
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── List                        // 收发记录，边到边
+            │   └── ListItem
+            │       └── Text                // MONO_S，文本或 HEX
+            └── Row
+                ├── TextInput               // 或 TextArea
+                └── YoActionButton          // 发送 / 停止
+YoSplitScaffold                             // ≥600vp 用 6:4
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 见下方行为细则中的同名描述。 |
+| 按下 | 见下方行为细则中的同名描述。 |
+| 禁用 | 见下方行为细则中的同名描述。 |
+| 空 | 见下方行为细则中的同名描述。 |
+| 错误 | 见下方行为细则中的同名描述。 |
+| 加载 | 见下方行为细则中的同名描述。 |
+| 无权限 | 没有流量统计权限时不显示其他应用（WN-111）。本应用自己的字节与「无权限看别人」分两行。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `wifi-network/in-app-connection-inspect` |
+| 架构编号 | WN-064 至 WN-111（行为细则里逐条出现） |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7 。文件不在 `main` |
+| 工作台入口 | 工作台「网络」卡片，或底栏网络槽（下标 2） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 本页只记录本应用自己发出的 TCP、UDP、TLS、WebSocket、HTTP 和组播，以及本应用的流量字节。其他应用的流量、整机抓包和洪泛不在这里。
 
 `YoNavDestinationKind.TERMINAL`。`YoPageShell` 标题「连接检查」，底栏隐藏，显示返回。

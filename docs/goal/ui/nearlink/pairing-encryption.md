@@ -13,6 +13,58 @@ related:
 
 # 配对与加密
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Scroll
+            └── Column
+                ├── Row
+                │   ├── Text
+                │   └── YoStatusPill
+                ├── TextInput
+                ├── YoSegmentButton
+                ├── List
+                │   └── ListItem
+                └── YoActionButton
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 未读取 ACB。顶栏与本页都是「加密状态未知」或「未验证」。不显示已加密（NL-093） |
+| 按下 | 发起配对松手后才调用系统确认（NL-097）。没有应用内 PIN。 |
+| 禁用 | 低版本没有配对发起接口时，按钮禁用并说明（NL-100）。解除配对不是可点成功按钮（NL-101）。 |
+| 空 | 没有地址时不展示假的已配对 |
+| 错误 | 配对失败原因可见（NL-099）。已连接但未加密用警告胶囊，不用成功胶囊（NL-095）。 |
+| 加载 | 仅配对按钮与 ACB 读取。不明文案期间不显示已加密 |
+| 无权限 | 未授权不发起配对。不能解除配对（NL-101）是缺口墙，不是权限墙。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `nearlink/pairing-encryption` |
+| 架构编号 | NL-093, NL-101 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6 。文件不在 `main` |
+| 工作台入口 | 工作台「星闪」卡片，或底栏星闪槽（下标 3） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 配对走系统确认。加密只相信 `getAcbState()` 的 `ENCRYPTED`。解除配对没有成功路径。
 
 架构：`docs/goal/architecture/nearlink/NL-093.md` 至 `NL-101.md`。

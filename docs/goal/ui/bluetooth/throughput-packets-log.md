@@ -15,6 +15,60 @@ related:
 
 # 吞吐、报文与会话日志
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Scroll
+            │   └── YoSegmentButton         // 文本 / HEX / 混合
+            ├── List
+            │   └── ListItemGroup
+            │       └── ListItem
+            │           └── Column
+            │               ├── Text        // 时间、方向、错误码
+            │               └── Text        // MONO_S
+            └── Row
+                ├── YoActionButton          // 导出
+                └── YoActionButton          // 清空，先 AlertDialog
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 报文段。已有收发则按时间列出。吞吐未开始，数字为 0 字节、用时 0。0 在这里是计数初值，与「字段缺失留空」不同，标签写「已发送」 |
+| 按下 | 「开始」松手后进入计数。「停止」松手后不再写。「导出」松手后写文件。行按下展开 HEX |
+| 禁用 | 未连接时吞吐开始禁用，原因「未连接」。选定特征不允许写时禁用，原因「特征不可写」。报文段在吞吐计数期间不追加 HEX，List 禁用滚动写入，已有行仍可看。没有「生成 HCI」按钮 |
+| 空 | 会话已建立但还没有收发：`YoEmpty`「这次会话还没有字节」。未连接不用空态冒充 |
+| 错误 | 导出失败：`YoError` 说明原因，已有行保留（BT-090）。吞吐写入失败：停止计数，已发送字节保留，结果区给出 GATT 或 SPP 的原错误 |
+| 加载 | 吞吐进行中胶囊「计数中」，主按钮是「停止」，数字持续更新。导出写文件时按钮 `loading`，List 仍可滚动 |
+| 无权限 | 未授权不开始吞吐计数，也不把 0 字节画成一次成功测量。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `bluetooth/throughput-packets-log` |
+| 架构编号 | BT-086, BT-087, BT-088, BT-089, BT-090 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8 。文件不在 `main` |
+| 工作台入口 | 工作台「蓝牙」卡片，或底栏蓝牙槽（`TAB_INDEX_BLUETOOTH` = 1） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 路由 `/bluetooth/session-log`。从 SPP 终端菜单或 GATT 客户端的日志卡片进入，参数带会话种类（SPP 或 GATT）和会话 id。状态在对应 ViewModel。记录和导出走 `common/yobluetooth` 与 `common/storage`。没有单独的平台吞吐 API，速率是应用层计数。
 
 ## 结构

@@ -8,6 +8,66 @@ related: [ui.wifi-network.shell, checklist.wifi-network]
 
 # 扫描、过滤与信道
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Row                         // 状态条，高 56vp
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── Scroll                      // 只包分段，宽度不写在 SegmentButton 上
+            │   └── YoSegmentButton         // SegmentButton，@kit.ArkUI
+            ├── TextInput                   // 过滤字段，YoTextModifier
+            ├── List
+            │   └── ListItem
+            │       └── Column
+            │           ├── Row
+            │           │   ├── Text        // 主行，accessibilityGroup
+            │           │   └── YoStatusPill
+            │           └── Text            // 次行，最多四个短事实
+            └── Row
+                ├── YoActionButton          // Button，PRIMARY
+                └── YoActionButton          // SECONDARY
+    bindSheet                               // 过滤或确认，不承载整条调试流程
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 见下方行为细则中的同名描述。 |
+| 按下 | 见下方行为细则中的同名描述。 |
+| 禁用 | 见下方行为细则中的同名描述。 |
+| 空 | 见下方行为细则中的同名描述。 |
+| 错误 | 见下方行为细则中的同名描述。 |
+| 加载 | 见下方行为细则中的同名描述。 |
+| 无权限 | 缺少 `SET_WIFI_INFO` 时扫描不启动，错误 201（WN-003）。冷却、WLAN 关闭、静止管控是禁用或错误，不是无权限。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `wifi-network/scan-filter-channel` |
+| 架构编号 | WN-027 至 WN-003（行为细则里逐条出现） |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7 。文件不在 `main` |
+| 工作台入口 | 工作台「网络」卡片，或底栏网络槽（下标 2） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 扫描页展示 `getScanInfoList` 的缓存，并始终标出缓存时间和剩余冷却。主动刷新只来自 `startScan`。完成后看 `wifiScanStateChange`：1 再读列表，0 保持上一份成功结果并显示失败。
 
 语义以 API 参考为准：`startScan`（API 21，`SET_WIFI_INFO`）是应用接口；`getScanInfoList` 是当前时刻前 30 秒的缓存。扫描指南里「主动扫描仅系统应用」那一句与 API 参考冲突，本页不采用。指南里的连接过程中不扫描、WLAN 关闭不扫描、温度与静止管控，仍然显示为失败。废弃的 `scan` / `getScanResults` 不出现在菜单或说明里。本页不申请位置权限。

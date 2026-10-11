@@ -15,6 +15,12 @@ related:
 本目录是星闪调试模块的界面设计，按屏幕拆分。它不实现功能，也不写 ArkUI 产品代码。
 
 每条清单只在一个屏幕里写验收表现。壳与导航写共用的断点、密度、状态词和 Kit 用法，屏幕文件引用它，不再各写一套。
+> 断点、Token、权限墙、深浅色以 [应用壳](../app-shell/README.md) 为准。质量门禁见 [QUALITY-GATE.md](../QUALITY-GATE.md)：**不可进入大规模页面实现**。目录不另建 `wifi_network` 文档树。
+
+
+本目录是星闪调试模块的界面设计，按屏幕拆分。它不实现功能，也不写 ArkUI 产品代码。
+
+每条清单只在一个屏幕里写验收表现。编号只追溯 `docs/goal/checklist/nearlink.md` 与 `docs/goal/architecture/nearlink/` 里的 NL-001–NL-120。下面的屏幕表是界面落点，不是第二份清单。断点、密度和状态词以应用壳为准。对接的 PR 写在 [质量门禁](../QUALITY-GATE.md)。
 
 | 屏幕 | 文件 | 清单 |
 | --- | --- | --- |

@@ -13,6 +13,58 @@ related:
 
 # 回连、后台与诊断
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Scroll
+            └── Column
+                ├── Row
+                │   ├── Text
+                │   └── YoStatusPill
+                ├── TextInput
+                ├── YoSegmentButton
+                ├── List
+                │   └── ListItem
+                └── YoActionButton
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 自动回连关闭。失败次数 0。后台开关关闭，胶囊「未申请长时任务」。诊断列表若本次进程已有事件则列出，否则为空态 |
+| 按下 | 开关按下松手后才改变意图。「停止自动回连」松手后不再发起。「重新发现」松手后进入经典发现或 BLE 扫描，由地址来源决定 |
+| 禁用 | 扫描仍在进行时，回连按钮禁用，原因「先停止扫描再连接」；若已经返回「扫描期间不允许连接」，该句成为原因（BT-093）。2900011 时相关按钮暂时禁用，原因「操作频繁」（BT-097）。没有可回连地址时自动回连禁用，原因「需要先发现或配对」 |
+| 空 | 本进程还没有任何诊断事件：`YoEmpty`「还没有诊断记录」。回连失败次数不为 0 时不用空态盖住次数 |
+| 错误 | 每次自动回连失败增加次数并保留原因，用户能停止（BT-092）。同一设备重连仍用旧客户端导致 2900099 时，子原因写「客户端未销毁」（BT-091）。未申请长时任务就退后台导致断开：原因是应用被挂起，不写「对端主动断开」（BT-094）。2900001：扫描与连接都结束，顶栏 `YoError`「蓝牙服务已停止」（BT-098） |
+| 加载 | 一次回连尝试进行中：胶囊「回连中」，次数尚不增加，失败事件到达后才加一。长时任务申请未返回时，后台开关 `loading` 态由旁边按钮的 `loading` 表示，胶囊仍是申请前的句子 |
+| 无权限 | 未授权不发起回连，也不申请长时任务。权限墙写明需要蓝牙权限。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `bluetooth/reconnect-background-diagnostics` |
+| 架构编号 | BT-091, BT-092, BT-093, BT-094, BT-095, BT-096, BT-097, BT-098 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8 。文件不在 `main` |
+| 工作台入口 | 工作台「蓝牙」卡片，或底栏蓝牙槽（`TAB_INDEX_BLUETOOTH` = 1） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 路由 `/bluetooth/diagnostics`。从概览或客户端的菜单进入。`MODULE`。状态在 `features/bluetooth` 的诊断与回连 ViewModel。连接、停扫和长时任务都经 `common/yobluetooth` 与 `common/platform`，不经 Kit。
 
 免配对地址固化不在本页画成功，书签规则在 [地址与身份](address-identity.md) 的 BT-030。

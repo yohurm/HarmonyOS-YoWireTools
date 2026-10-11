@@ -11,6 +11,12 @@ related: [checklist.wifi-network, research.wifi-network, architecture.wifi-netwo
 本目录是 Phase C 的界面设计。它只规定 `features/wifi_network` 各屏幕的结构、文案结果和状态。本阶段不写 ArkUI 产品代码，不改 `common/youi_kit`，不新增第二套组件库或补丁层。
 
 行为以 `docs/goal/checklist/wifi-network.md`、`docs/goal/research/wifi-network.md` 和 `docs/goal/architecture/wifi-network/` 为准。界面文案由 `features/wifi_network` 的页面状态生成。`common/youi_kit` 只提供壳、反馈和 Token，不解释 WLAN。
+> 断点、Token、权限墙、深浅色以 [应用壳](../app-shell/README.md) 为准。质量门禁见 [QUALITY-GATE.md](../QUALITY-GATE.md)：**不可进入大规模页面实现**。目录不另建 `wifi_network` 文档树。
+
+
+本目录是 Phase C 的界面设计。它只规定 `features/wifi_network` 各屏幕的结构、文案结果和状态。本阶段不写 ArkUI 产品代码，不改 `common/youi_kit`，不新增第二套组件库或补丁层。
+
+行为以 `docs/goal/checklist/wifi-network.md`、`docs/goal/research/wifi-network.md` 和 `docs/goal/architecture/wifi-network/` 为准，编号是 WN-001–WN-132。下面的屏幕表是界面落点，不是第二份清单。对接的 PR 写在 [质量门禁](../QUALITY-GATE.md)。界面文案由 `features/wifi_network` 的页面状态生成。`common/youi_kit` 只提供壳、反馈和 Token，不解释 WLAN。
 
 ## 屏幕
 

@@ -8,6 +8,60 @@ related: [ui.wifi-network.shell, checklist.wifi-network]
 
 # 会话日志
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Scroll
+            │   └── YoSegmentButton         // 文本 / HEX / 混合
+            ├── List
+            │   └── ListItemGroup
+            │       └── ListItem
+            │           └── Column
+            │               ├── Text        // 时间、方向、错误码
+            │               └── Text        // MONO_S
+            └── Row
+                ├── YoActionButton          // 导出
+                └── YoActionButton          // 清空，先 AlertDialog
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 按时间列出。错误码在行上（NL-107）。不提供 PHY 与连接后 RSSI 的测量列（NL-103）。 |
+| 按下 | 行按下展开 HEX。导出松手后写文件。 |
+| 禁用 | 没有行时导出禁用。不出现「开始抓包」。 |
+| 空 | 还没有会话行：YoEmpty「这次还没有记录」。 |
+| 错误 | 导出失败用 YoError，已有行保留。蓝牙 HCI 日志不写成星闪抓包成功（NL-113）。 |
+| 加载 | 读取历史时 YoLoading。新行到达不整页加载。 |
+| 无权限 | 会话日志不申请新权限。导出失败是错误。列表为空是空态（WN-130）。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `wifi-network/session-log` |
+| 架构编号 | WN-064, WN-128, WN-066, WN-129, WN-131, WN-132, WN-130, WN-039, WN-124 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/7 。文件不在 `main` |
+| 工作台入口 | 工作台「网络」卡片，或底栏网络槽（下标 2） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 会话日志是各屏动作的同一条时间线。每行有时间、动作、终态。页面状态写入 `common/debug_core` 的 `LogCaptureService`，本页只读已写入的记录。密钥、证书私钥、预共享密钥以掩码出现（WN-064）。
 
 从任意网络子页的标题菜单进入。`destinationKind = MODULE`。返回回到进入前的子页。

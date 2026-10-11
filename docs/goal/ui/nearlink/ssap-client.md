@@ -11,6 +11,61 @@ related:
 
 # SSAP 客户端
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Row
+            │   ├── Text                    // 名称
+            │   └── YoStatusPill
+            ├── Text                        // 地址或 BSSID，MONO_S
+            ├── List
+            │   └── ListItem
+            │       └── Row
+            │           ├── Text
+            │           └── Text
+            └── Row
+                └── YoActionButton
+YoSplitScaffold                             // ≥600vp：左列表右本页
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 已连接且服务已发现。读、写、通知按属性能力分开（NL-063 至 NL-070）。同一远端只建一次客户端（NL-059）。 |
+| 按下 | 每个操作松手后入队一次。树节点按下只选中。 |
+| 禁用 | 未连接时发现与读写禁用（NL-062）。属性不允许的操作禁用（NL-064、NL-066）。 |
+| 空 | 未发现：`YoEmpty`。未读：属性区空文案。二者都不是错误 |
+| 错误 | 连接失败原因可见（NL-076）。非法 HEX 不发送（NL-067）。MTU 失败不混用蓝牙码（NL-114）。 |
+| 加载 | 连接、发现、读、写、MTU 各自按钮加载，不把整页换成 `YoLoading` 而丢掉日志 |
+| 无权限 | 未授权不建立客户端、不发现服务。NL-059 的「同一远端只建一次」只在已授权且连接流程之内。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `nearlink/ssap-client` |
+| 架构编号 | NL-059 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6 。文件不在 `main` |
+| 工作台入口 | 工作台「星闪」卡片，或底栏星闪槽（下标 3） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 一台远端地址一份客户端会话：连接、服务树、读写、通知、MTU。端口数传不是这一页。
 
 架构：`docs/goal/architecture/nearlink/NL-059.md` 至 `NL-076.md`，以及 `NL-105.md`、`NL-106.md`、`NL-114.md`。

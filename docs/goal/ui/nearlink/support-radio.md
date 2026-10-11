@@ -12,6 +12,61 @@ related:
 
 # 支持与开关
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell                         // HdsNavigation
+        └── Column
+            ├── YoImmersiveSurface          // 仅概览状态卡
+            │   └── Row
+            │       ├── Text
+            │       └── YoStatusPill
+            ├── GridRow
+            │   └── GridCol
+            │       └── YoModeEntryCard     // 内含 Text 与胶囊
+            └── YoContentState              // CONTENT / LOADING / EMPTY / ERROR / PERMISSION
+                ├── YoLoading               // LoadingProgress + Text
+                ├── YoEmpty
+                ├── YoError
+                └── YoPermissionDenied      // Column + Text + Button
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 支持为真，开关已打开 |
+| 按下 | 入口卡用系统点击反馈。胶囊不可点。松手才进入子页。 |
+| 禁用 | 不支持、模拟器、正在开关或开关关闭时，扫描与连接入口 disabled，原因写在卡上（NL-002、NL-004、NL-006、NL-007）。 |
+| 空 | 根页不用空列表表示不支持或未扫描。查询前不显示空胶囊冒充结果。 |
+| 错误 | 801、低版本、读取本机名失败用 YoError，并带错误码（NL-003）。不把 801 画成开关关闭。 |
+| 加载 | 进入模块，支持与 `getState` 尚未返回 |
+| 无权限 | 只进入星闪根页不弹授权（NL-013）。用户拒绝后再扫描，扫描页才是权限墙（NL-015、NL-016）。权限名只有 `ACCESS_NEARLINK`（NL-017）。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `nearlink/support-radio` |
+| 架构编号 | NL-001, NL-115 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6 。文件不在 `main` |
+| 工作台入口 | 工作台「星闪」卡片，或底栏星闪槽（下标 3） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 根页顶部的能力条，加上从这里进入的合作设备集缺口页。模式入口的卡片只显示能否进入，扫描和连接的过程在各自屏幕。
 
 架构：`docs/goal/architecture/nearlink/NL-001.md` 到 `NL-018.md`，以及 `NL-111.md`、`NL-112.md`、`NL-115.md`。清单分组见 `docs/goal/checklist/nearlink.md` 的「设备与开关」「权限」「与蓝牙边界」。

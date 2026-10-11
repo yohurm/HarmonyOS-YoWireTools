@@ -12,6 +12,66 @@ related:
 
 # 扫描与过滤
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Row                         // 状态条，高 56vp
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── Scroll                      // 只包分段，宽度不写在 SegmentButton 上
+            │   └── YoSegmentButton         // SegmentButton，@kit.ArkUI
+            ├── TextInput                   // 过滤字段，YoTextModifier
+            ├── List
+            │   └── ListItem
+            │       └── Column
+            │           ├── Row
+            │           │   ├── Text        // 主行，accessibilityGroup
+            │           │   └── YoStatusPill
+            │           └── Text            // 次行，最多四个短事实
+            └── Row
+                ├── YoActionButton          // Button，PRIMARY
+                └── YoActionButton          // SECONDARY
+    bindSheet                               // 过滤或确认，不承载整条调试流程
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 尚未扫描。过滤摘要为默认低功耗。YoEmpty「尚未扫描」，不写「0 台设备」。 |
+| 按下 | 开始与列表行按下后松手才提交或进入详情。过滤确认在 bindSheet 里。 |
+| 禁用 | 开关关闭时开始禁用，原因「星闪已关闭」（NL-006）。校验失败的过滤不能开始（NL-030 至 NL-033）。 |
+| 空 | 扫描确实启动并结束且一条都没有：YoEmpty「没有发现设备」。这与启动失败不同。 |
+| 错误 | 1009700003、1009700099 或 801：YoError。列表保持上次结果（NL-037）。 |
+| 加载 | 胶囊「扫描进行中」。同一地址只更新一行（NL-039）。离开页面后变为已停止（NL-027、NL-110）。 |
+| 无权限 | 拒绝授权：未授权，可再次申请（NL-015）。不再弹框：`YoPermissionDenied` 前往应用设置（NL-016）。开关关闭是禁用，不是无权限。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `nearlink/scan-filters` |
+| 架构编号 | NL-019, NL-036 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/6 。文件不在 `main` |
+| 工作台入口 | 工作台「星闪」卡片，或底栏星闪槽（下标 3） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 发现设备、编辑过滤、查看一条广播。收藏和已配对地址对照也在广播详情里完成，不单独做成功向导。
 
 架构：`docs/goal/architecture/nearlink/NL-019.md` 至 `NL-052.md`，以及 `NL-104.md`、`NL-110.md`。研究里的过滤字段表见 `docs/goal/research/nearlink.md`「能力映射」。

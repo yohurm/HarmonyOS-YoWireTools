@@ -16,6 +16,58 @@ related:
 
 # MTU、PHY 与连接参数
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Scroll
+            └── Column
+                ├── Row
+                │   ├── Text
+                │   └── YoStatusPill
+                ├── TextInput
+                ├── YoSegmentButton
+                ├── List
+                │   └── ListItem
+                └── YoActionButton
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 已连接，未协商。当前 MTU 显示 23（BT-080）。三档停在均衡，尚未提交时不显示「已更新」。PHY 为待证 |
+| 按下 | 「协商」和三档的「应用」松手后才提交。PHY 区没有可按下的切换 |
+| 禁用 | 未连接时全部禁用。请求小于 23 或大于 517 时「协商」禁用，原因「范围是 23 到 517」（BT-081）。API 22 以下三档禁用，原因「当前系统没有连接参数枚举」。数字间隔没有输入框，因此没有可启用的数字提交（BT-084） |
+| 空 | 未连接时不使用空态代替禁用。没有「暂无 MTU」这种会把 23 藏起来的空画面 |
+| 错误 | 协商调用失败：当前值保持事件确认过的值，没有事件则保持 23，`YoError` 给出平台原因。三档调用失败：分段回到上一次成功枚举，失败原因可见。不把失败显示成毫秒已更新 |
+| 加载 | `setBLEMtuSize` 已返回但 `BLEMtuChange` 未到：胶囊「协商中」，当前数字不变（BT-082）。三档请求未返回时该分段按钮 `loading`，不提前打勾 |
+| 无权限 | 未授权或未连接时不发起 MTU 协商。未授权用权限墙；未连接用禁用，原因「未连接」。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `bluetooth/mtu-phy-connection` |
+| 架构编号 | BT-080, BT-081, BT-082, BT-083, BT-084, BT-085 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8 。文件不在 `main` |
+| 工作台入口 | 工作台「蓝牙」卡片，或底栏蓝牙槽（`TAB_INDEX_BLUETOOTH` = 1） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 这块在 GATT 客户端页的右栏或窄屏的下一段，不单独占一个 Tab。状态仍由 `BleMainViewModel` 展示。协商和三档参数只进 `common/yobluetooth` 的 `GattClientDataSource`。
 
 ## 结构

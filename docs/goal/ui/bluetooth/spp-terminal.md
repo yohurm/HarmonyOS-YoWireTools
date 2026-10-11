@@ -14,6 +14,59 @@ related:
 
 # SPP 终端
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell                         // TERMINAL
+        └── Column
+            ├── Row
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── List                        // 收发记录，边到边
+            │   └── ListItem
+            │       └── Text                // MONO_S，文本或 HEX
+            └── Row
+                ├── TextInput               // 或 TextArea
+                └── YoActionButton          // 发送 / 停止
+YoSplitScaffold                             // ≥600vp 用 6:4
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 已连接。胶囊 `success`「已连接」。输入为空。List 有历史则显示历史。标准或两端一致的自定义 UUID 都可以是这个默认 |
+| 按下 | 「发送」按下松手后提交。「停止发送」按下松手后停止后续分段。行按下展开 HEX |
+| 禁用 | 未连接或 API 22+ `isConnected` 为假时发送禁用，原因「未连接」（BT-043）。HEX 非法时发送禁用，原因「HEX 无效」（BT-046）。写操作进行中「发送」改为「停止发送」，避免再入队 |
+| 空 | 已连接但还没有字节：List 区 `YoEmpty`，标题「还没有数据」，没有主操作。未连接不是空，是禁用加说明 |
+| 错误 | UUID 不一致：不进入已连接，顶栏 `YoError` 说明原因（BT-038）。未配对：文案「尚未配对」，下一步「发起配对」，码 2900016（BT-022）。单次写入超过建议上限：该段不标已发送；默认分段长度 600 字节，超过 1024 字节失败可见（BT-041）。服务端关闭后本机胶囊变为未连接，对端方向不再追加成功行（BT-045） |
+| 加载 | 连接或 `sppAccept` 未返回时胶囊「连接中」，发送禁用。大缓冲写出时界面保持可点「停止发送」，不用整页 `YoLoading` 盖住终端（BT-042） |
+| 无权限 | 未授权不进入「已连接」。终端区改为权限墙，发送不可用（与 BT-043 的未连接区分：未连接是禁用，未授权是权限墙）。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `bluetooth/spp-terminal` |
+| 架构编号 | BT-037, BT-038, BT-039, BT-040, BT-041, BT-042, BT-043, BT-044, BT-045, BT-046 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8 。文件不在 `main` |
+| 工作台入口 | 工作台「蓝牙」卡片，或底栏蓝牙槽（`TAB_INDEX_BLUETOOTH` = 1） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 路由 `/bluetooth/spp/terminal`，参数是会话 id。页面 `SppTerminalPage`，状态 `SppTerminalViewModel`。读写只经 `common/yobluetooth` 的 SPP 用例。L2CAP 与本页共用终端壳，类型分段见 [L2CAP](l2cap.md)。本页默认类型是 `SPP_RFCOMM`。
 
 ## 结构

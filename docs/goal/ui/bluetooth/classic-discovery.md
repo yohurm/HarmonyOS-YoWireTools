@@ -15,6 +15,66 @@ related:
 
 # 经典发现
 
+> 壳、Token、权限墙和深浅色以 [应用壳](../app-shell/README.md) 为准。下文保留 Phase-C 行为细则。冲突时应用壳优先。页面只读页面状态，不调用 Kit。
+
+## 布局
+
+本屏层级见 `YoNavDestinationKind`，结构见下方组件树。 窄屏单列。窗口宽度不小于 600vp 且本屏同时有列表和详情时，用 `YoSplitScaffold`： 普通列表 4:6，终端 6:4，每栏至少 280vp。 页边距 `YoResponsive.pageHorizontal`，分区间距 `YoSpace.XL`（16vp）。 字号 `YoTypeStyle`，地址和 HEX 用 `MONO_S`。 原 Phase-C 若在下文另写了断点或底栏，与 [导航](../app-shell/navigation.md) 冲突时以导航为准。
+
+## ArkUI 组件树
+
+```text
+Navigation
+└── NavDestination
+    └── YoPageShell
+        └── Column
+            ├── Row                         // 状态条，高 56vp
+            │   ├── Text
+            │   └── YoStatusPill
+            ├── Scroll                      // 只包分段，宽度不写在 SegmentButton 上
+            │   └── YoSegmentButton         // SegmentButton，@kit.ArkUI
+            ├── TextInput                   // 过滤字段，YoTextModifier
+            ├── List
+            │   └── ListItem
+            │       └── Column
+            │           ├── Row
+            │           │   ├── Text        // 主行，accessibilityGroup
+            │           │   └── YoStatusPill
+            │           └── Text            // 次行，最多四个短事实
+            └── Row
+                ├── YoActionButton          // Button，PRIMARY
+                └── YoActionButton          // SECONDARY
+    bindSheet                               // 过滤或确认，不承载整条调试流程
+```
+
+`ListItem` 设置 `accessibilityGroup(true)`，朗读文本包含胶囊文案。胶囊组件自身不发声。过滤和配对说明用 `bindSheet`。破坏性确认用 `AlertDialog`。不使用 `HdsListItem`。
+
+## 状态矩阵
+
+| 态 | 本屏 |
+| --- | --- |
+| 默认 | 未发现。已配对设备已列出。主按钮「开始发现」。过滤摘要可见 |
+| 按下 | 「开始发现」按下后松手才请求。发现中主按钮文案是「停止」，按下松手才请求停止。行按下只表示选中，不立刻连接 |
+| 禁用 | 发现进行中不能再开始，按钮保持「停止」（BT-012）。上一次尚未停止完成时，「开始发现」禁用，原因「请先停止」（BT-013）。非 `STATE_ON` 时按钮禁用，原因来自适配器页的同一快照。选中纯 LE 行时「连接」禁用，原因「不是经典或双模」 |
+| 空 | 已配对为空且本次发现已结束、上报为零：`YoEmpty`，标题「附近没有经典设备」，主操作「再次发现」。发现尚未开始且已配对也为空时，标题「尚未发现」，主操作「开始发现」 |
+| 错误 | 未授权不进入发现中，列表不新增，用 `YoPermissionDenied`，可再次申请（BT-001）。蓝牙关闭显示 2900003，不用空态（BT-006）。硬件资源 2900009 或扫描失败 2902050 结束发现并显示该码（BT-018）。操作频繁 2900011 时按钮暂时禁用 |
+| 加载 | 发现中胶囊「发现中」，约 12 秒后回到空闲，按钮回到「开始发现」（BT-011）。已配对列表首次读取用列表区 `YoLoading`，不挡住停止按钮 |
+| 无权限 | 未授权不进入「发现中」，列表不新增，内容区为 `YoPermissionDenied`，可再次申请（BT-001）。 |
+
+按下只改变控件外观。松手后才把意图交给页面状态。禁用控件不进入按下。错误行若仍写着未授权，归到无权限，不另做一套权限样式。组件树是该页类型的上限：行为细则没有分段就不渲染 `YoSegmentButton`，没有过滤输入就不渲染 `TextInput`。缺口墙的写法见 [权限墙与缺口墙](../app-shell/permission-gap-wall.md)。
+
+## 编号追溯
+
+| 项 | 值 |
+| --- | --- |
+| 设计屏 | `bluetooth/classic-discovery` |
+| 架构编号 | BT-009, BT-010, BT-011, BT-012, BT-013, BT-014, BT-015, BT-016, BT-017, BT-018 |
+| 架构 PR | https://github.com/yohurm/HarmonyOS-YoWireTools/pull/8 。文件不在 `main` |
+| 工作台入口 | 工作台「蓝牙」卡片，或底栏蓝牙槽（`TAB_INDEX_BLUETOOTH` = 1） 。工作台没有 WB 编号，槽位是 `AppRoutes.TAB_INDEX_WORKBENCH` = 0 |
+
+## 行为细则
+
+
 路由 `/bluetooth/spp`。薄壳是 `SppMainPage`，状态在 `SppMainViewModel`。发现调用只进 `common/yobluetooth` 的 `StartClassicScanUseCase`。
 
 ## 结构
