@@ -56,3 +56,18 @@ ArkUI / UI Design Kit 只使用文档仓里有专页的组件。本设计用到�
 `HdsListItem` 有专页，但 `common/youi_kit` 未导出对应门面，目录把它放在 P2。屏幕列表行用 `ListItem` + `Text`，不用 `HdsListItem`。
 
 `SegmentButton` 的专页写明不支持通用属性。宽度和边距写在外层 `Row` 或 `Scroll` 上，由已有的 `YoSegmentButton` 包一层。这是样例与专页共同的约束，不是新组件。
+# 应用壳
+
+一个 `product/phone` HAP 里的一套壳。五个一级目的地与 `main` 上的底栏文案一致：工作台、蓝牙、网络、星闪、更多。
+
+| 文件 | 内容 |
+| --- | --- |
+| [information-architecture.md](information-architecture.md) | 目的地与从属屏 |
+| [navigation.md](navigation.md) | 一棵 Navigation、窄底栏、宽侧栏、对齐位 |
+| [layout-patterns.md](layout-patterns.md) | 八个参考对应的布局模式 |
+| [design-tokens.md](design-tokens.md) | 间距、圆角、字号、热区、颜色角色 |
+| [density.md](density.md) | 工具类密度：层级、行、胶囊、宽窄 |
+| [permission-gap-wall.md](permission-gap-wall.md) | 无权限与能力缺口时界面上有什么 |
+| [color-scheme.md](color-scheme.md) | 浅色 / 深色 |
+
+壳不读取射频 Kit，不在工作台弹出蓝牙、星闪或 WLAN 授权。
