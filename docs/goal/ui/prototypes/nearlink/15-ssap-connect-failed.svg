@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img">
+  <title>SSAP · 连接失败</title>
+  <rect width="390" height="844" fill="#F1F3F5"/>
+  <rect x="0" y="0" width="390" height="36" rx="0" fill="#FFFFFF"/>
+<text x="20" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="600" fill="#182431" text-anchor="start">9:41</text>
+<text x="318" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="start">5G</text>
+<rect x="342" y="14" width="22" height="10" rx="2" fill="none" stroke="#5C6B7A" stroke-width="1"/>
+<rect x="344" y="16" width="14" height="6" rx="1" fill="#182431"/>
+<rect x="0" y="36" width="390" height="56" rx="0" fill="#FFFFFF"/>
+<text x="18" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="28" font-weight="400" fill="#182431" text-anchor="start">‹</text>
+<text x="44" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="20" font-weight="600" fill="#182431" text-anchor="start">SSAP</text>
+<line x1="0" y1="92" x2="390" y2="92" stroke="#E6E8EB" stroke-width="1"/>
+<rect x="0" y="92" width="390" height="36" rx="0" fill="#E8F0FE"/>
+<text x="16" y="115" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="500" fill="#0A59F7" text-anchor="start">Client 已创建  ·  尚未 close</text>
+<rect x="128" y="826" width="134" height="5" rx="2.5" fill="#1A1A1A" opacity="0.35"/>
+<rect x="16" y="144" width="358" height="220" rx="16" fill="#FDECEA"/>
+<text x="32" y="176" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="18" font-weight="600" fill="#E84026" text-anchor="start">没有连上服务端</text>
+<text x="32" y="208" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="600" fill="#E84026" text-anchor="start">YW-NL-2102</text>
+<text x="32" y="238" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#182431" text-anchor="start">对端可能已停止广播，或星闪开关在</text>
+<text x="32" y="260" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#182431" text-anchor="start">连接过程中被关掉。</text>
+<text x="32" y="292" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="500" fill="#182431" text-anchor="start">Client 还没 close，可以重试连接。</text>
+<text x="32" y="314" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#5C6B7A" text-anchor="start">close 之后这个实例不能再使用。</text>
+<rect x="32" y="338" width="140" height="40" rx="20.0" fill="#E84026"/>
+<text x="102.0" y="363.0" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">重试连接</text>
+<rect x="184" y="338" width="150" height="40" rx="20.0" fill="#FFFFFF" stroke="#E6E8EB" stroke-width="1"/>
+<text x="259.0" y="363.0" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="500" fill="#182431" text-anchor="middle">回到发现</text>
+</svg>

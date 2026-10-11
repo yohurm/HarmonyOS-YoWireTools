@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844" role="img">
+  <title>发现台 · 空过滤被拒绝</title>
+  <rect width="390" height="844" fill="#F1F3F5"/>
+  <rect x="0" y="0" width="390" height="36" rx="0" fill="#FFFFFF"/>
+<text x="20" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="600" fill="#182431" text-anchor="start">9:41</text>
+<text x="318" y="24" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="11" font-weight="500" fill="#5C6B7A" text-anchor="start">5G</text>
+<rect x="342" y="14" width="22" height="10" rx="2" fill="none" stroke="#5C6B7A" stroke-width="1"/>
+<rect x="344" y="16" width="14" height="6" rx="1" fill="#182431"/>
+<rect x="0" y="36" width="390" height="56" rx="0" fill="#FFFFFF"/>
+<text x="18" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="28" font-weight="400" fill="#182431" text-anchor="start">‹</text>
+<text x="44" y="70" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="20" font-weight="600" fill="#182431" text-anchor="start">发现</text>
+<line x1="0" y1="92" x2="390" y2="92" stroke="#E6E8EB" stroke-width="1"/>
+<rect x="0" y="92" width="390" height="36" rx="0" fill="#E8F0FE"/>
+<text x="16" y="115" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="500" fill="#0A59F7" text-anchor="start">API 13  ·  过滤校验未通过</text>
+<rect x="128" y="826" width="134" height="5" rx="2.5" fill="#1A1A1A" opacity="0.35"/>
+<rect x="16" y="144" width="358" height="210" rx="16" fill="#FDECEA"/>
+<text x="32" y="176" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="18" font-weight="600" fill="#E84026" text-anchor="start">不能开始发现</text>
+<text x="32" y="208" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#182431" text-anchor="start">过滤组是空的。API 13 的 startScan</text>
+<text x="32" y="230" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#182431" text-anchor="start">会返回 401，而不是扫到所有设备。</text>
+<text x="32" y="262" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="14" font-weight="600" fill="#E84026" text-anchor="start">YW-NL-1003</text>
+<text x="32" y="290" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="13" font-weight="400" fill="#5C6B7A" text-anchor="start">补上设备名、地址或厂商 ID 中的一项。</text>
+<rect x="32" y="308" width="180" height="40" rx="20.0" fill="#E84026"/>
+<text x="122.0" y="333.0" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="15" font-weight="500" fill="#FFFFFF" text-anchor="middle">回到过滤组</text>
+<text x="16" y="388" font-family="WenQuanYi Micro Hei, HarmonyOS Sans, sans-serif" font-size="12" font-weight="400" fill="#5C6B7A" text-anchor="start">API 26 及以上才允许无过滤，并且必须单独确认功耗和噪声。</text>
+</svg>
