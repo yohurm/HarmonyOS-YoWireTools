@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.0" y="0.0" width="360.0" height="36.0" rx="0" fill="#FFFFFF" stroke="none"/>
+<text x="16.0" y="18.0" font-size="14" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">08:20</text>
+<text x="312.0" y="18.0" font-size="12" font-weight="400" fill="#182431" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">100%</text>
+<rect x="320.0" y="12.0" width="18.0" height="11.0" rx="2" fill="none" stroke="#182431" stroke-width="1.2"/>
+<rect x="322.0" y="14.0" width="12.0" height="7.0" rx="1" fill="#182431" stroke="none"/>
+<rect x="338.0" y="15.0" width="2.0" height="5.0" rx="0" fill="#182431" stroke="none"/>
+<text x="16.0" y="64.0" font-size="28" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Wi-Fi</text>
+<text x="16.0" y="102.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已连接</text>
+<path d="M20 146 Q28 140 36 146" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23 150 Q28 146 33 150" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="28.0" cy="154.0" r="1.4" fill="#0A59F7" stroke="#0A59F7" stroke-width="0"/>
+<text x="48.0" y="138.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Lab-2.4G</text>
+<path d="M52 162 H60 V63 H52 Z" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M54 162 V159 Q56 156 58 159 V162" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="162.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">已连接</text>
+<circle cx="332.0" cy="148.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="148.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="64.0" y1="184.0" x2="392.0" y2="184.0" stroke="#E6E6E6" stroke-width="1"/>
+<text x="16.0" y="202.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">可用网络</text>
+<path d="M20 246 Q28 240 36 246" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23 250 Q28 246 33 250" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="28.0" cy="254.0" r="1.4" fill="#182431" stroke="#182431" stroke-width="0"/>
+<text x="48.0" y="238.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Huawei-Guest</text>
+<path d="M52 262 H60 V63 H52 Z" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M54 262 V259 Q56 256 58 259 V262" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="262.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">加密 · -62 dBm</text>
+<circle cx="332.0" cy="248.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="248.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="64.0" y1="284.0" x2="392.0" y2="284.0" stroke="#E6E6E6" stroke-width="1"/>
+<path d="M20 310 Q28 304 36 310" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23 314 Q28 310 33 314" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="28.0" cy="318.0" r="1.4" fill="#182431" stroke="#182431" stroke-width="0"/>
+<text x="48.0" y="302.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">DIRECT-Lab</text>
+<path d="M52 326 H60 V63 H52 Z" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M54 326 V323 Q56 320 58 323 V326" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="326.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">加密 · -71 dBm</text>
+<circle cx="332.0" cy="312.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="312.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="64.0" y1="348.0" x2="392.0" y2="348.0" stroke="#E6E6E6" stroke-width="1"/>
+<path d="M20 374 Q28 368 36 374" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23 378 Q28 374 33 378" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="28.0" cy="382.0" r="1.4" fill="#182431" stroke="#182431" stroke-width="0"/>
+<text x="48.0" y="366.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">wlanaccess</text>
+<path d="M52 390 H60 V63 H52 Z" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M54 390 V387 Q56 384 58 387 V390" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="390.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">开放 · -78 dBm</text>
+<circle cx="332.0" cy="376.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="376.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="64.0" y1="412.0" x2="392.0" y2="412.0" stroke="#E6E6E6" stroke-width="1"/>
+<path d="M20 438 Q28 432 36 438" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23 442 Q28 438 33 442" fill="none" stroke="#182431" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="28.0" cy="446.0" r="1.4" fill="#182431" stroke="#182431" stroke-width="0"/>
+<text x="48.0" y="430.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Office-5G</text>
+<path d="M52 454 H60 V63 H52 Z" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M54 454 V451 Q56 448 58 451 V454" fill="none" stroke="#666666" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="68.0" y="454.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">加密 · -54 dBm</text>
+<circle cx="332.0" cy="440.0" r="7" fill="none" stroke="#C7C7CD" stroke-width="1.3"/>
+<text x="332.0" y="440.0" font-size="11" font-weight="700" fill="#C7C7CD" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">i</text>
+<line x1="64.0" y1="476.0" x2="392.0" y2="476.0" stroke="#E6E6E6" stroke-width="1"/>
+<text x="180.0" y="504.0" font-size="16" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">重新扫描</text>
+</svg>

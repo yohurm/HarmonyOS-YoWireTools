@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="0.0" y="0.0" width="360.0" height="800.0" rx="0" fill="#F1F3F5" stroke="none"/>
+<rect x="0.0" y="0.0" width="360.0" height="36.0" rx="0" fill="#F1F3F5" stroke="none"/>
+<text x="16.0" y="18.0" font-size="14" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">08:20</text>
+<text x="312.0" y="18.0" font-size="12" font-weight="400" fill="#182431" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">100%</text>
+<rect x="320.0" y="12.0" width="18.0" height="11.0" rx="2" fill="none" stroke="#182431" stroke-width="1.2"/>
+<rect x="322.0" y="14.0" width="12.0" height="7.0" rx="1" fill="#182431" stroke="none"/>
+<rect x="338.0" y="15.0" width="2.0" height="5.0" rx="0" fill="#182431" stroke="none"/>
+<text x="16.0" y="64.0" font-size="28" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">首页</text>
+<rect x="16.0" y="96.0" width="328.0" height="132.0" rx="16" fill="#FFFFFF" stroke="none"/>
+<text x="32.0" y="120.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">当前能力</text>
+<text x="32.0" y="148.0" font-size="16" font-weight="400" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">蓝牙</text>
+<text x="312.0" y="148.0" font-size="16" font-weight="400" fill="#666666" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">探测失败</text>
+<text x="32.0" y="172.0" font-size="16" font-weight="400" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Wi-Fi</text>
+<text x="312.0" y="172.0" font-size="16" font-weight="400" fill="#666666" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">探测失败</text>
+<text x="32.0" y="196.0" font-size="16" font-weight="400" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">星闪</text>
+<text x="312.0" y="196.0" font-size="16" font-weight="400" fill="#666666" text-anchor="end" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">探测失败</text>
+<text x="16.0" y="244.0" font-size="14" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">最近会话</text>
+<rect x="16.0" y="260.0" width="328.0" height="128.0" rx="16" fill="#FFFFFF" stroke="none"/>
+<text x="32.0" y="282.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">工装-A</text>
+<text x="32.0" y="304.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">经典蓝牙 · 今天 08:12</text>
+<path d="M316 284 L324 292 L316 300" fill="none" stroke="#C7C7CD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="32.0" y1="324.0" x2="328.0" y2="324.0" stroke="#E6E6E6" stroke-width="1"/>
+<text x="32.0" y="346.0" font-size="16" font-weight="700" fill="#182431" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Lab-2.4G</text>
+<text x="32.0" y="368.0" font-size="13" font-weight="400" fill="#666666" text-anchor="start" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">Wi-Fi 扫描 · 今天 08:05</text>
+<path d="M316 348 L324 356 L316 364" fill="none" stroke="#C7C7CD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="180.0" y="412.0" font-size="16" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">重试</text>
+<rect x="0.0" y="736.0" width="360.0" height="64.0" rx="0" fill="#FFFFFF" stroke="none"/>
+<line x1="0.0" y1="736.0" x2="360.0" y2="736.0" stroke="#E6E6E6" stroke-width="1"/>
+<path d="M37 756 L45 749 L53 756 V764 H37 Z" fill="none" stroke="#0A59F7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="45.0" y="776.0" font-size="12" font-weight="700" fill="#0A59F7" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">首页</text>
+<path d="M128 751 H142 M128 757 H142 M128 763 H138" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="135.0" y="776.0" font-size="12" font-weight="400" fill="#666666" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">调试</text>
+<path d="M218 752 L223 757 L218 762 M225 762 H232" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="225.0" y="776.0" font-size="12" font-weight="400" fill="#666666" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">控制台</text>
+<circle cx="315.0" cy="753.0" r="4" fill="none" stroke="#666666" stroke-width="1.6"/>
+<path d="M308 764 Q315 758 322 764" fill="none" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="315.0" y="776.0" font-size="12" font-weight="400" fill="#666666" text-anchor="middle" dominant-baseline="central" font-family="WenQuanYi Micro Hei, Droid Sans Fallback, sans-serif">我的</text>
+<rect x="132.0" y="790.0" width="96.0" height="4.0" rx="2" fill="#1A1A1A" stroke="none"/>
+</svg>
