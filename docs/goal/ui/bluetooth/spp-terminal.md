@@ -199,7 +199,7 @@ AlertDialog 「断开这路连接？」 确认 / 取消
 
 未连接：内容区不是空日志。`Column` 居中，最大宽 448。标题 20「未连接」，辅文 14「选择设备后连接」，主按钮「连接」。点「连接」若扫描页可打开则 `push` 经典扫描，否则按钮 disabled 且辅文「不能打开」。
 
-已连接：顶行胶囊「已连接」confirm。中部 `List` `layoutWeight` 1，行 48vp：4vp 圆点（收到用 `brand`，发出用 `font_secondary`）、时间 12、摘要 12 单行省略。新行到达时若用户贴着底部则滚到底；用户上滑后不抢滚动。底栏 `Row`：`TextInput` layoutWeight 1，主按钮「发送」宽不超过 448 的剩余。标题栏菜单「断开」「清空」「暂停」。断开先 `AlertDialog`，主按钮「断开」`ButtonRole.ERROR`，次按钮「取消」。
+已连接：顶行胶囊「已连接」confirm。中部 `List` `layoutWeight` 1，行 48vp：4vp 圆点（收到用 `brand`，发出用 `font_secondary`）、时间 12、摘要 12 单行省略。跟随底部与日志中心同一条规则，来源 M6「开启滑动到底部」：贴底时跟随，上滑后不抢。底栏 `Row`：`TextInput` layoutWeight 1，主按钮「发送」。标题栏菜单「断开」「清空」「暂停」「滑动到底部」。断开先 `AlertDialog`，主按钮「断开」`ButtonRole.ERROR`，次按钮「取消」。
 
 点一行：若 `/log/detail` 未注册，用 `bindSheet` 展示该行全文，不新做第二种详情皮肤。
 

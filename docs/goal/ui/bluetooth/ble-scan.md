@@ -197,13 +197,11 @@ bindSheet 「过滤」
 | BLE 通信 | RSSI 留在次行，不做成全宽数据卡 |
 # BLE 扫描
 
-路由 `/bluetooth/ble` 已在 `main` 作为目的地。来源：E3 `BluetoothClientView` 与 `BluetoothDeviceItem`；H2 的重新搜索；H7 只说明扫描前可以有过滤，本页不画 FastBle 的库表单，除非 ViewModel 已给出过滤词。
+路由 `/bluetooth/ble` 已在 `main` 作为目的地。来源：E3 `BluetoothClientView`；M12 蓝牙通讯列表（白卡片、浅底胶囊「连接」、底部实心「搜索设备」）；M5 的空态把主按钮放在底部；H2 的重新搜索。H7 只说明可以过滤，没有过滤词时不画 FastBle 表单。
 
-与经典扫描同一张卡片。次行是地址和 RSSI。不可连接的行仍显示，右侧按钮文案「不可连接」且 `enabled` false，行点击不 push。可连接行按钮「连接」，点击 `push` GATT 详情目标名并带上 ViewModel 的地址参数。连接进度在详情页，扫描页不弹第二张 sheet。
+卡片主行是名称，没有名称时主行才是地址。次行是地址和 RSSI，不把同一串地址再写一遍（M12 画面里两行都是 MAC，本文不学）。不可连接的行仍显示，胶囊文案「不可连接」且 `enabled` false，行点击不 push。可连接行的胶囊「连接」只提交连接，点击卡片本身 `push` GATT 详情。连接中胶囊内放 20vp `LoadingProgress`，色 `brand`。进度不另开 sheet。
 
-E3 在行内就地连接并在连接中显示 `LoadingProgress`，点已连接行才进入心率页。本应用把「进入详情」放在可连接行的点击上，避免一行里既跳转又发起连接。行内按钮只负责连接请求，结果反映到按钮文案「连接中」。
-
-空态沿 E3：不渲染空 `List`，中部说明「没有设备」，底部一颗主按钮「搜索设备」，最宽 448vp。
+空态沿 M5：不渲染空 `List`，中部「没有设备」，底部一颗 `EMPHASIZED`「搜索设备」，最宽 448vp。扫描中该按钮改为「停止」。
 
 过滤：仅当 ViewModel 提供名称关键字时，在标题下放一个 `Search`，高度 40，提示「名称」。没有关键字状态时不渲染 `Search`。
 

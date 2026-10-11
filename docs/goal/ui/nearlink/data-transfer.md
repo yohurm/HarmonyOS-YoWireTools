@@ -44,7 +44,7 @@ AlertDialog 断开确认
 采用控制台的单行日志、wifi 选择的一颗主按钮 sheet、蓝牙扫描里「没有行就不要假装成功」。不采用家居四页签、WLAN 的 IP 字段（除非 ViewModel 提供，否则不画）、体温卡、FastBle 过滤、NetworkQuery 四场景。
 # 星闪数据传输
 
-目标名 `/nearlink/data-transfer`。来源：SPP 终端的日志行与底栏；没有口令时不用 H1 的密码框。若 ViewModel 要求端口，才用半模态：一个 `TextInput`「端口」和主按钮「连接」。
+目标名 `/nearlink/data-transfer`。来源：SPP 终端的日志行与底栏；没有口令时不用 H1 的密码框。若 ViewModel 要求端口，才用半模态：标题「连接」、关闭（M17）、一个 `TextInput`「端口」和底部主按钮「连接」。
 
 未连接：标题「未连接」，辅文「填写端口后连接」或「连接后可以收发」（由是否需要端口决定，两句只出现一句）。主按钮「连接」。
 

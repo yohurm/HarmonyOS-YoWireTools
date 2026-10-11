@@ -96,7 +96,7 @@ Design Skill（交互规则，不替代 ArkUI 组件名）：
 不新编 BT / NL / WN / WB / LOG / SET。要追溯时只指向未进 `main` 的 [PR #20](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/20) `docs/goal/citation.md`。整机契约只指向未进 `main` 的 [PR #21](https://github.com/yohurm/HarmonyOS-YoWireTools/pull/21) `docs/goal/checklist/app.md` 与 `docs/goal/architecture/app/APP-001.md`–`APP-006.md`。
 # YoWireTools 手机 UI 规范
 
-本目录是整 App 的界面规范，从默认分支空白重写。PR #19 已关闭未合并，旧稿作废，不是底稿。门禁未过，不铺页面。
+本目录是整 App 的界面规范，从默认分支空白重写，并按工具库第二轮画面定稿。PR #19 已关闭未合并，旧稿作废，不是底稿。PR #22 同样已关闭未合并，不是底稿。门禁未过，不铺页面。
 
 产品是一个手机 HAP（`product/phone`，包名 `com.yohurm.yowiretools`）。Wi‑Fi、蓝牙、星闪、日志、设置都在这一个壳里，不另起蓝牙或网络产品。界面不调用 Kit。数据只沿这条对齐槽往下走：UI → ViewModel/State → UseCase → RepositoryContract → DataSource/KitBridge → Kit。
 

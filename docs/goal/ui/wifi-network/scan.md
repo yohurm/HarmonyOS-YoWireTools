@@ -52,7 +52,7 @@ bindSheet
 
 `List` 组「已连接」「可用」。行 64vp（E1 是通栏列表项，本文用效率 64 而不是 E3 的 76 卡，因为 WLAN 行是信息入口不是设备操作卡）。主行 SSID 16，次行「加密」或「开放」14。右侧图标按钮热区 40，「信息」，`push` 链路详情。
 
-点可用行且 ViewModel 标记需要口令：`bindSheet`。内容为只读 SSID、密码 `TextInput`、明文图标按钮、主按钮「下一步」。开放网络不打开 sheet，行点击就是提交连接动作，行尾出现 16vp `LoadingProgress`。
+点可用行且 ViewModel 标记需要口令：`bindSheet`，结构见布局模式里的连接半模态（M17 的标题与关闭，M1 的分段只在有两种认证方式时出现）。内容为标题「连接」、关闭、只读 SSID、密码 `TextInput`、明文图标按钮、底部「下一步」。开放网络不打开 sheet，行点击就是提交连接动作，行尾出现 16vp `LoadingProgress`。
 
 E1 用定时器直接 `wifiManager.getScanInfoList`。本页只观察 ViewModel 列表。
 

@@ -61,7 +61,7 @@ bindSheet
 
 ## 布局
 
-上：标题 20「尚未搜索 / 正在搜索 / 搜索成功 / 搜索失败」。辅文 14。文字按钮在标题行右侧。无结果且未搜索时，中部 48vp Symbol（SDK 核对后）和一句「附近的设备会出现在这里」。有结果后图示收起。
+上：标题 20「尚未搜索 / 正在搜索 / 搜索成功 / 搜索失败」。辅文 14。主按钮在底部，与 M12、M5 一致，不放在标题行。无结果时中部一句「附近的设备会出现在这里」，不放超过 48vp 的插画。有结果后这句话收起。
 
 `List` 两组：`ListItemGroup`「已连接」，`ListItemGroup`「可用」。行 76vp，圆角 16，左右 16，间距 12。主行名称 16，次行地址 14 `tnum`。右侧文字按钮「连接」，与正文间隔 12。连接中该按钮内放 20vp `LoadingProgress`，色 `brand`（E3 用了 `#FF0A59F7`，本文改 Token）。
 
@@ -71,18 +71,17 @@ bindSheet
 
 ```
 Column
-  Row
-    Column
-      Text 20
-      Text 14
-    Button TEXTUAL  「开始搜索」|「停止」|「重新搜索」
+  Column
+    Text 20
+    Text 14
   List layoutWeight 1  或空态 Column
     ListItemGroup header 已连接
     ListItemGroup header 可用
       ListItem
         Row
           Column 名称 / 地址
-          Button TEXTUAL 连接
+          Button 浅底胶囊 连接
+  Button EMPHASIZED 「开始搜索」|「停止」|「重新搜索」
 ```
 
 ## 状态

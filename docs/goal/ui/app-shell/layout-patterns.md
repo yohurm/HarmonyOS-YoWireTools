@@ -70,15 +70,15 @@
 
 ## 扫描列表
 
-来源：H2 蓝牙扫描（状态标题、重新搜索、设备列表）；E3 `BluetoothClientView`（有设备才渲染 `List`，否则空态；底栏一颗「搜索设备」）；E1 把「已连接」和扫描结果分成两组。
+来源：H2 蓝牙扫描（状态标题、重新搜索、设备列表）；E3 `BluetoothClientView`；M12 蓝牙通讯列表（白卡片、浅底胶囊「连接」、底部一颗实心「搜索设备」）；M3 健康设备卡（名称 + 一句状态，不放照片）。E1 把「已连接」和扫描结果分成两组。
 
-窄屏：`Column`。上为标题 20 Bold + 辅文 14 `font_secondary` + 文字按钮「开始搜索 / 停止 / 重新搜索」。中为 `List`，`layoutWeight` 1，左右边距 16vp，项间距 12vp。项是 76vp 卡片，圆角 16，背景 `comp_background_primary`。无项时中部改为空态，不留空白列表。
+窄屏：`Column`，背景 `background_secondary`。上为标题 20 Bold + 辅文 14。中为 `List`，`layoutWeight` 1，左右 16vp，项间距 12vp。项是圆角 16 的 `comp_background_primary` 卡片。主行名称，次行地址或 RSSI，两行不重复同一串字符（M12 的样例把 MAC 写了两遍，本文不学）。右侧「连接」是浅底胶囊：底 `comp_background_gray`，字 `brand`，不用实心主按钮。页面底部一颗 `EMPHASIZED`「搜索设备 / 停止」，最宽 448vp。无项时中部空态，底部按钮仍在。
 
 ## 连接半模态
 
-来源：H1 的选择、密码、一颗「下一步」；D-btn 半模态最宽 480vp、左右 16vp。E2 的 `WifiConnector` 直接调 Kit 并 `showToast`，本文不学那条调用，只保留「先确认当前链路，再让用户提交口令」的顺序。
+来源：H1 的选择、密码、一颗「下一步」；M17 账单半模态的标题行、关闭、模式分段、底部一颗完成；D-btn 半模态最宽 480vp、左右 16vp。E2 的 `WifiConnector` 直接调 Kit，本文不学调用。
 
-`bindSheet` 贴底。内容：标题、`Select` 或只读当前 SSID、`TextInput` 密码、尾部图标按钮切换明文、一颗 `ButtonStyleMode.EMPHASIZED`「下一步」。同一区域不再放第二颗主按钮。
+`bindSheet` 贴底。第一行：标题 20 与关闭图标按钮（热区 40）。若有两种模式，下一行用 `SegmentButton`，选中项填充 `comp_background_emphasize`、字 `font_on_primary`，未选中底 `comp_background_gray`、字 `font_primary`（M1 计算器的分段，颜色改回 `brand`，不用橙色或 M17 的绿色）。然后是字段。底部一颗 `EMPHASIZED`。不放分类宫格。
 
 ## 列表加详情
 
@@ -90,7 +90,13 @@
 
 ## 日志控制台
 
-来源：G12 hadice `SystemLogsPage`（级别多选、暂停、清空、关键字、无设备）；H6 用顶栏分类而不是再做一个窗口。手机上级别用 `Select` 或一排 `Toggle` 式筛选，不用桌面下拉浮层。行高 48vp。
+来源：G12 hadice 的级别、暂停、清空、关键字；H6 的分类页签；M6 应用内日志（搜索框、Debug/Info/Warn/Error/Fatal 一排芯片、垃圾桶清空、开关「滑动到底部」、半模态里的显示设置）。
+
+日志是工作台推进去的一整页，不是可拖动的圆形「log」按钮。级别用一排 `Button` 芯片，不用桌面多选下拉。选中芯片底 `comp_background_neutral`、字 `font_on_primary`；未选中只有字 `font_secondary`。级别色只映射 D2：Error/Fatal 用 `warning`，Warn 用 `alert`，Info 用 `brand`，Debug 用 `font_tertiary`。不用 M6 那种橙、红、紫、绿描边，也不提供背景色板。行高 48vp。
+
+## 空态与错误墙
+
+来源：M5 通用状态服务（中部标题、辅文、底部一颗胶囊按钮）；G4 的说明 + 重试。中部不强制插画。顶部可以用文字芯片切换「加载中 / 失败 / 空」，但芯片只是状态演示时才出现，正式页由 ViewModel 决定显示哪一种，不同时摆三颗演示芯片。
 
 ## 设置分组
 
@@ -98,4 +104,8 @@
 
 ## 度量卡
 
-来源：H8 的通信页用少量实时量，不用来代替设备列表。卡高至少 72vp，圆角 16，内边距 12。数字用页标题字号，说明用 12 Regular。一屏最多三张，多了改列表。
+来源：H8 的少量实时量；M4 测网速把一个速率放大，下面三列说明（时延、下载、上传）。数字用页标题字号，单位与说明用 12 `font_secondary`。颜色只用 `brand` 和文字 Token。不把页面铺成 M4 的全黑仪表，不画 0–500 的刻度弧，除非以后的契约明确要求测速页。一屏最多一个大数字加三列说明，或三张 72vp 卡。再多改列表。
+
+## 工具壳不采用的部分
+
+来源：M2 综合工具首页是三列宫格加「编辑」；M1 底栏是「计算器 / 工具 / 我的」。本应用保持 E4 的五个目的地。工作台不改成小工具宫格，底栏不改成两项或三项生活模板。M19 的滑动「标为已读 / 删除」不用于日志流。
