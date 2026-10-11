@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="640" viewBox="0 0 800 640">
+<rect width="800" height="640" fill="#F1F3F5"/>
+<rect x="0" y="0" width="800" height="48" rx="0" fill="#FFFFFF"/>
+<text x="16" y="24" font-size="18" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络</text>
+<text x="784" y="24" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">中屏不放透镜轨</text>
+<text x="70" y="78" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">链路</text>
+<text x="160" y="78" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">空口</text>
+<rect x="144" y="92" width="32" height="3" rx="1" fill="#0A59F7"/>
+<text x="250" y="78" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">主机</text>
+<text x="340" y="78" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">会话</text>
+<line x1="0" y1="104" x2="800" y2="104" stroke="#E4E5E9" stroke-width="1"/>
+<text x="16" y="128" font-size="13" fill="#666666" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">接入点</text>
+<rect x="16" y="146" width="300" height="64" rx="14" fill="#E7F0FE"/>
+<rect x="16" y="158" width="3" height="40" rx="1.5" fill="#0A59F7"/>
+<rect x="30" y="181" width="3" height="5" rx="1" fill="#0A59F7"/>
+<rect x="35" y="177" width="3" height="9" rx="1" fill="#0A59F7"/>
+<rect x="40" y="173" width="3" height="13" rx="1" fill="#0A59F7"/>
+<rect x="45" y="169" width="3" height="17" rx="1" fill="#0A59F7"/>
+<text x="58" y="168" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">YoLab-5G</text>
+<text x="58" y="190" font-size="12" fill="#3D8B37" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">当前 · WPA3 · 5 GHz · 36</text>
+<text x="304" y="168" font-size="15" fill="#0A59F7" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-42</text>
+<text x="304" y="188" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">dBm</text>
+<rect x="16" y="218" width="300" height="64" rx="14" fill="#FFFFFF"/>
+<rect x="30" y="253" width="3" height="5" rx="1" fill="#666666"/>
+<rect x="35" y="249" width="3" height="9" rx="1" fill="#666666"/>
+<rect x="40" y="245" width="3" height="13" rx="1" fill="#666666"/>
+<rect x="45" y="241" width="3" height="17" rx="1" fill="#E1E2E6"/>
+<text x="58" y="240" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">YoLab</text>
+<text x="58" y="262" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">WPA2 · 2.4 GHz · 6</text>
+<text x="304" y="240" font-size="15" fill="#666666" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-58</text>
+<text x="304" y="260" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">dBm</text>
+<rect x="16" y="290" width="300" height="64" rx="14" fill="#FFFFFF"/>
+<rect x="30" y="325" width="3" height="5" rx="1" fill="#666666"/>
+<rect x="35" y="321" width="3" height="9" rx="1" fill="#666666"/>
+<rect x="40" y="317" width="3" height="13" rx="1" fill="#666666"/>
+<rect x="45" y="313" width="3" height="17" rx="1" fill="#E1E2E6"/>
+<text x="58" y="312" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">Guest</text>
+<text x="58" y="334" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">开放 · 2.4 GHz · 11</text>
+<text x="304" y="312" font-size="15" fill="#666666" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-67</text>
+<text x="304" y="332" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">dBm</text>
+<rect x="16" y="362" width="300" height="64" rx="14" fill="#FFFFFF"/>
+<rect x="30" y="397" width="3" height="5" rx="1" fill="#666666"/>
+<rect x="35" y="393" width="3" height="9" rx="1" fill="#666666"/>
+<rect x="40" y="389" width="3" height="13" rx="1" fill="#E1E2E6"/>
+<rect x="45" y="385" width="3" height="17" rx="1" fill="#E1E2E6"/>
+<text x="58" y="384" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">隐藏网络</text>
+<text x="58" y="406" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">隐藏 · WPA2 · 5 GHz · 44</text>
+<text x="304" y="384" font-size="15" fill="#666666" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-71</text>
+<text x="304" y="404" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">dBm</text>
+<rect x="336" y="120" width="448" height="420" rx="16" fill="#FFFFFF"/>
+<line x1="372" y1="206.85714285714286" x2="768" y2="206.85714285714286" stroke="#E4E5E9" stroke-width="1"/>
+<text x="344" y="206.85714285714286" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-40</text>
+<line x1="372" y1="359.42857142857144" x2="768" y2="359.42857142857144" stroke="#E4E5E9" stroke-width="1"/>
+<text x="344" y="359.42857142857144" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-70</text>
+<line x1="372" y1="461.1428571428571" x2="768" y2="461.1428571428571" stroke="#E4E5E9" stroke-width="1"/>
+<text x="344" y="461.1428571428571" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-90</text>
+<path d="M454.3 512.0 L485.8 364.5 L515.4 364.5 L546.9 512.0 Z" fill="#8E8E93" stroke-linejoin="round" stroke-linecap="round" stroke="#8E8E93" stroke-width="2" fill-opacity="0.35"/>
+<path d="M372.0 512.0 L387.4 217.0 L428.6 217.0 L500.6 512.0 Z" fill="#0A59F7" stroke-linejoin="round" stroke-linecap="round" stroke="#0A59F7" stroke-width="2" fill-opacity="0.5"/>
+<text x="408.0" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">36</text>
+<text x="454.2857142857143" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">40</text>
+<text x="500.57142857142856" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">44</text>
+<text x="546.8571428571429" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">48</text>
+<text x="593.1428571428571" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">52</text>
+<text x="639.4285714285714" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">56</text>
+<text x="685.7142857142858" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">60</text>
+<text x="732.0" y="526" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">64</text>
+<rect x="0" y="576" width="800" height="64" rx="0" fill="#FFFFFF"/>
+<line x1="0" y1="576" x2="800" y2="576" stroke="#E4E5E9" stroke-width="1"/>
+<text x="16" y="600" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">YoLab-5G</text>
+<text x="16" y="622" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">5 GHz · 信道 36 · -42 dBm · 与信道图同步</text>
+<rect x="560" y="592" width="112" height="40" rx="20" fill="#FFFFFF" stroke="#E4E5E9" stroke-width="1"/>
+<text x="616.0" y="612" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">详情</text>
+<rect x="680" y="592" width="104" height="40" rx="20" fill="#0A59F7"/>
+<text x="732.0" y="612" font-size="14" fill="#FFFFFF" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">连接</text>
+</svg>

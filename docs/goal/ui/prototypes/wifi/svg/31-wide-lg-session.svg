@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+<rect width="1280" height="800" fill="#F1F3F5"/>
+<rect x="0" y="0" width="1280" height="48" rx="0" fill="#FFFFFF"/>
+<text x="16" y="24" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">9:41</text>
+<text x="64" y="24" font-size="16" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络</text>
+<text x="1264" y="24" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">模块内分栏 · 不替换应用工作台</text>
+<line x1="0" y1="48" x2="1280" y2="48" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="0" y="48" width="180" height="752" rx="0" fill="#FFFFFF"/>
+<line x1="180" y1="48" x2="180" y2="800" stroke="#E4E5E9" stroke-width="1"/>
+<text x="28" y="88" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">链路</text>
+<text x="28" y="108" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">当前路径</text>
+<text x="28" y="160" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">空口</text>
+<text x="28" y="180" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">接入点</text>
+<text x="28" y="232" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">主机</text>
+<text x="28" y="252" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">局域网</text>
+<rect x="12" y="284" width="156" height="56" rx="12" fill="#E7F0FE"/>
+<rect x="12" y="296" width="3" height="32" rx="1" fill="#0A59F7"/>
+<text x="28" y="304" font-size="16" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">会话</text>
+<text x="28" y="324" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">协议</text>
+<text x="16" y="772" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">透镜随对象走</text>
+<text x="200" y="76" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">会话</text>
+<text x="460" y="76" font-size="13" fill="#0A59F7" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">新建</text>
+<rect x="196" y="100" width="268" height="64" rx="12" fill="#E7F0FE"/>
+<text x="212" y="124" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">192.168.1.20:1883</text>
+<text x="212" y="146" font-size="12" fill="#0A59F7" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">TCP</text>
+<rect x="196" y="174" width="268" height="64" rx="12" fill="#FFFFFF"/>
+<text x="212" y="198" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">example.com</text>
+<text x="212" y="220" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">HTTP</text>
+<rect x="196" y="248" width="268" height="64" rx="12" fill="#FFFFFF"/>
+<text x="212" y="272" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">lab.local</text>
+<text x="212" y="294" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">MQTT</text>
+<rect x="496" y="64" width="460" height="620" rx="16" fill="#FFFFFF"/>
+<text x="516" y="92" font-size="13" fill="#666666" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">报文</text>
+<text x="516" y="120" font-size="12" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">TX</text>
+<text x="556" y="120" font-size="13" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">10 4D 51 54 54 04</text>
+<text x="516" y="148" font-size="12" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="556" y="148" font-size="13" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">20 02 00 00</text>
+<text x="516" y="176" font-size="12" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">TX</text>
+<text x="556" y="176" font-size="13" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">82 0A 6C 61 62</text>
+<text x="516" y="204" font-size="12" fill="#3D8B37" font-weight="700" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">RX</text>
+<text x="556" y="204" font-size="13" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="WenQuanYi Micro Hei Mono, Noto Sans Mono, monospace" dominant-baseline="middle">90 03 00 01</text>
+<rect x="512" y="620" width="428" height="40" rx="10" fill="#F1F3F5"/>
+<text x="524" y="640" font-size="12" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">文本</text>
+<text x="570" y="640" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">要发送的内容</text>
+<rect x="972" y="64" width="292" height="676" rx="16" fill="#FFFFFF"/>
+<text x="988" y="96" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">连接参数</text>
+<text x="988" y="124" font-size="18" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">TCP 客户端</text>
+<text x="988" y="164" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">远端</text>
+<text x="1240" y="164" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">192.168.1.20:1883</text>
+<text x="988" y="190" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">本地端口</text>
+<text x="1240" y="190" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">48122</text>
+<text x="988" y="216" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">编码</text>
+<text x="1240" y="216" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">HEX</text>
+<text x="988" y="242" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">自动重连</text>
+<text x="1240" y="242" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">关闭</text>
+<text x="988" y="276" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">参数改动只影响下一次连接。</text>
+<rect x="988" y="668" width="252" height="40" rx="20" fill="#FFFFFF" stroke="#E4E5E9" stroke-width="1"/>
+<text x="1114.0" y="688" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">断开</text>
+</svg>

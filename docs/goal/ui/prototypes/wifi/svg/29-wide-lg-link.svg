@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+<rect width="1280" height="800" fill="#F1F3F5"/>
+<rect x="0" y="0" width="1280" height="48" rx="0" fill="#FFFFFF"/>
+<text x="16" y="24" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">9:41</text>
+<text x="64" y="24" font-size="16" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络</text>
+<text x="1264" y="24" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">模块内分栏 · 不替换应用工作台</text>
+<line x1="0" y1="48" x2="1280" y2="48" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="0" y="48" width="180" height="752" rx="0" fill="#FFFFFF"/>
+<line x1="180" y1="48" x2="180" y2="800" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="12" y="68" width="156" height="56" rx="12" fill="#E7F0FE"/>
+<rect x="12" y="80" width="3" height="32" rx="1" fill="#0A59F7"/>
+<text x="28" y="88" font-size="16" fill="#0A59F7" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">链路</text>
+<text x="28" y="108" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">当前路径</text>
+<text x="28" y="160" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">空口</text>
+<text x="28" y="180" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">接入点</text>
+<text x="28" y="232" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">主机</text>
+<text x="28" y="252" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">局域网</text>
+<text x="28" y="304" font-size="16" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">会话</text>
+<text x="28" y="324" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">协议</text>
+<text x="16" y="772" font-size="11" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">透镜随对象走</text>
+<text x="200" y="78" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">路径检查</text>
+<rect x="196" y="100" width="268" height="64" rx="12" fill="#E7F0FE"/>
+<text x="212" y="124" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">example.com</text>
+<text x="212" y="146" font-size="12" fill="#0A59F7" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">进行中 · 解析</text>
+<rect x="196" y="174" width="268" height="64" rx="12" fill="#FFFFFF"/>
+<text x="212" y="198" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">192.168.1.1</text>
+<text x="212" y="220" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">通过 · 1 ms</text>
+<rect x="196" y="248" width="268" height="64" rx="12" fill="#FFFFFF"/>
+<text x="212" y="272" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">lab.local</text>
+<text x="212" y="294" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">失败 · YW-NET-1001</text>
+<rect x="196" y="330" width="268" height="40" rx="20" fill="#FFFFFF" stroke="#E4E5E9" stroke-width="1"/>
+<text x="330.0" y="350" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">新建检查</text>
+<rect x="496" y="64" width="460" height="300" rx="16" fill="#FFFFFF"/>
+<text x="516" y="92" font-size="14" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">example.com 的路径</text>
+<rect x="512" y="112" width="428" height="132" rx="16" fill="#FFFFFF"/>
+<line x1="547.6666666666666" y1="158" x2="904.3333333333334" y2="158" stroke="#E1E2E6" stroke-width="2"/>
+<circle cx="547.6666666666666" cy="158" r="11" fill="#FFFFFF" stroke="#3D8B37" stroke-width="2"/>
+<path d="M543.6666666666666 158 L546.6666666666666 161 L551.6666666666666 155" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke="#3D8B37" stroke-width="1.6"/>
+<text x="547.6666666666666" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">射频</text>
+<text x="547.6666666666666" y="210" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">开启</text>
+<circle cx="619.0" cy="158" r="11" fill="#FFFFFF" stroke="#3D8B37" stroke-width="2"/>
+<path d="M615.0 158 L618.0 161 L623.0 155" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke="#3D8B37" stroke-width="1.6"/>
+<text x="619.0" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">关联</text>
+<text x="619.0" y="210" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">-42</text>
+<circle cx="690.3333333333333" cy="158" r="11" fill="#FFFFFF" stroke="#3D8B37" stroke-width="2"/>
+<path d="M686.3333333333333 158 L689.3333333333333 161 L694.3333333333333 155" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke="#3D8B37" stroke-width="1.6"/>
+<text x="690.3333333333333" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">地址</text>
+<text x="690.3333333333333" y="210" font-size="11" fill="#3D8B37" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">.42</text>
+<circle cx="761.6666666666666" cy="158" r="11" fill="#FFFFFF" stroke="#0A59F7" stroke-width="2"/>
+<circle cx="761.6666666666666" cy="158" r="4" fill="#0A59F7"/>
+<text x="761.6666666666666" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网关</text>
+<text x="761.6666666666666" y="210" font-size="11" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">探测</text>
+<circle cx="833.0" cy="158" r="11" fill="#FFFFFF" stroke="#8E8E93" stroke-width="2"/>
+<text x="833.0" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">解析</text>
+<text x="833.0" y="210" font-size="11" fill="#8E8E93" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">等待</text>
+<circle cx="904.3333333333333" cy="158" r="11" fill="#FFFFFF" stroke="#8E8E93" stroke-width="2"/>
+<text x="904.3333333333333" y="190" font-size="11" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">出口</text>
+<text x="904.3333333333333" y="210" font-size="11" fill="#8E8E93" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">等待</text>
+<rect x="496" y="380" width="460" height="360" rx="16" fill="#FFFFFF"/>
+<text x="516" y="408" font-size="13" fill="#666666" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">步骤</text>
+<rect x="512" y="424" width="428" height="124" rx="16" fill="#FFFFFF"/>
+<circle cx="528" cy="444" r="4" fill="#3D8B37"/>
+<text x="542" y="444" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络状态</text>
+<text x="928" y="444" font-size="12" fill="#3D8B37" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">WLAN</text>
+<circle cx="528" cy="472" r="4" fill="#0A59F7"/>
+<text x="542" y="472" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">域名解析</text>
+<text x="928" y="472" font-size="12" fill="#0A59F7" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">example.com</text>
+<circle cx="528" cy="500" r="4" fill="#8E8E93"/>
+<text x="542" y="500" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">TCP 443</text>
+<text x="928" y="500" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">等待</text>
+<circle cx="528" cy="528" r="4" fill="#8E8E93"/>
+<text x="542" y="528" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">HTTP 探测</text>
+<text x="928" y="528" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">等待</text>
+<rect x="972" y="64" width="292" height="676" rx="16" fill="#FFFFFF"/>
+<text x="988" y="96" font-size="12" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">选中的一跳</text>
+<text x="988" y="124" font-size="18" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">域名解析</text>
+<text x="988" y="160" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">目标</text>
+<text x="1240" y="160" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">example.com</text>
+<text x="988" y="186" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">类型</text>
+<text x="1240" y="186" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">A / AAAA</text>
+<text x="988" y="212" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络</text>
+<text x="1240" y="212" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">默认 NetHandle</text>
+<text x="988" y="238" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">状态</text>
+<text x="1240" y="238" font-size="13" fill="#0A59F7" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">进行中</text>
+<text x="988" y="276" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">Whois 不在这一跳。</text>
+<text x="988" y="296" font-size="12" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">它只用于公网对象，且需要互联网。</text>
+<rect x="988" y="668" width="260" height="40" rx="20" fill="#FFFFFF" stroke="#E4E5E9" stroke-width="1"/>
+<text x="1118.0" y="688" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">停止检查</text>
+</svg>

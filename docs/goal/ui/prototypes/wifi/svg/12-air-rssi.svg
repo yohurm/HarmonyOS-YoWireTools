@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+<rect width="360" height="800" fill="#F1F3F5"/>
+<rect x="0" y="0" width="360" height="40" rx="0" fill="#FFFFFF"/>
+<text x="16" y="20" font-size="15" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">9:41</text>
+<rect x="320" y="14" width="18" height="11" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1.2"/>
+<rect x="323" y="17" width="10" height="5" rx="1" fill="#1A1A1A"/>
+<rect x="339" y="17" width="1.6" height="5" rx="0.6" fill="#1A1A1A"/>
+<rect x="298" y="20" width="3" height="4" rx="0.6" fill="#1A1A1A"/>
+<rect x="303" y="17" width="3" height="7" rx="0.6" fill="#1A1A1A"/>
+<rect x="308" y="14" width="3" height="10" rx="0.6" fill="#1A1A1A"/>
+<rect x="0" y="40" width="360" height="56" rx="0" fill="#FFFFFF"/>
+<text x="16" y="68" font-size="20" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">网络</text>
+<text x="344" y="68" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">暂停</text>
+<rect x="0" y="96" width="360" height="48" rx="0" fill="#FFFFFF"/>
+<text x="45" y="116" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">链路</text>
+<text x="135" y="116" font-size="14" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">空口</text>
+<rect x="121" y="132" width="28" height="3" rx="1.5" fill="#0A59F7"/>
+<text x="225" y="116" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">主机</text>
+<text x="315" y="116" font-size="14" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">会话</text>
+<line x1="0" y1="144" x2="360" y2="144" stroke="#E4E5E9" stroke-width="1"/>
+<rect x="16" y="156" width="328" height="32" rx="16" fill="#E6E7EB"/>
+<text x="70.66666666666666" y="172" font-size="12" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">列表</text>
+<text x="180.0" y="172" font-size="12" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">信道</text>
+<rect x="236.66666666666666" y="158" width="105.33333333333333" height="28" rx="14" fill="#FFFFFF"/>
+<text x="289.3333333333333" y="172" font-size="12" fill="#0A59F7" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">时间</text>
+<rect x="16" y="200" width="64" height="28" rx="14" fill="#FFFFFF"/>
+<text x="48.0" y="214" font-size="12" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">30 秒</text>
+<rect x="88" y="200" width="64" height="28" rx="14" fill="#0A59F7"/>
+<text x="120.0" y="214" font-size="12" fill="#FFFFFF" font-weight="700" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">1 分钟</text>
+<rect x="160" y="200" width="64" height="28" rx="14" fill="#FFFFFF"/>
+<text x="192.0" y="214" font-size="12" fill="#666666" font-weight="400" text-anchor="middle" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">5 分钟</text>
+<rect x="16" y="240" width="328" height="320" rx="16" fill="#FFFFFF"/>
+<line x1="44" y1="260.0" x2="332" y2="260.0" stroke="#E4E5E9" stroke-width="1"/>
+<line x1="44" y1="352.0" x2="332" y2="352.0" stroke="#E4E5E9" stroke-width="1"/>
+<line x1="44" y1="444.0" x2="332" y2="444.0" stroke="#E4E5E9" stroke-width="1"/>
+<line x1="44" y1="536.0" x2="332" y2="536.0" stroke="#E4E5E9" stroke-width="1"/>
+<polyline points="44.0,417.7 85.1,409.8 126.3,433.5 167.4,401.9 208.6,457.1 249.7,425.6 290.9,413.8 332.0,421.7" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="44.0,331.0 85.1,323.1 126.3,346.7 167.4,315.2 208.6,382.2 249.7,311.3 290.9,319.1 332.0,307.3" fill="none" stroke="#0A59F7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="44" y="548" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">0s</text>
+<text x="332" y="548" font-size="10" fill="#8E8E93" font-weight="400" text-anchor="end" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">60s</text>
+<rect x="16" y="572" width="328" height="72" rx="14" fill="#FFFFFF"/>
+<rect x="32" y="590" width="10" height="10" rx="2" fill="#0A59F7"/>
+<text x="50" y="595" font-size="13" fill="#1A1A1A" font-weight="700" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">YoLab-5G</text>
+<text x="150" y="595" font-size="11" fill="#3D8B37" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">当前</text>
+<rect x="32" y="616" width="10" height="10" rx="2" fill="#8E8E93"/>
+<text x="50" y="621" font-size="13" fill="#666666" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle">隐藏网络</text>
+<text x="32" y="636" font-size="1" fill="#1A1A1A" font-weight="400" text-anchor="start" font-family="Noto Sans CJK SC, Noto Sans CJK JP, sans-serif" dominant-baseline="middle"></text>
+<rect x="128.0" y="786" width="104" height="4" rx="2" fill="#1A1A1A" fill-opacity="0.28"/>
+</svg>
